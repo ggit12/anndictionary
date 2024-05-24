@@ -3,10 +3,16 @@ Conveniently process a dictionary of anndatas (adata_dict)
 
 # Example usage:
 
+\# Helpful inline frequency and joint frequency tables  
+display_html_summary(summarize_metadata(adata, columns = ['cell_type', 'donor_id', 'cell_type*donor_id']))
+
+
+## Build and process an adata_dict
+#### Processing of each dictionary entry will be independent
+
 \# Build a dictionary of adata (subsetted by tissue)  
 adata_dict = build_adata_dict(adata, ['tissue'], ['blood', 'kidney'])
 
-# Process each adata in adata_dict independently
 \# Normalize each AnnData in the dictionary  
 normalize_adata_dict(adata_dict)
 
