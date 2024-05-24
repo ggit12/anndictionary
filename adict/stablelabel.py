@@ -37,7 +37,6 @@ def get_slurm_cores():
 
 def pca_density_filter(data, n_components=3, threshold=0.10):
     """
-    
     Calculate density contours for PCA-reduced data, return the density of all input data,
     and identify the unique variables that were included in the PCA.
 

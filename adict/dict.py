@@ -173,7 +173,7 @@ def write_h5ad_adata_dict(adata_dict, directory, file_prefix=""):
     - file_prefix: String, optional prefix for the filenames.
 
     Example:
-    - If `file_prefix` is "experiment1_", files will be named "experiment1_group1.h5ad" for a key "group1".
+    - If ``file_prefix`` is ``experiment1_``, files will be named ``experiment1_group1.h5ad`` for a key ``group1``.
     """
     # Ensure the directory exists, create if it doesn't
     os.makedirs(directory, exist_ok=True)

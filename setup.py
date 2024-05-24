@@ -12,12 +12,9 @@ setup(
         # list of packages this package depends on
         'numpy', 
         'pandas',
-        'sklearn',
+        'scikit-learn',
         'scanpy',
         'anndata',
-        'os',
-        'random',
-        'itertools',
         'IPython',
         'scipy',
         'seaborn',
