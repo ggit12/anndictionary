@@ -1,6 +1,9 @@
 # adict
 Conveniently process a dictionary of anndatas (adata_dict)
 
+To view the documentation, clone this repository, and then navigate to docs/build/index.html and view in a browser.
+
+
 # Example usage:
 
 \# Helpful inline frequency and joint frequency tables  
