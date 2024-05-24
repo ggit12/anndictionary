@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>adict.adata_dict_functions &mdash; adict 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=2709fde1"></script>
+        <script src="../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            adict
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">adict</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">adict.adata_dict_functions</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for adict.adata_dict_functions</h1><div class="highlight"><pre>
+<span></span><span class="c1">#adata_dict functions</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">sklearn.base</span> <span class="kn">import</span> <span class="n">clone</span>
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">accuracy_score</span>
+<span class="kn">from</span> <span class="nn">sklearn.utils.validation</span> <span class="kn">import</span> <span class="n">check_random_state</span>
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">LabelEncoder</span>
+<span class="kn">import</span> <span class="nn">scanpy</span> <span class="k">as</span> <span class="nn">sc</span>
+<span class="kn">import</span> <span class="nn">anndata</span> <span class="k">as</span> <span class="nn">ad</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">itertools</span>
+<span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">HTML</span><span class="p">,</span> <span class="n">display</span>
+
+<span class="kn">from</span> <span class="nn">sklearn.decomposition</span> <span class="kn">import</span> <span class="n">PCA</span>
+<span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="n">gaussian_kde</span>
+
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="kn">import</span> <span class="nn">matplotlib</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">confusion_matrix</span>
+
+<div class="viewcode-block" id="check_and_create_strata">
+<a class="viewcode-back" href="../../modules.html#adict.adata_dict_functions.check_and_create_strata">[docs]</a>
+<span class="k">def</span> <span class="nf">check_and_create_strata</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">strata_keys</span><span class="p">):</span>
+    <span class="c1"># Check if any of the strata_keys are not present in adata.obs</span>
+    <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">adata</span><span class="o">.</span><span class="n">obs</span><span class="o">.</span><span class="n">columns</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">strata_keys</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;one or more of your stratifying variables does not exist in adata.obs&quot;</span><span class="p">)</span>
+    
+    <span class="c1"># Create a new column that combines the values of existing strata_keys, if not already present</span>
+    <span class="n">strata_key</span> <span class="o">=</span> <span class="s1">&#39;_&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">strata_keys</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">strata_key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">adata</span><span class="o">.</span><span class="n">obs</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+        <span class="n">adata</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="n">strata_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">adata</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="n">strata_keys</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span><span class="o">.</span><span class="n">agg</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;category&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1">#make sure it&#39;s categorical</span>
+        <span class="n">adata</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="n">strata_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">adata</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="n">strata_key</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;category&#39;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">strata_key</span></div>
+
+
+<div class="viewcode-block" id="build_adata_dict">
+<a class="viewcode-back" href="../../modules.html#adict.adata_dict_functions.build_adata_dict">[docs]</a>
+<span class="k">def</span> <span class="nf">build_adata_dict</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">strata_keys</span><span class="p">,</span> <span class="n">desired_strata</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">desired_strata</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+        <span class="c1"># Directly use the list of strata</span>
+        <span class="k">return</span> <span class="n">build_adata_dict_main</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">strata_keys</span><span class="p">,</span> <span class="n">desired_strata</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">desired_strata</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="c1"># Generate all combinations of desired strata values across strata_keys</span>
+        <span class="n">all_combinations</span> <span class="o">=</span> <span class="n">itertools</span><span class="o">.</span><span class="n">product</span><span class="p">(</span><span class="o">*</span><span class="p">(</span><span class="n">desired_strata</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">strata_keys</span><span class="p">))</span>
+        <span class="c1"># Convert tuples of combinations to a format suitable for strata_keys</span>
+        <span class="n">combined_strata_list</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;_&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">comb</span><span class="p">))</span> <span class="k">for</span> <span class="n">comb</span> <span class="ow">in</span> <span class="n">all_combinations</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">build_adata_dict_main</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">strata_keys</span><span class="p">,</span> <span class="n">combined_strata_list</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;desired_strata must be either a list or a dictionary of lists&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="build_adata_dict_main">
+<a class="viewcode-back" href="../../modules.html#adict.adata_dict_functions.build_adata_dict_main">[docs]</a>
+<span class="k">def</span> <span class="nf">build_adata_dict_main</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">strata_keys</span><span class="p">,</span> <span class="n">desired_strata</span><span class="p">):</span>
+    <span class="c1"># Check and create stratifying variable in adata</span>
+    <span class="n">strata_key</span> <span class="o">=</span> <span class="n">check_and_create_strata</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">strata_keys</span><span class="p">)</span>
+    <span class="c1"># Initialize the dictionary to store subsets</span>
+    <span class="n">subsets_dict</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="c1"># Filter adata for each desired stratum and add to the dictionary</span>
+    <span class="k">for</span> <span class="n">stratum</span> <span class="ow">in</span> <span class="n">desired_strata</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">stratum</span> <span class="ow">in</span> <span class="n">adata</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="n">strata_key</span><span class="p">]</span><span class="o">.</span><span class="n">cat</span><span class="o">.</span><span class="n">categories</span><span class="p">:</span>
+            <span class="n">subset</span> <span class="o">=</span> <span class="n">adata</span><span class="p">[</span><span class="n">adata</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="n">strata_key</span><span class="p">]</span> <span class="o">==</span> <span class="n">stratum</span><span class="p">]</span>
+            <span class="n">subsets_dict</span><span class="p">[</span><span class="n">stratum</span><span class="p">]</span> <span class="o">=</span> <span class="n">subset</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Warning: &#39;</span><span class="si">{</span><span class="n">stratum</span><span class="si">}</span><span class="s2">&#39; is not a valid category in &#39;</span><span class="si">{</span><span class="n">strata_key</span><span class="si">}</span><span class="s2">&#39;.&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">subsets_dict</span></div>
+
+
+<div class="viewcode-block" id="concatenate_adata_dict">
+<a class="viewcode-back" href="../../modules.html#adict.adata_dict_functions.concatenate_adata_dict">[docs]</a>
+<span class="k">def</span> <span class="nf">concatenate_adata_dict</span><span class="p">(</span><span class="n">adata_dict</span><span class="p">,</span> <span class="n">join</span><span class="o">=</span><span class="s1">&#39;outer&#39;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Concatenates all AnnData objects in adata_dict into a single AnnData object.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">    - adata_dict: Dictionary of AnnData objects with keys as identifiers.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">    - AnnData: A single AnnData object that combines all the subsets in adata_dict.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Extract all AnnData objects from the dictionary</span>
+    <span class="n">adatas</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">adata_dict</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+
+    <span class="c1"># Concatenate all AnnData objects into one</span>
+    <span class="k">if</span> <span class="n">adatas</span><span class="p">:</span>
+        <span class="n">full_adata</span> <span class="o">=</span> <span class="n">sc</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">adatas</span><span class="p">,</span> <span class="n">join</span><span class="o">=</span><span class="n">join</span><span class="p">,</span> <span class="n">index_unique</span><span class="o">=</span><span class="s1">&#39;-&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">full_adata</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;adata_dict is empty. No data available to concatenate.&quot;</span><span class="p">)</span></div>
+
+    
+<div class="viewcode-block" id="normalize_adata_dict">
+<a class="viewcode-back" href="../../modules.html#adict.adata_dict_functions.normalize_adata_dict">[docs]</a>
+<span class="k">def</span> <span class="nf">normalize_adata_dict</span><span class="p">(</span><span class="n">adata_dict</span><span class="p">,</span> <span class="n">target_sum</span><span class="o">=</span><span class="mf">1e4</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Normalizes each AnnData object in the dictionary using Scanpy&#39;s normalize_total.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">stratum</span><span class="p">,</span> <span class="n">adata</span> <span class="ow">in</span> <span class="n">adata_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">sc</span><span class="o">.</span><span class="n">pp</span><span class="o">.</span><span class="n">normalize_total</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">target_sum</span><span class="o">=</span><span class="n">target_sum</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="log_transform_adata_dict">
+<a class="viewcode-back" href="../../modules.html#adict.adata_dict_functions.log_transform_adata_dict">[docs]</a>
+<span class="k">def</span> <span class="nf">log_transform_adata_dict</span><span class="p">(</span><span class="n">adata_dict</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Log-transforms each AnnData object in the dictionary using Scanpy&#39;s log1p.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">stratum</span><span class="p">,</span> <span class="n">adata</span> <span class="ow">in</span> <span class="n">adata_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">sc</span><span class="o">.</span><span class="n">pp</span><span class="o">.</span><span class="n">log1p</span><span class="p">(</span><span class="n">adata</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="set_high_variance_genes">
+<a class="viewcode-back" href="../../modules.html#adict.adata_dict_functions.set_high_variance_genes">[docs]</a>
+<span class="k">def</span> <span class="nf">set_high_variance_genes</span><span class="p">(</span><span class="n">adata_dict</span><span class="p">,</span> <span class="n">n_top_genes</span><span class="o">=</span><span class="mi">2000</span><span class="p">,</span> <span class="n">subset</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Identifies high-variance genes in each AnnData object in the dictionary.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">    n_top_genes (int): Number of top high-variance genes to keep.</span>
+<span class="sd">    subset (bool): Whether to subset the adata to only include high-variance genes.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">stratum</span><span class="p">,</span> <span class="n">adata</span> <span class="ow">in</span> <span class="n">adata_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">sc</span><span class="o">.</span><span class="n">pp</span><span class="o">.</span><span class="n">highly_variable_genes</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">n_top_genes</span><span class="o">=</span><span class="n">n_top_genes</span><span class="p">,</span> <span class="n">subset</span><span class="o">=</span><span class="n">subset</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="scale_adata_dict">
+<a class="viewcode-back" href="../../modules.html#adict.adata_dict_functions.scale_adata_dict">[docs]</a>
+<span class="k">def</span> <span class="nf">scale_adata_dict</span><span class="p">(</span><span class="n">adata_dict</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Scales each AnnData object in the dictionary using Scanpy&#39;s scale function.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">stratum</span><span class="p">,</span> <span class="n">adata</span> <span class="ow">in</span> <span class="n">adata_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">sc</span><span class="o">.</span><span class="n">pp</span><span class="o">.</span><span class="n">scale</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">max_value</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="pca_adata_dict">
+<a class="viewcode-back" href="../../modules.html#adict.adata_dict_functions.pca_adata_dict">[docs]</a>
+<span class="k">def</span> <span class="nf">pca_adata_dict</span><span class="p">(</span><span class="n">adata_dict</span><span class="p">,</span> <span class="n">n_comps</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">mask_var</span><span class="o">=</span><span class="s1">&#39;highly_variable&#39;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Performs PCA on each AnnData object in the dictionary using Scanpy&#39;s pca function.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">    n_comps (int): Number of principal components to compute.</span>
+<span class="sd">    mask_var (str): Set to &#39;highly_variable&#39; to use highly_variable genes (if set). Set to None to use all genes.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">stratum</span><span class="p">,</span> <span class="n">adata</span> <span class="ow">in</span> <span class="n">adata_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">sc</span><span class="o">.</span><span class="n">pp</span><span class="o">.</span><span class="n">pca</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">n_comps</span><span class="o">=</span><span class="n">n_comps</span><span class="p">,</span> <span class="n">mask_var</span><span class="o">=</span><span class="n">mask_var</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="calculate_umap_adata_dict">
+<a class="viewcode-back" href="../../modules.html#adict.adata_dict_functions.calculate_umap_adata_dict">[docs]</a>
+<span class="k">def</span> <span class="nf">calculate_umap_adata_dict</span><span class="p">(</span><span class="n">adata_dict</span><span class="p">,</span> <span class="n">use_rep</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculates UMAP embeddings for each subset in the adata_dict.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">    adata_dict (dict): A dictionary with keys as strata and values as AnnData objects.</span>
+<span class="sd">    use_rep (str): The key in .obsm where the representation matrix is stored.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">    dict: A dictionary with the same keys as adata_dict, but values now include UMAP coordinates.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">stratum</span><span class="p">,</span> <span class="n">adata_subset</span> <span class="ow">in</span> <span class="n">adata_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="c1"># Ensure the representation exists</span>
+        <span class="k">if</span> <span class="n">use_rep</span> <span class="ow">in</span> <span class="n">adata_subset</span><span class="o">.</span><span class="n">obsm</span><span class="p">:</span>
+            <span class="c1"># Compute neighbors , necessary for UMAP</span>
+            <span class="n">sc</span><span class="o">.</span><span class="n">pp</span><span class="o">.</span><span class="n">neighbors</span><span class="p">(</span><span class="n">adata_subset</span><span class="p">,</span> <span class="n">use_rep</span><span class="o">=</span><span class="n">use_rep</span><span class="p">)</span>
+            <span class="c1"># Calculate UMAP</span>
+            <span class="n">sc</span><span class="o">.</span><span class="n">tl</span><span class="o">.</span><span class="n">umap</span><span class="p">(</span><span class="n">adata_subset</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Representation &#39;</span><span class="si">{</span><span class="n">use_rep</span><span class="si">}</span><span class="s2">&#39; not found in .obsm of &#39;</span><span class="si">{</span><span class="n">stratum</span><span class="si">}</span><span class="s2">&#39; subset.&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">adata_dict</span></div>
+
+
+<div class="viewcode-block" id="plot_umap_adata_dict">
+<a class="viewcode-back" href="../../modules.html#adict.adata_dict_functions.plot_umap_adata_dict">[docs]</a>
+<span class="k">def</span> <span class="nf">plot_umap_adata_dict</span><span class="p">(</span><span class="n">adata_dict</span><span class="p">,</span> <span class="n">color_by</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Plots UMAP embeddings for each AnnData object in adata_dict, colored by a specified variable.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">    adata_dict (dict): A dictionary with keys as strata and values as AnnData objects.</span>
+<span class="sd">    color_by (str): A variable by which to color the UMAP plots, typically a column in .obs.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">stratum</span><span class="p">,</span> <span class="n">adata_subset</span> <span class="ow">in</span> <span class="n">adata_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="c1"># Check if UMAP has been computed</span>
+        <span class="k">if</span> <span class="s1">&#39;X_umap&#39;</span> <span class="ow">in</span> <span class="n">adata_subset</span><span class="o">.</span><span class="n">obsm</span><span class="p">:</span>
+            <span class="n">title</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">stratum</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">color</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">color</span> <span class="ow">in</span> <span class="n">color_by</span><span class="p">]</span>
+            <span class="n">sc</span><span class="o">.</span><span class="n">pl</span><span class="o">.</span><span class="n">umap</span><span class="p">(</span><span class="n">adata_subset</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">color_by</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;UMAP not computed for &#39;</span><span class="si">{</span><span class="n">stratum</span><span class="si">}</span><span class="s2">&#39;. Please compute UMAP before plotting.&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="write_h5ad_adata_dict">
+<a class="viewcode-back" href="../../modules.html#adict.adata_dict_functions.write_h5ad_adata_dict">[docs]</a>
+<span class="k">def</span> <span class="nf">write_h5ad_adata_dict</span><span class="p">(</span><span class="n">adata_dict</span><span class="p">,</span> <span class="n">directory</span><span class="p">,</span> <span class="n">file_prefix</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Saves each AnnData object from adata_dict into separate .h5ad files.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">    - adata_dict: Dictionary of AnnData objects, with keys as identifiers.</span>
+<span class="sd">    - directory: String, directory path where .h5ad files will be saved.</span>
+<span class="sd">    - file_prefix: String, optional prefix for the filenames.</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">    - If `file_prefix` is &#39;experiment1_&#39;, files will be named &#39;experiment1_group1.h5ad&#39; for a key &#39;group1&#39;.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Ensure the directory exists, create if it doesn&#39;t</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">directory</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="c1"># Iterate over the dictionary and save each AnnData object</span>
+    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">adata</span> <span class="ow">in</span> <span class="n">adata_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="c1"># Construct the file path</span>
+        <span class="n">file_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">directory</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">file_prefix</span><span class="si">}{</span><span class="n">key</span><span class="si">}</span><span class="s2">.h5ad&quot;</span><span class="p">)</span>
+        <span class="c1"># Save the AnnData object</span>
+        <span class="n">sc</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="n">adata</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="stable_label_adata_dict">
+<a class="viewcode-back" href="../../modules.html#adict.adata_dict_functions.stable_label_adata_dict">[docs]</a>
+<span class="k">def</span> <span class="nf">stable_label_adata_dict</span><span class="p">(</span><span class="n">adata_dict</span><span class="p">,</span> <span class="n">feature_key</span><span class="p">,</span> <span class="n">label_key</span><span class="p">,</span> <span class="n">classifier</span><span class="p">,</span> <span class="n">max_iterations</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">stability_threshold</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">moving_average_length</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Trains a classifier for each AnnData object in adata_dict.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">    adata_dict (dict): Dictionary with keys as identifiers and values as AnnData objects.</span>
+<span class="sd">    feature_key (str): Key to access the features in adata.obsm.</span>
+<span class="sd">    label_key (str): Key to access the labels in adata.obs.</span>
+<span class="sd">    classifier: Classifier instance that implements fit and predict_proba methods.</span>
+<span class="sd">    max_iterations, stability_threshold, moving_average_length, random_state: Additional parameters for training.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">    results: Dict, keys are the identifiers from adata_dict and values are dictionaries containing the outputs from stable_label_adata.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">stratum</span><span class="p">,</span> <span class="n">adata</span> <span class="ow">in</span> <span class="n">adata_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Training classifier for </span><span class="si">{</span><span class="n">stratum</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">adata</span><span class="o">.</span><span class="n">obs</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+        <span class="n">trained_classifier</span><span class="p">,</span> <span class="n">history</span><span class="p">,</span> <span class="n">iterations</span><span class="p">,</span> <span class="n">final_labels</span> <span class="o">=</span> <span class="n">stable_label_adata</span><span class="p">(</span>
+            <span class="n">adata</span><span class="p">,</span> <span class="n">feature_key</span><span class="p">,</span> <span class="n">label_key</span><span class="p">,</span> <span class="n">classifier</span><span class="p">,</span> <span class="n">max_iterations</span><span class="p">,</span> <span class="n">stability_threshold</span><span class="p">,</span> <span class="n">moving_average_length</span><span class="p">,</span> <span class="n">random_state</span>
+        <span class="p">)</span>
+
+        <span class="n">results</span><span class="p">[</span><span class="n">stratum</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;classifier&#39;</span><span class="p">:</span> <span class="n">trained_classifier</span><span class="p">,</span>
+            <span class="s1">&#39;history&#39;</span><span class="p">:</span> <span class="n">history</span><span class="p">,</span>
+            <span class="s1">&#39;iterations&#39;</span><span class="p">:</span> <span class="n">iterations</span><span class="p">,</span>
+            <span class="s1">&#39;final_labels&#39;</span><span class="p">:</span> <span class="n">final_labels</span><span class="p">,</span>
+            <span class="s1">&#39;indices&#39;</span><span class="p">:</span> <span class="n">indices</span>
+        <span class="p">}</span>
+
+    <span class="k">return</span> <span class="n">results</span></div>
+
+
+<div class="viewcode-block" id="update_adata_labels_with_results_dict">
+<a class="viewcode-back" href="../../modules.html#adict.adata_dict_functions.update_adata_labels_with_results_dict">[docs]</a>
+<span class="k">def</span> <span class="nf">update_adata_labels_with_results_dict</span><span class="p">(</span><span class="n">adata_dict</span><span class="p">,</span> <span class="n">results_dict</span><span class="p">,</span> <span class="n">new_label_key</span><span class="o">=</span><span class="s1">&#39;stable_cell_type&#39;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Updates each AnnData object in adata_dict with new labels from results_dict.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">    - adata_dict: Dictionary of AnnData objects to be updated.</span>
+<span class="sd">    - results_dict: Dictionary of dictionaries containing results, including indices and final_labels for each AnnData key.</span>
+<span class="sd">    - new_label_key: Name of the new column in adata.obs where the labels will be stored.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">adata</span> <span class="ow">in</span> <span class="n">adata_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">results_dict</span><span class="p">:</span>
+            <span class="c1"># Extract results for the current subset</span>
+            <span class="n">subset_results</span> <span class="o">=</span> <span class="n">results_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+            <span class="n">indices</span> <span class="o">=</span> <span class="n">subset_results</span><span class="p">[</span><span class="s1">&#39;indices&#39;</span><span class="p">]</span>
+            <span class="n">final_labels</span> <span class="o">=</span> <span class="n">subset_results</span><span class="p">[</span><span class="s1">&#39;final_labels&#39;</span><span class="p">]</span>
+
+            <span class="c1"># Update labels in adata</span>
+            <span class="n">add_label_to_adata</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">indices</span><span class="p">,</span> <span class="n">final_labels</span><span class="p">,</span> <span class="n">new_label_key</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="plot_changes_adata_dict">
+<a class="viewcode-back" href="../../modules.html#adict.adata_dict_functions.plot_changes_adata_dict">[docs]</a>
+<span class="k">def</span> <span class="nf">plot_changes_adata_dict</span><span class="p">(</span><span class="n">adata_dict</span><span class="p">,</span> <span class="n">true_label_key</span><span class="p">,</span> <span class="n">predicted_label_key</span><span class="p">,</span> <span class="n">percentage</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Applies the plot_final_mismatches function to each AnnData object in adata_dict.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">    adata_dict (dict): Dictionary with keys as identifiers and values as AnnData objects.</span>
+<span class="sd">    predicted_label_key (str): The key in obs for predicted labels.</span>
+<span class="sd">    true_label_key (str): The key in obs for true labels.</span>
+<span class="sd">    percentage (bool): If True, plot percentages, otherwise plot counts.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">stratum</span><span class="p">,</span> <span class="n">adata</span> <span class="ow">in</span> <span class="n">adata_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Plotting changes for </span><span class="si">{</span><span class="n">stratum</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">plot_changes</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">true_label_key</span><span class="p">,</span> <span class="n">predicted_label_key</span><span class="p">,</span> <span class="n">percentage</span><span class="p">,</span> <span class="n">stratum</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="plot_confusion_matrix_adata_dict">
+<a class="viewcode-back" href="../../modules.html#adict.adata_dict_functions.plot_confusion_matrix_adata_dict">[docs]</a>
+<span class="k">def</span> <span class="nf">plot_confusion_matrix_adata_dict</span><span class="p">(</span><span class="n">adata_dict</span><span class="p">,</span> <span class="n">true_label_key</span><span class="p">,</span> <span class="n">predicted_label_key</span><span class="p">,</span>
+                                     <span class="n">row_color_keys</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">col_color_keys</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Applies the plot_confusion_matrix_from_adata function to each AnnData object in adata_dict.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">    adata_dict (dict): Dictionary with keys as identifiers and values as AnnData objects.</span>
+<span class="sd">    true_label_key (str): The key in obs for true class labels.</span>
+<span class="sd">    predicted_label_key (str): The key in obs for predicted class labels.</span>
+<span class="sd">    title (str): Title of the plot, which will be prefixed with the stratum name.</span>
+<span class="sd">    row_color_keys (list): Optional keys for row colors in adata.obs.</span>
+<span class="sd">    col_color_keys (list): Optional keys for column colors in adata.obs.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">stratum</span><span class="p">,</span> <span class="n">adata</span> <span class="ow">in</span> <span class="n">adata_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="c1"># Customize title for each subset</span>
+        <span class="n">subset_title</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Confusion Matrix for </span><span class="si">{</span><span class="n">stratum</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">plot_confusion_matrix_from_adata</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">true_label_key</span><span class="p">,</span> <span class="n">predicted_label_key</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">subset_title</span><span class="p">,</span>
+                                         <span class="n">row_color_keys</span><span class="o">=</span><span class="n">row_color_keys</span><span class="p">,</span> <span class="n">col_color_keys</span><span class="o">=</span><span class="n">col_color_keys</span><span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, ggit12.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

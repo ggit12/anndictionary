@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>adict.stablelabel_functions &mdash; adict 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=2709fde1"></script>
+        <script src="../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            adict
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">adict</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">adict.stablelabel_functions</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for adict.stablelabel_functions</h1><div class="highlight"><pre>
+<span></span><span class="c1">#stablelabel pipeline--an experimental pipeline to perform error correct on celltype annotations</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">sklearn.base</span> <span class="kn">import</span> <span class="n">clone</span>
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">accuracy_score</span>
+<span class="kn">from</span> <span class="nn">sklearn.utils.validation</span> <span class="kn">import</span> <span class="n">check_random_state</span>
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">LabelEncoder</span>
+<span class="kn">import</span> <span class="nn">scanpy</span> <span class="k">as</span> <span class="nn">sc</span>
+<span class="kn">import</span> <span class="nn">anndata</span> <span class="k">as</span> <span class="nn">ad</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">itertools</span>
+<span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">HTML</span><span class="p">,</span> <span class="n">display</span>
+
+<span class="kn">from</span> <span class="nn">sklearn.decomposition</span> <span class="kn">import</span> <span class="n">PCA</span>
+<span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="n">gaussian_kde</span>
+
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="kn">import</span> <span class="nn">matplotlib</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">confusion_matrix</span>
+
+<div class="viewcode-block" id="get_slurm_cores">
+<a class="viewcode-back" href="../../modules.html#adict.stablelabel_functions.get_slurm_cores">[docs]</a>
+<span class="k">def</span> <span class="nf">get_slurm_cores</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns the total number of CPU cores allocated to a Slurm job based on environment variables.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Get the number of CPUs per task (default to 1 if not set)</span>
+    <span class="n">cpus_per_task</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s1">&#39;SLURM_CPUS_PER_TASK&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+    
+    <span class="c1"># Get the number of tasks (default to 1 if not set)</span>
+    <span class="n">ntasks</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s1">&#39;SLURM_NTASKS&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+    
+    <span class="c1"># Calculate total cores</span>
+    <span class="n">total_cores</span> <span class="o">=</span> <span class="n">cpus_per_task</span> <span class="o">*</span> <span class="n">ntasks</span>
+    
+    <span class="k">return</span> <span class="n">total_cores</span></div>
+
+
+<div class="viewcode-block" id="pca_density_filter">
+<a class="viewcode-back" href="../../modules.html#adict.stablelabel_functions.pca_density_filter">[docs]</a>
+<span class="k">def</span> <span class="nf">pca_density_filter</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">n_components</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">0.10</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    George Crowley</span>
+<span class="sd">    Calculate density contours for PCA-reduced data, return the density of all input data,</span>
+<span class="sd">    and identify the unique variables that were included in the PCA.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">    - data: array-like, shape (n_samples, n_features)</span>
+<span class="sd">    - n_components: int, number of components for PCA to reduce the data to.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">    - pca_data: PCA-reduced data (None if all variables are constant).</span>
+<span class="sd">    - density: Density values of all the points (None if all variables are constant).</span>
+<span class="sd">    - unique_variables: List of unique variables that were included in the PCA (empty list if all variables are constant).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Check for constant variables (these will not be used by PCA)</span>
+    <span class="n">non_constant_columns</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span>
+    
+    <span class="c1"># Skip the block if no non-constant variables are found</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">non_constant_columns</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="p">[]</span>
+
+	<span class="c1"># Adjust n_components if necessary</span>
+    <span class="n">n_features</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">non_constant_columns</span><span class="p">)</span>
+    <span class="n">n_samples</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">n_components</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">n_components</span><span class="p">,</span> <span class="n">n_features</span><span class="p">,</span> <span class="n">n_samples</span><span class="p">)</span>
+        
+    <span class="n">unique_variables</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])[</span><span class="n">non_constant_columns</span><span class="p">]</span>
+
+    <span class="c1"># Perform PCA reduction only on non-constant variables</span>
+    <span class="n">pca</span> <span class="o">=</span> <span class="n">PCA</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="n">n_components</span><span class="p">)</span>
+    <span class="n">pca_data</span> <span class="o">=</span> <span class="n">pca</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">data</span><span class="p">[:,</span> <span class="n">non_constant_columns</span><span class="p">])</span>
+
+    <span class="c1"># Calculate the point density for all points</span>
+    <span class="n">kde</span> <span class="o">=</span> <span class="n">gaussian_kde</span><span class="p">(</span><span class="n">pca_data</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+    <span class="n">density</span> <span class="o">=</span> <span class="n">kde</span><span class="p">(</span><span class="n">pca_data</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+
+    <span class="c1"># Determine the density threshold</span>
+    <span class="n">cutoff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">density</span><span class="p">,</span> <span class="n">threshold</span> <span class="o">*</span> <span class="mi">100</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">density</span><span class="p">,</span> <span class="n">cutoff</span><span class="p">,</span> <span class="n">unique_variables</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="pca_density_wrapper">
+<a class="viewcode-back" href="../../modules.html#adict.stablelabel_functions.pca_density_wrapper">[docs]</a>
+<span class="k">def</span> <span class="nf">pca_density_wrapper</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">labels</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Apply calculate_density_contours_with_unique_variables to subsets of X indicated by labels.</span>
+<span class="sd">    Returns a vector indicating whether each row in X is above the threshold for its respective label group.</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters:</span>
+<span class="sd">    - X: array-like, shape (n_samples, n_features)</span>
+<span class="sd">    - labels: array-like, shape (n_samples,), labels indicating the subset to which each row belongs</span>
+<span class="sd">    </span>
+<span class="sd">    Returns:</span>
+<span class="sd">    - index_vector: array-like, boolean vector of length n_samples indicating rows above the threshold</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">unique_labels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span>
+    <span class="n">index_vector</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">X</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+    
+    <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">unique_labels</span><span class="p">:</span>
+        <span class="n">subset</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="n">labels</span> <span class="o">==</span> <span class="n">label</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">subset</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="p">:</span>
+            <span class="c1"># If fewer than 10 cells, include all cells by assigning density = 1 and cutoff = 0</span>
+            <span class="n">density</span><span class="p">,</span> <span class="n">cutoff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">subset</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="mi">0</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">density</span><span class="p">,</span> <span class="n">cutoff</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">pca_density_filter</span><span class="p">(</span><span class="n">subset</span><span class="p">,</span> <span class="n">n_components</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">0.10</span><span class="p">)</span>
+        
+        <span class="c1"># Mark rows above the threshold for this label</span>
+        <span class="n">high_density_indices</span> <span class="o">=</span> <span class="n">density</span> <span class="o">&gt;</span> <span class="n">cutoff</span>
+        <span class="n">global_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">labels</span> <span class="o">==</span> <span class="n">label</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="n">high_density_indices</span><span class="p">]</span>
+        <span class="n">index_vector</span><span class="p">[</span><span class="n">global_indices</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+    
+    <span class="k">return</span> <span class="n">index_vector</span></div>
+
+
+<span class="c1"># def pca_density_adata_dict(adata_dict, keys):</span>
+<span class="c1">#     &quot;&quot;&quot;</span>
+<span class="c1">#     This function applies PCA-based density filtering to the AnnData objects within adata_dict.</span>
+<span class="c1">#     If adata_dict contains only one key, the filtering is applied directly. If there are multiple keys,</span>
+<span class="c1">#     it recursively builds new adata dictionaries for subsets based on the provided keys and applies</span>
+<span class="c1">#     the filtering to these subsets. Finally, it concatenates the results back into a single AnnData object.</span>
+    
+<span class="c1">#     Parameters:</span>
+<span class="c1">#     - adata_dict: Dictionary of AnnData objects, with keys indicating different groups.</span>
+<span class="c1">#     - keys: List of keys to stratify the AnnData objects further if more than one group is present.</span>
+    
+<span class="c1">#     Returns:</span>
+<span class="c1">#     - AnnData object containing the results of PCA density filtering applied to each subset,</span>
+<span class="c1">#       with results combined if the initial dictionary had more than one key.</span>
+<span class="c1">#     &quot;&quot;&quot;</span>
+<span class="c1">#     if len(adata_dict) == 1:</span>
+<span class="c1">#         # Only one group in adata_dict, apply density filter directly</span>
+<span class="c1">#         label, adata = next(iter(adata_dict.items()))</span>
+<span class="c1">#         X = adata.X</span>
+<span class="c1">#         if X.shape[0] &lt; 10:</span>
+<span class="c1">#             density, cutoff = np.ones(X.shape[0]), 0</span>
+<span class="c1">#         else:</span>
+<span class="c1">#             density, cutoff, _ = pca_density_filter(X, n_components=3, threshold=0.10)</span>
+<span class="c1">#         high_density_indices = density &gt; cutoff</span>
+<span class="c1">#         index_vector = np.zeros(X.shape[0], dtype=bool)</span>
+<span class="c1">#         index_vector[high_density_indices] = True</span>
+<span class="c1">#         add_label_to_adata(adata, np.arange(X.shape[0]), index_vector, &#39;density_filter&#39;)</span>
+<span class="c1">#         return adata</span>
+<span class="c1">#     else:</span>
+<span class="c1">#         # More than one group, handle recursively</span>
+<span class="c1">#         first_key = keys[0]</span>
+<span class="c1">#         new_keys = keys[1:]</span>
+<span class="c1">#         updated_adatas = {}</span>
+<span class="c1">#         for key, group_adata in adata_dict.items():</span>
+<span class="c1">#             new_adata_dict = build_adata_dict(group_adata, new_keys, {k: group_adata.obs[k].unique().tolist() for k in new_keys})</span>
+<span class="c1">#             updated_adatas[key] = pca_density_wrapper(new_adata_dict, new_keys)</span>
+<span class="c1">#         return concatenate_adata_dict(updated_adatas)</span>
+    
+<div class="viewcode-block" id="pca_density_adata_dict">
+<a class="viewcode-back" href="../../modules.html#adict.stablelabel_functions.pca_density_adata_dict">[docs]</a>
+<span class="k">def</span> <span class="nf">pca_density_adata_dict</span><span class="p">(</span><span class="n">adata_dict</span><span class="p">,</span> <span class="n">keys</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Applies PCA-based density filtering recursively on subsets of an AnnData dictionary. Each subset</span>
+<span class="sd">    is determined by the provided keys. The function returns a dictionary where each AnnData object</span>
+<span class="sd">    has an additional metadata key indicating the result of the density filter. The structure of the</span>
+<span class="sd">    input dictionary is preserved, and each AnnData object&#39;s metadata is updated in-place.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">    - adata_dict: Dictionary of AnnData objects, with keys indicating different groups.</span>
+<span class="sd">    - keys: List of keys to further stratify the AnnData objects if recursion is needed.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">    - Dictionary: Updated adata_dict with the same keys but with each AnnData object having a new metadata key &#39;density_filter&#39;.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">keys</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="c1"># No further keys to split by, apply filtering directly</span>
+        <span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="n">adata</span> <span class="ow">in</span> <span class="n">adata_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">X</span> <span class="o">=</span> <span class="n">adata</span><span class="o">.</span><span class="n">X</span>
+            <span class="k">if</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="p">:</span>
+                <span class="n">density</span><span class="p">,</span> <span class="n">cutoff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="mi">0</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">density</span><span class="p">,</span> <span class="n">cutoff</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">pca_density_filter</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">n_components</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">0.10</span><span class="p">)</span>
+            <span class="n">high_density_indices</span> <span class="o">=</span> <span class="n">density</span> <span class="o">&gt;</span> <span class="n">cutoff</span>
+            <span class="n">index_vector</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+            <span class="n">index_vector</span><span class="p">[</span><span class="n">high_density_indices</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">add_label_to_adata</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">index_vector</span><span class="p">,</span> <span class="s1">&#39;density_filter&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># Recurse into further keys</span>
+        <span class="n">first_key</span> <span class="o">=</span> <span class="n">keys</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">new_keys</span> <span class="o">=</span> <span class="n">keys</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+        <span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="n">adata</span> <span class="ow">in</span> <span class="n">adata_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">subgroups</span> <span class="o">=</span> <span class="n">build_adata_dict</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="p">[</span><span class="n">first_key</span><span class="p">],</span> <span class="p">{</span><span class="n">first_key</span><span class="p">:</span> <span class="n">adata</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="n">first_key</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span><span class="o">.</span><span class="n">tolist</span><span class="p">()})</span>
+            <span class="n">pca_density_wrapper</span><span class="p">(</span><span class="n">subgroups</span><span class="p">,</span> <span class="n">new_keys</span><span class="p">)</span>  <span class="c1"># Recursively update each subgroup</span>
+            <span class="c1"># Combine results back into the original adata entry</span>
+            <span class="n">updated_adata</span> <span class="o">=</span> <span class="n">concatenate_adata_dict</span><span class="p">(</span><span class="n">subgroups</span><span class="p">)</span>
+            <span class="n">adata_dict</span><span class="p">[</span><span class="n">label</span><span class="p">]</span> <span class="o">=</span> <span class="n">updated_adata</span>
+
+    <span class="k">return</span> <span class="n">adata_dict</span></div>
+
+
+
+
+<div class="viewcode-block" id="stable_label">
+<a class="viewcode-back" href="../../modules.html#adict.stablelabel_functions.stable_label">[docs]</a>
+<span class="k">def</span> <span class="nf">stable_label</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">classifier</span><span class="p">,</span> <span class="n">max_iterations</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">stability_threshold</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">moving_average_length</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Trains a classifier using a semi-supervised approach where labels are probabilistically reassigned based on classifier predictions.</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters:</span>
+<span class="sd">    - X: ndarray, feature matrix.</span>
+<span class="sd">    - y: ndarray, initial labels for all data.</span>
+<span class="sd">    - classifier: a classifier instance that implements fit and predict_proba methods.</span>
+<span class="sd">    - max_iterations: int, maximum number of iterations for updating labels.</span>
+<span class="sd">    - stability_threshold: float, threshold for the fraction of labels changing to consider the labeling stable.</span>
+<span class="sd">    - moving_average_length: int, number of past iterations to consider for moving average.</span>
+<span class="sd">    - random_state: int or None, seed for random number generator for reproducibility.</span>
+<span class="sd">    </span>
+<span class="sd">    Returns:</span>
+<span class="sd">    - classifier: trained classifier.</span>
+<span class="sd">    - history: list, percentage of labels that changed at each iteration.</span>
+<span class="sd">    - iterations: int, number of iterations run.</span>
+<span class="sd">    - final_labels: ndarray, the labels after the last iteration.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">rng</span> <span class="o">=</span> <span class="n">check_random_state</span><span class="p">(</span><span class="n">random_state</span><span class="p">)</span>
+    <span class="n">history</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">current_labels</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    
+    <span class="k">for</span> <span class="n">iteration</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">max_iterations</span><span class="p">):</span>
+
+        <span class="c1">#Call the wrapper function to get the index vector</span>
+        <span class="n">dense_on_pca</span> <span class="o">=</span> <span class="n">pca_density_wrapper</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">current_labels</span><span class="p">)</span>
+
+        <span class="c1">#Get which labels are non_empty</span>
+        <span class="n">has_label</span> <span class="o">=</span> <span class="n">current_labels</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span>
+
+        <span class="c1">#Train the classifier on cells that are dense in pca space and have labels</span>
+        <span class="n">mask</span> <span class="o">=</span> <span class="n">dense_on_pca</span> <span class="o">&amp;</span> <span class="n">has_label</span>
+        <span class="n">classifier</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="n">mask</span><span class="p">],</span> <span class="n">current_labels</span><span class="p">[</span><span class="n">mask</span><span class="p">])</span>
+        
+        <span class="c1"># Predict label probabilities</span>
+        <span class="n">probabilities</span> <span class="o">=</span> <span class="n">classifier</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+
+        <span class="c1">#view some predicted probabilities for rows of X</span>
+        <span class="c1"># print(&quot;Sample predicted probabilities for rows of X:&quot;, probabilities[:5])</span>
+        
+        <span class="c1"># Sample new labels from the predicted probabilities</span>
+        <span class="c1"># new_labels = np.array([np.argmax(prob) if max(prob) &gt; 0.6 else current_labels[i] for i, prob in enumerate(probabilities)])</span>
+        <span class="n">new_labels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">prob</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">prob</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">probabilities</span><span class="p">)])</span>
+
+        <span class="c1"># def transform_row(row, p):</span>
+        <span class="c1">#     &quot;&quot;&quot;</span>
+        <span class="c1">#     Transform an array by raising each element to the power of p and then normalizing these values</span>
+        <span class="c1">#     so that their sum is 1.</span>
+
+        <span class="c1">#     Parameters:</span>
+        <span class="c1">#     row (np.array): The input array to be transformed.</span>
+        <span class="c1">#     p (float): The power to which each element of the array is raised.</span>
+
+        <span class="c1">#     Returns:</span>
+        <span class="c1">#     np.array: An array where each element is raised to the power of p and</span>
+        <span class="c1">#             normalized so that the sum of all elements is 1.</span>
+        <span class="c1">#     &quot;&quot;&quot;</span>
+        <span class="c1">#     row = np.array(row)  # Ensure input is a numpy array</span>
+        <span class="c1">#     powered_row = np.power(row, p)  # Raise each element to the power p</span>
+        <span class="c1">#     normalized_row = powered_row / np.sum(powered_row)  # Normalize the powered values</span>
+        <span class="c1">#     return normalized_row</span>
+        
+        <span class="c1"># new_labels = np.array([np.random.choice(len(row), p=transform_row(row, 4)) for row in probabilities])</span>
+
+        <span class="c1">#randomly flip row label with probability given by confidence in assignment--hopefully prevents &quot;cell type takeover&quot;</span>
+        <span class="c1"># def random_bool(p):</span>
+        <span class="c1">#     weights = [p, 1-p]</span>
+        <span class="c1">#     weights = [w**2 for w in weights]</span>
+        <span class="c1">#     weights = [w/sum(weights) for w in weights]</span>
+        <span class="c1">#     return random.choices([False, True], weights=weights, k=1)[0]</span>
+
+        <span class="c1"># new_labels = np.array([np.random.choice(len(row)) if random_bool(max(row)) else current_labels[i] for i, row in enumerate(probabilities)])</span>
+        
+        <span class="c1"># Determine the percentage of labels that changed</span>
+        <span class="n">changes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">new_labels</span> <span class="o">!=</span> <span class="n">current_labels</span><span class="p">)</span>
+
+        <span class="c1"># Record the percentage of labels that changed</span>
+        <span class="n">history</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">changes</span><span class="p">)</span>
+        
+        <span class="c1"># Compute moving average of label changes over the last n iterations</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">history</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">moving_average_length</span><span class="p">:</span>
+            <span class="n">moving_average</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">history</span><span class="p">[</span><span class="o">-</span><span class="n">moving_average_length</span><span class="p">:])</span>
+            <span class="k">if</span> <span class="n">moving_average</span> <span class="o">&lt;</span> <span class="n">stability_threshold</span><span class="p">:</span>
+                <span class="k">break</span>
+
+        <span class="c1">#update current labels</span>
+        <span class="n">current_labels</span> <span class="o">=</span> <span class="n">new_labels</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">current_labels</span><span class="p">))</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;converged to single label.&quot;</span><span class="p">)</span>
+            <span class="k">break</span>
+
+    <span class="k">return</span> <span class="n">classifier</span><span class="p">,</span> <span class="n">history</span><span class="p">,</span> <span class="n">iteration</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">current_labels</span></div>
+
+
+<div class="viewcode-block" id="stable_label_adata">
+<a class="viewcode-back" href="../../modules.html#adict.stablelabel_functions.stable_label_adata">[docs]</a>
+<span class="k">def</span> <span class="nf">stable_label_adata</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">feature_key</span><span class="p">,</span> <span class="n">label_key</span><span class="p">,</span> <span class="n">classifier</span><span class="p">,</span> <span class="n">max_iterations</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">stability_threshold</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">moving_average_length</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A wrapper for train_classifier_with_probabilistic_labels that handles categorical labels.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">    - adata: AnnData object containing the dataset.</span>
+<span class="sd">    - feature_key: str, key to access the features in adata.obsm.</span>
+<span class="sd">    - label_key: str, key to access the labels in adata.obs.</span>
+<span class="sd">    - classifier: classifier instance that implements fit and predict_proba methods.</span>
+<span class="sd">    - max_iterations, stability_threshold, moving_average_length, random_state: passed directly to train_classifier_with_probabilistic_labels.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">    - classifier: trained classifier.</span>
+<span class="sd">    - history: list, percentage of labels that changed at each iteration.</span>
+<span class="sd">    - iterations: int, number of iterations run.</span>
+<span class="sd">    - final_labels: ndarray, text-based final labels after the last iteration.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Initialize Label Encoder</span>
+    <span class="n">label_encoder</span> <span class="o">=</span> <span class="n">LabelEncoder</span><span class="p">()</span>
+    
+    <span class="c1"># Extract features and labels from adata</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">adata</span><span class="o">.</span><span class="n">obsm</span><span class="p">[</span><span class="n">feature_key</span><span class="p">]</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">adata</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="n">label_key</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+
+    <span class="c1"># Define a list of values to treat as missing</span>
+    <span class="n">missing_values</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="s1">&#39;missing&#39;</span><span class="p">,</span> <span class="s1">&#39;unannotated&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;NA&#39;</span><span class="p">])</span>
+
+    <span class="c1"># Replace defined missing values with np.nan</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span> <span class="k">if</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">missing_values</span> <span class="ow">or</span> <span class="n">pd</span><span class="o">.</span><span class="n">isna</span><span class="p">(</span><span class="n">item</span><span class="p">)</span> <span class="k">else</span> <span class="n">item</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">y</span><span class="p">])</span>
+
+    <span class="c1"># Encode categorical labels to integers</span>
+    <span class="n">encoded_labels</span> <span class="o">=</span> <span class="n">label_encoder</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+
+    <span class="c1"># Map np.nan&#39;s encoding index to -1</span>
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span> <span class="ow">in</span> <span class="n">label_encoder</span><span class="o">.</span><span class="n">classes_</span><span class="p">:</span>
+        <span class="n">nan_label_index</span> <span class="o">=</span> <span class="n">label_encoder</span><span class="o">.</span><span class="n">transform</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">encoded_labels</span><span class="p">[</span><span class="n">encoded_labels</span> <span class="o">==</span> <span class="n">nan_label_index</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+    
+    <span class="c1"># Train the classifier using the modified training function that handles probabilistic labels</span>
+    <span class="n">trained_classifier</span><span class="p">,</span> <span class="n">history</span><span class="p">,</span> <span class="n">iterations</span><span class="p">,</span> <span class="n">final_numeric_labels</span> <span class="o">=</span> <span class="n">stable_label</span><span class="p">(</span>
+        <span class="n">X</span><span class="p">,</span> <span class="n">encoded_labels</span><span class="p">,</span> <span class="n">classifier</span><span class="p">,</span> <span class="n">max_iterations</span><span class="p">,</span> <span class="n">stability_threshold</span><span class="p">,</span> <span class="n">moving_average_length</span><span class="p">,</span> <span class="n">random_state</span>
+    <span class="p">)</span>
+    
+    <span class="c1"># Decode the numeric labels back to original text labels</span>
+    <span class="n">final_labels</span> <span class="o">=</span> <span class="n">label_encoder</span><span class="o">.</span><span class="n">inverse_transform</span><span class="p">(</span><span class="n">final_numeric_labels</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">trained_classifier</span><span class="p">,</span> <span class="n">history</span><span class="p">,</span> <span class="n">iterations</span><span class="p">,</span> <span class="n">final_labels</span></div>
+
+
+
+
+<div class="viewcode-block" id="update_adata_labels_with_results">
+<a class="viewcode-back" href="../../modules.html#adict.stablelabel_functions.update_adata_labels_with_results">[docs]</a>
+<span class="k">def</span> <span class="nf">update_adata_labels_with_results</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">results</span><span class="p">,</span> <span class="n">new_label_key</span><span class="o">=</span><span class="s1">&#39;stable_cell_type&#39;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Collects indices and labels from results and adds them to the AnnData object using add_label_to_adata function.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">    - adata: AnnData object to be updated.</span>
+<span class="sd">    - results: Dictionary containing results, including indices and final_labels.</span>
+<span class="sd">    - new_label_key: Name of the new column in adata.obs where the labels will be stored.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Collect all indices and labels from the results</span>
+    <span class="n">all_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">info</span><span class="p">[</span><span class="s1">&#39;indices&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">stratum</span><span class="p">,</span> <span class="n">info</span> <span class="ow">in</span> <span class="n">results</span><span class="o">.</span><span class="n">items</span><span class="p">()])</span>
+    <span class="n">all_labels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">info</span><span class="p">[</span><span class="s1">&#39;final_labels&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">stratum</span><span class="p">,</span> <span class="n">info</span> <span class="ow">in</span> <span class="n">results</span><span class="o">.</span><span class="n">items</span><span class="p">()])</span>
+
+    <span class="c1"># Call the function to add labels to adata</span>
+    <span class="n">add_label_to_adata</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">all_indices</span><span class="p">,</span> <span class="n">all_labels</span><span class="p">,</span> <span class="n">new_label_key</span><span class="p">)</span></div>
+
+
+
+
+
+<div class="viewcode-block" id="plot_training_history">
+<a class="viewcode-back" href="../../modules.html#adict.stablelabel_functions.plot_training_history">[docs]</a>
+<span class="k">def</span> <span class="nf">plot_training_history</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">separate</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">separate</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">stratum</span><span class="p">,</span> <span class="n">info</span> <span class="ow">in</span> <span class="n">results</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">info</span><span class="p">[</span><span class="s1">&#39;history&#39;</span><span class="p">],</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;o&#39;</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Percent Label Change vs. Iteration - </span><span class="si">{</span><span class="n">stratum</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Iteration&#39;</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Percent Label Change&#39;</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">stratum</span><span class="p">,</span> <span class="n">info</span> <span class="ow">in</span> <span class="n">results</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">info</span><span class="p">[</span><span class="s1">&#39;history&#39;</span><span class="p">],</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">stratum</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Percent Label Change vs. Iteration - All Strata&#39;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Iteration&#39;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Percent Label Change&#39;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="plot_changes">
+<a class="viewcode-back" href="../../modules.html#adict.stablelabel_functions.plot_changes">[docs]</a>
+<span class="k">def</span> <span class="nf">plot_changes</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">true_label_key</span><span class="p">,</span> <span class="n">predicted_label_key</span><span class="p">,</span> <span class="n">percentage</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">stratum</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="c1"># Extract the series from the AnnData object&#39;s DataFrame</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">adata</span><span class="o">.</span><span class="n">obs</span><span class="p">[[</span><span class="n">predicted_label_key</span><span class="p">,</span> <span class="n">true_label_key</span><span class="p">]]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    
+    <span class="c1"># Add a mismatch column that checks whether the predicted and true labels are different</span>
+    <span class="n">data</span><span class="p">[</span><span class="s1">&#39;Changed&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">true_label_key</span><span class="p">]</span> <span class="o">!=</span> <span class="n">data</span><span class="p">[</span><span class="n">predicted_label_key</span><span class="p">]</span>
+    
+    <span class="c1"># Group by predicted label key and calculate the sum of mismatches or the mean if percentage</span>
+    <span class="k">if</span> <span class="n">percentage</span><span class="p">:</span>
+        <span class="n">change_summary</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">true_label_key</span><span class="p">)[</span><span class="s1">&#39;Changed&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">change_summary</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">true_label_key</span><span class="p">)[</span><span class="s1">&#39;Changed&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+    
+    <span class="c1"># Sort the summary in descending order</span>
+    <span class="n">change_summary</span> <span class="o">=</span> <span class="n">change_summary</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    
+    <span class="c1"># Plotting</span>
+    <span class="n">ax</span> <span class="o">=</span> <span class="n">change_summary</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s1">&#39;bar&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="n">true_label_key</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Percentage of Labels Changed&#39;</span> <span class="k">if</span> <span class="n">percentage</span> <span class="k">else</span> <span class="s1">&#39;Count of Labels Changed&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">stratum</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">(</span><span class="n">change_summary</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">90</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="plot_confusion_matrix_from_adata">
+<a class="viewcode-back" href="../../modules.html#adict.stablelabel_functions.plot_confusion_matrix_from_adata">[docs]</a>
+<span class="k">def</span> <span class="nf">plot_confusion_matrix_from_adata</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">true_label_key</span><span class="p">,</span> <span class="n">predicted_label_key</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Confusion Matrix&#39;</span><span class="p">,</span>
+                                     <span class="n">row_color_keys</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">col_color_keys</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Wrapper function to plot a confusion matrix from an AnnData object, with optional row and column colors.</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters:</span>
+<span class="sd">    - adata: AnnData object containing the dataset.</span>
+<span class="sd">    - true_label_key: str, key to access the true class labels in adata.obs.</span>
+<span class="sd">    - predicted_label_key: str, key to access the predicted class labels in adata.obs.</span>
+<span class="sd">    - title: str, title of the plot.</span>
+<span class="sd">    - row_color_key: str, key for row colors in adata.obs.</span>
+<span class="sd">    - col_color_key: str, key for column colors in adata.obs.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Check and convert row_color_key and col_color_key to lists if they are not None</span>
+    <span class="k">if</span> <span class="n">row_color_keys</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">row_color_keys</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+        <span class="n">row_color_keys</span> <span class="o">=</span> <span class="p">[</span><span class="n">row_color_keys</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">col_color_keys</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">col_color_keys</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+        <span class="n">col_color_keys</span> <span class="o">=</span> <span class="p">[</span><span class="n">col_color_keys</span><span class="p">]</span>
+
+    <span class="c1"># Get unique labels</span>
+    <span class="n">true_labels</span> <span class="o">=</span> <span class="n">adata</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="n">true_label_key</span><span class="p">]</span>
+    <span class="n">predicted_labels</span> <span class="o">=</span> <span class="n">adata</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="n">predicted_label_key</span><span class="p">]</span>
+
+    <span class="c1"># Encode labels</span>
+    <span class="n">label_encoder</span> <span class="o">=</span> <span class="n">LabelEncoder</span><span class="p">()</span>
+    <span class="n">true_labels_encoded</span> <span class="o">=</span> <span class="n">label_encoder</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">true_labels</span><span class="p">)</span>
+    <span class="n">predicted_labels_encoded</span> <span class="o">=</span> <span class="n">label_encoder</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">predicted_labels</span><span class="p">)</span>
+
+    <span class="c1"># Decode labels for plot annotations</span>
+    <span class="n">labels</span> <span class="o">=</span> <span class="n">label_encoder</span><span class="o">.</span><span class="n">classes_</span>
+
+    <span class="c1"># Create label-to-color dictionary for mapping</span>
+    <span class="k">if</span> <span class="n">row_color_keys</span><span class="p">:</span>
+        <span class="n">true_label_subset</span> <span class="o">=</span> <span class="n">adata</span><span class="o">.</span><span class="n">obs</span><span class="p">[[</span><span class="n">true_label_key</span><span class="p">]</span> <span class="o">+</span> <span class="n">row_color_keys</span><span class="p">]</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">()</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="n">true_label_key</span><span class="p">)</span>
+        <span class="n">true_label_color_dict</span> <span class="o">=</span> <span class="p">{</span><span class="n">label</span><span class="p">:</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">row</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">row_color_keys</span><span class="p">}</span>
+                        <span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">true_label_subset</span><span class="o">.</span><span class="n">iterrows</span><span class="p">()</span>
+                        <span class="p">}</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">true_label_color_dict</span> <span class="o">=</span> <span class="kc">None</span>
+    
+    <span class="k">if</span> <span class="n">col_color_keys</span><span class="p">:</span>
+        <span class="n">predicted_label_subset</span> <span class="o">=</span> <span class="n">adata</span><span class="o">.</span><span class="n">obs</span><span class="p">[[</span><span class="n">predicted_label_key</span><span class="p">]</span> <span class="o">+</span> <span class="n">col_color_keys</span><span class="p">]</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">()</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="n">predicted_label_key</span><span class="p">)</span>
+        <span class="n">predicted_label_color_dict</span> <span class="o">=</span> <span class="p">{</span><span class="n">label</span><span class="p">:</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">col</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">col_color_keys</span><span class="p">}</span>
+                        <span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">predicted_label_subset</span><span class="o">.</span><span class="n">iterrows</span><span class="p">()</span>
+                        <span class="p">}</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">predicted_label_color_dict</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="c1"># Call the main plot function</span>
+    <span class="n">plot_confusion_matrix</span><span class="p">(</span><span class="n">true_labels_encoded</span><span class="p">,</span> <span class="n">predicted_labels_encoded</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span>
+                          <span class="n">row_color_keys</span><span class="o">=</span><span class="n">row_color_keys</span><span class="p">,</span> <span class="n">col_color_keys</span><span class="o">=</span><span class="n">col_color_keys</span><span class="p">,</span>
+                          <span class="n">true_label_color_dict</span><span class="o">=</span><span class="n">true_label_color_dict</span><span class="p">,</span> <span class="n">predicted_label_color_dict</span><span class="o">=</span><span class="n">predicted_label_color_dict</span><span class="p">,</span>
+                          <span class="n">true_labels</span><span class="o">=</span><span class="n">true_labels</span><span class="p">,</span> <span class="n">predicted_labels</span><span class="o">=</span><span class="n">predicted_labels</span><span class="p">)</span></div>
+
+    
+
+<div class="viewcode-block" id="plot_confusion_matrix">
+<a class="viewcode-back" href="../../modules.html#adict.stablelabel_functions.plot_confusion_matrix">[docs]</a>
+<span class="k">def</span> <span class="nf">plot_confusion_matrix</span><span class="p">(</span><span class="n">true_labels_encoded</span><span class="p">,</span> <span class="n">predicted_labels_encoded</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Confusion Matrix&#39;</span><span class="p">,</span>
+                          <span class="n">row_color_keys</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">col_color_keys</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                          <span class="n">true_label_color_dict</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">predicted_label_color_dict</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                          <span class="n">true_labels</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">predicted_labels</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Plots a confusion matrix using seaborn clustermap with optional row and column colors and clustering turned off.</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters:</span>
+<span class="sd">    - true_labels_encoded: array-like, encoded true class labels.</span>
+<span class="sd">    - predicted_labels_encoded: array-like, encoded classifier&#39;s predicted labels.</span>
+<span class="sd">    - labels: list, a list of label names corresponding to the class indices.</span>
+<span class="sd">    - title: str, title of the plot.</span>
+<span class="sd">    - row_colors: array-like, colors for each row.</span>
+<span class="sd">    - col_colors: array-like, colors for each column.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Compute the confusion matrix</span>
+    <span class="n">cm</span> <span class="o">=</span> <span class="n">confusion_matrix</span><span class="p">(</span><span class="n">true_labels_encoded</span><span class="p">,</span> <span class="n">predicted_labels_encoded</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">labels</span><span class="p">)))</span>
+
+    <span class="c1"># Normalize the confusion matrix by row (i.e., by the number of samples in each class)</span>
+    <span class="n">cm_normalized</span> <span class="o">=</span> <span class="n">cm</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;float&#39;</span><span class="p">)</span> <span class="o">/</span> <span class="n">cm</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>
+    <span class="n">cm_normalized</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">cm_normalized</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">labels</span><span class="p">)</span>
+
+    <span class="c1"># Compute the row and column colors</span>
+    <span class="c1"># Get unified color mapping</span>
+    <span class="n">keys</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">row_color_keys</span> <span class="ow">or</span> <span class="p">[])</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="n">col_color_keys</span> <span class="ow">or</span> <span class="p">[]))</span>
+    <span class="n">color_map</span> <span class="o">=</span> <span class="n">create_color_map</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">keys</span><span class="p">)</span>
+
+    <span class="c1"># Function to map labels to their respective colors remains unchanged</span>
+    <span class="k">def</span> <span class="nf">map_labels_to_colors</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">label_color_dict</span><span class="p">,</span> <span class="n">color_map</span><span class="p">):</span>
+        <span class="c1"># Create a list of color codes according to the order of labels</span>
+        <span class="n">color_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">labels</span><span class="p">:</span>
+            <span class="n">color_dict</span> <span class="o">=</span> <span class="n">label_color_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="p">{})</span>
+            <span class="c1"># Map each metadata key to its color, priority given by order in keys</span>
+            <span class="n">colors</span> <span class="o">=</span> <span class="p">[</span><span class="n">color_map</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">color_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span> <span class="s1">&#39;#FFFFFF&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">]</span>
+            <span class="n">color_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">colors</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">color_list</span>
+
+    <span class="k">if</span> <span class="n">row_color_keys</span><span class="p">:</span>
+        <span class="c1"># Applying the function to true and predicted labels using the decoded labels</span>
+        <span class="n">row_colors</span> <span class="o">=</span> <span class="n">map_labels_to_colors</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">true_labels</span><span class="p">),</span> <span class="n">true_label_color_dict</span><span class="p">,</span> <span class="n">color_map</span><span class="p">)</span>
+
+        <span class="c1"># Convert lists of color lists to DataFrame (needed for clustermap)</span>
+        <span class="n">row_colors</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">row_colors</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">true_labels</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">row_colors</span> <span class="o">=</span> <span class="kc">None</span>
+    
+    <span class="c1">#Do the same for cols</span>
+    <span class="k">if</span> <span class="n">col_color_keys</span><span class="p">:</span>
+        <span class="n">col_colors</span> <span class="o">=</span> <span class="n">map_labels_to_colors</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">predicted_labels</span><span class="p">),</span> <span class="n">predicted_label_color_dict</span><span class="p">,</span> <span class="n">color_map</span><span class="p">)</span>
+        <span class="n">col_colors</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">col_colors</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">predicted_labels</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">col_colors</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="c1">#set size-specific params</span>
+    <span class="k">if</span> <span class="n">cm_normalized</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">30</span><span class="p">:</span>
+        <span class="n">annot</span><span class="p">,</span> <span class="n">xticklabels</span><span class="p">,</span> <span class="n">yticklabels</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">annot</span><span class="p">,</span> <span class="n">xticklabels</span><span class="p">,</span> <span class="n">yticklabels</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">True</span>
+
+
+    <span class="c1"># Use clustermap to display the heatmap with row and column colors</span>
+    <span class="n">g</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">clustermap</span><span class="p">(</span><span class="n">cm_normalized</span><span class="p">,</span> <span class="n">annot</span><span class="o">=</span><span class="n">annot</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s2">&quot;.2f&quot;</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;Blues&quot;</span><span class="p">,</span>
+                       <span class="n">row_colors</span><span class="o">=</span><span class="n">row_colors</span><span class="p">,</span> <span class="n">col_colors</span><span class="o">=</span><span class="n">col_colors</span><span class="p">,</span>
+                       <span class="n">xticklabels</span><span class="o">=</span><span class="n">xticklabels</span><span class="p">,</span> <span class="n">yticklabels</span><span class="o">=</span><span class="n">yticklabels</span><span class="p">,</span>
+                    <span class="c1">#    xticklabels=labels, yticklabels=labels,</span>
+                       <span class="n">row_cluster</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">col_cluster</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">15</span><span class="p">))</span>
+
+    <span class="n">g</span><span class="o">.</span><span class="n">ax_heatmap</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mf">1.05</span><span class="p">)</span>
+    <span class="n">g</span><span class="o">.</span><span class="n">ax_heatmap</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;True label&#39;</span><span class="p">)</span>
+    <span class="n">g</span><span class="o">.</span><span class="n">ax_heatmap</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Predicted label&#39;</span><span class="p">)</span>
+    <span class="c1"># plt.figure(figsize=(15, 6))</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div>
+
+    
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, ggit12.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
