@@ -3,6 +3,13 @@ Conveniently process a dictionary of anndatas (adata_dict)
 
 To view the documentation, clone this repository, and then navigate to docs/build/index.html and view in a browser.
 
+# Install
+\#in bash, clone the repository
+git clone https://github.com/ggit12/adict .
+cd adict
+\#activate your prefered environment, then
+pip install -e .
+
 
 # Example usage:
 
