@@ -5,7 +5,7 @@ To view the documentation, clone this repository, and then navigate to docs/buil
 
 # Install
 \#in bash, clone the repository  
-git clone https://github.com/ggit12/adict .  
+git clone https://github.com/ggit12/adict  
 cd adict  
 \#activate your prefered environment, then  
 pip install -e .  
