@@ -297,6 +297,7 @@ def stable_label_adata(adata, feature_key, label_key, classifier, max_iterations
     - history: list, percentage of labels that changed at each iteration.
     - iterations: int, number of iterations run.
     - final_labels: ndarray, text-based final labels after the last iteration.
+    - label_encoder: the label encoder used during training (can be used to convert predictions to semantic labels)
     """
     # Initialize Label Encoder
     label_encoder = LabelEncoder()
@@ -327,7 +328,7 @@ def stable_label_adata(adata, feature_key, label_key, classifier, max_iterations
     # Decode the numeric labels back to original text labels
     final_labels = label_encoder.inverse_transform(final_numeric_labels)
     
-    return trained_classifier, history, iterations, final_labels
+    return trained_classifier, history, iterations, final_labels, label_encoder
 
 
 

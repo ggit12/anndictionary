@@ -18,7 +18,8 @@ setup(
         'IPython',
         'scipy',
         'seaborn',
-        'matplotlib'
+        'matplotlib',
+        'squidpy'
     ],
     classifiers=[
         # Trove classifiers

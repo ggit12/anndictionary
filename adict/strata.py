@@ -67,7 +67,7 @@ def stable_label_adata_strata(adata, feature_key, label_key, strata_keys, classi
     strata = np.unique(adata.obs[strata_key])
 
     # Initialize results dictionary
-    results = {}
+    stable_label_results = {}
 
     for stratum in strata:
         # Subset adata for the current stratum
@@ -77,20 +77,21 @@ def stable_label_adata_strata(adata, feature_key, label_key, strata_keys, classi
         indices = np.array(subset_adata.obs.index)
         
         # Train classifier on this subset
-        trained_classifier, history, iterations, final_labels = stable_label_adata(
+        trained_classifier, history, iterations, final_labels, label_encoder = stable_label_adata(
             subset_adata, feature_key, label_key, classifier, max_iterations, stability_threshold, moving_average_length, random_state
         )
         
         # Store results in dictionary
-        results[stratum] = {
+        stable_label_results[stratum] = {
             'classifier': trained_classifier,
             'history': history,
             'iterations': iterations,
             'final_labels': final_labels,
+            'label_encoder': label_encoder,
             'indices': indices
         }
 
-    return results
+    return stable_label_results
 
 def plot_confusion_matrix_across_strata(adata, true_label_key, predicted_label_key, strata_keys, title='Confusion Matrix'):
     """
