@@ -110,7 +110,22 @@ def display_html_summary_adata_dict(summary_dict_dict):
         print(f"Summary for {stratum}:")
         display_html_summary(summary_dict)
 
-    
+def adata_dict_fapply(adata_dict, func, **kwargs):
+    """
+    Applies a given function to each AnnData object in the adata_dict.
+
+    Parameters:
+    - adata_dict: Dictionary of AnnData objects with keys as identifiers.
+    - func: Function to apply to each AnnData object in the dictionary.
+    - kwargs: Additional keyword arguments to pass to the function.
+
+    Returns:
+    - None: The function modifies the AnnData objects in place.
+    """
+    for key, adata in adata_dict.items():
+        func(adata, **kwargs)
+
+
 def subsample_adata_dict(adata_dict, n_obs=None, random_state=0):
     """
     Subsamples each AnnData object in the dictionary using Scanpy's subsample function.
