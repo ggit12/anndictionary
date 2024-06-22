@@ -20,8 +20,38 @@ import matplotlib
 import matplotlib.pyplot as plt
 from sklearn.metrics import confusion_matrix
 
+from .dict import check_and_create_strata
+
+from .stablelabel import (
+    get_slurm_cores,
+    pca_density_filter,
+    pca_density_wrapper,
+    pca_density_adata_dict,
+    stable_label,
+    stable_label_adata,
+    update_adata_labels_with_results,
+    plot_training_history,
+    plot_changes,
+    plot_confusion_matrix_from_adata,
+    plot_confusion_matrix
+)
+
 def preprocess_adata_strata(adata, strata_keys, target_cells = 10000, min_cells = 25):
-    
+    """
+    Preprocess an AnnData object by stratifying, filtering, and subsampling based on specified criteria.
+
+    Parameters:
+    adata (AnnData): Annotated data matrix.
+    strata_keys (list of str): List of column names in `adata.obs` to use for stratification.
+    target_cells (int, optional): Target number of cells to retain per stratum. Default is 10000.
+    min_cells (int, optional): Minimum number of cells required to retain a stratum. Default is 25.
+
+    Returns:
+    AnnData: Concatenated AnnData object after filtering and subsampling.
+
+    Raises:
+    ValueError: If no strata meet the minimum cell requirement after filtering.
+    """
     # Check and create stratfying variable in adata
     strata_key = check_and_create_strata(adata, strata_keys)
 
