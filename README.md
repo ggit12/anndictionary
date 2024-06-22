@@ -87,9 +87,10 @@ adata
 
 
 
+`adict` has a helpful frequency summary function to do frequencies and joint frequencies
+
 
 ```python
-#adict has a helpful frequency summary function to do frequencies and joint frequencies
 adict.display_html_summary(adict.summarize_metadata(adata, columns = ['tissue','cell_type','cell_type*tissue']))
 ```
 
@@ -299,7 +300,7 @@ adict.plot_umap_adata_dict(adata_dict, color_by = ['cell_type', 'donor_id'])
 
 
     
-![png](Basic_Tutorial_files/Basic_Tutorial_24_1.png)
+![png](Basic_Tutorial_files/Basic_Tutorial_25_1.png)
     
 
 
@@ -308,7 +309,7 @@ adict.plot_umap_adata_dict(adata_dict, color_by = ['cell_type', 'donor_id'])
 
 
     
-![png](Basic_Tutorial_files/Basic_Tutorial_24_3.png)
+![png](Basic_Tutorial_files/Basic_Tutorial_25_3.png)
     
 
 
