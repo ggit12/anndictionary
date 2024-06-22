@@ -1,8 +1,18 @@
-from . import stablelabel
-from . import dict
 from . import metadata_summary
 from . import utils
+from . import stablelabel
+from . import dict
 from . import strata
+
+from .metadata_summary import (
+    summarize_metadata,
+    display_html_summary
+)
+
+from .utils import (
+    add_label_to_adata,
+    create_color_map
+)
 
 from .stablelabel import (
     get_slurm_cores, 
@@ -19,10 +29,14 @@ from .stablelabel import (
 )
 
 from .dict import (
-    check_and_create_strata, 
-    build_adata_dict, 
-    concatenate_adata_dict, 
     adata_dict_fapply, 
+    adata_dict_fapply_return,
+    check_and_create_strata,
+    build_adata_dict, 
+    subsplit_adata_dict,  
+    concatenate_adata_dict, 
+    resample_adata, 
+    resample_adata_dict,
     normalize_adata_dict, 
     log_transform_adata_dict, 
     set_high_variance_genes, 
@@ -44,15 +58,6 @@ from .dict import (
     subsample_adata_dict
 )
 
-from .metadata_summary import (
-    summarize_metadata,
-    display_html_summary
-)
-
-from .utils import (
-    add_label_to_adata,
-    create_color_map
-)
 
 from .strata import (
     preprocess_adata_strata,
@@ -74,8 +79,12 @@ __all__ = [
     'plot_confusion_matrix', 
     'check_and_create_strata', 
     'build_adata_dict', 
+    'subsplit_adata_dict', 
     'concatenate_adata_dict', 
-    'adata_dict_fapply', 
+    'adata_dict_fapply',
+    'adata_dict_fapply_return', 
+    'resample_adata',
+    'resample_adata_dict',
     'normalize_adata_dict', 
     'log_transform_adata_dict', 
     'set_high_variance_genes', 
