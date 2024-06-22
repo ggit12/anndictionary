@@ -93,6 +93,8 @@
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">confusion_matrix</span>
 
+<span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">create_color_map</span>
+
 <div class="viewcode-block" id="get_slurm_cores">
 <a class="viewcode-back" href="../../modules.html#adict.stablelabel.get_slurm_cores">[docs]</a>
 <span class="k">def</span> <span class="nf">get_slurm_cores</span><span class="p">():</span>
@@ -448,6 +450,16 @@
 <div class="viewcode-block" id="plot_training_history">
 <a class="viewcode-back" href="../../modules.html#adict.stablelabel.plot_training_history">[docs]</a>
 <span class="k">def</span> <span class="nf">plot_training_history</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">separate</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Plot the training history of a model, showing percent label change versus iteration.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">    results (dict): Dictionary where keys are strata names and values are dictionaries containing training history.</span>
+<span class="sd">    separate (bool, optional): If True, plot each stratum&#39;s training history separately. If False, plot all strata together. Default is True.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">    None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">separate</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">stratum</span><span class="p">,</span> <span class="n">info</span> <span class="ow">in</span> <span class="n">results</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
@@ -469,16 +481,59 @@
         <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div>
 
 
+<span class="c1"># def plot_changes(adata, true_label_key, predicted_label_key, percentage=True, stratum=None):</span>
+<span class="c1">#     # Extract the series from the AnnData object&#39;s DataFrame</span>
+<span class="c1">#     data = adata.obs[[predicted_label_key, true_label_key]].copy()</span>
+    
+<span class="c1">#     # Add a mismatch column that checks whether the predicted and true labels are different</span>
+<span class="c1">#     data[&#39;Changed&#39;] = data[true_label_key] != data[predicted_label_key]</span>
+    
+<span class="c1">#     # Group by predicted label key and calculate the sum of mismatches or the mean if percentage</span>
+<span class="c1">#     if percentage:</span>
+<span class="c1">#         change_summary = data.groupby(true_label_key)[&#39;Changed&#39;].mean()</span>
+<span class="c1">#     else:</span>
+<span class="c1">#         change_summary = data.groupby(true_label_key)[&#39;Changed&#39;].sum()</span>
+    
+<span class="c1">#     # Sort the summary in descending order</span>
+<span class="c1">#     change_summary = change_summary.sort_values(ascending=False)</span>
+    
+<span class="c1">#     # Plotting</span>
+<span class="c1">#     ax = change_summary.plot(kind=&#39;bar&#39;, color=&#39;red&#39;, figsize=(10, 6))</span>
+<span class="c1">#     ax.set_xlabel(true_label_key)</span>
+<span class="c1">#     ax.set_ylabel(&#39;Percentage of Labels Changed&#39; if percentage else &#39;Count of Labels Changed&#39;)</span>
+<span class="c1">#     ax.set_title(stratum)</span>
+<span class="c1">#     ax.set_xticklabels(change_summary.index, rotation=90)</span>
+<span class="c1">#     plt.xticks(fontsize=8)</span>
+<span class="c1">#     plt.show()</span>
+
 <div class="viewcode-block" id="plot_changes">
 <a class="viewcode-back" href="../../modules.html#adict.stablelabel.plot_changes">[docs]</a>
 <span class="k">def</span> <span class="nf">plot_changes</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">true_label_key</span><span class="p">,</span> <span class="n">predicted_label_key</span><span class="p">,</span> <span class="n">percentage</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">stratum</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Plot the changes between true and predicted labels in an AnnData object.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">    adata (AnnData): Annotated data matrix.</span>
+<span class="sd">    true_label_key (str): Key for the true labels in `adata.obs`.</span>
+<span class="sd">    predicted_label_key (str): Key for the predicted labels in `adata.obs`.</span>
+<span class="sd">    percentage (bool, optional): If True, plot the percentage of labels changed. If False, plot the count of labels changed. Default is True.</span>
+<span class="sd">    stratum (str, optional): Title for the plot, often used to indicate the stratum. Default is None.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">    None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># Extract the series from the AnnData object&#39;s DataFrame</span>
     <span class="n">data</span> <span class="o">=</span> <span class="n">adata</span><span class="o">.</span><span class="n">obs</span><span class="p">[[</span><span class="n">predicted_label_key</span><span class="p">,</span> <span class="n">true_label_key</span><span class="p">]]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    
+    <span class="c1"># Convert to categorical with a common category set</span>
+    <span class="n">common_categories</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">true_label_key</span><span class="p">]</span><span class="o">.</span><span class="n">cat</span><span class="o">.</span><span class="n">categories</span><span class="p">)</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">predicted_label_key</span><span class="p">]</span><span class="o">.</span><span class="n">cat</span><span class="o">.</span><span class="n">categories</span><span class="p">)))</span>
+    <span class="n">data</span><span class="p">[</span><span class="n">true_label_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">true_label_key</span><span class="p">]</span><span class="o">.</span><span class="n">cat</span><span class="o">.</span><span class="n">set_categories</span><span class="p">(</span><span class="n">common_categories</span><span class="p">)</span>
+    <span class="n">data</span><span class="p">[</span><span class="n">predicted_label_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">predicted_label_key</span><span class="p">]</span><span class="o">.</span><span class="n">cat</span><span class="o">.</span><span class="n">set_categories</span><span class="p">(</span><span class="n">common_categories</span><span class="p">)</span>
     
     <span class="c1"># Add a mismatch column that checks whether the predicted and true labels are different</span>
     <span class="n">data</span><span class="p">[</span><span class="s1">&#39;Changed&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">true_label_key</span><span class="p">]</span> <span class="o">!=</span> <span class="n">data</span><span class="p">[</span><span class="n">predicted_label_key</span><span class="p">]</span>
     
-    <span class="c1"># Group by predicted label key and calculate the sum of mismatches or the mean if percentage</span>
+    <span class="c1"># Group by true label key and calculate the sum of mismatches or the mean if percentage</span>
     <span class="k">if</span> <span class="n">percentage</span><span class="p">:</span>
         <span class="n">change_summary</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">true_label_key</span><span class="p">)[</span><span class="s1">&#39;Changed&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
     <span class="k">else</span><span class="p">:</span>
@@ -521,12 +576,15 @@
         <span class="n">col_color_keys</span> <span class="o">=</span> <span class="p">[</span><span class="n">col_color_keys</span><span class="p">]</span>
 
     <span class="c1"># Get unique labels</span>
-    <span class="n">true_labels</span> <span class="o">=</span> <span class="n">adata</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="n">true_label_key</span><span class="p">]</span>
-    <span class="n">predicted_labels</span> <span class="o">=</span> <span class="n">adata</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="n">predicted_label_key</span><span class="p">]</span>
+    <span class="n">true_labels</span> <span class="o">=</span> <span class="n">adata</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="n">true_label_key</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+    <span class="n">predicted_labels</span> <span class="o">=</span> <span class="n">adata</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="n">predicted_label_key</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
 
-    <span class="c1"># Encode labels</span>
+    <span class="n">combined_labels</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">true_labels</span><span class="p">,</span> <span class="n">predicted_labels</span><span class="p">])</span>
     <span class="n">label_encoder</span> <span class="o">=</span> <span class="n">LabelEncoder</span><span class="p">()</span>
-    <span class="n">true_labels_encoded</span> <span class="o">=</span> <span class="n">label_encoder</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">true_labels</span><span class="p">)</span>
+    <span class="n">label_encoder</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">combined_labels</span><span class="p">)</span>
+
+    <span class="c1">#Encode labels</span>
+    <span class="n">true_labels_encoded</span> <span class="o">=</span> <span class="n">label_encoder</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">true_labels</span><span class="p">)</span>
     <span class="n">predicted_labels_encoded</span> <span class="o">=</span> <span class="n">label_encoder</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">predicted_labels</span><span class="p">)</span>
 
     <span class="c1"># Decode labels for plot annotations</span>
@@ -549,8 +607,13 @@
     <span class="k">else</span><span class="p">:</span>
         <span class="n">predicted_label_color_dict</span> <span class="o">=</span> <span class="kc">None</span>
 
+    <span class="c1"># Compute the row and column colors</span>
+    <span class="c1"># Get unified color mapping</span>
+    <span class="n">keys</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">row_color_keys</span> <span class="ow">or</span> <span class="p">[])</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="n">col_color_keys</span> <span class="ow">or</span> <span class="p">[]))</span>
+    <span class="n">color_map</span> <span class="o">=</span> <span class="n">create_color_map</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">keys</span><span class="p">)</span>
+
     <span class="c1"># Call the main plot function</span>
-    <span class="n">plot_confusion_matrix</span><span class="p">(</span><span class="n">true_labels_encoded</span><span class="p">,</span> <span class="n">predicted_labels_encoded</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span>
+    <span class="n">plot_confusion_matrix</span><span class="p">(</span><span class="n">true_labels_encoded</span><span class="p">,</span> <span class="n">predicted_labels_encoded</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">color_map</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span>
                           <span class="n">row_color_keys</span><span class="o">=</span><span class="n">row_color_keys</span><span class="p">,</span> <span class="n">col_color_keys</span><span class="o">=</span><span class="n">col_color_keys</span><span class="p">,</span>
                           <span class="n">true_label_color_dict</span><span class="o">=</span><span class="n">true_label_color_dict</span><span class="p">,</span> <span class="n">predicted_label_color_dict</span><span class="o">=</span><span class="n">predicted_label_color_dict</span><span class="p">,</span>
                           <span class="n">true_labels</span><span class="o">=</span><span class="n">true_labels</span><span class="p">,</span> <span class="n">predicted_labels</span><span class="o">=</span><span class="n">predicted_labels</span><span class="p">)</span></div>
@@ -559,7 +622,7 @@
 
 <div class="viewcode-block" id="plot_confusion_matrix">
 <a class="viewcode-back" href="../../modules.html#adict.stablelabel.plot_confusion_matrix">[docs]</a>
-<span class="k">def</span> <span class="nf">plot_confusion_matrix</span><span class="p">(</span><span class="n">true_labels_encoded</span><span class="p">,</span> <span class="n">predicted_labels_encoded</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Confusion Matrix&#39;</span><span class="p">,</span>
+<span class="k">def</span> <span class="nf">plot_confusion_matrix</span><span class="p">(</span><span class="n">true_labels_encoded</span><span class="p">,</span> <span class="n">predicted_labels_encoded</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">color_map</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Confusion Matrix&#39;</span><span class="p">,</span> 
                           <span class="n">row_color_keys</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">col_color_keys</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                           <span class="n">true_label_color_dict</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">predicted_label_color_dict</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                           <span class="n">true_labels</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">predicted_labels</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -580,11 +643,6 @@
     <span class="c1"># Normalize the confusion matrix by row (i.e., by the number of samples in each class)</span>
     <span class="n">cm_normalized</span> <span class="o">=</span> <span class="n">cm</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;float&#39;</span><span class="p">)</span> <span class="o">/</span> <span class="n">cm</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>
     <span class="n">cm_normalized</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">cm_normalized</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">labels</span><span class="p">)</span>
-
-    <span class="c1"># Compute the row and column colors</span>
-    <span class="c1"># Get unified color mapping</span>
-    <span class="n">keys</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">row_color_keys</span> <span class="ow">or</span> <span class="p">[])</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="n">col_color_keys</span> <span class="ow">or</span> <span class="p">[]))</span>
-    <span class="n">color_map</span> <span class="o">=</span> <span class="n">create_color_map</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">keys</span><span class="p">)</span>
 
     <span class="c1"># Function to map labels to their respective colors remains unchanged</span>
     <span class="k">def</span> <span class="nf">map_labels_to_colors</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">label_color_dict</span><span class="p">,</span> <span class="n">color_map</span><span class="p">):</span>

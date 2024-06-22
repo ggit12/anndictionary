@@ -93,10 +93,40 @@
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">confusion_matrix</span>
 
+<span class="kn">from</span> <span class="nn">.dict</span> <span class="kn">import</span> <span class="n">check_and_create_strata</span>
+
+<span class="kn">from</span> <span class="nn">.stablelabel</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">get_slurm_cores</span><span class="p">,</span>
+    <span class="n">pca_density_filter</span><span class="p">,</span>
+    <span class="n">pca_density_wrapper</span><span class="p">,</span>
+    <span class="n">pca_density_adata_dict</span><span class="p">,</span>
+    <span class="n">stable_label</span><span class="p">,</span>
+    <span class="n">stable_label_adata</span><span class="p">,</span>
+    <span class="n">update_adata_labels_with_results</span><span class="p">,</span>
+    <span class="n">plot_training_history</span><span class="p">,</span>
+    <span class="n">plot_changes</span><span class="p">,</span>
+    <span class="n">plot_confusion_matrix_from_adata</span><span class="p">,</span>
+    <span class="n">plot_confusion_matrix</span>
+<span class="p">)</span>
+
 <div class="viewcode-block" id="preprocess_adata_strata">
 <a class="viewcode-back" href="../../modules.html#adict.strata.preprocess_adata_strata">[docs]</a>
 <span class="k">def</span> <span class="nf">preprocess_adata_strata</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">strata_keys</span><span class="p">,</span> <span class="n">target_cells</span> <span class="o">=</span> <span class="mi">10000</span><span class="p">,</span> <span class="n">min_cells</span> <span class="o">=</span> <span class="mi">25</span><span class="p">):</span>
-    
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Preprocess an AnnData object by stratifying, filtering, and subsampling based on specified criteria.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">    adata (AnnData): Annotated data matrix.</span>
+<span class="sd">    strata_keys (list of str): List of column names in `adata.obs` to use for stratification.</span>
+<span class="sd">    target_cells (int, optional): Target number of cells to retain per stratum. Default is 10000.</span>
+<span class="sd">    min_cells (int, optional): Minimum number of cells required to retain a stratum. Default is 25.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">    AnnData: Concatenated AnnData object after filtering and subsampling.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">    ValueError: If no strata meet the minimum cell requirement after filtering.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># Check and create stratfying variable in adata</span>
     <span class="n">strata_key</span> <span class="o">=</span> <span class="n">check_and_create_strata</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">strata_keys</span><span class="p">)</span>
 
