@@ -19,7 +19,8 @@ setup(
         'scipy',
         'seaborn',
         'matplotlib',
-        'squidpy'
+        'squidpy',
+        'inspect'
     ],
     classifiers=[
         # Trove classifiers
