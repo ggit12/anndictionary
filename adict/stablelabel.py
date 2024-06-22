@@ -20,6 +20,8 @@ import matplotlib
 import matplotlib.pyplot as plt
 from sklearn.metrics import confusion_matrix
 
+from .utils import create_color_map
+
 def get_slurm_cores():
     """
     Returns the total number of CPU cores allocated to a Slurm job based on environment variables.
@@ -352,6 +354,16 @@ def update_adata_labels_with_results(adata, results, new_label_key='stable_cell_
 
 
 def plot_training_history(results, separate=True):
+    """
+    Plot the training history of a model, showing percent label change versus iteration.
+
+    Parameters:
+    results (dict): Dictionary where keys are strata names and values are dictionaries containing training history.
+    separate (bool, optional): If True, plot each stratum's training history separately. If False, plot all strata together. Default is True.
+
+    Returns:
+    None
+    """
     if separate:
         for stratum, info in results.items():
             plt.figure(figsize=(10, 6))
@@ -372,14 +384,57 @@ def plot_training_history(results, separate=True):
         plt.legend()
         plt.show()
 
+# def plot_changes(adata, true_label_key, predicted_label_key, percentage=True, stratum=None):
+#     # Extract the series from the AnnData object's DataFrame
+#     data = adata.obs[[predicted_label_key, true_label_key]].copy()
+    
+#     # Add a mismatch column that checks whether the predicted and true labels are different
+#     data['Changed'] = data[true_label_key] != data[predicted_label_key]
+    
+#     # Group by predicted label key and calculate the sum of mismatches or the mean if percentage
+#     if percentage:
+#         change_summary = data.groupby(true_label_key)['Changed'].mean()
+#     else:
+#         change_summary = data.groupby(true_label_key)['Changed'].sum()
+    
+#     # Sort the summary in descending order
+#     change_summary = change_summary.sort_values(ascending=False)
+    
+#     # Plotting
+#     ax = change_summary.plot(kind='bar', color='red', figsize=(10, 6))
+#     ax.set_xlabel(true_label_key)
+#     ax.set_ylabel('Percentage of Labels Changed' if percentage else 'Count of Labels Changed')
+#     ax.set_title(stratum)
+#     ax.set_xticklabels(change_summary.index, rotation=90)
+#     plt.xticks(fontsize=8)
+#     plt.show()
+
 def plot_changes(adata, true_label_key, predicted_label_key, percentage=True, stratum=None):
+    """
+    Plot the changes between true and predicted labels in an AnnData object.
+
+    Parameters:
+    adata (AnnData): Annotated data matrix.
+    true_label_key (str): Key for the true labels in `adata.obs`.
+    predicted_label_key (str): Key for the predicted labels in `adata.obs`.
+    percentage (bool, optional): If True, plot the percentage of labels changed. If False, plot the count of labels changed. Default is True.
+    stratum (str, optional): Title for the plot, often used to indicate the stratum. Default is None.
+
+    Returns:
+    None
+    """
     # Extract the series from the AnnData object's DataFrame
     data = adata.obs[[predicted_label_key, true_label_key]].copy()
+    
+    # Convert to categorical with a common category set
+    common_categories = list(set(data[true_label_key].cat.categories).union(set(data[predicted_label_key].cat.categories)))
+    data[true_label_key] = data[true_label_key].cat.set_categories(common_categories)
+    data[predicted_label_key] = data[predicted_label_key].cat.set_categories(common_categories)
     
     # Add a mismatch column that checks whether the predicted and true labels are different
     data['Changed'] = data[true_label_key] != data[predicted_label_key]
     
-    # Group by predicted label key and calculate the sum of mismatches or the mean if percentage
+    # Group by true label key and calculate the sum of mismatches or the mean if percentage
     if percentage:
         change_summary = data.groupby(true_label_key)['Changed'].mean()
     else:
@@ -419,12 +474,15 @@ def plot_confusion_matrix_from_adata(adata, true_label_key, predicted_label_key,
         col_color_keys = [col_color_keys]
 
     # Get unique labels
-    true_labels = adata.obs[true_label_key]
-    predicted_labels = adata.obs[predicted_label_key]
+    true_labels = adata.obs[true_label_key].astype(str)
+    predicted_labels = adata.obs[predicted_label_key].astype(str)
 
-    # Encode labels
+    combined_labels = pd.concat([true_labels, predicted_labels])
     label_encoder = LabelEncoder()
-    true_labels_encoded = label_encoder.fit_transform(true_labels)
+    label_encoder.fit(combined_labels)
+
+    #Encode labels
+    true_labels_encoded = label_encoder.transform(true_labels)
     predicted_labels_encoded = label_encoder.transform(predicted_labels)
 
     # Decode labels for plot annotations
@@ -447,14 +505,19 @@ def plot_confusion_matrix_from_adata(adata, true_label_key, predicted_label_key,
     else:
         predicted_label_color_dict = None
 
+    # Compute the row and column colors
+    # Get unified color mapping
+    keys = list(set(row_color_keys or []).union(col_color_keys or []))
+    color_map = create_color_map(adata, keys)
+
     # Call the main plot function
-    plot_confusion_matrix(true_labels_encoded, predicted_labels_encoded, labels, title,
+    plot_confusion_matrix(true_labels_encoded, predicted_labels_encoded, labels, color_map, title,
                           row_color_keys=row_color_keys, col_color_keys=col_color_keys,
                           true_label_color_dict=true_label_color_dict, predicted_label_color_dict=predicted_label_color_dict,
                           true_labels=true_labels, predicted_labels=predicted_labels)
     
 
-def plot_confusion_matrix(true_labels_encoded, predicted_labels_encoded, labels, title='Confusion Matrix',
+def plot_confusion_matrix(true_labels_encoded, predicted_labels_encoded, labels, color_map, title='Confusion Matrix', 
                           row_color_keys=None, col_color_keys=None,
                           true_label_color_dict=None, predicted_label_color_dict=None,
                           true_labels=None, predicted_labels=None):
@@ -475,11 +538,6 @@ def plot_confusion_matrix(true_labels_encoded, predicted_labels_encoded, labels,
     # Normalize the confusion matrix by row (i.e., by the number of samples in each class)
     cm_normalized = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
     cm_normalized = pd.DataFrame(cm_normalized, index=labels, columns=labels)
-
-    # Compute the row and column colors
-    # Get unified color mapping
-    keys = list(set(row_color_keys or []).union(col_color_keys or []))
-    color_map = create_color_map(adata, keys)
 
     # Function to map labels to their respective colors remains unchanged
     def map_labels_to_colors(labels, label_color_dict, color_map):
