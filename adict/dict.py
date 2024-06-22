@@ -85,22 +85,18 @@ def adata_dict_fapply_return(adata_dict, func, **kwargs):
 
 def check_and_create_strata(adata, strata_keys):
     """
-    Checks if the specified stratifying variables are present in the AnnData object, 
+    Checks if the specified stratifying variables are present in the AnnData object,
     and creates a new column combining these variables if it does not already exist.
 
     Parameters:
-    adata : AnnData
-        The annotated data matrix.
-    strata_keys : list of str
-        List of keys (column names) in adata.obs to be used for stratification.
+    adata : (AnnData) An AnnData object.
+    strata_keys : (list of str) List of keys (column names) in adata.obs to be used for stratification.
 
     Returns:
-    str
-        The name of the newly created or verified existing combined strata column.
+    str: (str) The name of the newly created or verified existing combined strata column.
 
     Raises:
-    ValueError
-        If one or more of the specified stratifying variables do not exist in adata.obs.
+    ValueError: If one or more of the specified stratifying variables do not exist in adata.obs.
     """
     # Check if any of the strata_keys are not present in adata.obs
     if any(key not in adata.obs.columns for key in strata_keys):
@@ -262,15 +258,15 @@ def resample_adata(adata, strata_keys, min_num_cells, **kwargs):
 
     Parameters:
     adata (AnnData): Annotated data matrix.
-    strata_keys (list of str): List of column names in `adata.obs` to use for stratification.
+    strata_keys (list of str): List of column names in adata.obs to use for stratification.
     min_num_cells (int): Minimum number of cells required to retain a stratum.
-    **kwargs: Additional keyword arguments to pass to the subsample function.
+    kwargs: Additional keyword arguments to pass to the subsample function.
 
     Returns:
     AnnData: Concatenated AnnData object after resampling and filtering.
 
     Raises:
-    ValueError: If any of the specified `strata_keys` do not exist in `adata.obs`.
+    ValueError: If any of the specified strata_keys do not exist in adata.obs.
     """
     # Step 1: Create the strata key
     strata_key = check_and_create_strata(adata, strata_keys)
@@ -293,9 +289,9 @@ def resample_adata_dict(adata_dict, strata_keys, min_num_cells=0, **kwargs):
 
     Parameters:
     adata_dict (dict): Dictionary where keys are strata values and values are AnnData objects.
-    strata_keys (list of str): List of column names in `adata.obs` to use for stratification.
+    strata_keys (list of str): List of column names in adata.obs to use for stratification.
     min_num_cells (int, optional): Minimum number of cells required to retain a stratum. Default is 0.
-    **kwargs: Additional keyword arguments to pass to the resample function.
+    kwargs: Additional keyword arguments to pass to the resample function.
 
     Returns:
     dict: Dictionary of resampled AnnData objects after filtering.
