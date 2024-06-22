@@ -20,7 +20,88 @@ import matplotlib
 import matplotlib.pyplot as plt
 from sklearn.metrics import confusion_matrix
 
+import inspect
+
+from .metadata_summary import summarize_metadata, display_html_summary
+from .stablelabel import (
+    get_slurm_cores,
+    pca_density_filter,
+    pca_density_wrapper,
+    pca_density_adata_dict,
+    stable_label,
+    stable_label_adata,
+    update_adata_labels_with_results,
+    plot_training_history,
+    plot_changes,
+    plot_confusion_matrix_from_adata,
+    plot_confusion_matrix
+)
+from .utils import add_label_to_adata, create_color_map
+
+def adata_dict_fapply(adata_dict, func, **kwargs):
+    """
+    Applies a given function to each AnnData object in the adata_dict.
+
+    Parameters:
+    - adata_dict: Dictionary of AnnData objects with keys as identifiers.
+    - func: Function to apply to each AnnData object in the dictionary.
+    - kwargs: Additional keyword arguments to pass to the function.
+
+    Returns:
+    - None: The function modifies the AnnData objects in place.
+    """
+    sig = inspect.signature(func)
+    accepts_key = 'key' in sig.parameters
+
+    for key, adata in adata_dict.items():
+        if accepts_key:
+            func(adata, key=key, **kwargs)
+        else:
+            func(adata, **kwargs)
+
+
+def adata_dict_fapply_return(adata_dict, func, **kwargs):
+    """
+    Applies a given function to each AnnData object in the adata_dict and returns the results in a dictionary.
+
+    Parameters:
+    - adata_dict (dict): Dictionary of AnnData objects with keys as identifiers.
+    - func: Function to apply to each AnnData object in the dictionary.
+    - kwargs: Additional keyword arguments to pass to the function.
+
+    Returns:
+    - dict: A dictionary with the same keys as adata_dict, containing the results of the function applied to each AnnData object.
+    """
+    sig = inspect.signature(func)
+    accepts_key = 'key' in sig.parameters
+
+    results = {}
+    for key, adata in adata_dict.items():
+        if accepts_key:
+            results[key] = func(adata, key=key, **kwargs)
+        else:
+            results[key] = func(adata, **kwargs)
+    return results
+
 def check_and_create_strata(adata, strata_keys):
+    """
+    Checks if the specified stratifying variables are present in the AnnData object, 
+    and creates a new column combining these variables if it does not already exist.
+
+    Parameters:
+    adata : AnnData
+        The annotated data matrix.
+    strata_keys : list of str
+        List of keys (column names) in adata.obs to be used for stratification.
+
+    Returns:
+    str
+        The name of the newly created or verified existing combined strata column.
+
+    Raises:
+    ValueError
+        If one or more of the specified stratifying variables do not exist in adata.obs.
+    """
     # Check if any of the strata_keys are not present in adata.obs
     if any(key not in adata.obs.columns for key in strata_keys):
         raise ValueError("one or more of your stratifying variables does not exist in adata.obs")
@@ -36,6 +117,20 @@ def check_and_create_strata(adata, strata_keys):
     return strata_key
 
 def build_adata_dict(adata, strata_keys, desired_strata):
+    """
+    Build a dictionary of AnnData objects split by desired strata values.
+
+    Parameters:
+    adata (AnnData): Annotated data matrix.
+    strata_keys (list of str): List of column names in `adata.obs` to use for stratification.
+    desired_strata (list or dict): List of desired strata values or a dictionary where keys are strata keys and values are lists of desired strata values.
+
+    Returns:
+    dict: Dictionary where keys are strata values and values are corresponding AnnData subsets.
+
+    Raises:
+    ValueError: If `desired_strata` is neither a list nor a dictionary of lists.
+    """
     if isinstance(desired_strata, list):
         # Directly use the list of strata
         return build_adata_dict_main(adata, strata_keys, desired_strata)
@@ -49,6 +144,17 @@ def build_adata_dict(adata, strata_keys, desired_strata):
         raise ValueError("desired_strata must be either a list or a dictionary of lists")
 
 def build_adata_dict_main(adata, strata_keys, desired_strata):
+    """
+    Main function to build a dictionary of AnnData objects based on desired strata values.
+
+    Parameters:
+    adata (AnnData): Annotated data matrix.
+    strata_keys (list of str): List of column names in `adata.obs` to use for stratification.
+    desired_strata (list of str): List of desired strata values.
+
+    Returns:
+    dict: Dictionary where keys are strata values and values are corresponding AnnData subsets.
+    """
     # Check and create stratifying variable in adata
     strata_key = check_and_create_strata(adata, strata_keys)
     # Initialize the dictionary to store subsets
@@ -62,41 +168,56 @@ def build_adata_dict_main(adata, strata_keys, desired_strata):
             print(f"Warning: '{stratum}' is not a valid category in '{strata_key}'.")
     return subsets_dict
 
-def concatenate_adata_dict(adata_dict, join='outer'):
+def subsplit_adata_dict(adata_dict, strata_keys, desired_strata):
     """
-    Concatenates all AnnData objects in adata_dict into a single AnnData object.
+    Split each value of an AnnData dictionary into further subsets based on additional desired strata.
 
     Parameters:
-    - adata_dict: Dictionary of AnnData objects with keys as identifiers.
+    adata_dict (dict): Dictionary where keys are strata values and values are AnnData objects.
+    strata_keys (list of str): List of column names in `adata.obs` to use for further stratification.
+    desired_strata (list or dict): List of desired strata values or a dictionary where keys are strata keys and values are lists of desired strata values.
+
+    Returns:
+    dict: Nested dictionary of AnnData objects split by the additional desired strata.
+    """
+    #this function takes an adata_dict and splits each value of the dictionary (an anndata) into a dictionary of anndatas
+    #Would be correct to call this function: build_adata_dict_from_adata_dict()
+    return adata_dict_fapply_return(adata_dict, build_adata_dict, strata_keys=strata_keys, desired_strata=desired_strata)
+
+
+def concatenate_adata_dict(adata_dict, **kwargs):
+    """
+    Concatenates all AnnData objects in adata_dict into a single AnnData object. join defualts to "outer" and index_unique defaults to "-".
+
+    Parameters:
+    - adata_dict (dict): Dictionary of AnnData objects with keys as identifiers.
+    - kwargs: Additional keyword arguments, including 'join' which specifies the join method for concatenation.
 
     Returns:
     - AnnData: A single AnnData object that combines all the subsets in adata_dict.
     """
-    # Extract all AnnData objects from the dictionary
+    kwargs.setdefault('join', 'outer')
+    kwargs.setdefault('index_unique', '-')
+    
     adatas = list(adata_dict.values())
-
-    # Concatenate all AnnData objects into one
     if adatas:
-        full_adata = sc.concat(adatas, join=join, index_unique='-')
-        return full_adata
+        return sc.concat(adatas, **kwargs)
     else:
         raise ValueError("adata_dict is empty. No data available to concatenate.")
-    
-def summarize_metadata_adata_dict(adata_dict, columns):
+
+
+def summarize_metadata_adata_dict(adata_dict, **kwargs):
     """
     Generate summary tables for each AnnData object in the dictionary using the summarize_metadata function.
-    
+
     Parameters:
     - adata_dict (dict): Dictionary of AnnData objects with keys as identifiers.
-    - columns (list of str): List of columns from the metadata to summarize. Use '*' to specify joint frequencies of multiple columns.
-    
+    - kwargs: Additional keyword arguments, including 'columns' which specifies a list of columns from the metadata to summarize. Use '*' to specify joint frequencies of multiple columns.
+
     Returns:
     - dict: A dictionary of summary dictionaries for each AnnData object in the adata_dict.
     """
-    summary_dict = {}
-    for stratum, adata in adata_dict.items():
-        summary_dict[stratum] = summarize_metadata(adata, columns)
-    return summary_dict
+    return adata_dict_fapply_return(adata_dict, summarize_metadata, **kwargs)
 
 def display_html_summary_adata_dict(summary_dict_dict):
     """
@@ -110,118 +231,185 @@ def display_html_summary_adata_dict(summary_dict_dict):
         print(f"Summary for {stratum}:")
         display_html_summary(summary_dict)
 
-def adata_dict_fapply(adata_dict, func, **kwargs):
-    """
-    Applies a given function to each AnnData object in the adata_dict.
 
-    Parameters:
-    - adata_dict: Dictionary of AnnData objects with keys as identifiers.
-    - func: Function to apply to each AnnData object in the dictionary.
-    - kwargs: Additional keyword arguments to pass to the function.
-
-    Returns:
-    - None: The function modifies the AnnData objects in place.
-    """
-    for key, adata in adata_dict.items():
-        func(adata, **kwargs)
-
-
-def subsample_adata_dict(adata_dict, n_obs=None, random_state=0):
+def subsample_adata_dict(adata_dict, **kwargs):
     """
     Subsamples each AnnData object in the dictionary using Scanpy's subsample function.
     
     Parameters:
     - adata_dict (dict): Dictionary of AnnData objects with keys as identifiers.
-    - n_obs (int, optional): Number of cells to subsample. If None, subsampling is not performed. Default is None.
-    - random_state (int, optional): Seed for random number generator. Default is 0.
-    
+    - kwargs: Additional keyword arguments to pass to the subsample function.
+
     Returns:
     - None: The function modifies the input AnnData objects in place.
     """
-    for stratum, adata in adata_dict.items():
-        if n_obs is not None:
-            sc.pp.subsample(adata, n_obs=n_obs, random_state=random_state)
+    n_obs = kwargs.get('n_obs', None)
+    fraction = kwargs.get('fraction', None)
+
+    if n_obs is None and fraction is None:
+        fraction = 1
+        kwargs['fraction'] = fraction
+
+    def subsample_adata(adata, **kwargs):
+        if n_obs is None or adata.n_obs > n_obs:
+            sc.pp.subsample(adata, **kwargs)
+
+    adata_dict_fapply(adata_dict, subsample_adata, **kwargs)
+
+def resample_adata(adata, strata_keys, min_num_cells, **kwargs):
+    """
+    Resample an AnnData object based on specified strata keys and drop strata with fewer than the minimum number of cells.
+
+    Parameters:
+    adata (AnnData): Annotated data matrix.
+    strata_keys (list of str): List of column names in `adata.obs` to use for stratification.
+    min_num_cells (int): Minimum number of cells required to retain a stratum.
+    **kwargs: Additional keyword arguments to pass to the subsample function.
+
+    Returns:
+    AnnData: Concatenated AnnData object after resampling and filtering.
+
+    Raises:
+    ValueError: If any of the specified `strata_keys` do not exist in `adata.obs`.
+    """
+    # Step 1: Create the strata key
+    strata_key = check_and_create_strata(adata, strata_keys)
     
-def normalize_adata_dict(adata_dict, target_sum=1e4):
+    # Step 2: Build adata_dict based on the strata key
+    strata_dict = build_adata_dict(adata, strata_keys, adata.obs[strata_key].cat.categories.tolist())
+    
+    # Step 3: Subsample each AnnData object in the strata_dict
+    subsample_adata_dict(strata_dict, **kwargs)
+    
+    # Step 4: Drop AnnData objects with fewer than min_num_cells
+    filtered_dict = {k: v for k, v in strata_dict.items() if v.n_obs >= min_num_cells}
+    
+    # Step 5: Concatenate the filtered_dict back to a single AnnData object
+    return concatenate_adata_dict(filtered_dict)
+
+def resample_adata_dict(adata_dict, strata_keys, min_num_cells=0, **kwargs):
+    """
+    Resample each AnnData object in a dictionary based on specified strata keys and drop strata with fewer than the minimum number of cells.
+
+    Parameters:
+    adata_dict (dict): Dictionary where keys are strata values and values are AnnData objects.
+    strata_keys (list of str): List of column names in `adata.obs` to use for stratification.
+    min_num_cells (int, optional): Minimum number of cells required to retain a stratum. Default is 0.
+    **kwargs: Additional keyword arguments to pass to the resample function.
+
+    Returns:
+    dict: Dictionary of resampled AnnData objects after filtering.
+    """
+    return adata_dict_fapply_return(adata_dict, resample_adata, strata_keys=strata_keys, min_num_cells=min_num_cells, **kwargs)
+
+
+def normalize_adata_dict(adata_dict, **kwargs):
     """
     Normalizes each AnnData object in the dictionary using Scanpy's normalize_total.
-    """
-    for stratum, adata in adata_dict.items():
-        sc.pp.normalize_total(adata, target_sum=target_sum)
 
-def log_transform_adata_dict(adata_dict):
+    Parameters:
+    - adata_dict (dict): Dictionary of AnnData objects with keys as identifiers.
+    - kwargs: Additional keyword arguments to pass to the normalize_total function.
+
+    Returns:
+    - None: The function modifies the input AnnData objects in place.
+    """
+    adata_dict_fapply(adata_dict, sc.pp.normalize_total, **kwargs)
+
+def log_transform_adata_dict(adata_dict, **kwargs):
     """
     Log-transforms each AnnData object in the dictionary using Scanpy's log1p.
-    """
-    for stratum, adata in adata_dict.items():
-        sc.pp.log1p(adata)
 
-def set_high_variance_genes(adata_dict, n_top_genes=2000, subset=False):
+    Parameters:
+    - adata_dict (dict): Dictionary of AnnData objects with keys as identifiers.
+    - kwargs: Additional keyword arguments to pass to the log1p function.
+
+    Returns:
+    - None: The function modifies the input AnnData objects in place.
+    """
+    adata_dict_fapply(adata_dict, sc.pp.log1p, **kwargs)
+
+def set_high_variance_genes(adata_dict, **kwargs):
     """
     Identifies high-variance genes in each AnnData object in the dictionary.
 
     Parameters:
-    n_top_genes (int): Number of top high-variance genes to keep.
-    subset (bool): Whether to subset the adata to only include high-variance genes.
-    """
-    for stratum, adata in adata_dict.items():
-        sc.pp.highly_variable_genes(adata, n_top_genes=n_top_genes, subset=subset)
+    - adata_dict (dict): Dictionary of AnnData objects with keys as identifiers.
+    - kwargs: Additional keyword arguments to pass to the highly_variable_genes function.
 
-def scale_adata_dict(adata_dict):
+    Returns:
+    - None: The function modifies the input AnnData objects in place.
+    """
+    adata_dict_fapply(adata_dict, sc.pp.highly_variable_genes, **kwargs)
+
+def scale_adata_dict(adata_dict, **kwargs):
     """
     Scales each AnnData object in the dictionary using Scanpy's scale function.
-    """
-    for stratum, adata in adata_dict.items():
-        sc.pp.scale(adata, max_value=10)
 
-def pca_adata_dict(adata_dict, n_comps=50, mask_var='highly_variable'):
+    Parameters:
+    - adata_dict (dict): Dictionary of AnnData objects with keys as identifiers.
+    - kwargs: Additional keyword arguments to pass to the scale function.
+
+    Returns:
+    - None: The function modifies the input AnnData objects in place.
+    """
+    adata_dict_fapply(adata_dict, sc.pp.scale, **kwargs)
+
+def pca_adata_dict(adata_dict, **kwargs):
     """
     Performs PCA on each AnnData object in the dictionary using Scanpy's pca function.
 
     Parameters:
-    n_comps (int): Number of principal components to compute.
-    mask_var (str): Set to 'highly_variable' to use highly_variable genes (if set). Set to None to use all genes.
-    """
-    for stratum, adata in adata_dict.items():
-        sc.pp.pca(adata, n_comps=n_comps, mask_var=mask_var)
+    - adata_dict (dict): Dictionary of AnnData objects with keys as identifiers.
+    - kwargs: Additional keyword arguments to pass to the pca function.
 
-def calculate_umap_adata_dict(adata_dict, use_rep):
+    Returns:
+    - None: The function modifies the input AnnData objects in place.
+    """
+    adata_dict_fapply(adata_dict, sc.pp.pca, **kwargs)
+
+def calculate_umap_adata_dict(adata_dict, **kwargs):
     """
     Calculates UMAP embeddings for each subset in the adata_dict.
 
     Parameters:
-    adata_dict (dict): A dictionary with keys as strata and values as AnnData objects.
-    use_rep (str): The key in .obsm where the representation matrix is stored.
+    - adata_dict (dict): A dictionary with keys as strata and values as AnnData objects.
+    - kwargs: Additional keyword arguments, including 'use_rep' which specifies the key in .obsm where the representation matrix is stored.
 
     Returns:
-    dict: A dictionary with the same keys as adata_dict, but values now include UMAP coordinates.
+    - dict: A dictionary with the same keys as adata_dict, but values now include UMAP coordinates.
     """
-    for stratum, adata_subset in adata_dict.items():
-        # Ensure the representation exists
-        if use_rep in adata_subset.obsm:
-            # Compute neighbors , necessary for UMAP
-            sc.pp.neighbors(adata_subset, use_rep=use_rep)
-            # Calculate UMAP
-            sc.tl.umap(adata_subset)
+    def calculate_umap(adata, **kwargs):
+        use_rep = kwargs.get('use_rep')
+        if use_rep in adata.obsm:
+            sc.pp.neighbors(adata, use_rep=use_rep)
+            sc.tl.umap(adata)
         else:
-            print(f"Representation '{use_rep}' not found in .obsm of '{stratum}' subset.")
+            print(f"Representation '{use_rep}' not found in .obsm of adata.")
+    adata_dict_fapply(adata_dict, calculate_umap, **kwargs)
     return adata_dict
 
-def plot_umap_adata_dict(adata_dict, color_by):
+def plot_umap_adata_dict(adata_dict, **kwargs):
     """
     Plots UMAP embeddings for each AnnData object in adata_dict, colored by a specified variable.
 
     Parameters:
-    adata_dict (dict): A dictionary with keys as strata and values as AnnData objects.
-    color_by (str): A variable by which to color the UMAP plots, typically a column in .obs.
+    - adata_dict (dict): A dictionary with keys as strata and values as AnnData objects.
+    - kwargs: Additional keyword arguments, including 'color_by' which specifies a variable by which to color the UMAP plots, typically a column in .obs.
+
+    Returns:
+    - None: The function creates plots for the AnnData objects.
     """
-    for stratum, adata_subset in adata_dict.items():
-        # Check if UMAP has been computed
-        if 'X_umap' in adata_subset.obsm:
-            title = [f"{stratum} {color}" for color in color_by]
-            sc.pl.umap(adata_subset, color=color_by, title=title)
+    def plot_umap(adata, key=None, **kwargs):
+        print(f"Plotting UMAP for key: {key}")
+        color_by = kwargs.get('color_by')
+        if 'X_umap' in adata.obsm:
+            title = [f"{color}" for color in color_by]
+            sc.pl.umap(adata, color=color_by, title=title)
         else:
-            print(f"UMAP not computed for '{stratum}'. Please compute UMAP before plotting.")
+            print(f"UMAP not computed for adata with key {key}. Please compute UMAP before plotting.")
+    adata_dict_fapply(adata_dict, plot_umap, **kwargs)
+
 
 def write_h5ad_adata_dict(adata_dict, directory, file_prefix=""):
     """
@@ -378,8 +566,6 @@ def update_adata_dict_with_label_dict(adata_dict, results_dict, new_label_key=No
             add_label_to_adata(adata, indices, labels, new_label_key)
 
 
-
-
 def plot_changes_adata_dict(adata_dict, true_label_key, predicted_label_key, percentage=True):
     """
     Applies the plot_final_mismatches function to each AnnData object in adata_dict.
@@ -412,19 +598,24 @@ def plot_confusion_matrix_adata_dict(adata_dict, true_label_key, predicted_label
         subset_title = f"Confusion Matrix for {stratum}"
         plot_confusion_matrix_from_adata(adata, true_label_key, predicted_label_key, title=subset_title,
                                          row_color_keys=row_color_keys, col_color_keys=col_color_keys)
-        
-def plot_spatial_adata_dict(adata_dict, color_by, crop_coord=None):
+
+
+def plot_spatial_adata_dict(adata_dict, **kwargs):
     """
     Plots spatial data for each AnnData object in adata_dict, colored by a specified variable.
 
     Parameters:
-    adata_dict (dict): A dictionary with keys as strata and values as AnnData objects.
-    color_by (str): A variable by which to color the spatial plots, typically a column in .obs.
+    - adata_dict (dict): A dictionary with keys as strata and values as AnnData objects.
+    - kwargs: Additional keyword arguments, including 'color_by' which specifies a variable by which to color the spatial plots, typically a column in .obs, and 'crop_coord' which specifies coordinates for cropping the spatial plots.
+
+    Returns:
+    - None: The function creates spatial plots for the AnnData objects.
     """
-    for stratum, adata_subset in adata_dict.items():
-        # Check if spatial coordinates are available
-        if 'spatial' in adata_subset.obsm:
-            title = [f"{stratum} {color}" for color in color_by]
-            sc.pl.spatial(adata_subset, color=color_by, title=title, crop_coord=crop_coord)
+    def plot_spatial(adata, **kwargs):
+        if 'spatial' in adata.obsm:
+            sc.pl.spatial(adata, **kwargs)
         else:
-            print(f"Spatial coordinates not available for '{stratum}'. Please add spatial data before plotting.")
+            print(f"Spatial coordinates not available for adata. Please add spatial data before plotting.")
+    
+    adata_dict_fapply(adata_dict, plot_spatial, **kwargs)
+
