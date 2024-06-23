@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Modules Documentation &mdash; adict 0.1 documentation</title>
+  <title>Modules Documentation &mdash; anndict 0.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
 
@@ -21,7 +21,7 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="prev" title="Welcome to adict’s documentation!" href="index.html" /> 
+    <link rel="prev" title="Welcome to anndict’s documentation!" href="index.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -33,7 +33,7 @@
           
           
           <a href="index.html" class="icon icon-home">
-            adict
+            anndict
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -46,57 +46,57 @@
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Modules Documentation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#adict.dict.adata_dict_fapply"><code class="docutils literal notranslate"><span class="pre">adata_dict_fapply()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#adict.dict.adata_dict_fapply_return"><code class="docutils literal notranslate"><span class="pre">adata_dict_fapply_return()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#adict.dict.check_and_create_strata"><code class="docutils literal notranslate"><span class="pre">check_and_create_strata()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#adict.dict.build_adata_dict"><code class="docutils literal notranslate"><span class="pre">build_adata_dict()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#adict.dict.build_adata_dict_main"><code class="docutils literal notranslate"><span class="pre">build_adata_dict_main()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#adict.dict.subsplit_adata_dict"><code class="docutils literal notranslate"><span class="pre">subsplit_adata_dict()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#adict.dict.concatenate_adata_dict"><code class="docutils literal notranslate"><span class="pre">concatenate_adata_dict()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#adict.dict.summarize_metadata_adata_dict"><code class="docutils literal notranslate"><span class="pre">summarize_metadata_adata_dict()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#adict.dict.display_html_summary_adata_dict"><code class="docutils literal notranslate"><span class="pre">display_html_summary_adata_dict()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#adict.dict.subsample_adata_dict"><code class="docutils literal notranslate"><span class="pre">subsample_adata_dict()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#adict.dict.resample_adata"><code class="docutils literal notranslate"><span class="pre">resample_adata()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#adict.dict.resample_adata_dict"><code class="docutils literal notranslate"><span class="pre">resample_adata_dict()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#adict.dict.normalize_adata_dict"><code class="docutils literal notranslate"><span class="pre">normalize_adata_dict()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#adict.dict.log_transform_adata_dict"><code class="docutils literal notranslate"><span class="pre">log_transform_adata_dict()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#adict.dict.set_high_variance_genes"><code class="docutils literal notranslate"><span class="pre">set_high_variance_genes()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#adict.dict.scale_adata_dict"><code class="docutils literal notranslate"><span class="pre">scale_adata_dict()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#adict.dict.pca_adata_dict"><code class="docutils literal notranslate"><span class="pre">pca_adata_dict()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#adict.dict.calculate_umap_adata_dict"><code class="docutils literal notranslate"><span class="pre">calculate_umap_adata_dict()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#adict.dict.plot_umap_adata_dict"><code class="docutils literal notranslate"><span class="pre">plot_umap_adata_dict()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#adict.dict.write_h5ad_adata_dict"><code class="docutils literal notranslate"><span class="pre">write_h5ad_adata_dict()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#adict.dict.stable_label_adata_dict"><code class="docutils literal notranslate"><span class="pre">stable_label_adata_dict()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#adict.dict.predict_labels_adata_dict"><code class="docutils literal notranslate"><span class="pre">predict_labels_adata_dict()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#adict.dict.update_adata_labels_with_stable_label_results_dict"><code class="docutils literal notranslate"><span class="pre">update_adata_labels_with_stable_label_results_dict()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#adict.dict.update_adata_labels_with_predictions_dict"><code class="docutils literal notranslate"><span class="pre">update_adata_labels_with_predictions_dict()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#adict.dict.update_adata_dict_with_label_dict"><code class="docutils literal notranslate"><span class="pre">update_adata_dict_with_label_dict()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#adict.dict.plot_changes_adata_dict"><code class="docutils literal notranslate"><span class="pre">plot_changes_adata_dict()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#adict.dict.plot_confusion_matrix_adata_dict"><code class="docutils literal notranslate"><span class="pre">plot_confusion_matrix_adata_dict()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#adict.dict.plot_spatial_adata_dict"><code class="docutils literal notranslate"><span class="pre">plot_spatial_adata_dict()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#adict.strata.preprocess_adata_strata"><code class="docutils literal notranslate"><span class="pre">preprocess_adata_strata()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#adict.strata.stable_label_adata_strata"><code class="docutils literal notranslate"><span class="pre">stable_label_adata_strata()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#adict.strata.plot_confusion_matrix_across_strata"><code class="docutils literal notranslate"><span class="pre">plot_confusion_matrix_across_strata()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#adict.utils.add_label_to_adata"><code class="docutils literal notranslate"><span class="pre">add_label_to_adata()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#adict.utils.create_color_map"><code class="docutils literal notranslate"><span class="pre">create_color_map()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#adict.metadata_summary.summarize_metadata"><code class="docutils literal notranslate"><span class="pre">summarize_metadata()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#adict.metadata_summary.display_html_summary"><code class="docutils literal notranslate"><span class="pre">display_html_summary()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#adict.stablelabel.get_slurm_cores"><code class="docutils literal notranslate"><span class="pre">get_slurm_cores()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#adict.stablelabel.pca_density_filter"><code class="docutils literal notranslate"><span class="pre">pca_density_filter()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#adict.stablelabel.pca_density_wrapper"><code class="docutils literal notranslate"><span class="pre">pca_density_wrapper()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#adict.stablelabel.pca_density_adata_dict"><code class="docutils literal notranslate"><span class="pre">pca_density_adata_dict()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#adict.stablelabel.stable_label"><code class="docutils literal notranslate"><span class="pre">stable_label()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#adict.stablelabel.stable_label_adata"><code class="docutils literal notranslate"><span class="pre">stable_label_adata()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#adict.stablelabel.update_adata_labels_with_results"><code class="docutils literal notranslate"><span class="pre">update_adata_labels_with_results()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#adict.stablelabel.plot_training_history"><code class="docutils literal notranslate"><span class="pre">plot_training_history()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#adict.stablelabel.plot_changes"><code class="docutils literal notranslate"><span class="pre">plot_changes()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#adict.stablelabel.plot_confusion_matrix_from_adata"><code class="docutils literal notranslate"><span class="pre">plot_confusion_matrix_from_adata()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#adict.stablelabel.plot_confusion_matrix"><code class="docutils literal notranslate"><span class="pre">plot_confusion_matrix()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#adict.squidpy_dict.compute_spatial_neighbors_adata_dict"><code class="docutils literal notranslate"><span class="pre">compute_spatial_neighbors_adata_dict()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#adict.squidpy_dict.perform_colocalization_adata_dict"><code class="docutils literal notranslate"><span class="pre">perform_colocalization_adata_dict()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#adict.squidpy_dict.plot_colocalization_adata_dict"><code class="docutils literal notranslate"><span class="pre">plot_colocalization_adata_dict()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#adict.squidpy_dict.compute_interaction_matrix_adata_dict"><code class="docutils literal notranslate"><span class="pre">compute_interaction_matrix_adata_dict()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#adict.squidpy_dict.plot_interaction_matrix_adata_dict"><code class="docutils literal notranslate"><span class="pre">plot_interaction_matrix_adata_dict()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#anndict.dict.adata_dict_fapply"><code class="docutils literal notranslate"><span class="pre">adata_dict_fapply()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#anndict.dict.adata_dict_fapply_return"><code class="docutils literal notranslate"><span class="pre">adata_dict_fapply_return()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#anndict.dict.check_and_create_strata"><code class="docutils literal notranslate"><span class="pre">check_and_create_strata()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#anndict.dict.build_adata_dict"><code class="docutils literal notranslate"><span class="pre">build_adata_dict()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#anndict.dict.build_adata_dict_main"><code class="docutils literal notranslate"><span class="pre">build_adata_dict_main()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#anndict.dict.subsplit_adata_dict"><code class="docutils literal notranslate"><span class="pre">subsplit_adata_dict()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#anndict.dict.concatenate_adata_dict"><code class="docutils literal notranslate"><span class="pre">concatenate_adata_dict()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#anndict.dict.summarize_metadata_adata_dict"><code class="docutils literal notranslate"><span class="pre">summarize_metadata_adata_dict()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#anndict.dict.display_html_summary_adata_dict"><code class="docutils literal notranslate"><span class="pre">display_html_summary_adata_dict()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#anndict.dict.subsample_adata_dict"><code class="docutils literal notranslate"><span class="pre">subsample_adata_dict()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#anndict.dict.resample_adata"><code class="docutils literal notranslate"><span class="pre">resample_adata()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#anndict.dict.resample_adata_dict"><code class="docutils literal notranslate"><span class="pre">resample_adata_dict()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#anndict.dict.normalize_adata_dict"><code class="docutils literal notranslate"><span class="pre">normalize_adata_dict()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#anndict.dict.log_transform_adata_dict"><code class="docutils literal notranslate"><span class="pre">log_transform_adata_dict()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#anndict.dict.set_high_variance_genes"><code class="docutils literal notranslate"><span class="pre">set_high_variance_genes()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#anndict.dict.scale_adata_dict"><code class="docutils literal notranslate"><span class="pre">scale_adata_dict()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#anndict.dict.pca_adata_dict"><code class="docutils literal notranslate"><span class="pre">pca_adata_dict()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#anndict.dict.calculate_umap_adata_dict"><code class="docutils literal notranslate"><span class="pre">calculate_umap_adata_dict()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#anndict.dict.plot_umap_adata_dict"><code class="docutils literal notranslate"><span class="pre">plot_umap_adata_dict()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#anndict.dict.write_h5ad_adata_dict"><code class="docutils literal notranslate"><span class="pre">write_h5ad_adata_dict()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#anndict.dict.stable_label_adata_dict"><code class="docutils literal notranslate"><span class="pre">stable_label_adata_dict()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#anndict.dict.predict_labels_adata_dict"><code class="docutils literal notranslate"><span class="pre">predict_labels_adata_dict()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#anndict.dict.update_adata_labels_with_stable_label_results_dict"><code class="docutils literal notranslate"><span class="pre">update_adata_labels_with_stable_label_results_dict()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#anndict.dict.update_adata_labels_with_predictions_dict"><code class="docutils literal notranslate"><span class="pre">update_adata_labels_with_predictions_dict()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#anndict.dict.update_adata_dict_with_label_dict"><code class="docutils literal notranslate"><span class="pre">update_adata_dict_with_label_dict()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#anndict.dict.plot_changes_adata_dict"><code class="docutils literal notranslate"><span class="pre">plot_changes_adata_dict()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#anndict.dict.plot_confusion_matrix_adata_dict"><code class="docutils literal notranslate"><span class="pre">plot_confusion_matrix_adata_dict()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#anndict.dict.plot_spatial_adata_dict"><code class="docutils literal notranslate"><span class="pre">plot_spatial_adata_dict()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#anndict.strata.preprocess_adata_strata"><code class="docutils literal notranslate"><span class="pre">preprocess_adata_strata()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#anndict.strata.stable_label_adata_strata"><code class="docutils literal notranslate"><span class="pre">stable_label_adata_strata()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#anndict.strata.plot_confusion_matrix_across_strata"><code class="docutils literal notranslate"><span class="pre">plot_confusion_matrix_across_strata()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#anndict.utils.add_label_to_adata"><code class="docutils literal notranslate"><span class="pre">add_label_to_adata()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#anndict.utils.create_color_map"><code class="docutils literal notranslate"><span class="pre">create_color_map()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#anndict.metadata_summary.summarize_metadata"><code class="docutils literal notranslate"><span class="pre">summarize_metadata()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#anndict.metadata_summary.display_html_summary"><code class="docutils literal notranslate"><span class="pre">display_html_summary()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#anndict.stablelabel.get_slurm_cores"><code class="docutils literal notranslate"><span class="pre">get_slurm_cores()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#anndict.stablelabel.pca_density_filter"><code class="docutils literal notranslate"><span class="pre">pca_density_filter()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#anndict.stablelabel.pca_density_wrapper"><code class="docutils literal notranslate"><span class="pre">pca_density_wrapper()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#anndict.stablelabel.pca_density_adata_dict"><code class="docutils literal notranslate"><span class="pre">pca_density_adata_dict()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#anndict.stablelabel.stable_label"><code class="docutils literal notranslate"><span class="pre">stable_label()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#anndict.stablelabel.stable_label_adata"><code class="docutils literal notranslate"><span class="pre">stable_label_adata()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#anndict.stablelabel.update_adata_labels_with_results"><code class="docutils literal notranslate"><span class="pre">update_adata_labels_with_results()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#anndict.stablelabel.plot_training_history"><code class="docutils literal notranslate"><span class="pre">plot_training_history()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#anndict.stablelabel.plot_changes"><code class="docutils literal notranslate"><span class="pre">plot_changes()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#anndict.stablelabel.plot_confusion_matrix_from_adata"><code class="docutils literal notranslate"><span class="pre">plot_confusion_matrix_from_adata()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#anndict.stablelabel.plot_confusion_matrix"><code class="docutils literal notranslate"><span class="pre">plot_confusion_matrix()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#anndict.squidpy_dict.compute_spatial_neighbors_adata_dict"><code class="docutils literal notranslate"><span class="pre">compute_spatial_neighbors_adata_dict()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#anndict.squidpy_dict.perform_colocalization_adata_dict"><code class="docutils literal notranslate"><span class="pre">perform_colocalization_adata_dict()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#anndict.squidpy_dict.plot_colocalization_adata_dict"><code class="docutils literal notranslate"><span class="pre">plot_colocalization_adata_dict()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#anndict.squidpy_dict.compute_interaction_matrix_adata_dict"><code class="docutils literal notranslate"><span class="pre">compute_interaction_matrix_adata_dict()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#anndict.squidpy_dict.plot_interaction_matrix_adata_dict"><code class="docutils literal notranslate"><span class="pre">plot_interaction_matrix_adata_dict()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -107,7 +107,7 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="index.html">adict</a>
+          <a href="index.html">anndict</a>
       </nav>
 
       <div class="wy-nav-content">
@@ -125,11 +125,11 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="module-adict.dict">
-<span id="modules-documentation"></span><h1>Modules Documentation<a class="headerlink" href="#module-adict.dict" title="Link to this heading"></a></h1>
+  <section id="module-anndict.dict">
+<span id="modules-documentation"></span><h1>Modules Documentation<a class="headerlink" href="#module-anndict.dict" title="Link to this heading"></a></h1>
 <dl class="py function">
-<dt class="sig sig-object py" id="adict.dict.adata_dict_fapply">
-<span class="sig-prename descclassname"><span class="pre">adict.dict.</span></span><span class="sig-name descname"><span class="pre">adata_dict_fapply</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">func</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/adict/dict.html#adata_dict_fapply"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#adict.dict.adata_dict_fapply" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="anndict.dict.adata_dict_fapply">
+<span class="sig-prename descclassname"><span class="pre">anndict.dict.</span></span><span class="sig-name descname"><span class="pre">adata_dict_fapply</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">func</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/dict.html#adata_dict_fapply"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.dict.adata_dict_fapply" title="Link to this definition"></a></dt>
 <dd><p>Applies a given function to each AnnData object in the adata_dict.</p>
 <p>Parameters:
 - adata_dict: Dictionary of AnnData objects with keys as identifiers.
@@ -140,8 +140,8 @@
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="adict.dict.adata_dict_fapply_return">
-<span class="sig-prename descclassname"><span class="pre">adict.dict.</span></span><span class="sig-name descname"><span class="pre">adata_dict_fapply_return</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">func</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/adict/dict.html#adata_dict_fapply_return"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#adict.dict.adata_dict_fapply_return" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="anndict.dict.adata_dict_fapply_return">
+<span class="sig-prename descclassname"><span class="pre">anndict.dict.</span></span><span class="sig-name descname"><span class="pre">adata_dict_fapply_return</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">func</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/dict.html#adata_dict_fapply_return"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.dict.adata_dict_fapply_return" title="Link to this definition"></a></dt>
 <dd><p>Applies a given function to each AnnData object in the adata_dict and returns the results in a dictionary.</p>
 <p>Parameters:
 - adata_dict (dict): Dictionary of AnnData objects with keys as identifiers.
@@ -152,8 +152,8 @@
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="adict.dict.check_and_create_strata">
-<span class="sig-prename descclassname"><span class="pre">adict.dict.</span></span><span class="sig-name descname"><span class="pre">check_and_create_strata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strata_keys</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/adict/dict.html#check_and_create_strata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#adict.dict.check_and_create_strata" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="anndict.dict.check_and_create_strata">
+<span class="sig-prename descclassname"><span class="pre">anndict.dict.</span></span><span class="sig-name descname"><span class="pre">check_and_create_strata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strata_keys</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/dict.html#check_and_create_strata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.dict.check_and_create_strata" title="Link to this definition"></a></dt>
 <dd><p>Checks if the specified stratifying variables are present in the AnnData object,
 and creates a new column combining these variables if it does not already exist.</p>
 <p>Parameters:
@@ -166,8 +166,8 @@ ValueError: If one or more of the specified stratifying variables do not exist i
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="adict.dict.build_adata_dict">
-<span class="sig-prename descclassname"><span class="pre">adict.dict.</span></span><span class="sig-name descname"><span class="pre">build_adata_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strata_keys</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">desired_strata</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/adict/dict.html#build_adata_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#adict.dict.build_adata_dict" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="anndict.dict.build_adata_dict">
+<span class="sig-prename descclassname"><span class="pre">anndict.dict.</span></span><span class="sig-name descname"><span class="pre">build_adata_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strata_keys</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">desired_strata</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/dict.html#build_adata_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.dict.build_adata_dict" title="Link to this definition"></a></dt>
 <dd><p>Build a dictionary of AnnData objects split by desired strata values.</p>
 <p>Parameters:
 adata (AnnData): Annotated data matrix.
@@ -180,8 +180,8 @@ ValueError: If <cite>desired_strata</cite> is neither a list nor a dictionary of
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="adict.dict.build_adata_dict_main">
-<span class="sig-prename descclassname"><span class="pre">adict.dict.</span></span><span class="sig-name descname"><span class="pre">build_adata_dict_main</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strata_keys</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">desired_strata</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/adict/dict.html#build_adata_dict_main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#adict.dict.build_adata_dict_main" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="anndict.dict.build_adata_dict_main">
+<span class="sig-prename descclassname"><span class="pre">anndict.dict.</span></span><span class="sig-name descname"><span class="pre">build_adata_dict_main</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strata_keys</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">desired_strata</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/dict.html#build_adata_dict_main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.dict.build_adata_dict_main" title="Link to this definition"></a></dt>
 <dd><p>Main function to build a dictionary of AnnData objects based on desired strata values.</p>
 <p>Parameters:
 adata (AnnData): Annotated data matrix.
@@ -192,8 +192,8 @@ dict: Dictionary where keys are strata values and values are corresponding AnnDa
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="adict.dict.subsplit_adata_dict">
-<span class="sig-prename descclassname"><span class="pre">adict.dict.</span></span><span class="sig-name descname"><span class="pre">subsplit_adata_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strata_keys</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">desired_strata</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/adict/dict.html#subsplit_adata_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#adict.dict.subsplit_adata_dict" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="anndict.dict.subsplit_adata_dict">
+<span class="sig-prename descclassname"><span class="pre">anndict.dict.</span></span><span class="sig-name descname"><span class="pre">subsplit_adata_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strata_keys</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">desired_strata</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/dict.html#subsplit_adata_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.dict.subsplit_adata_dict" title="Link to this definition"></a></dt>
 <dd><p>Split each value of an AnnData dictionary into further subsets based on additional desired strata.</p>
 <p>Parameters:
 adata_dict (dict): Dictionary where keys are strata values and values are AnnData objects.
@@ -204,8 +204,8 @@ dict: Nested dictionary of AnnData objects split by the additional desired strat
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="adict.dict.concatenate_adata_dict">
-<span class="sig-prename descclassname"><span class="pre">adict.dict.</span></span><span class="sig-name descname"><span class="pre">concatenate_adata_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata_dict</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/adict/dict.html#concatenate_adata_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#adict.dict.concatenate_adata_dict" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="anndict.dict.concatenate_adata_dict">
+<span class="sig-prename descclassname"><span class="pre">anndict.dict.</span></span><span class="sig-name descname"><span class="pre">concatenate_adata_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata_dict</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/dict.html#concatenate_adata_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.dict.concatenate_adata_dict" title="Link to this definition"></a></dt>
 <dd><p>Concatenates all AnnData objects in adata_dict into a single AnnData object. join defualts to “outer” and index_unique defaults to “-“.</p>
 <p>Parameters:
 - adata_dict (dict): Dictionary of AnnData objects with keys as identifiers.
@@ -215,8 +215,8 @@ dict: Nested dictionary of AnnData objects split by the additional desired strat
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="adict.dict.summarize_metadata_adata_dict">
-<span class="sig-prename descclassname"><span class="pre">adict.dict.</span></span><span class="sig-name descname"><span class="pre">summarize_metadata_adata_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata_dict</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/adict/dict.html#summarize_metadata_adata_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#adict.dict.summarize_metadata_adata_dict" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="anndict.dict.summarize_metadata_adata_dict">
+<span class="sig-prename descclassname"><span class="pre">anndict.dict.</span></span><span class="sig-name descname"><span class="pre">summarize_metadata_adata_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata_dict</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/dict.html#summarize_metadata_adata_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.dict.summarize_metadata_adata_dict" title="Link to this definition"></a></dt>
 <dd><p>Generate summary tables for each AnnData object in the dictionary using the summarize_metadata function.</p>
 <p>Parameters:
 - adata_dict (dict): Dictionary of AnnData objects with keys as identifiers.
@@ -226,8 +226,8 @@ dict: Nested dictionary of AnnData objects split by the additional desired strat
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="adict.dict.display_html_summary_adata_dict">
-<span class="sig-prename descclassname"><span class="pre">adict.dict.</span></span><span class="sig-name descname"><span class="pre">display_html_summary_adata_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">summary_dict_dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/adict/dict.html#display_html_summary_adata_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#adict.dict.display_html_summary_adata_dict" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="anndict.dict.display_html_summary_adata_dict">
+<span class="sig-prename descclassname"><span class="pre">anndict.dict.</span></span><span class="sig-name descname"><span class="pre">display_html_summary_adata_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">summary_dict_dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/dict.html#display_html_summary_adata_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.dict.display_html_summary_adata_dict" title="Link to this definition"></a></dt>
 <dd><p>Display separate HTML tables for each metadata category in the summary dictionaries,
 arranging up to three tables in a row before starting a new line.</p>
 <p>Parameters:
@@ -235,8 +235,8 @@ arranging up to three tables in a row before starting a new line.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="adict.dict.subsample_adata_dict">
-<span class="sig-prename descclassname"><span class="pre">adict.dict.</span></span><span class="sig-name descname"><span class="pre">subsample_adata_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata_dict</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/adict/dict.html#subsample_adata_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#adict.dict.subsample_adata_dict" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="anndict.dict.subsample_adata_dict">
+<span class="sig-prename descclassname"><span class="pre">anndict.dict.</span></span><span class="sig-name descname"><span class="pre">subsample_adata_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata_dict</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/dict.html#subsample_adata_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.dict.subsample_adata_dict" title="Link to this definition"></a></dt>
 <dd><p>Subsamples each AnnData object in the dictionary using Scanpy’s subsample function.</p>
 <p>Parameters:
 - adata_dict (dict): Dictionary of AnnData objects with keys as identifiers.
@@ -246,8 +246,8 @@ arranging up to three tables in a row before starting a new line.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="adict.dict.resample_adata">
-<span class="sig-prename descclassname"><span class="pre">adict.dict.</span></span><span class="sig-name descname"><span class="pre">resample_adata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strata_keys</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_num_cells</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/adict/dict.html#resample_adata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#adict.dict.resample_adata" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="anndict.dict.resample_adata">
+<span class="sig-prename descclassname"><span class="pre">anndict.dict.</span></span><span class="sig-name descname"><span class="pre">resample_adata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strata_keys</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_num_cells</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/dict.html#resample_adata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.dict.resample_adata" title="Link to this definition"></a></dt>
 <dd><p>Resample an AnnData object based on specified strata keys and drop strata with fewer than the minimum number of cells.</p>
 <p>Parameters:
 adata (AnnData): Annotated data matrix.
@@ -261,8 +261,8 @@ ValueError: If any of the specified strata_keys do not exist in adata.obs.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="adict.dict.resample_adata_dict">
-<span class="sig-prename descclassname"><span class="pre">adict.dict.</span></span><span class="sig-name descname"><span class="pre">resample_adata_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strata_keys</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_num_cells</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/adict/dict.html#resample_adata_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#adict.dict.resample_adata_dict" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="anndict.dict.resample_adata_dict">
+<span class="sig-prename descclassname"><span class="pre">anndict.dict.</span></span><span class="sig-name descname"><span class="pre">resample_adata_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strata_keys</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_num_cells</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/dict.html#resample_adata_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.dict.resample_adata_dict" title="Link to this definition"></a></dt>
 <dd><p>Resample each AnnData object in a dictionary based on specified strata keys and drop strata with fewer than the minimum number of cells.</p>
 <p>Parameters:
 adata_dict (dict): Dictionary where keys are strata values and values are AnnData objects.
@@ -274,8 +274,8 @@ dict: Dictionary of resampled AnnData objects after filtering.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="adict.dict.normalize_adata_dict">
-<span class="sig-prename descclassname"><span class="pre">adict.dict.</span></span><span class="sig-name descname"><span class="pre">normalize_adata_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata_dict</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/adict/dict.html#normalize_adata_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#adict.dict.normalize_adata_dict" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="anndict.dict.normalize_adata_dict">
+<span class="sig-prename descclassname"><span class="pre">anndict.dict.</span></span><span class="sig-name descname"><span class="pre">normalize_adata_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata_dict</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/dict.html#normalize_adata_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.dict.normalize_adata_dict" title="Link to this definition"></a></dt>
 <dd><p>Normalizes each AnnData object in the dictionary using Scanpy’s normalize_total.</p>
 <p>Parameters:
 - adata_dict (dict): Dictionary of AnnData objects with keys as identifiers.
@@ -285,8 +285,8 @@ dict: Dictionary of resampled AnnData objects after filtering.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="adict.dict.log_transform_adata_dict">
-<span class="sig-prename descclassname"><span class="pre">adict.dict.</span></span><span class="sig-name descname"><span class="pre">log_transform_adata_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata_dict</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/adict/dict.html#log_transform_adata_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#adict.dict.log_transform_adata_dict" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="anndict.dict.log_transform_adata_dict">
+<span class="sig-prename descclassname"><span class="pre">anndict.dict.</span></span><span class="sig-name descname"><span class="pre">log_transform_adata_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata_dict</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/dict.html#log_transform_adata_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.dict.log_transform_adata_dict" title="Link to this definition"></a></dt>
 <dd><p>Log-transforms each AnnData object in the dictionary using Scanpy’s log1p.</p>
 <p>Parameters:
 - adata_dict (dict): Dictionary of AnnData objects with keys as identifiers.
@@ -296,8 +296,8 @@ dict: Dictionary of resampled AnnData objects after filtering.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="adict.dict.set_high_variance_genes">
-<span class="sig-prename descclassname"><span class="pre">adict.dict.</span></span><span class="sig-name descname"><span class="pre">set_high_variance_genes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata_dict</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/adict/dict.html#set_high_variance_genes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#adict.dict.set_high_variance_genes" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="anndict.dict.set_high_variance_genes">
+<span class="sig-prename descclassname"><span class="pre">anndict.dict.</span></span><span class="sig-name descname"><span class="pre">set_high_variance_genes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata_dict</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/dict.html#set_high_variance_genes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.dict.set_high_variance_genes" title="Link to this definition"></a></dt>
 <dd><p>Identifies high-variance genes in each AnnData object in the dictionary.</p>
 <p>Parameters:
 - adata_dict (dict): Dictionary of AnnData objects with keys as identifiers.
@@ -307,8 +307,8 @@ dict: Dictionary of resampled AnnData objects after filtering.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="adict.dict.scale_adata_dict">
-<span class="sig-prename descclassname"><span class="pre">adict.dict.</span></span><span class="sig-name descname"><span class="pre">scale_adata_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata_dict</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/adict/dict.html#scale_adata_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#adict.dict.scale_adata_dict" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="anndict.dict.scale_adata_dict">
+<span class="sig-prename descclassname"><span class="pre">anndict.dict.</span></span><span class="sig-name descname"><span class="pre">scale_adata_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata_dict</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/dict.html#scale_adata_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.dict.scale_adata_dict" title="Link to this definition"></a></dt>
 <dd><p>Scales each AnnData object in the dictionary using Scanpy’s scale function.</p>
 <p>Parameters:
 - adata_dict (dict): Dictionary of AnnData objects with keys as identifiers.
@@ -318,8 +318,8 @@ dict: Dictionary of resampled AnnData objects after filtering.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="adict.dict.pca_adata_dict">
-<span class="sig-prename descclassname"><span class="pre">adict.dict.</span></span><span class="sig-name descname"><span class="pre">pca_adata_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata_dict</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/adict/dict.html#pca_adata_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#adict.dict.pca_adata_dict" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="anndict.dict.pca_adata_dict">
+<span class="sig-prename descclassname"><span class="pre">anndict.dict.</span></span><span class="sig-name descname"><span class="pre">pca_adata_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata_dict</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/dict.html#pca_adata_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.dict.pca_adata_dict" title="Link to this definition"></a></dt>
 <dd><p>Performs PCA on each AnnData object in the dictionary using Scanpy’s pca function.</p>
 <p>Parameters:
 - adata_dict (dict): Dictionary of AnnData objects with keys as identifiers.
@@ -329,8 +329,8 @@ dict: Dictionary of resampled AnnData objects after filtering.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="adict.dict.calculate_umap_adata_dict">
-<span class="sig-prename descclassname"><span class="pre">adict.dict.</span></span><span class="sig-name descname"><span class="pre">calculate_umap_adata_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata_dict</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/adict/dict.html#calculate_umap_adata_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#adict.dict.calculate_umap_adata_dict" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="anndict.dict.calculate_umap_adata_dict">
+<span class="sig-prename descclassname"><span class="pre">anndict.dict.</span></span><span class="sig-name descname"><span class="pre">calculate_umap_adata_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata_dict</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/dict.html#calculate_umap_adata_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.dict.calculate_umap_adata_dict" title="Link to this definition"></a></dt>
 <dd><p>Calculates UMAP embeddings for each subset in the adata_dict.</p>
 <p>Parameters:
 - adata_dict (dict): A dictionary with keys as strata and values as AnnData objects.
@@ -340,8 +340,8 @@ dict: Dictionary of resampled AnnData objects after filtering.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="adict.dict.plot_umap_adata_dict">
-<span class="sig-prename descclassname"><span class="pre">adict.dict.</span></span><span class="sig-name descname"><span class="pre">plot_umap_adata_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata_dict</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/adict/dict.html#plot_umap_adata_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#adict.dict.plot_umap_adata_dict" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="anndict.dict.plot_umap_adata_dict">
+<span class="sig-prename descclassname"><span class="pre">anndict.dict.</span></span><span class="sig-name descname"><span class="pre">plot_umap_adata_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata_dict</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/dict.html#plot_umap_adata_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.dict.plot_umap_adata_dict" title="Link to this definition"></a></dt>
 <dd><p>Plots UMAP embeddings for each AnnData object in adata_dict, colored by a specified variable.</p>
 <p>Parameters:
 - adata_dict (dict): A dictionary with keys as strata and values as AnnData objects.
@@ -351,8 +351,8 @@ dict: Dictionary of resampled AnnData objects after filtering.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="adict.dict.write_h5ad_adata_dict">
-<span class="sig-prename descclassname"><span class="pre">adict.dict.</span></span><span class="sig-name descname"><span class="pre">write_h5ad_adata_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">directory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/adict/dict.html#write_h5ad_adata_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#adict.dict.write_h5ad_adata_dict" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="anndict.dict.write_h5ad_adata_dict">
+<span class="sig-prename descclassname"><span class="pre">anndict.dict.</span></span><span class="sig-name descname"><span class="pre">write_h5ad_adata_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">directory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/dict.html#write_h5ad_adata_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.dict.write_h5ad_adata_dict" title="Link to this definition"></a></dt>
 <dd><p>Saves each AnnData object from adata_dict into separate .h5ad files.</p>
 <p>Parameters:
 - adata_dict: Dictionary of AnnData objects, with keys as identifiers.
@@ -363,8 +363,8 @@ dict: Dictionary of resampled AnnData objects after filtering.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="adict.dict.stable_label_adata_dict">
-<span class="sig-prename descclassname"><span class="pre">adict.dict.</span></span><span class="sig-name descname"><span class="pre">stable_label_adata_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feature_key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label_key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">classifier_class</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iterations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stability_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">moving_average_length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_state</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/adict/dict.html#stable_label_adata_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#adict.dict.stable_label_adata_dict" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="anndict.dict.stable_label_adata_dict">
+<span class="sig-prename descclassname"><span class="pre">anndict.dict.</span></span><span class="sig-name descname"><span class="pre">stable_label_adata_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feature_key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label_key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">classifier_class</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iterations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stability_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">moving_average_length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_state</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/dict.html#stable_label_adata_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.dict.stable_label_adata_dict" title="Link to this definition"></a></dt>
 <dd><p>Trains a classifier for each AnnData object in adata_dict.</p>
 <p>Parameters:
 adata_dict (dict): Dictionary with keys as identifiers and values as AnnData objects.
@@ -377,8 +377,8 @@ results: Dict, keys are the identifiers from adata_dict and values are dictionar
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="adict.dict.predict_labels_adata_dict">
-<span class="sig-prename descclassname"><span class="pre">adict.dict.</span></span><span class="sig-name descname"><span class="pre">predict_labels_adata_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stable_label_results</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feature_key</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/adict/dict.html#predict_labels_adata_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#adict.dict.predict_labels_adata_dict" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="anndict.dict.predict_labels_adata_dict">
+<span class="sig-prename descclassname"><span class="pre">anndict.dict.</span></span><span class="sig-name descname"><span class="pre">predict_labels_adata_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stable_label_results</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feature_key</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/dict.html#predict_labels_adata_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.dict.predict_labels_adata_dict" title="Link to this definition"></a></dt>
 <dd><p>Predicts labels for each AnnData object in adata_dict using the corresponding classifier from stable_label_results,
 and converts numeric predictions back to text labels.</p>
 <p>Parameters:
@@ -390,8 +390,8 @@ predictions_dict (dict): Dictionary with keys as identifiers from adata_dict and
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="adict.dict.update_adata_labels_with_stable_label_results_dict">
-<span class="sig-prename descclassname"><span class="pre">adict.dict.</span></span><span class="sig-name descname"><span class="pre">update_adata_labels_with_stable_label_results_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stable_label_results_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_label_key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'stable_cell_type'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/adict/dict.html#update_adata_labels_with_stable_label_results_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#adict.dict.update_adata_labels_with_stable_label_results_dict" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="anndict.dict.update_adata_labels_with_stable_label_results_dict">
+<span class="sig-prename descclassname"><span class="pre">anndict.dict.</span></span><span class="sig-name descname"><span class="pre">update_adata_labels_with_stable_label_results_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stable_label_results_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_label_key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'stable_cell_type'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/dict.html#update_adata_labels_with_stable_label_results_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.dict.update_adata_labels_with_stable_label_results_dict" title="Link to this definition"></a></dt>
 <dd><p>Updates each AnnData object in adata_dict with new labels from stable_label_results_dict.</p>
 <p>Parameters:
 - adata_dict: Dictionary of AnnData objects to be updated.
@@ -400,8 +400,8 @@ predictions_dict (dict): Dictionary with keys as identifiers from adata_dict and
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="adict.dict.update_adata_labels_with_predictions_dict">
-<span class="sig-prename descclassname"><span class="pre">adict.dict.</span></span><span class="sig-name descname"><span class="pre">update_adata_labels_with_predictions_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">predictions_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_label_key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'predicted_cell_type'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/adict/dict.html#update_adata_labels_with_predictions_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#adict.dict.update_adata_labels_with_predictions_dict" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="anndict.dict.update_adata_labels_with_predictions_dict">
+<span class="sig-prename descclassname"><span class="pre">anndict.dict.</span></span><span class="sig-name descname"><span class="pre">update_adata_labels_with_predictions_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">predictions_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_label_key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'predicted_cell_type'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/dict.html#update_adata_labels_with_predictions_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.dict.update_adata_labels_with_predictions_dict" title="Link to this definition"></a></dt>
 <dd><p>Updates each AnnData object in adata_dict with new labels from predictions_dict.</p>
 <p>Parameters:
 - adata_dict: Dictionary of AnnData objects to be updated.
@@ -410,8 +410,8 @@ predictions_dict (dict): Dictionary with keys as identifiers from adata_dict and
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="adict.dict.update_adata_dict_with_label_dict">
-<span class="sig-prename descclassname"><span class="pre">adict.dict.</span></span><span class="sig-name descname"><span class="pre">update_adata_dict_with_label_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">results_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_label_key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label_key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/adict/dict.html#update_adata_dict_with_label_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#adict.dict.update_adata_dict_with_label_dict" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="anndict.dict.update_adata_dict_with_label_dict">
+<span class="sig-prename descclassname"><span class="pre">anndict.dict.</span></span><span class="sig-name descname"><span class="pre">update_adata_dict_with_label_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">results_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_label_key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label_key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/dict.html#update_adata_dict_with_label_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.dict.update_adata_dict_with_label_dict" title="Link to this definition"></a></dt>
 <dd><p>Wrapper function to update each AnnData object in adata_dict with new labels from results_dict.
 Accepts either ‘final_labels’ or ‘predicted_labels’ as the label key.
 results_dict can be either 1) stable_label_results: the object returned by stable_label_adata_dict()
@@ -424,8 +424,8 @@ or 2) predictions_dict: the object returned by predict_labels_adata_dict</p>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="adict.dict.plot_changes_adata_dict">
-<span class="sig-prename descclassname"><span class="pre">adict.dict.</span></span><span class="sig-name descname"><span class="pre">plot_changes_adata_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">true_label_key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">predicted_label_key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">percentage</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/adict/dict.html#plot_changes_adata_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#adict.dict.plot_changes_adata_dict" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="anndict.dict.plot_changes_adata_dict">
+<span class="sig-prename descclassname"><span class="pre">anndict.dict.</span></span><span class="sig-name descname"><span class="pre">plot_changes_adata_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">true_label_key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">predicted_label_key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">percentage</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/dict.html#plot_changes_adata_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.dict.plot_changes_adata_dict" title="Link to this definition"></a></dt>
 <dd><p>Applies the plot_final_mismatches function to each AnnData object in adata_dict.</p>
 <p>Parameters:
 adata_dict (dict): Dictionary with keys as identifiers and values as AnnData objects.
@@ -435,8 +435,8 @@ percentage (bool): If True, plot percentages, otherwise plot counts.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="adict.dict.plot_confusion_matrix_adata_dict">
-<span class="sig-prename descclassname"><span class="pre">adict.dict.</span></span><span class="sig-name descname"><span class="pre">plot_confusion_matrix_adata_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">true_label_key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">predicted_label_key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row_color_keys</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">col_color_keys</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/adict/dict.html#plot_confusion_matrix_adata_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#adict.dict.plot_confusion_matrix_adata_dict" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="anndict.dict.plot_confusion_matrix_adata_dict">
+<span class="sig-prename descclassname"><span class="pre">anndict.dict.</span></span><span class="sig-name descname"><span class="pre">plot_confusion_matrix_adata_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">true_label_key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">predicted_label_key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row_color_keys</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">col_color_keys</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/dict.html#plot_confusion_matrix_adata_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.dict.plot_confusion_matrix_adata_dict" title="Link to this definition"></a></dt>
 <dd><p>Applies the plot_confusion_matrix_from_adata function to each AnnData object in adata_dict.</p>
 <p>Parameters:
 adata_dict (dict): Dictionary with keys as identifiers and values as AnnData objects.
@@ -448,8 +448,8 @@ col_color_keys (list): Optional keys for column colors in adata.obs.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="adict.dict.plot_spatial_adata_dict">
-<span class="sig-prename descclassname"><span class="pre">adict.dict.</span></span><span class="sig-name descname"><span class="pre">plot_spatial_adata_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata_dict</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/adict/dict.html#plot_spatial_adata_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#adict.dict.plot_spatial_adata_dict" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="anndict.dict.plot_spatial_adata_dict">
+<span class="sig-prename descclassname"><span class="pre">anndict.dict.</span></span><span class="sig-name descname"><span class="pre">plot_spatial_adata_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata_dict</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/dict.html#plot_spatial_adata_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.dict.plot_spatial_adata_dict" title="Link to this definition"></a></dt>
 <dd><p>Plots spatial data for each AnnData object in adata_dict, colored by a specified variable.</p>
 <p>Parameters:
 - adata_dict (dict): A dictionary with keys as strata and values as AnnData objects.
@@ -458,9 +458,9 @@ col_color_keys (list): Optional keys for column colors in adata.obs.</p>
 - None: The function creates spatial plots for the AnnData objects.</p>
 </dd></dl>
 
-<dl class="py function" id="module-adict.strata">
-<dt class="sig sig-object py" id="adict.strata.preprocess_adata_strata">
-<span class="sig-prename descclassname"><span class="pre">adict.strata.</span></span><span class="sig-name descname"><span class="pre">preprocess_adata_strata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strata_keys</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_cells</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_cells</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">25</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/adict/strata.html#preprocess_adata_strata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#adict.strata.preprocess_adata_strata" title="Link to this definition"></a></dt>
+<dl class="py function" id="module-anndict.strata">
+<dt class="sig sig-object py" id="anndict.strata.preprocess_adata_strata">
+<span class="sig-prename descclassname"><span class="pre">anndict.strata.</span></span><span class="sig-name descname"><span class="pre">preprocess_adata_strata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strata_keys</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_cells</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_cells</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">25</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/strata.html#preprocess_adata_strata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.strata.preprocess_adata_strata" title="Link to this definition"></a></dt>
 <dd><p>Preprocess an AnnData object by stratifying, filtering, and subsampling based on specified criteria.</p>
 <p>Parameters:
 adata (AnnData): Annotated data matrix.
@@ -474,8 +474,8 @@ ValueError: If no strata meet the minimum cell requirement after filtering.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="adict.strata.stable_label_adata_strata">
-<span class="sig-prename descclassname"><span class="pre">adict.strata.</span></span><span class="sig-name descname"><span class="pre">stable_label_adata_strata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feature_key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label_key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strata_keys</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">classifier</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iterations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stability_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">moving_average_length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_state</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/adict/strata.html#stable_label_adata_strata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#adict.strata.stable_label_adata_strata" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="anndict.strata.stable_label_adata_strata">
+<span class="sig-prename descclassname"><span class="pre">anndict.strata.</span></span><span class="sig-name descname"><span class="pre">stable_label_adata_strata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feature_key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label_key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strata_keys</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">classifier</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iterations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stability_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">moving_average_length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_state</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/strata.html#stable_label_adata_strata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.strata.stable_label_adata_strata" title="Link to this definition"></a></dt>
 <dd><p>Trains a classifier for each stratum specified in adata.obs using a strata_key.</p>
 <p>Parameters:
 - adata: AnnData object containing the dataset.
@@ -489,8 +489,8 @@ ValueError: If no strata meet the minimum cell requirement after filtering.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="adict.strata.plot_confusion_matrix_across_strata">
-<span class="sig-prename descclassname"><span class="pre">adict.strata.</span></span><span class="sig-name descname"><span class="pre">plot_confusion_matrix_across_strata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">true_label_key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">predicted_label_key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strata_keys</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Confusion</span> <span class="pre">Matrix'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/adict/strata.html#plot_confusion_matrix_across_strata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#adict.strata.plot_confusion_matrix_across_strata" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="anndict.strata.plot_confusion_matrix_across_strata">
+<span class="sig-prename descclassname"><span class="pre">anndict.strata.</span></span><span class="sig-name descname"><span class="pre">plot_confusion_matrix_across_strata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">true_label_key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">predicted_label_key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strata_keys</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Confusion</span> <span class="pre">Matrix'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/strata.html#plot_confusion_matrix_across_strata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.strata.plot_confusion_matrix_across_strata" title="Link to this definition"></a></dt>
 <dd><p>Wrapper function to plot confusion matrices for different strata in an AnnData object.</p>
 <p>Parameters:
 - adata: AnnData object containing the dataset.
@@ -500,9 +500,9 @@ ValueError: If no strata meet the minimum cell requirement after filtering.</p>
 - title: str, prefix to the title of the plot for each stratum.</p>
 </dd></dl>
 
-<dl class="py function" id="module-adict.utils">
-<dt class="sig sig-object py" id="adict.utils.add_label_to_adata">
-<span class="sig-prename descclassname"><span class="pre">adict.utils.</span></span><span class="sig-name descname"><span class="pre">add_label_to_adata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">indices</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_label_key</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/adict/utils.html#add_label_to_adata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#adict.utils.add_label_to_adata" title="Link to this definition"></a></dt>
+<dl class="py function" id="module-anndict.utils">
+<dt class="sig sig-object py" id="anndict.utils.add_label_to_adata">
+<span class="sig-prename descclassname"><span class="pre">anndict.utils.</span></span><span class="sig-name descname"><span class="pre">add_label_to_adata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">indices</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_label_key</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/utils.html#add_label_to_adata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.utils.add_label_to_adata" title="Link to this definition"></a></dt>
 <dd><p>Adds a label to the AnnData object in a specified column for given indices.</p>
 <p>Parameters:
 - adata: AnnData object to be updated.
@@ -512,8 +512,8 @@ ValueError: If no strata meet the minimum cell requirement after filtering.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="adict.utils.create_color_map">
-<span class="sig-prename descclassname"><span class="pre">adict.utils.</span></span><span class="sig-name descname"><span class="pre">create_color_map</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keys</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/adict/utils.html#create_color_map"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#adict.utils.create_color_map" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="anndict.utils.create_color_map">
+<span class="sig-prename descclassname"><span class="pre">anndict.utils.</span></span><span class="sig-name descname"><span class="pre">create_color_map</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keys</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/utils.html#create_color_map"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.utils.create_color_map" title="Link to this definition"></a></dt>
 <dd><p>Creates a unified color map for given keys from an AnnData object, differentiating
 between continuous and categorical data.</p>
 <p>Parameters:
@@ -523,9 +523,9 @@ between continuous and categorical data.</p>
 - dict: A color map linking unique values or ranges from the specified keys to colors.</p>
 </dd></dl>
 
-<dl class="py function" id="module-adict.metadata_summary">
-<dt class="sig sig-object py" id="adict.metadata_summary.summarize_metadata">
-<span class="sig-prename descclassname"><span class="pre">adict.metadata_summary.</span></span><span class="sig-name descname"><span class="pre">summarize_metadata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">columns</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/adict/metadata_summary.html#summarize_metadata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#adict.metadata_summary.summarize_metadata" title="Link to this definition"></a></dt>
+<dl class="py function" id="module-anndict.metadata_summary">
+<dt class="sig sig-object py" id="anndict.metadata_summary.summarize_metadata">
+<span class="sig-prename descclassname"><span class="pre">anndict.metadata_summary.</span></span><span class="sig-name descname"><span class="pre">summarize_metadata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">columns</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/metadata_summary.html#summarize_metadata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.metadata_summary.summarize_metadata" title="Link to this definition"></a></dt>
 <dd><p>Generate a summary for specified metadata columns in an anndata object as a dictionary.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -545,8 +545,8 @@ Use ‘*’ to specify joint frequencies of multiple columns.</p></li>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="adict.metadata_summary.display_html_summary">
-<span class="sig-prename descclassname"><span class="pre">adict.metadata_summary.</span></span><span class="sig-name descname"><span class="pre">display_html_summary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">summary_dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/adict/metadata_summary.html#display_html_summary"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#adict.metadata_summary.display_html_summary" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="anndict.metadata_summary.display_html_summary">
+<span class="sig-prename descclassname"><span class="pre">anndict.metadata_summary.</span></span><span class="sig-name descname"><span class="pre">display_html_summary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">summary_dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/metadata_summary.html#display_html_summary"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.metadata_summary.display_html_summary" title="Link to this definition"></a></dt>
 <dd><p>Display separate HTML tables for each metadata category in the summary dictionary,
 arranging up to three tables in a row before starting a new line.</p>
 <dl class="field-list simple">
@@ -556,15 +556,15 @@ arranging up to three tables in a row before starting a new line.</p>
 </dl>
 </dd></dl>
 
-<dl class="py function" id="module-adict.stablelabel">
-<dt class="sig sig-object py" id="adict.stablelabel.get_slurm_cores">
-<span class="sig-prename descclassname"><span class="pre">adict.stablelabel.</span></span><span class="sig-name descname"><span class="pre">get_slurm_cores</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/adict/stablelabel.html#get_slurm_cores"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#adict.stablelabel.get_slurm_cores" title="Link to this definition"></a></dt>
+<dl class="py function" id="module-anndict.stablelabel">
+<dt class="sig sig-object py" id="anndict.stablelabel.get_slurm_cores">
+<span class="sig-prename descclassname"><span class="pre">anndict.stablelabel.</span></span><span class="sig-name descname"><span class="pre">get_slurm_cores</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/stablelabel.html#get_slurm_cores"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.stablelabel.get_slurm_cores" title="Link to this definition"></a></dt>
 <dd><p>Returns the total number of CPU cores allocated to a Slurm job based on environment variables.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="adict.stablelabel.pca_density_filter">
-<span class="sig-prename descclassname"><span class="pre">adict.stablelabel.</span></span><span class="sig-name descname"><span class="pre">pca_density_filter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_components</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/adict/stablelabel.html#pca_density_filter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#adict.stablelabel.pca_density_filter" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="anndict.stablelabel.pca_density_filter">
+<span class="sig-prename descclassname"><span class="pre">anndict.stablelabel.</span></span><span class="sig-name descname"><span class="pre">pca_density_filter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_components</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/stablelabel.html#pca_density_filter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.stablelabel.pca_density_filter" title="Link to this definition"></a></dt>
 <dd><p>Calculate density contours for PCA-reduced data, return the density of all input data,
 and identify the unique variables that were included in the PCA.</p>
 <p>Parameters:
@@ -577,8 +577,8 @@ and identify the unique variables that were included in the PCA.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="adict.stablelabel.pca_density_wrapper">
-<span class="sig-prename descclassname"><span class="pre">adict.stablelabel.</span></span><span class="sig-name descname"><span class="pre">pca_density_wrapper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/adict/stablelabel.html#pca_density_wrapper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#adict.stablelabel.pca_density_wrapper" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="anndict.stablelabel.pca_density_wrapper">
+<span class="sig-prename descclassname"><span class="pre">anndict.stablelabel.</span></span><span class="sig-name descname"><span class="pre">pca_density_wrapper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/stablelabel.html#pca_density_wrapper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.stablelabel.pca_density_wrapper" title="Link to this definition"></a></dt>
 <dd><p>Apply calculate_density_contours_with_unique_variables to subsets of X indicated by labels.
 Returns a vector indicating whether each row in X is above the threshold for its respective label group.</p>
 <p>Parameters:
@@ -589,8 +589,8 @@ Returns a vector indicating whether each row in X is above the threshold for its
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="adict.stablelabel.pca_density_adata_dict">
-<span class="sig-prename descclassname"><span class="pre">adict.stablelabel.</span></span><span class="sig-name descname"><span class="pre">pca_density_adata_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keys</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/adict/stablelabel.html#pca_density_adata_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#adict.stablelabel.pca_density_adata_dict" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="anndict.stablelabel.pca_density_adata_dict">
+<span class="sig-prename descclassname"><span class="pre">anndict.stablelabel.</span></span><span class="sig-name descname"><span class="pre">pca_density_adata_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keys</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/stablelabel.html#pca_density_adata_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.stablelabel.pca_density_adata_dict" title="Link to this definition"></a></dt>
 <dd><p>Applies PCA-based density filtering recursively on subsets of an AnnData dictionary. Each subset
 is determined by the provided keys. The function returns a dictionary where each AnnData object
 has an additional metadata key indicating the result of the density filter. The structure of the
@@ -603,8 +603,8 @@ input dictionary is preserved, and each AnnData object’s metadata is updated i
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="adict.stablelabel.stable_label">
-<span class="sig-prename descclassname"><span class="pre">adict.stablelabel.</span></span><span class="sig-name descname"><span class="pre">stable_label</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">classifier</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iterations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stability_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">moving_average_length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_state</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/adict/stablelabel.html#stable_label"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#adict.stablelabel.stable_label" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="anndict.stablelabel.stable_label">
+<span class="sig-prename descclassname"><span class="pre">anndict.stablelabel.</span></span><span class="sig-name descname"><span class="pre">stable_label</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">classifier</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iterations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stability_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">moving_average_length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_state</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/stablelabel.html#stable_label"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.stablelabel.stable_label" title="Link to this definition"></a></dt>
 <dd><p>Trains a classifier using a semi-supervised approach where labels are probabilistically reassigned based on classifier predictions.</p>
 <p>Parameters:
 - X: ndarray, feature matrix.
@@ -622,8 +622,8 @@ input dictionary is preserved, and each AnnData object’s metadata is updated i
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="adict.stablelabel.stable_label_adata">
-<span class="sig-prename descclassname"><span class="pre">adict.stablelabel.</span></span><span class="sig-name descname"><span class="pre">stable_label_adata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feature_key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label_key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">classifier</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iterations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stability_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">moving_average_length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_state</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/adict/stablelabel.html#stable_label_adata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#adict.stablelabel.stable_label_adata" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="anndict.stablelabel.stable_label_adata">
+<span class="sig-prename descclassname"><span class="pre">anndict.stablelabel.</span></span><span class="sig-name descname"><span class="pre">stable_label_adata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feature_key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label_key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">classifier</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iterations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stability_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">moving_average_length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_state</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/stablelabel.html#stable_label_adata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.stablelabel.stable_label_adata" title="Link to this definition"></a></dt>
 <dd><p>A wrapper for train_classifier_with_probabilistic_labels that handles categorical labels.</p>
 <p>Parameters:
 - adata: AnnData object containing the dataset.
@@ -640,8 +640,8 @@ input dictionary is preserved, and each AnnData object’s metadata is updated i
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="adict.stablelabel.update_adata_labels_with_results">
-<span class="sig-prename descclassname"><span class="pre">adict.stablelabel.</span></span><span class="sig-name descname"><span class="pre">update_adata_labels_with_results</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">results</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_label_key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'stable_cell_type'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/adict/stablelabel.html#update_adata_labels_with_results"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#adict.stablelabel.update_adata_labels_with_results" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="anndict.stablelabel.update_adata_labels_with_results">
+<span class="sig-prename descclassname"><span class="pre">anndict.stablelabel.</span></span><span class="sig-name descname"><span class="pre">update_adata_labels_with_results</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">results</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_label_key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'stable_cell_type'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/stablelabel.html#update_adata_labels_with_results"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.stablelabel.update_adata_labels_with_results" title="Link to this definition"></a></dt>
 <dd><p>Collects indices and labels from results and adds them to the AnnData object using add_label_to_adata function.</p>
 <p>Parameters:
 - adata: AnnData object to be updated.
@@ -650,8 +650,8 @@ input dictionary is preserved, and each AnnData object’s metadata is updated i
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="adict.stablelabel.plot_training_history">
-<span class="sig-prename descclassname"><span class="pre">adict.stablelabel.</span></span><span class="sig-name descname"><span class="pre">plot_training_history</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">results</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">separate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/adict/stablelabel.html#plot_training_history"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#adict.stablelabel.plot_training_history" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="anndict.stablelabel.plot_training_history">
+<span class="sig-prename descclassname"><span class="pre">anndict.stablelabel.</span></span><span class="sig-name descname"><span class="pre">plot_training_history</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">results</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">separate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/stablelabel.html#plot_training_history"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.stablelabel.plot_training_history" title="Link to this definition"></a></dt>
 <dd><p>Plot the training history of a model, showing percent label change versus iteration.</p>
 <p>Parameters:
 results (dict): Dictionary where keys are strata names and values are dictionaries containing training history.
@@ -661,8 +661,8 @@ None</p>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="adict.stablelabel.plot_changes">
-<span class="sig-prename descclassname"><span class="pre">adict.stablelabel.</span></span><span class="sig-name descname"><span class="pre">plot_changes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">true_label_key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">predicted_label_key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">percentage</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stratum</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/adict/stablelabel.html#plot_changes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#adict.stablelabel.plot_changes" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="anndict.stablelabel.plot_changes">
+<span class="sig-prename descclassname"><span class="pre">anndict.stablelabel.</span></span><span class="sig-name descname"><span class="pre">plot_changes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">true_label_key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">predicted_label_key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">percentage</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stratum</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/stablelabel.html#plot_changes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.stablelabel.plot_changes" title="Link to this definition"></a></dt>
 <dd><p>Plot the changes between true and predicted labels in an AnnData object.</p>
 <p>Parameters:
 adata (AnnData): Annotated data matrix.
@@ -675,8 +675,8 @@ None</p>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="adict.stablelabel.plot_confusion_matrix_from_adata">
-<span class="sig-prename descclassname"><span class="pre">adict.stablelabel.</span></span><span class="sig-name descname"><span class="pre">plot_confusion_matrix_from_adata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">true_label_key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">predicted_label_key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Confusion</span> <span class="pre">Matrix'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row_color_keys</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">col_color_keys</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/adict/stablelabel.html#plot_confusion_matrix_from_adata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#adict.stablelabel.plot_confusion_matrix_from_adata" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="anndict.stablelabel.plot_confusion_matrix_from_adata">
+<span class="sig-prename descclassname"><span class="pre">anndict.stablelabel.</span></span><span class="sig-name descname"><span class="pre">plot_confusion_matrix_from_adata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">true_label_key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">predicted_label_key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Confusion</span> <span class="pre">Matrix'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row_color_keys</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">col_color_keys</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/stablelabel.html#plot_confusion_matrix_from_adata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.stablelabel.plot_confusion_matrix_from_adata" title="Link to this definition"></a></dt>
 <dd><p>Wrapper function to plot a confusion matrix from an AnnData object, with optional row and column colors.</p>
 <p>Parameters:
 - adata: AnnData object containing the dataset.
@@ -688,8 +688,8 @@ None</p>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="adict.stablelabel.plot_confusion_matrix">
-<span class="sig-prename descclassname"><span class="pre">adict.stablelabel.</span></span><span class="sig-name descname"><span class="pre">plot_confusion_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">true_labels_encoded</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">predicted_labels_encoded</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color_map</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Confusion</span> <span class="pre">Matrix'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row_color_keys</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">col_color_keys</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">true_label_color_dict</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">predicted_label_color_dict</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">true_labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">predicted_labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/adict/stablelabel.html#plot_confusion_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#adict.stablelabel.plot_confusion_matrix" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="anndict.stablelabel.plot_confusion_matrix">
+<span class="sig-prename descclassname"><span class="pre">anndict.stablelabel.</span></span><span class="sig-name descname"><span class="pre">plot_confusion_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">true_labels_encoded</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">predicted_labels_encoded</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color_map</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Confusion</span> <span class="pre">Matrix'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row_color_keys</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">col_color_keys</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">true_label_color_dict</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">predicted_label_color_dict</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">true_labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">predicted_labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/stablelabel.html#plot_confusion_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.stablelabel.plot_confusion_matrix" title="Link to this definition"></a></dt>
 <dd><p>Plots a confusion matrix using seaborn clustermap with optional row and column colors and clustering turned off.</p>
 <p>Parameters:
 - true_labels_encoded: array-like, encoded true class labels.
@@ -700,17 +700,17 @@ None</p>
 - col_colors: array-like, colors for each column.</p>
 </dd></dl>
 
-<dl class="py function" id="module-adict.squidpy_dict">
-<dt class="sig sig-object py" id="adict.squidpy_dict.compute_spatial_neighbors_adata_dict">
-<span class="sig-prename descclassname"><span class="pre">adict.squidpy_dict.</span></span><span class="sig-name descname"><span class="pre">compute_spatial_neighbors_adata_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata_dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/adict/squidpy_dict.html#compute_spatial_neighbors_adata_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#adict.squidpy_dict.compute_spatial_neighbors_adata_dict" title="Link to this definition"></a></dt>
+<dl class="py function" id="module-anndict.squidpy_dict">
+<dt class="sig sig-object py" id="anndict.squidpy_dict.compute_spatial_neighbors_adata_dict">
+<span class="sig-prename descclassname"><span class="pre">anndict.squidpy_dict.</span></span><span class="sig-name descname"><span class="pre">compute_spatial_neighbors_adata_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata_dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/squidpy_dict.html#compute_spatial_neighbors_adata_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.squidpy_dict.compute_spatial_neighbors_adata_dict" title="Link to this definition"></a></dt>
 <dd><p>Computes spatial neighborhood graphs for each AnnData object in adata_dict.</p>
 <p>Parameters:
 adata_dict (dict): A dictionary with keys as strata and values as AnnData objects.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="adict.squidpy_dict.perform_colocalization_adata_dict">
-<span class="sig-prename descclassname"><span class="pre">adict.squidpy_dict.</span></span><span class="sig-name descname"><span class="pre">perform_colocalization_adata_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cluster_key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'cell_type'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/adict/squidpy_dict.html#perform_colocalization_adata_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#adict.squidpy_dict.perform_colocalization_adata_dict" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="anndict.squidpy_dict.perform_colocalization_adata_dict">
+<span class="sig-prename descclassname"><span class="pre">anndict.squidpy_dict.</span></span><span class="sig-name descname"><span class="pre">perform_colocalization_adata_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cluster_key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'cell_type'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/squidpy_dict.html#perform_colocalization_adata_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.squidpy_dict.perform_colocalization_adata_dict" title="Link to this definition"></a></dt>
 <dd><p>Performs colocalization analysis for each AnnData object in adata_dict.</p>
 <p>Parameters:
 adata_dict (dict): A dictionary with keys as strata and values as AnnData objects.
@@ -718,8 +718,8 @@ cluster_key (str): The key in adata.obs containing the cell type or cluster info
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="adict.squidpy_dict.plot_colocalization_adata_dict">
-<span class="sig-prename descclassname"><span class="pre">adict.squidpy_dict.</span></span><span class="sig-name descname"><span class="pre">plot_colocalization_adata_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cluster_key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'cell_type'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_cell_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(10,</span> <span class="pre">5)</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/adict/squidpy_dict.html#plot_colocalization_adata_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#adict.squidpy_dict.plot_colocalization_adata_dict" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="anndict.squidpy_dict.plot_colocalization_adata_dict">
+<span class="sig-prename descclassname"><span class="pre">anndict.squidpy_dict.</span></span><span class="sig-name descname"><span class="pre">plot_colocalization_adata_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cluster_key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'cell_type'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_cell_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(10,</span> <span class="pre">5)</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/squidpy_dict.html#plot_colocalization_adata_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.squidpy_dict.plot_colocalization_adata_dict" title="Link to this definition"></a></dt>
 <dd><p>Plots colocalization results for each AnnData object in adata_dict, optionally focusing on a specific source cell type.</p>
 <p>Parameters:
 adata_dict (dict): A dictionary with keys as strata and values as AnnData objects.
@@ -728,8 +728,8 @@ source_cell_type (str, optional): The specific source cell type to focus on in t
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="adict.squidpy_dict.compute_interaction_matrix_adata_dict">
-<span class="sig-prename descclassname"><span class="pre">adict.squidpy_dict.</span></span><span class="sig-name descname"><span class="pre">compute_interaction_matrix_adata_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cluster_key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'cell_type'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/adict/squidpy_dict.html#compute_interaction_matrix_adata_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#adict.squidpy_dict.compute_interaction_matrix_adata_dict" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="anndict.squidpy_dict.compute_interaction_matrix_adata_dict">
+<span class="sig-prename descclassname"><span class="pre">anndict.squidpy_dict.</span></span><span class="sig-name descname"><span class="pre">compute_interaction_matrix_adata_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cluster_key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'cell_type'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/squidpy_dict.html#compute_interaction_matrix_adata_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.squidpy_dict.compute_interaction_matrix_adata_dict" title="Link to this definition"></a></dt>
 <dd><p>Computes interaction matrices for each AnnData object in adata_dict.</p>
 <p>Parameters:
 adata_dict (dict): A dictionary with keys as strata and values as AnnData objects.
@@ -737,8 +737,8 @@ cluster_key (str): The key in adata.obs containing the cell type or cluster info
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="adict.squidpy_dict.plot_interaction_matrix_adata_dict">
-<span class="sig-prename descclassname"><span class="pre">adict.squidpy_dict.</span></span><span class="sig-name descname"><span class="pre">plot_interaction_matrix_adata_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cluster_key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'cell_type'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/adict/squidpy_dict.html#plot_interaction_matrix_adata_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#adict.squidpy_dict.plot_interaction_matrix_adata_dict" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="anndict.squidpy_dict.plot_interaction_matrix_adata_dict">
+<span class="sig-prename descclassname"><span class="pre">anndict.squidpy_dict.</span></span><span class="sig-name descname"><span class="pre">plot_interaction_matrix_adata_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cluster_key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'cell_type'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/squidpy_dict.html#plot_interaction_matrix_adata_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.squidpy_dict.plot_interaction_matrix_adata_dict" title="Link to this definition"></a></dt>
 <dd><p>Plots interaction matrices for each AnnData object in adata_dict.</p>
 <p>Parameters:
 adata_dict (dict): A dictionary with keys as strata and values as AnnData objects.
@@ -751,7 +751,7 @@ cluster_key (str): The key in adata.obs containing the cell type or cluster info
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="index.html" class="btn btn-neutral float-left" title="Welcome to adict’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="index.html" class="btn btn-neutral float-left" title="Welcome to anndict’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
 
   <hr/>

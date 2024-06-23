@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='adict',
+    name='anndict',
     version='0.1',
     packages=find_packages(),
     description='Conveniently process a dictionary of anndatas (adata_dict)',
@@ -19,8 +19,7 @@ setup(
         'scipy',
         'seaborn',
         'matplotlib',
-        'squidpy',
-        'inspect'
+        'squidpy'
     ],
     classifiers=[
         # Trove classifiers
