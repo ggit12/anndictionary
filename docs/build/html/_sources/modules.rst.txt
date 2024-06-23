@@ -1,32 +1,32 @@
 Modules Documentation
 =====================
 
-.. automodule:: adict.dict
+.. automodule:: anndict.dict
    :members:
    :undoc-members:
    :member-order: bysource
 
-.. automodule:: adict.strata
+.. automodule:: anndict.strata
    :members:
    :undoc-members:
    :member-order: bysource
 
-.. automodule:: adict.utils
+.. automodule:: anndict.utils
    :members:
    :undoc-members:
    :member-order: bysource
 
-.. automodule:: adict.metadata_summary
+.. automodule:: anndict.metadata_summary
    :members:
    :undoc-members:
    :member-order: bysource
 
-.. automodule:: adict.stablelabel
+.. automodule:: anndict.stablelabel
    :members:
    :undoc-members:
    :member-order: bysource
    
-.. automodule:: adict.squidpy_dict
+.. automodule:: anndict.squidpy_dict
    :members:
    :undoc-members:
    :member-order: bysource
