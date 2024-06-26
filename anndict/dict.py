@@ -440,7 +440,7 @@ def stable_label_adata_dict(adata_dict, feature_key, label_key, classifier_class
     label_key (str): Key to access the labels in adata.obs.
     classifier: Classifier instance that implements fit and predict_proba methods.
     max_iterations, stability_threshold, moving_average_length, random_state: Additional parameters for training.
-    **kwargs: Additional keyword arguments to pass to the classifier constructor.
+    kwargs: Additional keyword arguments to pass to the classifier constructor.
 
     Returns:
     results: Dict, keys are the identifiers from adata_dict and values are dictionaries containing the outputs from stable_label_adata.
