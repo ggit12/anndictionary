@@ -430,7 +430,7 @@ def write_h5ad_adata_dict(adata_dict, directory, file_prefix=""):
         sc.write(file_path, adata)
 
 
-def stable_label_adata_dict(adata_dict, feature_key, label_key, classifier_class, max_iterations=100, stability_threshold=0.05, moving_average_length=3, random_state=None):
+def stable_label_adata_dict(adata_dict, feature_key, label_key, classifier_class, max_iterations=100, stability_threshold=0.05, moving_average_length=3, random_state=None, **kwargs):
     """
     Trains a classifier for each AnnData object in adata_dict.
 
@@ -440,6 +440,7 @@ def stable_label_adata_dict(adata_dict, feature_key, label_key, classifier_class
     label_key (str): Key to access the labels in adata.obs.
     classifier: Classifier instance that implements fit and predict_proba methods.
     max_iterations, stability_threshold, moving_average_length, random_state: Additional parameters for training.
+    **kwargs: Additional keyword arguments to pass to the classifier constructor.
 
     Returns:
     results: Dict, keys are the identifiers from adata_dict and values are dictionaries containing the outputs from stable_label_adata.
@@ -449,7 +450,7 @@ def stable_label_adata_dict(adata_dict, feature_key, label_key, classifier_class
         print(f"Training classifier for {stratum}")
 
         #create a classifier for this stratum
-        classifier = classifier_class(random_state=random_state, max_iter=1000, n_jobs=get_slurm_cores())
+        classifier = classifier_class(random_state=random_state, **kwargs)
 
 
         indices = np.array(adata.obs.index)
