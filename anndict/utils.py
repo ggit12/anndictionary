@@ -20,21 +20,40 @@ import matplotlib
 import matplotlib.pyplot as plt
 from sklearn.metrics import confusion_matrix
 
+
 def add_label_to_adata(adata, indices, labels, new_label_key):
     """
     Adds a label to the AnnData object in a specified column for given indices.
 
     Parameters:
     - adata: AnnData object to be updated.
-    - all_indices: Array of indices where labels will be assigned.
-    - all_labels: Array of labels corresponding to the indices.
+    - indices: Array of indices where labels will be assigned.
+    - labels: Array of labels corresponding to the indices.
     - new_label_key: Name of the column in adata.obs where the labels will be stored.
     """
-    # Initialize a new label column with a default value 'unannotated'
-    adata.obs[new_label_key] = 'unannotated'
+    add_col_to_adata_obs(adata, indices, labels, new_label_key)
+    
 
-    # Assign the collected final labels to the new column for the corresponding indices
+def add_col_to_adata_obs(adata, indices, labels, new_label_key):
+    """
+    Adds a label to the AnnData object in a specified column for given indices.
+
+    Parameters:
+    - adata: AnnData object to be updated.
+    - indices: Array of indices where labels will be assigned.
+    - labels: Array of labels corresponding to the indices.
+    - new_label_key: Name of the column in adata.obs where the labels will be stored.
+    """
+    if isinstance(labels[0], (int, np.integer)):
+        dtype = int
+    elif isinstance(labels[0], (float, np.floating)):
+        dtype = float
+    else:
+        dtype = str
+
+    adata.obs[new_label_key] = np.full(adata.obs.shape[0], np.nan, dtype=dtype)
     adata.obs.loc[indices, new_label_key] = labels
+
 
 def create_color_map(adata, keys):
     """
