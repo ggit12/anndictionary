@@ -112,34 +112,42 @@ def check_and_create_strata(adata, strata_keys):
 
     return strata_key
 
-def build_adata_dict(adata, strata_keys, desired_strata):
+def build_adata_dict(adata, strata_keys, desired_strata=None):
     """
     Build a dictionary of AnnData objects split by desired strata values.
 
     Parameters:
     adata (AnnData): Annotated data matrix.
     strata_keys (list of str): List of column names in `adata.obs` to use for stratification.
-    desired_strata (list or dict): List of desired strata values or a dictionary where keys are strata keys and values are lists of desired strata values.
-
+    desired_strata (list or dict, optional): List of desired strata values or a dictionary where keys are strata keys and values are lists of desired strata values. If None (Default), all combinations of categories in adata.obs[strata_keys] will be used.
     Returns:
     dict: Dictionary where keys are strata values and values are corresponding AnnData subsets.
 
     Raises:
     ValueError: If `desired_strata` is neither a list nor a dictionary of lists.
     """
-    if isinstance(desired_strata, list):
+    if desired_strata is None:
+        # Generate all combinations of categories in adata.obs[strata_keys]
+        all_categories = [adata.obs[key].cat.categories.tolist() for key in strata_keys]
+        all_combinations = itertools.product(*all_categories)
+        desired_strata = ['_'.join(map(str, comb)) for comb in all_combinations]
+        return build_adata_dict_main(adata, strata_keys, desired_strata, print_missing_strata=False)
+    
+    elif isinstance(desired_strata, list):
         # Directly use the list of strata
         return build_adata_dict_main(adata, strata_keys, desired_strata)
+    
     elif isinstance(desired_strata, dict):
         # Generate all combinations of desired strata values across strata_keys
         all_combinations = itertools.product(*(desired_strata[key] for key in strata_keys))
         # Convert tuples of combinations to a format suitable for strata_keys
         combined_strata_list = ['_'.join(map(str, comb)) for comb in all_combinations]
         return build_adata_dict_main(adata, strata_keys, combined_strata_list)
+    
     else:
         raise ValueError("desired_strata must be either a list or a dictionary of lists")
 
-def build_adata_dict_main(adata, strata_keys, desired_strata):
+def build_adata_dict_main(adata, strata_keys, desired_strata, print_missing_strata=True):
     """
     Main function to build a dictionary of AnnData objects based on desired strata values.
 
@@ -161,7 +169,8 @@ def build_adata_dict_main(adata, strata_keys, desired_strata):
             subset = adata[adata.obs[strata_key] == stratum]
             subsets_dict[stratum] = subset
         else:
-            print(f"Warning: '{stratum}' is not a valid category in '{strata_key}'.")
+            if print_missing_strata:
+                print(f"Warning: '{stratum}' is not a valid category in '{strata_key}'.")
     return subsets_dict
 
 def subsplit_adata_dict(adata_dict, strata_keys, desired_strata):
@@ -595,24 +604,3 @@ def plot_confusion_matrix_adata_dict(adata_dict, true_label_key, predicted_label
         subset_title = f"Confusion Matrix for {stratum}"
         plot_confusion_matrix_from_adata(adata, true_label_key, predicted_label_key, title=subset_title,
                                          row_color_keys=row_color_keys, col_color_keys=col_color_keys)
-
-
-def plot_spatial_adata_dict(adata_dict, **kwargs):
-    """
-    Plots spatial data for each AnnData object in adata_dict, colored by a specified variable.
-
-    Parameters:
-    - adata_dict (dict): A dictionary with keys as strata and values as AnnData objects.
-    - kwargs: Additional keyword arguments, including 'color_by' which specifies a variable by which to color the spatial plots, typically a column in .obs, and 'crop_coord' which specifies coordinates for cropping the spatial plots.
-
-    Returns:
-    - None: The function creates spatial plots for the AnnData objects.
-    """
-    def plot_spatial(adata, **kwargs):
-        if 'spatial' in adata.obsm:
-            sc.pl.spatial(adata, **kwargs)
-        else:
-            print(f"Spatial coordinates not available for adata. Please add spatial data before plotting.")
-    
-    adata_dict_fapply(adata_dict, plot_spatial, **kwargs)
-
