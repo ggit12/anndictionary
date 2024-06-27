@@ -95,6 +95,8 @@
 </li>
       <li><a href="modules.html#anndict.dict.adata_dict_fapply_return">adata_dict_fapply_return() (in module anndict.dict)</a>
 </li>
+      <li><a href="modules.html#anndict.utils.add_col_to_adata_obs">add_col_to_adata_obs() (in module anndict.utils)</a>
+</li>
       <li><a href="modules.html#anndict.utils.add_label_to_adata">add_label_to_adata() (in module anndict.utils)</a>
 </li>
       <li>
@@ -114,10 +116,10 @@
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li>
-    anndict.squidpy_dict
+    anndict.spatial_dict
 
       <ul>
-        <li><a href="modules.html#module-anndict.squidpy_dict">module</a>
+        <li><a href="modules.html#module-anndict.spatial_dict">module</a>
 </li>
       </ul></li>
       <li>
@@ -153,6 +155,8 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="modules.html#anndict.dict.build_adata_dict_main">build_adata_dict_main() (in module anndict.dict)</a>
 </li>
+      <li><a href="modules.html#anndict.spatial_dict.build_adata_from_transcript_positions">build_adata_from_transcript_positions() (in module anndict.spatial_dict)</a>
+</li>
   </ul></td>
 </tr></table>
 
@@ -163,13 +167,15 @@
 </li>
       <li><a href="modules.html#anndict.dict.check_and_create_strata">check_and_create_strata() (in module anndict.dict)</a>
 </li>
-      <li><a href="modules.html#anndict.squidpy_dict.compute_interaction_matrix_adata_dict">compute_interaction_matrix_adata_dict() (in module anndict.squidpy_dict)</a>
+      <li><a href="modules.html#anndict.spatial_dict.compute_interaction_matrix_adata_dict">compute_interaction_matrix_adata_dict() (in module anndict.spatial_dict)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="modules.html#anndict.squidpy_dict.compute_spatial_neighbors_adata_dict">compute_spatial_neighbors_adata_dict() (in module anndict.squidpy_dict)</a>
+      <li><a href="modules.html#anndict.spatial_dict.compute_spatial_neighbors_adata_dict">compute_spatial_neighbors_adata_dict() (in module anndict.spatial_dict)</a>
 </li>
       <li><a href="modules.html#anndict.dict.concatenate_adata_dict">concatenate_adata_dict() (in module anndict.dict)</a>
+</li>
+      <li><a href="modules.html#anndict.spatial_dict.create_anndata">create_anndata() (in module anndict.spatial_dict)</a>
 </li>
       <li><a href="modules.html#anndict.utils.create_color_map">create_color_map() (in module anndict.utils)</a>
 </li>
@@ -194,6 +200,10 @@
       <li><a href="modules.html#anndict.stablelabel.get_slurm_cores">get_slurm_cores() (in module anndict.stablelabel)</a>
 </li>
   </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="modules.html#anndict.spatial_dict.get_steps_and_coords">get_steps_and_coords() (in module anndict.spatial_dict)</a>
+</li>
+  </ul></td>
 </tr></table>
 
 <h2 id="L">L</h2>
@@ -215,7 +225,7 @@
 </li>
         <li><a href="modules.html#module-anndict.metadata_summary">anndict.metadata_summary</a>
 </li>
-        <li><a href="modules.html#module-anndict.squidpy_dict">anndict.squidpy_dict</a>
+        <li><a href="modules.html#module-anndict.spatial_dict">anndict.spatial_dict</a>
 </li>
         <li><a href="modules.html#module-anndict.stablelabel">anndict.stablelabel</a>
 </li>
@@ -246,35 +256,39 @@
 </li>
       <li><a href="modules.html#anndict.stablelabel.pca_density_wrapper">pca_density_wrapper() (in module anndict.stablelabel)</a>
 </li>
-      <li><a href="modules.html#anndict.squidpy_dict.perform_colocalization_adata_dict">perform_colocalization_adata_dict() (in module anndict.squidpy_dict)</a>
+      <li><a href="modules.html#anndict.spatial_dict.perform_colocalization_adata_dict">perform_colocalization_adata_dict() (in module anndict.spatial_dict)</a>
 </li>
       <li><a href="modules.html#anndict.stablelabel.plot_changes">plot_changes() (in module anndict.stablelabel)</a>
 </li>
       <li><a href="modules.html#anndict.dict.plot_changes_adata_dict">plot_changes_adata_dict() (in module anndict.dict)</a>
 </li>
-      <li><a href="modules.html#anndict.squidpy_dict.plot_colocalization_adata_dict">plot_colocalization_adata_dict() (in module anndict.squidpy_dict)</a>
+      <li><a href="modules.html#anndict.spatial_dict.plot_colocalization_adata_dict">plot_colocalization_adata_dict() (in module anndict.spatial_dict)</a>
 </li>
       <li><a href="modules.html#anndict.stablelabel.plot_confusion_matrix">plot_confusion_matrix() (in module anndict.stablelabel)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="modules.html#anndict.strata.plot_confusion_matrix_across_strata">plot_confusion_matrix_across_strata() (in module anndict.strata)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="modules.html#anndict.dict.plot_confusion_matrix_adata_dict">plot_confusion_matrix_adata_dict() (in module anndict.dict)</a>
 </li>
       <li><a href="modules.html#anndict.stablelabel.plot_confusion_matrix_from_adata">plot_confusion_matrix_from_adata() (in module anndict.stablelabel)</a>
 </li>
-      <li><a href="modules.html#anndict.squidpy_dict.plot_interaction_matrix_adata_dict">plot_interaction_matrix_adata_dict() (in module anndict.squidpy_dict)</a>
+      <li><a href="modules.html#anndict.spatial_dict.plot_interaction_matrix_adata_dict">plot_interaction_matrix_adata_dict() (in module anndict.spatial_dict)</a>
 </li>
-      <li><a href="modules.html#anndict.dict.plot_spatial_adata_dict">plot_spatial_adata_dict() (in module anndict.dict)</a>
+      <li><a href="modules.html#anndict.spatial_dict.plot_spatial_adata_dict">plot_spatial_adata_dict() (in module anndict.spatial_dict)</a>
 </li>
       <li><a href="modules.html#anndict.stablelabel.plot_training_history">plot_training_history() (in module anndict.stablelabel)</a>
 </li>
       <li><a href="modules.html#anndict.dict.plot_umap_adata_dict">plot_umap_adata_dict() (in module anndict.dict)</a>
 </li>
+      <li><a href="modules.html#anndict.spatial_dict.populate_sparse_array">populate_sparse_array() (in module anndict.spatial_dict)</a>
+</li>
       <li><a href="modules.html#anndict.dict.predict_labels_adata_dict">predict_labels_adata_dict() (in module anndict.dict)</a>
 </li>
       <li><a href="modules.html#anndict.strata.preprocess_adata_strata">preprocess_adata_strata() (in module anndict.strata)</a>
+</li>
+      <li><a href="modules.html#anndict.spatial_dict.process_gene_counts">process_gene_counts() (in module anndict.spatial_dict)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -282,10 +296,12 @@
 <h2 id="R">R</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="modules.html#anndict.dict.resample_adata">resample_adata() (in module anndict.dict)</a>
+      <li><a href="modules.html#anndict.spatial_dict.read_data">read_data() (in module anndict.spatial_dict)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="modules.html#anndict.dict.resample_adata">resample_adata() (in module anndict.dict)</a>
+</li>
       <li><a href="modules.html#anndict.dict.resample_adata_dict">resample_adata_dict() (in module anndict.dict)</a>
 </li>
   </ul></td>
