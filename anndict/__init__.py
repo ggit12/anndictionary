@@ -3,6 +3,7 @@ from . import utils
 from . import stablelabel
 from . import dict
 from . import strata
+from . import spatial_dict
 
 from .metadata_summary import (
     summarize_metadata,
@@ -10,6 +11,7 @@ from .metadata_summary import (
 )
 
 from .utils import (
+    add_col_to_adata_obs,
     add_label_to_adata,
     create_color_map
 )
@@ -58,11 +60,25 @@ from .dict import (
     subsample_adata_dict
 )
 
-
 from .strata import (
     preprocess_adata_strata,
     stable_label_adata_strata,
     plot_confusion_matrix_across_strata
+)
+
+from .spatial_dict import (
+    read_data,
+    get_steps_and_coords,
+    populate_sparse_array,
+    process_gene_counts,
+    create_anndata,
+    build_adata_from_transcript_positions,
+    plot_spatial_adata_dict,
+    compute_spatial_neighbors_adata_dict,
+    perform_colocalization_adata_dict,
+    plot_colocalization_adata_dict,
+    compute_interaction_matrix_adata_dict,
+    plot_interaction_matrix_adata_dict
 )
 
 __all__ = [
@@ -106,9 +122,21 @@ __all__ = [
     'subsample_adata_dict',
     'summarize_metadata',
     'display_html_summary',
+    'add_col_to_adata_obs',
     'add_label_to_adata',
     'create_color_map',
     'preprocess_adata_strata',
     'stable_label_adata_strata',
-    'plot_confusion_matrix_across_strata'
+    'plot_confusion_matrix_across_strata',
+    'read_data',
+    'get_steps_and_coords',
+    'populate_sparse_array',
+    'process_gene_counts',
+    'create_anndata',
+    'build_adata_from_transcript_positions',
+    'compute_spatial_neighbors_adata_dict',
+    'perform_colocalization_adata_dict',
+    'plot_colocalization_adata_dict',
+    'compute_interaction_matrix_adata_dict',
+    'plot_interaction_matrix_adata_dict'
 ]
