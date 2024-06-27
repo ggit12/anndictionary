@@ -54,7 +54,6 @@ from .dict import (
     update_adata_dict_with_label_dict, 
     plot_changes_adata_dict, 
     plot_confusion_matrix_adata_dict, 
-    plot_spatial_adata_dict,
     summarize_metadata_adata_dict,
     display_html_summary_adata_dict,
     subsample_adata_dict

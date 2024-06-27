@@ -163,23 +163,6 @@ def create_anndata(sparse_array, genes, coords_top_left):
     
     return adata
 
-def build_adata_from_transcript_positions(input_path, output_path, box_size=16, step_size=16):
-    """
-    Builds an AnnData object from a tissue_positions.{csv,parquet} file and saves it to a specified output path. These are the files output by most spatial transcriptomic platforms, including Visium, Visium HD, Xenium, and Merscope.
-
-    Parameters: 
-    input_path (str): The path to the input CSV or Parquet file.
-    output_path (str): The path to the output h5ad file.
-    box_size (int, optional): The size of the box. Default is 16.
-    step_size (int, optional): The step size. Default is 16.
-
-    Returns:
-    None
-    """
-    sparse_array, genes, coords_top_left = process_gene_counts(input_path, box_size, step_size)
-    adata = create_anndata(sparse_array, genes, coords_top_left)
-    adata.write(output_path)
-
 
 def build_adata_from_transcript_positions(paths_dict, box_size=16, step_size=16):
     """
@@ -196,12 +179,16 @@ def build_adata_from_transcript_positions(paths_dict, box_size=16, step_size=16)
     Example:
     --------
     paths_dict = {
-        "input_path1.csv": "output_path1.h5ad",
-        "input_path2.parquet": "output_path2.h5ad",
+        'input_path1.csv': 'output_path1.h5ad',  
+
+        'input_path2.parquet': 'output_path2.h5ad'
+        
         # Add more input-output path pairs as needed
-    }
+        
+        }
 
     build_adata_from_transcript_positions(paths_dict)
+
     """
     for input_path, output_path in paths_dict.items():
         sparse_array, genes, coords_top_left = process_gene_counts(input_path, box_size, step_size)
