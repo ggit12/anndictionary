@@ -26,7 +26,7 @@ Modules Documentation
    :undoc-members:
    :member-order: bysource
    
-.. automodule:: anndict.squidpy_dict
+.. automodule:: anndict.spatial_dict
    :members:
    :undoc-members:
    :member-order: bysource

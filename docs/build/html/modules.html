@@ -73,11 +73,11 @@
 <li class="toctree-l2"><a class="reference internal" href="#anndict.dict.update_adata_dict_with_label_dict"><code class="docutils literal notranslate"><span class="pre">update_adata_dict_with_label_dict()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#anndict.dict.plot_changes_adata_dict"><code class="docutils literal notranslate"><span class="pre">plot_changes_adata_dict()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#anndict.dict.plot_confusion_matrix_adata_dict"><code class="docutils literal notranslate"><span class="pre">plot_confusion_matrix_adata_dict()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#anndict.dict.plot_spatial_adata_dict"><code class="docutils literal notranslate"><span class="pre">plot_spatial_adata_dict()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#anndict.strata.preprocess_adata_strata"><code class="docutils literal notranslate"><span class="pre">preprocess_adata_strata()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#anndict.strata.stable_label_adata_strata"><code class="docutils literal notranslate"><span class="pre">stable_label_adata_strata()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#anndict.strata.plot_confusion_matrix_across_strata"><code class="docutils literal notranslate"><span class="pre">plot_confusion_matrix_across_strata()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#anndict.utils.add_label_to_adata"><code class="docutils literal notranslate"><span class="pre">add_label_to_adata()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#anndict.utils.add_col_to_adata_obs"><code class="docutils literal notranslate"><span class="pre">add_col_to_adata_obs()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#anndict.utils.create_color_map"><code class="docutils literal notranslate"><span class="pre">create_color_map()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#anndict.metadata_summary.summarize_metadata"><code class="docutils literal notranslate"><span class="pre">summarize_metadata()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#anndict.metadata_summary.display_html_summary"><code class="docutils literal notranslate"><span class="pre">display_html_summary()</span></code></a></li>
@@ -92,11 +92,18 @@
 <li class="toctree-l2"><a class="reference internal" href="#anndict.stablelabel.plot_changes"><code class="docutils literal notranslate"><span class="pre">plot_changes()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#anndict.stablelabel.plot_confusion_matrix_from_adata"><code class="docutils literal notranslate"><span class="pre">plot_confusion_matrix_from_adata()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#anndict.stablelabel.plot_confusion_matrix"><code class="docutils literal notranslate"><span class="pre">plot_confusion_matrix()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#anndict.squidpy_dict.compute_spatial_neighbors_adata_dict"><code class="docutils literal notranslate"><span class="pre">compute_spatial_neighbors_adata_dict()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#anndict.squidpy_dict.perform_colocalization_adata_dict"><code class="docutils literal notranslate"><span class="pre">perform_colocalization_adata_dict()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#anndict.squidpy_dict.plot_colocalization_adata_dict"><code class="docutils literal notranslate"><span class="pre">plot_colocalization_adata_dict()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#anndict.squidpy_dict.compute_interaction_matrix_adata_dict"><code class="docutils literal notranslate"><span class="pre">compute_interaction_matrix_adata_dict()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#anndict.squidpy_dict.plot_interaction_matrix_adata_dict"><code class="docutils literal notranslate"><span class="pre">plot_interaction_matrix_adata_dict()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#anndict.spatial_dict.read_data"><code class="docutils literal notranslate"><span class="pre">read_data()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#anndict.spatial_dict.get_steps_and_coords"><code class="docutils literal notranslate"><span class="pre">get_steps_and_coords()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#anndict.spatial_dict.populate_sparse_array"><code class="docutils literal notranslate"><span class="pre">populate_sparse_array()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#anndict.spatial_dict.process_gene_counts"><code class="docutils literal notranslate"><span class="pre">process_gene_counts()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#anndict.spatial_dict.create_anndata"><code class="docutils literal notranslate"><span class="pre">create_anndata()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#anndict.spatial_dict.build_adata_from_transcript_positions"><code class="docutils literal notranslate"><span class="pre">build_adata_from_transcript_positions()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#anndict.spatial_dict.plot_spatial_adata_dict"><code class="docutils literal notranslate"><span class="pre">plot_spatial_adata_dict()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#anndict.spatial_dict.compute_spatial_neighbors_adata_dict"><code class="docutils literal notranslate"><span class="pre">compute_spatial_neighbors_adata_dict()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#anndict.spatial_dict.perform_colocalization_adata_dict"><code class="docutils literal notranslate"><span class="pre">perform_colocalization_adata_dict()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#anndict.spatial_dict.plot_colocalization_adata_dict"><code class="docutils literal notranslate"><span class="pre">plot_colocalization_adata_dict()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#anndict.spatial_dict.compute_interaction_matrix_adata_dict"><code class="docutils literal notranslate"><span class="pre">compute_interaction_matrix_adata_dict()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#anndict.spatial_dict.plot_interaction_matrix_adata_dict"><code class="docutils literal notranslate"><span class="pre">plot_interaction_matrix_adata_dict()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -167,13 +174,13 @@ ValueError: If one or more of the specified stratifying variables do not exist i
 
 <dl class="py function">
 <dt class="sig sig-object py" id="anndict.dict.build_adata_dict">
-<span class="sig-prename descclassname"><span class="pre">anndict.dict.</span></span><span class="sig-name descname"><span class="pre">build_adata_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strata_keys</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">desired_strata</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/dict.html#build_adata_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.dict.build_adata_dict" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">anndict.dict.</span></span><span class="sig-name descname"><span class="pre">build_adata_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strata_keys</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">desired_strata</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/dict.html#build_adata_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.dict.build_adata_dict" title="Link to this definition"></a></dt>
 <dd><p>Build a dictionary of AnnData objects split by desired strata values.</p>
 <p>Parameters:
 adata (AnnData): Annotated data matrix.
 strata_keys (list of str): List of column names in <cite>adata.obs</cite> to use for stratification.
-desired_strata (list or dict): List of desired strata values or a dictionary where keys are strata keys and values are lists of desired strata values.</p>
-<p>Returns:
+desired_strata (list or dict, optional): List of desired strata values or a dictionary where keys are strata keys and values are lists of desired strata values. If None (Default), all combinations of categories in adata.obs[strata_keys] will be used.
+Returns:
 dict: Dictionary where keys are strata values and values are corresponding AnnData subsets.</p>
 <p>Raises:
 ValueError: If <cite>desired_strata</cite> is neither a list nor a dictionary of lists.</p>
@@ -181,7 +188,7 @@ ValueError: If <cite>desired_strata</cite> is neither a list nor a dictionary of
 
 <dl class="py function">
 <dt class="sig sig-object py" id="anndict.dict.build_adata_dict_main">
-<span class="sig-prename descclassname"><span class="pre">anndict.dict.</span></span><span class="sig-name descname"><span class="pre">build_adata_dict_main</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strata_keys</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">desired_strata</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/dict.html#build_adata_dict_main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.dict.build_adata_dict_main" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">anndict.dict.</span></span><span class="sig-name descname"><span class="pre">build_adata_dict_main</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strata_keys</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">desired_strata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_missing_strata</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/dict.html#build_adata_dict_main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.dict.build_adata_dict_main" title="Link to this definition"></a></dt>
 <dd><p>Main function to build a dictionary of AnnData objects based on desired strata values.</p>
 <p>Parameters:
 adata (AnnData): Annotated data matrix.
@@ -448,17 +455,6 @@ row_color_keys (list): Optional keys for row colors in adata.obs.
 col_color_keys (list): Optional keys for column colors in adata.obs.</p>
 </dd></dl>
 
-<dl class="py function">
-<dt class="sig sig-object py" id="anndict.dict.plot_spatial_adata_dict">
-<span class="sig-prename descclassname"><span class="pre">anndict.dict.</span></span><span class="sig-name descname"><span class="pre">plot_spatial_adata_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata_dict</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/dict.html#plot_spatial_adata_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.dict.plot_spatial_adata_dict" title="Link to this definition"></a></dt>
-<dd><p>Plots spatial data for each AnnData object in adata_dict, colored by a specified variable.</p>
-<p>Parameters:
-- adata_dict (dict): A dictionary with keys as strata and values as AnnData objects.
-- kwargs: Additional keyword arguments, including ‘color_by’ which specifies a variable by which to color the spatial plots, typically a column in .obs, and ‘crop_coord’ which specifies coordinates for cropping the spatial plots.</p>
-<p>Returns:
-- None: The function creates spatial plots for the AnnData objects.</p>
-</dd></dl>
-
 <dl class="py function" id="module-anndict.strata">
 <dt class="sig sig-object py" id="anndict.strata.preprocess_adata_strata">
 <span class="sig-prename descclassname"><span class="pre">anndict.strata.</span></span><span class="sig-name descname"><span class="pre">preprocess_adata_strata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strata_keys</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_cells</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_cells</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">25</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/strata.html#preprocess_adata_strata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.strata.preprocess_adata_strata" title="Link to this definition"></a></dt>
@@ -507,8 +503,19 @@ ValueError: If no strata meet the minimum cell requirement after filtering.</p>
 <dd><p>Adds a label to the AnnData object in a specified column for given indices.</p>
 <p>Parameters:
 - adata: AnnData object to be updated.
-- all_indices: Array of indices where labels will be assigned.
-- all_labels: Array of labels corresponding to the indices.
+- indices: Array of indices where labels will be assigned.
+- labels: Array of labels corresponding to the indices.
+- new_label_key: Name of the column in adata.obs where the labels will be stored.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="anndict.utils.add_col_to_adata_obs">
+<span class="sig-prename descclassname"><span class="pre">anndict.utils.</span></span><span class="sig-name descname"><span class="pre">add_col_to_adata_obs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">indices</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_label_key</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/utils.html#add_col_to_adata_obs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.utils.add_col_to_adata_obs" title="Link to this definition"></a></dt>
+<dd><p>Adds a label to the AnnData object in a specified column for given indices.</p>
+<p>Parameters:
+- adata: AnnData object to be updated.
+- indices: Array of indices where labels will be assigned.
+- labels: Array of labels corresponding to the indices.
 - new_label_key: Name of the column in adata.obs where the labels will be stored.</p>
 </dd></dl>
 
@@ -701,17 +708,114 @@ None</p>
 - col_colors: array-like, colors for each column.</p>
 </dd></dl>
 
-<dl class="py function" id="module-anndict.squidpy_dict">
-<dt class="sig sig-object py" id="anndict.squidpy_dict.compute_spatial_neighbors_adata_dict">
-<span class="sig-prename descclassname"><span class="pre">anndict.squidpy_dict.</span></span><span class="sig-name descname"><span class="pre">compute_spatial_neighbors_adata_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata_dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/squidpy_dict.html#compute_spatial_neighbors_adata_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.squidpy_dict.compute_spatial_neighbors_adata_dict" title="Link to this definition"></a></dt>
+<dl class="py function" id="module-anndict.spatial_dict">
+<dt class="sig sig-object py" id="anndict.spatial_dict.read_data">
+<span class="sig-prename descclassname"><span class="pre">anndict.spatial_dict.</span></span><span class="sig-name descname"><span class="pre">read_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/spatial_dict.html#read_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.spatial_dict.read_data" title="Link to this definition"></a></dt>
+<dd><p>Reads the data from a CSV or Parquet file and ensures it contains the necessary columns.</p>
+<p>Parameters:
+file_path (str): The path to the CSV or Parquet file.</p>
+<p>Returns:
+pd.DataFrame: The data read from the file.</p>
+<p>Raises:
+ValueError: If the required columns are not present in the file.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="anndict.spatial_dict.get_steps_and_coords">
+<span class="sig-prename descclassname"><span class="pre">anndict.spatial_dict.</span></span><span class="sig-name descname"><span class="pre">get_steps_and_coords</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">box_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">step_size</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/spatial_dict.html#get_steps_and_coords"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.spatial_dict.get_steps_and_coords" title="Link to this definition"></a></dt>
+<dd><p>Computes the number of steps and the top-left coordinates of each box.</p>
+<p>Parameters:
+df (pd.DataFrame): The data containing ‘global_x’ and ‘global_y’ columns.
+box_size (int): The size of the box.
+step_size (int): The step size.</p>
+<p>Returns:
+tuple: A tuple containing the number of steps in x and y directions, and the list of top-left coordinates of each box.</p>
+<p>Raises:
+ValueError: If the box size is larger than the image dimensions.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="anndict.spatial_dict.populate_sparse_array">
+<span class="sig-prename descclassname"><span class="pre">anndict.spatial_dict.</span></span><span class="sig-name descname"><span class="pre">populate_sparse_array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coords_top_left</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">genes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">step_size</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/spatial_dict.html#populate_sparse_array"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.spatial_dict.populate_sparse_array" title="Link to this definition"></a></dt>
+<dd><p>Populates a sparse array with gene counts.</p>
+<p>Parameters:
+df (pd.DataFrame): The data containing ‘global_x’, ‘global_y’, and ‘gene’ columns.
+coords_top_left (list): The list of top-left coordinates of each box.
+genes (np.array): The unique genes.
+step_size (int): The step size.</p>
+<p>Returns:
+scipy.sparse.csr_matrix: The sparse matrix with gene counts.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="anndict.spatial_dict.process_gene_counts">
+<span class="sig-prename descclassname"><span class="pre">anndict.spatial_dict.</span></span><span class="sig-name descname"><span class="pre">process_gene_counts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">box_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">step_size</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/spatial_dict.html#process_gene_counts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.spatial_dict.process_gene_counts" title="Link to this definition"></a></dt>
+<dd><p>Processes the gene counts from the CSV file.</p>
+<p>Parameters:
+file_path (str): The path to the CSV file.
+box_size (int): The size of the box.
+step_size (int): The step size.</p>
+<p>Returns:
+tuple: A tuple containing the sparse matrix, unique genes, and list of top-left coordinates of each box.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="anndict.spatial_dict.create_anndata">
+<span class="sig-prename descclassname"><span class="pre">anndict.spatial_dict.</span></span><span class="sig-name descname"><span class="pre">create_anndata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sparse_array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">genes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coords_top_left</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/spatial_dict.html#create_anndata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.spatial_dict.create_anndata" title="Link to this definition"></a></dt>
+<dd><p>Creates an AnnData object from the sparse matrix and coordinates.</p>
+<p>Parameters:
+sparse_array (scipy.sparse.csr_matrix): The sparse matrix with gene counts.
+genes (np.array): The unique genes.
+coords_top_left (list): The list of top-left coordinates of each box.</p>
+<p>Returns:
+anndata.AnnData: The AnnData object containing the gene counts and metadata.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="anndict.spatial_dict.build_adata_from_transcript_positions">
+<span class="sig-prename descclassname"><span class="pre">anndict.spatial_dict.</span></span><span class="sig-name descname"><span class="pre">build_adata_from_transcript_positions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">paths_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">box_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">16</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">step_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">16</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/spatial_dict.html#build_adata_from_transcript_positions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.spatial_dict.build_adata_from_transcript_positions" title="Link to this definition"></a></dt>
+<dd><p>Builds an AnnData object from a tissue_positions.{csv,parquet} file and saves it to a specified output path. These are the files output by most spatial transcriptomic platforms, including Visium, Visium HD, Xenium, and Merscope.</p>
+<p>Parameters:
+paths_dict (dict): A dictionary with input paths as keys and output paths as values.
+box_size (int, optional): The size of the box. Default is 16.
+step_size (int, optional): The step size. Default is 16.</p>
+<p>Returns:
+None</p>
+<section id="example">
+<h2>Example:<a class="headerlink" href="#example" title="Link to this heading"></a></h2>
+<dl>
+<dt>paths_dict = {</dt><dd><p>‘input_path1.csv’: ‘output_path1.h5ad’,</p>
+<p>‘input_path2.parquet’: ‘output_path2.h5ad’</p>
+<p># Add more input-output path pairs as needed</p>
+<p>}</p>
+</dd>
+</dl>
+<p>build_adata_from_transcript_positions(paths_dict)</p>
+</section>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="anndict.spatial_dict.plot_spatial_adata_dict">
+<span class="sig-prename descclassname"><span class="pre">anndict.spatial_dict.</span></span><span class="sig-name descname"><span class="pre">plot_spatial_adata_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata_dict</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/spatial_dict.html#plot_spatial_adata_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.spatial_dict.plot_spatial_adata_dict" title="Link to this definition"></a></dt>
+<dd><p>Plots spatial data for each AnnData object in adata_dict, colored by a specified variable.</p>
+<p>Parameters:
+- adata_dict (dict): A dictionary with keys as strata and values as AnnData objects.
+- kwargs: Additional keyword arguments, including ‘color_by’ which specifies a variable by which to color the spatial plots, typically a column in .obs, and ‘crop_coord’ which specifies coordinates for cropping the spatial plots.</p>
+<p>Returns:
+- None: The function creates spatial plots for the AnnData objects.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="anndict.spatial_dict.compute_spatial_neighbors_adata_dict">
+<span class="sig-prename descclassname"><span class="pre">anndict.spatial_dict.</span></span><span class="sig-name descname"><span class="pre">compute_spatial_neighbors_adata_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata_dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/spatial_dict.html#compute_spatial_neighbors_adata_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.spatial_dict.compute_spatial_neighbors_adata_dict" title="Link to this definition"></a></dt>
 <dd><p>Computes spatial neighborhood graphs for each AnnData object in adata_dict.</p>
 <p>Parameters:
 adata_dict (dict): A dictionary with keys as strata and values as AnnData objects.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="anndict.squidpy_dict.perform_colocalization_adata_dict">
-<span class="sig-prename descclassname"><span class="pre">anndict.squidpy_dict.</span></span><span class="sig-name descname"><span class="pre">perform_colocalization_adata_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cluster_key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'cell_type'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/squidpy_dict.html#perform_colocalization_adata_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.squidpy_dict.perform_colocalization_adata_dict" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="anndict.spatial_dict.perform_colocalization_adata_dict">
+<span class="sig-prename descclassname"><span class="pre">anndict.spatial_dict.</span></span><span class="sig-name descname"><span class="pre">perform_colocalization_adata_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cluster_key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'cell_type'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/spatial_dict.html#perform_colocalization_adata_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.spatial_dict.perform_colocalization_adata_dict" title="Link to this definition"></a></dt>
 <dd><p>Performs colocalization analysis for each AnnData object in adata_dict.</p>
 <p>Parameters:
 adata_dict (dict): A dictionary with keys as strata and values as AnnData objects.
@@ -719,8 +823,8 @@ cluster_key (str): The key in adata.obs containing the cell type or cluster info
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="anndict.squidpy_dict.plot_colocalization_adata_dict">
-<span class="sig-prename descclassname"><span class="pre">anndict.squidpy_dict.</span></span><span class="sig-name descname"><span class="pre">plot_colocalization_adata_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cluster_key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'cell_type'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_cell_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(10,</span> <span class="pre">5)</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/squidpy_dict.html#plot_colocalization_adata_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.squidpy_dict.plot_colocalization_adata_dict" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="anndict.spatial_dict.plot_colocalization_adata_dict">
+<span class="sig-prename descclassname"><span class="pre">anndict.spatial_dict.</span></span><span class="sig-name descname"><span class="pre">plot_colocalization_adata_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cluster_key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'cell_type'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_cell_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(10,</span> <span class="pre">5)</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/spatial_dict.html#plot_colocalization_adata_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.spatial_dict.plot_colocalization_adata_dict" title="Link to this definition"></a></dt>
 <dd><p>Plots colocalization results for each AnnData object in adata_dict, optionally focusing on a specific source cell type.</p>
 <p>Parameters:
 adata_dict (dict): A dictionary with keys as strata and values as AnnData objects.
@@ -729,8 +833,8 @@ source_cell_type (str, optional): The specific source cell type to focus on in t
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="anndict.squidpy_dict.compute_interaction_matrix_adata_dict">
-<span class="sig-prename descclassname"><span class="pre">anndict.squidpy_dict.</span></span><span class="sig-name descname"><span class="pre">compute_interaction_matrix_adata_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cluster_key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'cell_type'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/squidpy_dict.html#compute_interaction_matrix_adata_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.squidpy_dict.compute_interaction_matrix_adata_dict" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="anndict.spatial_dict.compute_interaction_matrix_adata_dict">
+<span class="sig-prename descclassname"><span class="pre">anndict.spatial_dict.</span></span><span class="sig-name descname"><span class="pre">compute_interaction_matrix_adata_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cluster_key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'cell_type'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/spatial_dict.html#compute_interaction_matrix_adata_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.spatial_dict.compute_interaction_matrix_adata_dict" title="Link to this definition"></a></dt>
 <dd><p>Computes interaction matrices for each AnnData object in adata_dict.</p>
 <p>Parameters:
 adata_dict (dict): A dictionary with keys as strata and values as AnnData objects.
@@ -738,8 +842,8 @@ cluster_key (str): The key in adata.obs containing the cell type or cluster info
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="anndict.squidpy_dict.plot_interaction_matrix_adata_dict">
-<span class="sig-prename descclassname"><span class="pre">anndict.squidpy_dict.</span></span><span class="sig-name descname"><span class="pre">plot_interaction_matrix_adata_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cluster_key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'cell_type'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/squidpy_dict.html#plot_interaction_matrix_adata_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.squidpy_dict.plot_interaction_matrix_adata_dict" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="anndict.spatial_dict.plot_interaction_matrix_adata_dict">
+<span class="sig-prename descclassname"><span class="pre">anndict.spatial_dict.</span></span><span class="sig-name descname"><span class="pre">plot_interaction_matrix_adata_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cluster_key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'cell_type'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/spatial_dict.html#plot_interaction_matrix_adata_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.spatial_dict.plot_interaction_matrix_adata_dict" title="Link to this definition"></a></dt>
 <dd><p>Plots interaction matrices for each AnnData object in adata_dict.</p>
 <p>Parameters:
 adata_dict (dict): A dictionary with keys as strata and values as AnnData objects.
