@@ -230,8 +230,8 @@ def stable_label(X, y, classifier, max_iterations=100, stability_threshold=0.05,
         # print("Sample predicted probabilities for rows of X:", probabilities[:5])
         
         # Sample new labels from the predicted probabilities
-        # new_labels = np.array([np.argmax(prob) if max(prob) > 0.6 else current_labels[i] for i, prob in enumerate(probabilities)])
-        new_labels = np.array([np.argmax(prob) for i, prob in enumerate(probabilities)])
+        new_labels = np.array([np.argmax(prob) if max(prob) > 0.8 else current_labels[i] for i, prob in enumerate(probabilities)])
+        # new_labels = np.array([np.argmax(prob) for i, prob in enumerate(probabilities)])
 
         # def transform_row(row, p):
         #     """
