@@ -163,8 +163,44 @@ def create_anndata(sparse_array, genes, coords_top_left):
     
     return adata
 
+def add_blank_image_to_adata(adata, platform="Merscope"):
+    """
+    Adds a dummy image to the AnnData object based on the platform specifications.
 
-def build_adata_from_transcript_positions(paths_dict, box_size=16, step_size=16):
+    Parameters:
+    adata (anndata.AnnData): The AnnData object to which the image will be added.
+    platform (str): The platform from which the data originates. Default is "Merscope".
+
+    Returns:
+    anndata.AnnData: The updated AnnData object with the image and spatial data.
+    """
+    adata.obsm['spatial'] = adata.obs[['global_x_topleft', 'global_y_topleft']].to_numpy()
+    
+    max_x = int(adata.obs['global_x_topleft'].max())
+    max_y = int(adata.obs['global_y_topleft'].max())
+    
+    dummy_image = np.ones((max_y + 1, max_x + 1, 3))
+    
+    if platform in ["Merscope", "Xenium"]:
+        adata.uns['spatial'] = {
+            'library_id': {
+                'images': {
+                    'hires': dummy_image,
+                    'lowres': dummy_image
+                },
+                'scalefactors': {
+                    'tissue_hires_scalef': 1.0,
+                    'tissue_lowres_scalef': 1.0,
+                    'spot_diameter_fullres': 16  # Example spot diameter, adjust as needed
+                }
+            }
+        }
+    
+    return adata
+
+
+
+def build_adata_from_transcript_positions(paths_dict, box_size=16, step_size=16, platform="Merscope"):
     """
     Builds an AnnData object from a tissue_positions.{csv,parquet} file and saves it to a specified output path. These are the files output by most spatial transcriptomic platforms, including Visium, Visium HD, Xenium, and Merscope.
 
@@ -172,6 +208,7 @@ def build_adata_from_transcript_positions(paths_dict, box_size=16, step_size=16)
     paths_dict (dict): A dictionary with input paths as keys and output paths as values.
     box_size (int, optional): The size of the box. Default is 16.
     step_size (int, optional): The step size. Default is 16.
+    platform (str, optional): The platform used, either "Merscope" (default) or "Xenium".
 
     Returns:
     None
@@ -184,7 +221,7 @@ def build_adata_from_transcript_positions(paths_dict, box_size=16, step_size=16)
         'input_path2.parquet': 'output_path2.h5ad'
         
         # Add more input-output path pairs as needed
-        
+
         }
 
     build_adata_from_transcript_positions(paths_dict)
@@ -193,6 +230,42 @@ def build_adata_from_transcript_positions(paths_dict, box_size=16, step_size=16)
     for input_path, output_path in paths_dict.items():
         sparse_array, genes, coords_top_left = process_gene_counts(input_path, box_size, step_size)
         adata = create_anndata(sparse_array, genes, coords_top_left)
+        adata = add_blank_image_to_adata(adata, platform=platform)
+        adata.write(output_path)
+
+def build_adata_from_visium(paths_dict, hd=False):
+    """
+    Processes Visium data from input directories and saves the processed AnnData objects to specified output paths.
+
+    Parameters:
+    paths_dict (dict): A dictionary with input directories as keys and output file paths as values.
+    hd (bool, optional): If True, converts 'spatial' to float and 'obs' columns to integers. Default is False.
+
+    Returns:
+    None
+
+    Example:
+    --------
+    paths_dict = {
+        'input_dir1': 'output_path1.h5ad',
+
+        'input_dir2': 'output_path2.h5ad'
+        
+        # Add more input-output path pairs as needed
+
+        }
+
+
+    build_adata_from_visium(paths_dict, hd=True)
+    """
+    for input_dir, output_path in paths_dict.items():
+        adata = sc.read_visium(input_dir)
+        
+        if hd:
+            #Run fixes to sc.read_visium for visium HD data
+            adata.obsm['spatial'] = adata.obsm['spatial'].astype(float)
+            adata.obs = adata.obs.astype(int)
+        
         adata.write(output_path)
 
 
