@@ -750,14 +750,15 @@ None</p>
 
 <dl class="py function" id="module-anndict.spatial_dict">
 <dt class="sig sig-object py" id="anndict.spatial_dict.read_data">
-<span class="sig-prename descclassname"><span class="pre">anndict.spatial_dict.</span></span><span class="sig-name descname"><span class="pre">read_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/spatial_dict.html#read_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.spatial_dict.read_data" title="Link to this definition"></a></dt>
-<dd><p>Reads the data from a CSV or Parquet file and ensures it contains the necessary columns.</p>
+<span class="sig-prename descclassname"><span class="pre">anndict.spatial_dict.</span></span><span class="sig-name descname"><span class="pre">read_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">platform</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/spatial_dict.html#read_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.spatial_dict.read_data" title="Link to this definition"></a></dt>
+<dd><p>Reads the data from a CSV file and ensures it contains the necessary columns.</p>
 <p>Parameters:
-file_path (str): The path to the CSV or Parquet file.</p>
+file_path (str): The path to the CSV file.
+platform (str): The platform type (“Merscope” or “Xenium”).</p>
 <p>Returns:
 pd.DataFrame: The data read from the file.</p>
 <p>Raises:
-ValueError: If the required columns are not present in the file.</p>
+ValueError: If the required columns are not present in the file or if the file format is unsupported.</p>
 </dd></dl>
 
 <dl class="py function">
@@ -789,7 +790,7 @@ scipy.sparse.csr_matrix: The sparse matrix with gene counts.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="anndict.spatial_dict.process_gene_counts">
-<span class="sig-prename descclassname"><span class="pre">anndict.spatial_dict.</span></span><span class="sig-name descname"><span class="pre">process_gene_counts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">box_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">step_size</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/spatial_dict.html#process_gene_counts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.spatial_dict.process_gene_counts" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">anndict.spatial_dict.</span></span><span class="sig-name descname"><span class="pre">process_gene_counts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">box_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">step_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">platform</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/spatial_dict.html#process_gene_counts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.spatial_dict.process_gene_counts" title="Link to this definition"></a></dt>
 <dd><p>Processes the gene counts from the CSV file.</p>
 <p>Parameters:
 file_path (str): The path to the CSV file.
@@ -825,7 +826,7 @@ anndata.AnnData: The updated AnnData object with the image and spatial data.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="anndict.spatial_dict.build_adata_from_transcript_positions">
 <span class="sig-prename descclassname"><span class="pre">anndict.spatial_dict.</span></span><span class="sig-name descname"><span class="pre">build_adata_from_transcript_positions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">paths_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">box_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">16</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">step_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">16</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">platform</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Merscope'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/spatial_dict.html#build_adata_from_transcript_positions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.spatial_dict.build_adata_from_transcript_positions" title="Link to this definition"></a></dt>
-<dd><p>Builds an AnnData object from a tissue_positions.{csv,parquet} file and saves it to a specified output path. These are the files output by most spatial transcriptomic platforms, including Visium, Visium HD, Xenium, and Merscope.</p>
+<dd><p>Builds an AnnData object from a detected_trancsripts.csv (Merscope) or transcripts.csv (Xenium) file and saves it to a specified output path. These are the files output by most spatial transcriptomic platforms, including Visium, Visium HD, Xenium, and Merscope.</p>
 <p>Parameters:
 paths_dict (dict): A dictionary with input paths as keys and output paths as values.
 box_size (int, optional): The size of the box. Default is 16.
@@ -837,7 +838,7 @@ None</p>
 <h2>Example:<a class="headerlink" href="#example" title="Link to this heading"></a></h2>
 <dl>
 <dt>paths_dict = {</dt><dd><p>‘input_path1.csv’: ‘output_path1.h5ad’,</p>
-<p>‘input_path2.parquet’: ‘output_path2.h5ad’</p>
+<p>‘input_path2.csv’: ‘output_path2.h5ad’</p>
 <p># Add more input-output path pairs as needed</p>
 <p>}</p>
 </dd>

@@ -28,33 +28,42 @@ from scipy.sparse import dok_matrix
 from .dict import adata_dict_fapply
 
 
-def read_data(file_path):
+def read_data(file_path, platform=None):
     """
-    Reads the data from a CSV or Parquet file and ensures it contains the necessary columns.
+    Reads the data from a CSV file and ensures it contains the necessary columns.
 
     Parameters:
-    file_path (str): The path to the CSV or Parquet file.
+    file_path (str): The path to the CSV file.
+    platform (str): The platform type ("Merscope" or "Xenium").
 
     Returns:
     pd.DataFrame: The data read from the file.
 
     Raises:
-    ValueError: If the required columns are not present in the file.
+    ValueError: If the required columns are not present in the file or if the file format is unsupported.
     """
     print("reading data")
-    
-    if file_path.endswith('.csv'):
-        df = pd.read_csv(file_path)
-    elif file_path.endswith('.parquet'):
-        df = pd.read_parquet(file_path)
+
+    if not file_path.endswith('.csv'):
+        raise ValueError("Unsupported file format. Please provide a CSV file.")
+
+    df = pd.read_csv(file_path)
+
+    required_columns_merscope = {'global_x', 'global_y', 'gene'}
+    required_columns_xenium = {'feature_name', 'x_location', 'y_location'}
+
+    if platform == "Merscope":
+        if not required_columns_merscope.issubset(df.columns):
+            raise ValueError(f"The file must contain the following columns for Merscope: {required_columns_merscope}")
+    elif platform == "Xenium":
+        if not required_columns_xenium.issubset(df.columns):
+            raise ValueError(f"The file must contain the following columns for Xenium: {required_columns_xenium}")
+        df = df.rename(columns={"feature_name": "gene", "x_location": "global_x", "y_location": "global_y"})
     else:
-        raise ValueError("Unsupported file format. Please provide a CSV or Parquet file.")
-    
-    required_columns = {'global_x', 'global_y', 'gene'}
-    if not required_columns.issubset(df.columns):
-        raise ValueError(f"The file must contain the following columns: {required_columns}")
-    
+        raise ValueError("Unsupported platform. Please provide either 'Merscope' or 'Xenium' as the platform.")
+
     return df
+
 
 
 def get_steps_and_coords(df, box_size, step_size):
@@ -122,7 +131,7 @@ def populate_sparse_array(df, coords_top_left, genes, step_size):
     return sparse_array.tocsr()
 
 
-def process_gene_counts(file_path, box_size, step_size):
+def process_gene_counts(file_path, box_size, step_size, platform=None):
     """
     Processes the gene counts from the CSV file.
 
@@ -134,7 +143,7 @@ def process_gene_counts(file_path, box_size, step_size):
     Returns:
     tuple: A tuple containing the sparse matrix, unique genes, and list of top-left coordinates of each box.
     """
-    df = read_data(file_path)
+    df = read_data(file_path, platform=platform)
     print("processing gene counts")
     genes = df['gene'].unique()
     x_steps, y_steps, coords_top_left = get_steps_and_coords(df, box_size, step_size)
@@ -202,7 +211,7 @@ def add_blank_image_to_adata(adata, platform="Merscope"):
 
 def build_adata_from_transcript_positions(paths_dict, box_size=16, step_size=16, platform="Merscope"):
     """
-    Builds an AnnData object from a tissue_positions.{csv,parquet} file and saves it to a specified output path. These are the files output by most spatial transcriptomic platforms, including Visium, Visium HD, Xenium, and Merscope.
+    Builds an AnnData object from a detected_trancsripts.csv (Merscope) or transcripts.csv (Xenium) file and saves it to a specified output path. These are the files output by most spatial transcriptomic platforms, including Visium, Visium HD, Xenium, and Merscope.
 
     Parameters: 
     paths_dict (dict): A dictionary with input paths as keys and output paths as values.
@@ -218,7 +227,7 @@ def build_adata_from_transcript_positions(paths_dict, box_size=16, step_size=16,
     paths_dict = {
         'input_path1.csv': 'output_path1.h5ad',  
 
-        'input_path2.parquet': 'output_path2.h5ad'
+        'input_path2.csv': 'output_path2.h5ad'
         
         # Add more input-output path pairs as needed
 
@@ -228,7 +237,7 @@ def build_adata_from_transcript_positions(paths_dict, box_size=16, step_size=16,
 
     """
     for input_path, output_path in paths_dict.items():
-        sparse_array, genes, coords_top_left = process_gene_counts(input_path, box_size, step_size)
+        sparse_array, genes, coords_top_left = process_gene_counts(input_path, box_size, step_size, platform=platform)
         adata = create_anndata(sparse_array, genes, coords_top_left)
         adata = add_blank_image_to_adata(adata, platform=platform)
         adata.write(output_path)
