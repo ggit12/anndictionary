@@ -32,6 +32,7 @@ from .stablelabel import (
 )
 
 from .dict import (
+    AdataDict,
     adata_dict_fapply, 
     adata_dict_fapply_return,
     check_and_create_strata,
@@ -98,7 +99,8 @@ __all__ = [
     'check_and_create_strata', 
     'build_adata_dict', 
     'subsplit_adata_dict', 
-    'concatenate_adata_dict', 
+    'concatenate_adata_dict',
+    'AdataDict', 
     'adata_dict_fapply',
     'adata_dict_fapply_return', 
     'resample_adata',

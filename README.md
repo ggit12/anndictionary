@@ -20,6 +20,7 @@ pip install -e .
 # About
 `anndict` is a package that lets you process multiple `anndata` objects in parallel with a simplified interface (so that you can avoid writing a bunch of for loops). This is accomplished by a dictionary-based wrapping of `scanpy`.
 
+### If you like functions:
 The main function in this package is `adata_dict_fapply()` (and its cousin `adata_dict_fapply_return()`, which does the same thing but also returns the result as a dictionary). 
 
 `adata_dict_fapply()` works just like `lapply()` in R. It takes `adata_dict_fapply(adata_dict, func, **kwargs)`. 
@@ -32,11 +33,21 @@ You can have `func` take the argument `key` (i.e., `func(adata, key=None)`) if y
 
 Many functions in `anndict` are built around `adata_dict_fapply()`, and the package provides prebuilt wrappers for several common Scanpy functions, as well as functions to build and concatenate `adata` dictionaries.
 
+### If you like objects (under development):
+This package also defines the class AdataDict(), which is a dictionary of anndatas. When a method is called on an AdataDict, it is applied independently to each adata in the dictionary. Currently in beta.
+
+The syntax looks like this: `adata_dict.fapply(func, **kwargs)`, where `adata_dict`, `func`, and `**kwargs` are as defined above.
+
 
 Read the tutorial below for basic demonstrations.
 
 # Tutorial
 This is the tutorial notebook for `anndict`. Follow the tutorial below to get started.
+
+See `tutorial_notbooks` for other tutorials:
+
+- Label transfer with UCE
+- Automated spatial transcriptomic annotation with UCE
 
 
 
@@ -261,3 +272,38 @@ adata = adt.concatenate_adata_dict(adata_dict)
 #View summary table for concatenated adata
 # adt.display_html_summary(adt.summarize_metadata(adata, columns = ['tissue','cell_type','cell_type*tissue']))
 ```
+
+
+```python
+#Note, you could also run scanpy functions directly on the adata_dict like this:
+import scanpy as sc
+adata_dict = adt.build_adata_dict(adata=adata,strata_keys=['tissue'], desired_strata=['liver','kidney'])
+adata_dict.fapply(sc.pp.subsample, fraction=0.1)
+
+```
+
+
+
+
+    {'liver': None, 'kidney': None}
+
+
+
+
+```python
+adata_dict
+```
+
+
+
+
+    {'liver': AnnData object with n_obs × n_vars = 500 × 60664
+         obs: 'soma_joinid', 'dataset_id', 'assay', 'assay_ontology_term_id', 'cell_type', 'cell_type_ontology_term_id', 'development_stage', 'development_stage_ontology_term_id', 'disease', 'disease_ontology_term_id', 'donor_id', 'is_primary_data', 'self_reported_ethnicity', 'self_reported_ethnicity_ontology_term_id', 'sex', 'sex_ontology_term_id', 'suspension_type', 'tissue', 'tissue_ontology_term_id', 'tissue_general', 'tissue_general_ontology_term_id', 'raw_sum', 'nnz', 'raw_mean_nnz', 'raw_variance_nnz', 'n_measured_vars'
+         var: 'soma_joinid', 'feature_id', 'feature_name', 'feature_length', 'nnz', 'n_measured_obs'
+         obsm: 'uce',
+     'kidney': AnnData object with n_obs × n_vars = 964 × 60664
+         obs: 'soma_joinid', 'dataset_id', 'assay', 'assay_ontology_term_id', 'cell_type', 'cell_type_ontology_term_id', 'development_stage', 'development_stage_ontology_term_id', 'disease', 'disease_ontology_term_id', 'donor_id', 'is_primary_data', 'self_reported_ethnicity', 'self_reported_ethnicity_ontology_term_id', 'sex', 'sex_ontology_term_id', 'suspension_type', 'tissue', 'tissue_ontology_term_id', 'tissue_general', 'tissue_general_ontology_term_id', 'raw_sum', 'nnz', 'raw_mean_nnz', 'raw_variance_nnz', 'n_measured_vars'
+         var: 'soma_joinid', 'feature_id', 'feature_name', 'feature_length', 'nnz', 'n_measured_obs'
+         obsm: 'uce'}
+
+
