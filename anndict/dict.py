@@ -38,6 +38,40 @@ from .stablelabel import (
 )
 from .utils import add_label_to_adata, create_color_map
 
+
+class AdataDict(dict):
+    """
+    AdataDict is a dictionary-like container where values are AnnData objects.
+    
+    This class provides two main functionalities:
+    1. It behaves like an AnnData object by passing each method through to each AnnData in the dictionary. For example, adata_dict.obs.group_by("column") will apply the group_by method on the obs attribute of each AnnData object in the dictionary.
+    2. It has a method fapply(func, kwargs) that applies a given function func with arguments kwargs to each AnnData object in the dictionary.
+    
+    Methods:
+    __getattr__(attr) Dynamically creates methods that apply the corresponding method of AnnData objects in the dictionary.
+        
+    fapply(func, kwargs) Applies the provided function func with additional arguments kwargs to each AnnData object in the dictionary.
+    
+    Attributes:
+    Inherits attributes from the built-in dict class.
+
+    """
+    def __getattr__(self, attr):
+        def method(*args, **kwargs):
+            results = {}
+            for key, adata in self.items():
+                func = getattr(adata, attr)
+                results[key] = func(*args, **kwargs)
+            return results
+        return method
+    
+    def fapply(self, func, **kwargs):
+        results = {}
+        for key, adata in self.items():
+            results[key] = func(adata, **kwargs)
+        return results
+
+
 def adata_dict_fapply(adata_dict, func, **kwargs):
     """
     Applies a given function to each AnnData object in the adata_dict.
@@ -171,7 +205,7 @@ def build_adata_dict_main(adata, strata_keys, desired_strata, print_missing_stra
         else:
             if print_missing_strata:
                 print(f"Warning: '{stratum}' is not a valid category in '{strata_key}'.")
-    return subsets_dict
+    return AdataDict(subsets_dict)
 
 def subsplit_adata_dict(adata_dict, strata_keys, desired_strata):
     """
