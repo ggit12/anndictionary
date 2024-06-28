@@ -13,7 +13,8 @@ from .metadata_summary import (
 from .utils import (
     add_col_to_adata_obs,
     add_label_to_adata,
-    create_color_map
+    create_color_map,
+    UCE_adata
 )
 
 from .stablelabel import (
@@ -71,7 +72,9 @@ from .spatial_dict import (
     populate_sparse_array,
     process_gene_counts,
     create_anndata,
+    add_blank_image_to_adata,
     build_adata_from_transcript_positions,
+    build_adata_from_visium,
     plot_spatial_adata_dict,
     compute_spatial_neighbors_adata_dict,
     perform_colocalization_adata_dict,
@@ -124,6 +127,7 @@ __all__ = [
     'add_col_to_adata_obs',
     'add_label_to_adata',
     'create_color_map',
+    'UCE_adata',
     'preprocess_adata_strata',
     'stable_label_adata_strata',
     'plot_confusion_matrix_across_strata',
@@ -132,7 +136,9 @@ __all__ = [
     'populate_sparse_array',
     'process_gene_counts',
     'create_anndata',
+    'add_blank_image_to_adata',
     'build_adata_from_transcript_positions',
+    'build_adata_from_visium',
     'compute_spatial_neighbors_adata_dict',
     'perform_colocalization_adata_dict',
     'plot_colocalization_adata_dict',
