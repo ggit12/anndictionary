@@ -79,6 +79,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#anndict.utils.add_label_to_adata"><code class="docutils literal notranslate"><span class="pre">add_label_to_adata()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#anndict.utils.add_col_to_adata_obs"><code class="docutils literal notranslate"><span class="pre">add_col_to_adata_obs()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#anndict.utils.create_color_map"><code class="docutils literal notranslate"><span class="pre">create_color_map()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#anndict.utils.UCE_adata"><code class="docutils literal notranslate"><span class="pre">UCE_adata()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#anndict.metadata_summary.summarize_metadata"><code class="docutils literal notranslate"><span class="pre">summarize_metadata()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#anndict.metadata_summary.display_html_summary"><code class="docutils literal notranslate"><span class="pre">display_html_summary()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#anndict.stablelabel.get_slurm_cores"><code class="docutils literal notranslate"><span class="pre">get_slurm_cores()</span></code></a></li>
@@ -97,7 +98,9 @@
 <li class="toctree-l2"><a class="reference internal" href="#anndict.spatial_dict.populate_sparse_array"><code class="docutils literal notranslate"><span class="pre">populate_sparse_array()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#anndict.spatial_dict.process_gene_counts"><code class="docutils literal notranslate"><span class="pre">process_gene_counts()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#anndict.spatial_dict.create_anndata"><code class="docutils literal notranslate"><span class="pre">create_anndata()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#anndict.spatial_dict.add_blank_image_to_adata"><code class="docutils literal notranslate"><span class="pre">add_blank_image_to_adata()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#anndict.spatial_dict.build_adata_from_transcript_positions"><code class="docutils literal notranslate"><span class="pre">build_adata_from_transcript_positions()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#anndict.spatial_dict.build_adata_from_visium"><code class="docutils literal notranslate"><span class="pre">build_adata_from_visium()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#anndict.spatial_dict.plot_spatial_adata_dict"><code class="docutils literal notranslate"><span class="pre">plot_spatial_adata_dict()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#anndict.spatial_dict.compute_spatial_neighbors_adata_dict"><code class="docutils literal notranslate"><span class="pre">compute_spatial_neighbors_adata_dict()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#anndict.spatial_dict.perform_colocalization_adata_dict"><code class="docutils literal notranslate"><span class="pre">perform_colocalization_adata_dict()</span></code></a></li>
@@ -531,6 +534,20 @@ between continuous and categorical data.</p>
 - dict: A color map linking unique values or ranges from the specified keys to colors.</p>
 </dd></dl>
 
+<dl class="py function">
+<dt class="sig sig-object py" id="anndict.utils.UCE_adata">
+<span class="sig-prename descclassname"><span class="pre">anndict.utils.</span></span><span class="sig-name descname"><span class="pre">UCE_adata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata_paths</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/utils.html#UCE_adata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.utils.UCE_adata" title="Link to this definition"></a></dt>
+<dd><p>Runs the eval_single_anndata.py script for each specified anndata path. This function is included largely for illustrative purposes and will be restrictivley slow with a gpu.</p>
+<p>Parameters:
+adata_paths (list of str): A list of paths to the .h5ad files to be processed.</p>
+<p>This function constructs the command to run the eval_single_anndata.py script
+with specified arguments and then executes the command using subprocess.run.</p>
+<p>The function assumes that a uce-compatible conda environment is already activated
+and the working directory is correctly set to UCE (i.e. as in <a class="reference external" href="https://github.com/snap-stanford/UCE">https://github.com/snap-stanford/UCE</a>)</p>
+<p>Example usage:
+UCE_adata([“../dat/liver.h5ad”, “../dat/kidney.h5ad”])</p>
+</dd></dl>
+
 <dl class="py function" id="module-anndict.metadata_summary">
 <dt class="sig sig-object py" id="anndict.metadata_summary.summarize_metadata">
 <span class="sig-prename descclassname"><span class="pre">anndict.metadata_summary.</span></span><span class="sig-name descname"><span class="pre">summarize_metadata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">columns</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/metadata_summary.html#summarize_metadata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.metadata_summary.summarize_metadata" title="Link to this definition"></a></dt>
@@ -772,13 +789,25 @@ anndata.AnnData: The AnnData object containing the gene counts and metadata.</p>
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="anndict.spatial_dict.add_blank_image_to_adata">
+<span class="sig-prename descclassname"><span class="pre">anndict.spatial_dict.</span></span><span class="sig-name descname"><span class="pre">add_blank_image_to_adata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">platform</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Merscope'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/spatial_dict.html#add_blank_image_to_adata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.spatial_dict.add_blank_image_to_adata" title="Link to this definition"></a></dt>
+<dd><p>Adds a dummy image to the AnnData object based on the platform specifications.</p>
+<p>Parameters:
+adata (anndata.AnnData): The AnnData object to which the image will be added.
+platform (str): The platform from which the data originates. Default is “Merscope”.</p>
+<p>Returns:
+anndata.AnnData: The updated AnnData object with the image and spatial data.</p>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="anndict.spatial_dict.build_adata_from_transcript_positions">
-<span class="sig-prename descclassname"><span class="pre">anndict.spatial_dict.</span></span><span class="sig-name descname"><span class="pre">build_adata_from_transcript_positions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">paths_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">box_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">16</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">step_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">16</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/spatial_dict.html#build_adata_from_transcript_positions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.spatial_dict.build_adata_from_transcript_positions" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">anndict.spatial_dict.</span></span><span class="sig-name descname"><span class="pre">build_adata_from_transcript_positions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">paths_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">box_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">16</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">step_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">16</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">platform</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Merscope'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/spatial_dict.html#build_adata_from_transcript_positions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.spatial_dict.build_adata_from_transcript_positions" title="Link to this definition"></a></dt>
 <dd><p>Builds an AnnData object from a tissue_positions.{csv,parquet} file and saves it to a specified output path. These are the files output by most spatial transcriptomic platforms, including Visium, Visium HD, Xenium, and Merscope.</p>
 <p>Parameters:
 paths_dict (dict): A dictionary with input paths as keys and output paths as values.
 box_size (int, optional): The size of the box. Default is 16.
-step_size (int, optional): The step size. Default is 16.</p>
+step_size (int, optional): The step size. Default is 16.
+platform (str, optional): The platform used, either “Merscope” (default) or “Xenium”.</p>
 <p>Returns:
 None</p>
 <section id="example">
@@ -791,6 +820,28 @@ None</p>
 </dd>
 </dl>
 <p>build_adata_from_transcript_positions(paths_dict)</p>
+</section>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="anndict.spatial_dict.build_adata_from_visium">
+<span class="sig-prename descclassname"><span class="pre">anndict.spatial_dict.</span></span><span class="sig-name descname"><span class="pre">build_adata_from_visium</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">paths_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/spatial_dict.html#build_adata_from_visium"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.spatial_dict.build_adata_from_visium" title="Link to this definition"></a></dt>
+<dd><p>Processes Visium data from input directories and saves the processed AnnData objects to specified output paths.</p>
+<p>Parameters:
+paths_dict (dict): A dictionary with input directories as keys and output file paths as values.
+hd (bool, optional): If True, converts ‘spatial’ to float and ‘obs’ columns to integers. Default is False.</p>
+<p>Returns:
+None</p>
+<section id="id1">
+<h2>Example:<a class="headerlink" href="#id1" title="Link to this heading"></a></h2>
+<dl>
+<dt>paths_dict = {</dt><dd><p>‘input_dir1’: ‘output_path1.h5ad’,</p>
+<p>‘input_dir2’: ‘output_path2.h5ad’</p>
+<p># Add more input-output path pairs as needed</p>
+<p>}</p>
+</dd>
+</dl>
+<p>build_adata_from_visium(paths_dict, hd=True)</p>
 </section>
 </dd></dl>
 
