@@ -82,6 +82,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#anndict.strata.plot_confusion_matrix_across_strata"><code class="docutils literal notranslate"><span class="pre">plot_confusion_matrix_across_strata()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#anndict.utils.add_label_to_adata"><code class="docutils literal notranslate"><span class="pre">add_label_to_adata()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#anndict.utils.add_col_to_adata_obs"><code class="docutils literal notranslate"><span class="pre">add_col_to_adata_obs()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#anndict.utils.add_col_to_adata_var"><code class="docutils literal notranslate"><span class="pre">add_col_to_adata_var()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#anndict.utils.create_color_map"><code class="docutils literal notranslate"><span class="pre">create_color_map()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#anndict.utils.UCE_adata"><code class="docutils literal notranslate"><span class="pre">UCE_adata()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#anndict.metadata_summary.summarize_metadata"><code class="docutils literal notranslate"><span class="pre">summarize_metadata()</span></code></a></li>
@@ -543,6 +544,17 @@ ValueError: If no strata meet the minimum cell requirement after filtering.</p>
 - indices: Array of indices where labels will be assigned.
 - labels: Array of labels corresponding to the indices.
 - new_label_key: Name of the column in adata.obs where the labels will be stored.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="anndict.utils.add_col_to_adata_var">
+<span class="sig-prename descclassname"><span class="pre">anndict.utils.</span></span><span class="sig-name descname"><span class="pre">add_col_to_adata_var</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">indices</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_label_key</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/utils.html#add_col_to_adata_var"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.utils.add_col_to_adata_var" title="Link to this definition"></a></dt>
+<dd><p>Adds a label to the AnnData object in a specified column for given indices in adata.var.</p>
+<p>Parameters:
+- adata: AnnData object to be updated.
+- indices: Array of indices where labels will be assigned.
+- labels: Array of labels corresponding to the indices.
+- new_label_key: Name of the column in adata.var where the labels will be stored.</p>
 </dd></dl>
 
 <dl class="py function">

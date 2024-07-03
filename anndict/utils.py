@@ -57,6 +57,27 @@ def add_col_to_adata_obs(adata, indices, labels, new_label_key):
     adata.obs.loc[indices, new_label_key] = labels
 
 
+def add_col_to_adata_var(adata, indices, labels, new_label_key):
+    """
+    Adds a label to the AnnData object in a specified column for given indices in adata.var.
+
+    Parameters:
+    - adata: AnnData object to be updated.
+    - indices: Array of indices where labels will be assigned.
+    - labels: Array of labels corresponding to the indices.
+    - new_label_key: Name of the column in adata.var where the labels will be stored.
+    """
+    if isinstance(labels[0], (int, np.integer)):
+        dtype = int
+    elif isinstance(labels[0], (float, np.floating)):
+        dtype = float
+    else:
+        dtype = str
+
+    adata.var[new_label_key] = np.full(adata.var.shape[0], np.nan, dtype=dtype)
+    adata.var.loc[indices, new_label_key] = labels
+
+
 def create_color_map(adata, keys):
     """
     Creates a unified color map for given keys from an AnnData object, differentiating
