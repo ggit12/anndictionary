@@ -20,7 +20,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 from sklearn.metrics import confusion_matrix
 
-from .utils import create_color_map
+from .utils import create_color_map, add_label_to_adata
 
 def get_slurm_cores():
     """
@@ -161,6 +161,7 @@ def pca_density_adata_dict(adata_dict, keys):
     Returns:
     - Dictionary: Updated adata_dict with the same keys but with each AnnData object having a new metadata key 'density_filter'.
     """
+    from .dict import build_adata_dict, concatenate_adata_dict
     if len(keys) == 0:
         # No further keys to split by, apply filtering directly
         for label, adata in adata_dict.items():
