@@ -324,7 +324,7 @@ def resample_adata(adata, strata_keys, min_num_cells, n_largest_groups=None, **k
         selected_categories = category_counts.nlargest(n_largest_groups).index.tolist()
     
     # Step 4: Build adata_dict based on the strata key
-    strata_dict = build_adata_dict(adata, strata_key, selected_categories)
+    strata_dict = build_adata_dict(adata, [strata_key], selected_categories)
     
     # Step 5: Subsample each AnnData object in the strata_dict
     subsample_adata_dict(strata_dict, **kwargs)
@@ -630,7 +630,7 @@ def plot_changes_adata_dict(adata_dict, true_label_key, predicted_label_key, per
         plot_changes(adata, true_label_key, predicted_label_key, percentage, stratum)
 
 def plot_confusion_matrix_adata_dict(adata_dict, true_label_key, predicted_label_key,
-                                     row_color_keys=None, col_color_keys=None):
+                                     row_color_keys=None, col_color_keys=None, figsize=(10,10)):
     """
     Applies the plot_confusion_matrix_from_adata function to each AnnData object in adata_dict.
 
@@ -646,4 +646,4 @@ def plot_confusion_matrix_adata_dict(adata_dict, true_label_key, predicted_label
         # Customize title for each subset
         subset_title = f"Confusion Matrix for {stratum}"
         plot_confusion_matrix_from_adata(adata, true_label_key, predicted_label_key, title=subset_title,
-                                         row_color_keys=row_color_keys, col_color_keys=col_color_keys)
+                                         row_color_keys=row_color_keys, col_color_keys=col_color_keys, figsize=figsize)
