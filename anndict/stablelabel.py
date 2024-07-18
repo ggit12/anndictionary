@@ -453,8 +453,9 @@ def plot_changes(adata, true_label_key, predicted_label_key, percentage=True, st
     plt.xticks(fontsize=8)
     plt.show()
 
+
 def plot_confusion_matrix_from_adata(adata, true_label_key, predicted_label_key, title='Confusion Matrix',
-                                     row_color_keys=None, col_color_keys=None):
+                                     row_color_keys=None, col_color_keys=None, figsize=None):
     """
     Wrapper function to plot a confusion matrix from an AnnData object, with optional row and column colors.
     
@@ -486,25 +487,20 @@ def plot_confusion_matrix_from_adata(adata, true_label_key, predicted_label_key,
     true_labels_encoded = label_encoder.transform(true_labels)
     predicted_labels_encoded = label_encoder.transform(predicted_labels)
 
-    # Decode labels for plot annotations
-    labels = label_encoder.classes_
-
     # Create label-to-color dictionary for mapping
+    true_label_color_dict = None
     if row_color_keys:
         true_label_subset = adata.obs[[true_label_key] + row_color_keys].drop_duplicates().set_index(true_label_key)
         true_label_color_dict = {label: {key: row[key] for key in row_color_keys}
                         for label, row in true_label_subset.iterrows()
                         }
-    else:
-        true_label_color_dict = None
-    
+
+    predicted_label_color_dict = None
     if col_color_keys:
         predicted_label_subset = adata.obs[[predicted_label_key] + col_color_keys].drop_duplicates().set_index(predicted_label_key)
         predicted_label_color_dict = {label: {key: col[key] for key in col_color_keys}
                         for label, col in predicted_label_subset.iterrows()
                         }
-    else:
-        predicted_label_color_dict = None
 
     # Compute the row and column colors
     # Get unified color mapping
@@ -512,16 +508,16 @@ def plot_confusion_matrix_from_adata(adata, true_label_key, predicted_label_key,
     color_map = create_color_map(adata, keys)
 
     # Call the main plot function
-    plot_confusion_matrix(true_labels_encoded, predicted_labels_encoded, labels, color_map, title,
+    plot_confusion_matrix(true_labels_encoded, predicted_labels_encoded, label_encoder, color_map, title,
                           row_color_keys=row_color_keys, col_color_keys=col_color_keys,
                           true_label_color_dict=true_label_color_dict, predicted_label_color_dict=predicted_label_color_dict,
-                          true_labels=true_labels, predicted_labels=predicted_labels)
-    
+                          true_labels=true_labels, predicted_labels=predicted_labels, figsize=figsize)
 
-def plot_confusion_matrix(true_labels_encoded, predicted_labels_encoded, labels, color_map, title='Confusion Matrix', 
+
+def plot_confusion_matrix(true_labels_encoded, predicted_labels_encoded, label_encoder, color_map, title='Confusion Matrix', 
                           row_color_keys=None, col_color_keys=None,
                           true_label_color_dict=None, predicted_label_color_dict=None,
-                          true_labels=None, predicted_labels=None):
+                          true_labels=None, predicted_labels=None, figsize=None):
     """
     Plots a confusion matrix using seaborn clustermap with optional row and column colors and clustering turned off.
     
@@ -533,12 +529,19 @@ def plot_confusion_matrix(true_labels_encoded, predicted_labels_encoded, labels,
     - row_colors: array-like, colors for each row.
     - col_colors: array-like, colors for each column.
     """
+        
+    labels_true = np.unique(true_labels_encoded)
+    labels_pred = np.unique(predicted_labels_encoded)
+    
     # Compute the confusion matrix
-    cm = confusion_matrix(true_labels_encoded, predicted_labels_encoded, labels=np.arange(len(labels)))
-
+    cm = confusion_matrix(true_labels_encoded, predicted_labels_encoded, labels=np.arange(len(label_encoder.classes_)))
+    
     # Normalize the confusion matrix by row (i.e., by the number of samples in each class)
-    cm_normalized = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
-    cm_normalized = pd.DataFrame(cm_normalized, index=labels, columns=labels)
+    cm_normalized = cm.astype('float') / cm.sum(axis=1, keepdims=True)
+    cm_normalized = pd.DataFrame(cm_normalized[np.ix_(labels_true, labels_pred)], 
+                             index=label_encoder.inverse_transform(labels_true), 
+                             columns=label_encoder.inverse_transform(labels_pred))
+
 
     # Function to map labels to their respective colors remains unchanged
     def map_labels_to_colors(labels, label_color_dict, color_map):
@@ -551,39 +554,32 @@ def plot_confusion_matrix(true_labels_encoded, predicted_labels_encoded, labels,
             color_list.append(colors)
         return color_list
 
+    row_colors = None
     if row_color_keys:
         # Applying the function to true and predicted labels using the decoded labels
-        row_colors = map_labels_to_colors(np.unique(true_labels), true_label_color_dict, color_map)
-
+        row_colors = map_labels_to_colors(label_encoder.inverse_transform(labels_true), true_label_color_dict, color_map)
+        
         # Convert lists of color lists to DataFrame (needed for clustermap)
-        row_colors = pd.DataFrame(row_colors, index=np.unique(true_labels))
-    else:
-        row_colors = None
+        row_colors = pd.DataFrame(row_colors, index=label_encoder.inverse_transform(labels_true))
     
     #Do the same for cols
+    col_colors = None
     if col_color_keys:
-        col_colors = map_labels_to_colors(np.unique(predicted_labels), predicted_label_color_dict, color_map)
-        col_colors = pd.DataFrame(col_colors, index=np.unique(predicted_labels))
-    else:
-        col_colors = None
+        col_colors = map_labels_to_colors(label_encoder.inverse_transform(labels_pred), predicted_label_color_dict, color_map)
+        col_colors = pd.DataFrame(col_colors, index=label_encoder.inverse_transform(labels_pred))
 
-    #set size-specific params
-    if cm_normalized.shape[0] > 30:
-        annot, xticklabels, yticklabels = False, False, False
-    else:
-        annot, xticklabels, yticklabels = True, True, True
+    # Set size-specific params
+    xticklabels = True if len(labels_pred) <= 30 else False
+    yticklabels = True if len(labels_true) <= 30 else False
+    annot = True if len(labels_true) <= 30 and len(labels_pred) <= 30 else False
 
-
-    # Use clustermap to display the heatmap with row and column colors
     g = sns.clustermap(cm_normalized, annot=annot, fmt=".2f", cmap="Blues",
                        row_colors=row_colors, col_colors=col_colors,
                        xticklabels=xticklabels, yticklabels=yticklabels,
-                    #    xticklabels=labels, yticklabels=labels,
-                       row_cluster=False, col_cluster=False, figsize=(15, 15))
+                       row_cluster=False, col_cluster=False, figsize=figsize)
 
     g.ax_heatmap.set_title(title, y=1.05)
     g.ax_heatmap.set_ylabel('True label')
     g.ax_heatmap.set_xlabel('Predicted label')
-    # plt.figure(figsize=(15, 6))
     plt.show()
     
