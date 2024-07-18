@@ -295,7 +295,7 @@ def subsample_adata_dict(adata_dict, **kwargs):
 
     adata_dict_fapply(adata_dict, subsample_adata, **kwargs)
 
-def resample_adata(adata, strata_keys, min_num_cells, **kwargs):
+def resample_adata(adata, strata_keys, min_num_cells, n_largest_groups=None, **kwargs):
     """
     Resample an AnnData object based on specified strata keys and drop strata with fewer than the minimum number of cells.
 
@@ -313,20 +313,29 @@ def resample_adata(adata, strata_keys, min_num_cells, **kwargs):
     """
     # Step 1: Create the strata key
     strata_key = check_and_create_strata(adata, strata_keys)
+
+    # Step 2: Calculate the size of each category
+    category_counts = adata.obs[strata_key].value_counts()
     
-    # Step 2: Build adata_dict based on the strata key
-    strata_dict = build_adata_dict(adata, strata_keys, adata.obs[strata_key].cat.categories.tolist())
+    # Step 3: Identify the top n largest categories or all categories if n is None
+    if n_largest_groups is None:
+        selected_categories = category_counts.index.tolist()
+    else:
+        selected_categories = category_counts.nlargest(n_largest_groups).index.tolist()
     
-    # Step 3: Subsample each AnnData object in the strata_dict
+    # Step 4: Build adata_dict based on the strata key
+    strata_dict = build_adata_dict(adata, strata_key, selected_categories)
+    
+    # Step 5: Subsample each AnnData object in the strata_dict
     subsample_adata_dict(strata_dict, **kwargs)
     
-    # Step 4: Drop AnnData objects with fewer than min_num_cells
+    # Step 6: Drop AnnData objects with fewer than min_num_cells
     filtered_dict = {k: v for k, v in strata_dict.items() if v.n_obs >= min_num_cells}
     
-    # Step 5: Concatenate the filtered_dict back to a single AnnData object
+    # Step 7: Concatenate the filtered_dict back to a single AnnData object
     return concatenate_adata_dict(filtered_dict)
 
-def resample_adata_dict(adata_dict, strata_keys, min_num_cells=0, **kwargs):
+def resample_adata_dict(adata_dict, strata_keys, n_largest_groups=None, min_num_cells=0, **kwargs):
     """
     Resample each AnnData object in a dictionary based on specified strata keys and drop strata with fewer than the minimum number of cells.
 
@@ -339,7 +348,7 @@ def resample_adata_dict(adata_dict, strata_keys, min_num_cells=0, **kwargs):
     Returns:
     dict: Dictionary of resampled AnnData objects after filtering.
     """
-    return adata_dict_fapply_return(adata_dict, resample_adata, strata_keys=strata_keys, min_num_cells=min_num_cells, **kwargs)
+    return adata_dict_fapply_return(adata_dict, resample_adata, strata_keys=strata_keys, n_largest_groups=n_largest_groups, min_num_cells=min_num_cells, **kwargs)
 
 
 def normalize_adata_dict(adata_dict, **kwargs):
