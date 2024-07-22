@@ -19,7 +19,8 @@ setup(
         'scipy',
         'seaborn',
         'matplotlib',
-        'squidpy'
+        'squidpy',
+        'harmonypy'
     ],
     classifiers=[
         # Trove classifiers

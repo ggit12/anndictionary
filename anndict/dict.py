@@ -19,6 +19,7 @@ import seaborn as sns
 import matplotlib
 import matplotlib.pyplot as plt
 from sklearn.metrics import confusion_matrix
+import harmonypy as hm
 
 import inspect
 
@@ -34,7 +35,8 @@ from .stablelabel import (
     plot_training_history,
     plot_changes,
     plot_confusion_matrix_from_adata,
-    plot_confusion_matrix
+    plot_confusion_matrix,
+    harmony_label_transfer
 )
 from .utils import add_label_to_adata, create_color_map
 
@@ -145,6 +147,39 @@ def check_and_create_strata(adata, strata_keys):
         adata.obs[strata_key] = adata.obs[strata_key].astype('category')
 
     return strata_key
+
+
+def read_adata_dict(paths):
+    """
+    Reads .h5ad files from a list of paths and returns them in a dictionary.
+
+    For each element in the provided list of paths, if the element is a directory,
+    it reads all .h5ad files in that directory. If the element is an .h5ad file,
+    it reads the file directly. The results are returned as a dictionary with
+    keys "ad1", "ad2", ..., where each value is an AnnData object.
+
+    Parameters:
+    paths (list): A list of paths to directories or .h5ad files.
+
+    Returns:
+    dict: A dictionary with keys as "ad1", "ad2", ... and values as AnnData objects.
+    """
+    adata_dict = {}
+    count = 1
+    
+    for path in paths:
+        if os.path.isdir(path):
+            for file in os.listdir(path):
+                if file.endswith(".h5ad"):
+                    file_path = os.path.join(path, file)
+                    adata_dict[f"ad{count}"] = ad.read_h5ad(file_path)
+                    count += 1
+        elif path.endswith(".h5ad"):
+            adata_dict[f"ad{count}"] = ad.read_h5ad(path)
+            count += 1
+    
+    return adata_dict
+
 
 def build_adata_dict(adata, strata_keys, desired_strata=None):
     """
@@ -629,6 +664,7 @@ def plot_changes_adata_dict(adata_dict, true_label_key, predicted_label_key, per
         print(f"Plotting changes for {stratum}")
         plot_changes(adata, true_label_key, predicted_label_key, percentage, stratum)
 
+
 def plot_confusion_matrix_adata_dict(adata_dict, true_label_key, predicted_label_key,
                                      row_color_keys=None, col_color_keys=None, figsize=(10,10)):
     """
@@ -647,3 +683,7 @@ def plot_confusion_matrix_adata_dict(adata_dict, true_label_key, predicted_label
         subset_title = f"Confusion Matrix for {stratum}"
         plot_confusion_matrix_from_adata(adata, true_label_key, predicted_label_key, title=subset_title,
                                          row_color_keys=row_color_keys, col_color_keys=col_color_keys, figsize=figsize)
+
+
+def harmony_label_transfer_adata_dict(adata_dict, master_data, master_susbet_column='tissue', label_column='cell_type'):
+    adata_dict_fapply(adata_dict, harmony_label_transfer, master_data=master_data, master_susbet_column=master_susbet_column, label_column=label_column)

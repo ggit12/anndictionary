@@ -28,7 +28,8 @@ from .stablelabel import (
     plot_training_history, 
     plot_changes, 
     plot_confusion_matrix_from_adata, 
-    plot_confusion_matrix
+    plot_confusion_matrix,
+    harmony_label_transfer
 )
 
 from .dict import (
@@ -36,6 +37,7 @@ from .dict import (
     adata_dict_fapply, 
     adata_dict_fapply_return,
     check_and_create_strata,
+    read_adata_dict,
     build_adata_dict, 
     subsplit_adata_dict,  
     concatenate_adata_dict, 
@@ -58,7 +60,8 @@ from .dict import (
     plot_confusion_matrix_adata_dict, 
     summarize_metadata_adata_dict,
     display_html_summary_adata_dict,
-    subsample_adata_dict
+    subsample_adata_dict,
+    harmony_label_transfer_adata_dict
 )
 
 from .strata import (
@@ -97,6 +100,7 @@ __all__ = [
     'plot_confusion_matrix_from_adata', 
     'plot_confusion_matrix', 
     'check_and_create_strata', 
+    'read_adata_dict', 
     'build_adata_dict', 
     'subsplit_adata_dict', 
     'concatenate_adata_dict',
@@ -145,5 +149,7 @@ __all__ = [
     'perform_colocalization_adata_dict',
     'plot_colocalization_adata_dict',
     'compute_interaction_matrix_adata_dict',
-    'plot_interaction_matrix_adata_dict'
+    'plot_interaction_matrix_adata_dict',
+    'harmony_label_transfer', 
+    'harmony_label_transfer_adata_dict'
 ]
