@@ -16,6 +16,11 @@ Modules Documentation
    :undoc-members:
    :member-order: bysource
 
+.. automodule:: anndict.ai
+   :members:
+   :undoc-members:
+   :member-order: bysource
+
 .. automodule:: anndict.metadata_summary
    :members:
    :undoc-members:
