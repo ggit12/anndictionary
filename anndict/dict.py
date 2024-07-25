@@ -871,7 +871,7 @@ def ai_annotate_biological_process_adata_dict(adata_dict, groupby, n_top_genes=1
     return adata_dict_fapply_return(adata_dict, ai_annotate_biological_process, groupby=groupby, n_top_genes=n_top_genes, label_column=label_column)
 
 
-def unify_labels(adata_dict, label_columns, new_label_column, simplification_level='unified, typo-fixed'):
+def ai_unify_labels(adata_dict, label_columns, new_label_column, simplification_level='unified, typo-fixed'):
     """
     Unifies cell type labels across multiple AnnData objects by mapping them to a simplified, unified set of labels.
 
