@@ -1,5 +1,6 @@
 from . import metadata_summary
 from . import utils
+from . import ai
 from . import stablelabel
 from . import dict
 from . import strata
@@ -15,6 +16,17 @@ from .utils import (
     add_label_to_adata,
     create_color_map,
     UCE_adata
+)
+
+from .ai import (
+    set_openai_api_key, 
+    get_openai_client, 
+    attempt_ai_integration, 
+    generate_file_key, 
+    map_cell_type_labels_to_simplified_set, 
+    map_gene_labels_to_simplified_set, 
+    ai_biological_process, 
+    ai_cell_type
 )
 
 from .stablelabel import (
@@ -151,5 +163,13 @@ __all__ = [
     'compute_interaction_matrix_adata_dict',
     'plot_interaction_matrix_adata_dict',
     'harmony_label_transfer', 
-    'harmony_label_transfer_adata_dict'
+    'harmony_label_transfer_adata_dict',
+    'set_openai_api_key', 
+    'get_openai_client', 
+    'attempt_ai_integration', 
+    'generate_file_key', 
+    'map_cell_type_labels_to_simplified_set', 
+    'map_gene_labels_to_simplified_set', 
+    'ai_biological_process', 
+    'ai_cell_type'
 ]
