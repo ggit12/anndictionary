@@ -73,7 +73,17 @@ from .dict import (
     summarize_metadata_adata_dict,
     display_html_summary_adata_dict,
     subsample_adata_dict,
-    harmony_label_transfer_adata_dict
+    harmony_label_transfer_adata_dict,
+    simplify_obs_column, 
+    simplify_obs_column_adata_dict, 
+    simplify_var_index, 
+    simplify_obs_column_adata_dict, 
+    ai_annotate, 
+    ai_annotate_cell_type, 
+    ai_annotate_cell_type_adata_dict, 
+    ai_annotate_biological_process, 
+    ai_annotate_biological_process_adata_dict, 
+    ai_unify_labels
 )
 
 from .strata import (
@@ -171,5 +181,15 @@ __all__ = [
     'map_cell_type_labels_to_simplified_set', 
     'map_gene_labels_to_simplified_set', 
     'ai_biological_process', 
-    'ai_cell_type'
+    'ai_cell_type',
+    'simplify_obs_column', 
+    'simplify_obs_column_adata_dict', 
+    'simplify_var_index', 
+    'simplify_obs_column_adata_dict', 
+    'ai_annotate', 
+    'ai_annotate_cell_type', 
+    'ai_annotate_cell_type_adata_dict', 
+    'ai_annotate_biological_process', 
+    'ai_annotate_biological_process_adata_dict', 
+    'ai_unify_labels'
 ]
