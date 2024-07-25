@@ -20,6 +20,15 @@ pip install -e .
 # About
 `anndict` is a package that lets you process multiple `anndata` objects in parallel with a simplified interface (so that you can avoid writing a bunch of for loops). This is accomplished by a dictionary-based wrapping of `scanpy`.
 
+## AI to make things easier
+To make it easier to handle basics like cell type annotation for anndatas (one or many), and to make cell type labels agree across multiple anndatas, we provide AI-based processing to handle these tedious tasks. There are also AI-based functions to to biological process inference on gene lists.
+
+These functions include `ai_annotate_cell_type`, `ai_annotate_biological_process`, and `ai_unify_labels`, which all operate over many adata at once.
+
+
+
+During installation, you will be prompted to enter an OpenAI API key to allow the AI backend to operate (this will modify your .bashrc, you can also skip this step and set the OPENAI_API_KEY environemnt variable yourself). Directions on how to get an OpenAI API key can be found here: https://platform.openai.com/docs/quickstart/account-setup. You'll need to buy at least $5 of credits to start (so that you can use GPT-4+).
+
 ### If you like functions:
 The main function in this package is `adata_dict_fapply()` (and its cousin `adata_dict_fapply_return()`, which does the same thing but also returns the result as a dictionary). 
 
