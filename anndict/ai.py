@@ -49,6 +49,18 @@ def get_openai_client():
     
     return OpenAI(api_key=api_key)
 
+def enforce_semantic_list(lst):
+    error_message = "gene_list appears to contain numeric or numeric cast as string. Please ensure you are passing semantic labels (i.e. gene symbols or cell types) and not integer labels for AI interpretation."
+    
+    if not all(isinstance(item, str) for item in lst):
+        raise ValueError(error_message)
+    
+    try:
+        [float(item) for item in lst]
+        raise ValueError(error_message)
+    except ValueError:
+        return True
+
 def attempt_ai_integration(ai_func, fallback_func, *args, **kwargs):
     """
     Attempts to run the AI integration function with the provided arguments. If an exception occurs,
@@ -102,7 +114,7 @@ def generate_file_key(file_path):
     )
     
     # Extract the generated name from the response
-    generated_name = response.choices[0].message['content'].strip()
+    generated_name = response.choices[0].message.content.strip()
 
     return generated_name
 
@@ -119,12 +131,16 @@ def map_cell_type_labels_to_simplified_set(labels, simplification_level=''):
         dict: A dictionary mapping the original labels to the smaller set of labels.
     """
     #todo, could allow passing custom examples
+
+    #enforce that labels are semantic
+    enforce_semantic_list(labels)
+
     # Prepare the prompt
     labels_str = "    ".join(labels)
 
     # Prepare the messages for the Chat Completions API
     messages = [
-        {"role": "system", "content": f"You are a python dictionary mapping generatory that takes a list of categories and provides a {simplification_level} simplified mapping as a dictionary. Example: Fibroblast    CD8-positive T Cells    CD4-positive T Cells -> {{'Fibroblast':'Fibroblast','CD8-positive T Cells':'T Cell','CD4-positive T Cells':'T Cell'}}"},
+        {"role": "system", "content": f"You are a python dictionary mapping generatory that takes a list of categories and provides a mapping to a {simplification_level} simplified set as a dictionary. The string you return must be valid python and will be directly evaluated as eval(str). Example: Fibroblast    CD8-positive T Cells    CD4-positive T Cells -> {{'Fibroblast':'Fibroblast','CD8-positive T Cells':'T Cell','CD4-positive T Cells':'T Cell'}}"},
         {"role": "user", "content": f"{labels_str} -> "}
     ]
 
@@ -135,12 +151,12 @@ def map_cell_type_labels_to_simplified_set(labels, simplification_level=''):
     response = client.chat.completions.create(
         model="gpt-4o",
         messages=messages,
-        max_tokens=20,  # Adjust max tokens as needed
+        max_tokens=500,  # Adjust max tokens as needed
         temperature=0  # Adjust the creativity of the response
     )
     
     # Extract the generated mapping from the response
-    generated_mapping = response.choices[0].message['content'].strip()
+    generated_mapping = response.choices[0].message.content.strip()
 
     # Convert the generated mapping to a dictionary
     mapping_dict = eval(generated_mapping)
@@ -158,12 +174,15 @@ def map_gene_labels_to_simplified_set(labels, simplification_level=''):
     Returns:
         dict: A dictionary mapping the original labels to the smaller set of labels.
     """
+    #enforce that labels are semantic
+    enforce_semantic_list(labels)
+
     # Prepare the prompt
     labels_str = "    ".join(labels)
 
     # Prepare the messages for the Chat Completions API
     messages = [
-        {"role": "system", "content": f"You are a python dictionary mapping generatory that takes a list of genes and provides a smaller, {simplification_level} simplified mapping as a dictionary. Example: HSP90AA1    HSPA1A    HSPA1B    CLOCK    ARNTL    PER1    IL1A    IL6 -> {{'HSP90AA1':'Heat Shock Proteins','HSPA1A':'Heat Shock Proteins','HSPA1B':'Heat Shock Proteins','CLOCK':'Circadian Rhythm','ARNTL':'Circadian Rhythm','PER1':'Circadian Rhythm','IL1A':'Interleukins','IL6':'Interleukins'}}"},
+        {"role": "system", "content": f"You are a python dictionary mapping generatory that takes a list of genes and provides a mapping to a {simplification_level} simplified set as a dictionary. The string you return must be valid python and will be directly evaluated as eval(str). Example: HSP90AA1    HSPA1A    HSPA1B    CLOCK    ARNTL    PER1    IL1A    IL6 -> {{'HSP90AA1':'Heat Shock Proteins','HSPA1A':'Heat Shock Proteins','HSPA1B':'Heat Shock Proteins','CLOCK':'Circadian Rhythm','ARNTL':'Circadian Rhythm','PER1':'Circadian Rhythm','IL1A':'Interleukins','IL6':'Interleukins'}}"},
         {"role": "user", "content": f"{labels_str} -> "}
     ]
 
@@ -174,12 +193,12 @@ def map_gene_labels_to_simplified_set(labels, simplification_level=''):
     response = client.chat.completions.create(
         model="gpt-4o",
         messages=messages,
-        max_tokens=20,  # Adjust max tokens as needed
+        max_tokens=500,  # Adjust max tokens as needed
         temperature=0  # Adjust the creativity of the response
     )
     
     # Extract the generated mapping from the response
-    generated_mapping = response.choices[0].message['content'].strip()
+    generated_mapping = response.choices[0].message.content.strip()
 
     # Convert the generated mapping to a dictionary
     mapping_dict = eval(generated_mapping)
@@ -197,6 +216,9 @@ def ai_biological_process(gene_list):
     Returns:
         dict: A dictionary containing the description of the biological process.
     """
+    #enforce that labels are semantic
+    enforce_semantic_list(gene_list)
+
     # Prepare the prompt
     if len(gene_list) == 1:
         gpt_prompt = f"In a few words and without restating any part of the question, describe the single most prominent biological process represented by the gene: {gene_list[0]}"
@@ -214,7 +236,7 @@ def ai_biological_process(gene_list):
     client = get_openai_client()
 
     # Call the OpenAI Chat Completions API to generate the annotation
-    gpt_annotation = client.chat_completions.create(
+    gpt_annotation = client.chat.completions.create(
         model="gpt-4o",
         messages=messages,
         max_tokens=100,
@@ -222,7 +244,7 @@ def ai_biological_process(gene_list):
     )
 
     # Extract the generated annotation from the response
-    annotation = gpt_annotation.choices[0].message['content'].strip()
+    annotation = gpt_annotation.choices[0].message.content.strip()
 
     return annotation
 
@@ -236,6 +258,12 @@ def ai_cell_type(gene_list):
     Returns:
         str: The cell type label generate by AI
     """
+    #todo
+    #add option to pass tissue of origin to prompt
+
+    #enforce that labels are semantic
+    enforce_semantic_list(gene_list)
+
     # Prepare the prompt
     if len(gene_list) == 1:
         gpt_prompt = f"In a few words and without restating any part of the question, describe the single most likely cell type represented by the marker gene: {gene_list[0]}"
@@ -253,7 +281,7 @@ def ai_cell_type(gene_list):
     client = get_openai_client()
 
     # Call the OpenAI Chat Completions API to generate the annotation
-    gpt_annotation = client.chat_completions.create(
+    gpt_annotation = client.chat.completions.create(
         model="gpt-4o",
         messages=messages,
         max_tokens=100,
@@ -261,6 +289,6 @@ def ai_cell_type(gene_list):
     )
 
     # Extract the generated annotation from the response
-    annotation = gpt_annotation.choices[0].message['content'].strip()
+    annotation = gpt_annotation.choices[0].message.content.strip()
 
     return annotation

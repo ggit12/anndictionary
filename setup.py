@@ -1,12 +1,4 @@
 from setuptools import setup, find_packages
-from setuptools.command.install import install
-import subprocess
-
-class PostInstallCommand(install):
-    """Post-installation for installation mode."""
-    def run(self):
-        install.run(self)
-        subprocess.call(["python", "post_install.py"])
 
 setup(
     name='anndict',
@@ -28,7 +20,7 @@ setup(
         'seaborn',
         'matplotlib',
         'squidpy',
-        'harmonypy',
+        'harmonypy', 
         'openai'
     ],
     classifiers=[
@@ -40,7 +32,4 @@ setup(
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.7',
     ],
-    cmdclass={
-        'install': PostInstallCommand,
-    },
 )
