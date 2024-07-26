@@ -1,6 +1,6 @@
 import os
 import openai
-from openai.error import AuthenticationError
+# from openai.error import AuthenticationError
 
 def set_openai_api_key(api_key):
     bashrc_path = os.path.expanduser("~/.bashrc")

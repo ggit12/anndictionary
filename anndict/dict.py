@@ -129,6 +129,7 @@ def adata_dict_fapply_return(adata_dict, func, **kwargs):
             results[key] = func(adata, **kwargs)
     return results
 
+
 def check_and_create_strata(adata, strata_keys):
     """
     Checks if the specified stratifying variables are present in the AnnData object,
@@ -229,6 +230,7 @@ def build_adata_dict(adata, strata_keys, desired_strata=None):
     else:
         raise ValueError("desired_strata must be either a list or a dictionary of lists")
 
+
 def build_adata_dict_main(adata, strata_keys, desired_strata, print_missing_strata=True):
     """
     Main function to build a dictionary of AnnData objects based on desired strata values.
@@ -254,6 +256,7 @@ def build_adata_dict_main(adata, strata_keys, desired_strata, print_missing_stra
             if print_missing_strata:
                 print(f"Warning: '{stratum}' is not a valid category in '{strata_key}'.")
     return AdataDict(subsets_dict)
+
 
 def subsplit_adata_dict(adata_dict, strata_keys, desired_strata):
     """
@@ -306,6 +309,7 @@ def summarize_metadata_adata_dict(adata_dict, **kwargs):
     """
     return adata_dict_fapply_return(adata_dict, summarize_metadata, **kwargs)
 
+
 def display_html_summary_adata_dict(summary_dict_dict):
     """
     Display separate HTML tables for each metadata category in the summary dictionaries,
@@ -317,6 +321,40 @@ def display_html_summary_adata_dict(summary_dict_dict):
     for stratum, summary_dict in summary_dict_dict.items():
         print(f"Summary for {stratum}:")
         display_html_summary(summary_dict)
+
+def set_var_index(adata_dict, column):
+    """
+    Set the index of adata.var to the specified column for each AnnData object in adata_dict.
+
+    Parameters:
+    adata_dict (dict): A dictionary where keys are identifiers and values are AnnData objects.
+    column (str): The column name to set as the index of adata.var.
+
+    Returns:
+    dict: A dictionary with the same structure as adata_dict, where the var attribute of each AnnData object has its index set to the specified column.
+    """
+    def set_var_index_main(adata, column):
+        adata.var = adata.var.set_index(column)
+        return adata
+    return adata_dict_fapply_return(adata_dict, set_var_index_main, column=column)
+
+
+def set_obs_index(adata_dict, column):
+    """
+    Set the index of adata.obs to the specified column for each AnnData object in adata_dict.
+
+    Parameters:
+    adata_dict (dict): A dictionary where keys are identifiers and values are AnnData objects.
+    column (str): The column name to set as the index of adata.obs.
+
+    Returns:
+    dict: A dictionary with the same structure as adata_dict, where the obs attribute of each AnnData object has its index set to the specified column.
+    """
+    def set_obs_index_main(adata, column):
+        adata.obs = adata.obs.set_index(column)
+        return adata
+
+    return adata_dict_fapply_return(adata_dict, set_obs_index_main, column=column)
 
 
 def subsample_adata_dict(adata_dict, **kwargs):
@@ -342,6 +380,7 @@ def subsample_adata_dict(adata_dict, **kwargs):
             sc.pp.subsample(adata, **kwargs)
 
     adata_dict_fapply(adata_dict, subsample_adata, **kwargs)
+
 
 def resample_adata(adata, strata_keys, min_num_cells, n_largest_groups=None, **kwargs):
     """
@@ -383,6 +422,7 @@ def resample_adata(adata, strata_keys, min_num_cells, n_largest_groups=None, **k
     # Step 7: Concatenate the filtered_dict back to a single AnnData object
     return concatenate_adata_dict(filtered_dict)
 
+
 def resample_adata_dict(adata_dict, strata_keys, n_largest_groups=None, min_num_cells=0, **kwargs):
     """
     Resample each AnnData object in a dictionary based on specified strata keys and drop strata with fewer than the minimum number of cells.
@@ -412,6 +452,7 @@ def normalize_adata_dict(adata_dict, **kwargs):
     """
     adata_dict_fapply(adata_dict, sc.pp.normalize_total, **kwargs)
 
+
 def log_transform_adata_dict(adata_dict, **kwargs):
     """
     Log-transforms each AnnData object in the dictionary using Scanpy's log1p.
@@ -424,6 +465,7 @@ def log_transform_adata_dict(adata_dict, **kwargs):
     - None: The function modifies the input AnnData objects in place.
     """
     adata_dict_fapply(adata_dict, sc.pp.log1p, **kwargs)
+
 
 def set_high_variance_genes(adata_dict, **kwargs):
     """
@@ -438,6 +480,7 @@ def set_high_variance_genes(adata_dict, **kwargs):
     """
     adata_dict_fapply(adata_dict, sc.pp.highly_variable_genes, **kwargs)
 
+
 def scale_adata_dict(adata_dict, **kwargs):
     """
     Scales each AnnData object in the dictionary using Scanpy's scale function.
@@ -450,6 +493,7 @@ def scale_adata_dict(adata_dict, **kwargs):
     - None: The function modifies the input AnnData objects in place.
     """
     adata_dict_fapply(adata_dict, sc.pp.scale, **kwargs)
+
 
 def pca_adata_dict(adata_dict, **kwargs):
     """
@@ -464,6 +508,35 @@ def pca_adata_dict(adata_dict, **kwargs):
     """
     adata_dict_fapply(adata_dict, sc.pp.pca, **kwargs)
 
+
+def neighbors_adata_dict(adata_dict, **kwargs):
+    """
+    Calculates neighborhood graph for each AnnData object in the dictionary using Scanpy's neighbors function.
+
+    Parameters:
+    - adata_dict (dict): Dictionary of AnnData objects with keys as identifiers.
+    - kwargs: Additional keyword arguments to pass to the sc.pp.neighbors function.
+
+    Returns:
+    - None: The function modifies the input AnnData objects in place.
+    """
+    adata_dict_fapply(adata_dict, sc.pp.neighbors, **kwargs)
+
+
+def leiden_adata_dict(adata_dict, **kwargs):
+    """
+    Performs Leiden clustering for each AnnData object in the dictionary using Scanpy's leiden function.
+
+    Parameters:
+    - adata_dict (dict): Dictionary of AnnData objects with keys as identifiers.
+    - kwargs: Additional keyword arguments to pass to the sc.tl.leiden function.
+
+    Returns:
+    - None: The function modifies the input AnnData objects in place.
+    """
+    adata_dict_fapply(adata_dict, sc.tl.leiden, **kwargs)
+
+
 def calculate_umap_adata_dict(adata_dict, **kwargs):
     """
     Calculates UMAP embeddings for each subset in the adata_dict.
@@ -475,15 +548,17 @@ def calculate_umap_adata_dict(adata_dict, **kwargs):
     Returns:
     - dict: A dictionary with the same keys as adata_dict, but values now include UMAP coordinates.
     """
-    def calculate_umap(adata, **kwargs):
-        use_rep = kwargs.get('use_rep')
-        if use_rep in adata.obsm:
-            sc.pp.neighbors(adata, use_rep=use_rep)
-            sc.tl.umap(adata)
-        else:
-            print(f"Representation '{use_rep}' not found in .obsm of adata.")
-    adata_dict_fapply(adata_dict, calculate_umap, **kwargs)
+    # def calculate_umap(adata, **kwargs):
+    #     use_rep = kwargs.get('use_rep')
+    #     if use_rep in adata.obsm:
+    #         sc.pp.neighbors(adata, use_rep=use_rep)
+    #         sc.tl.umap(adata)
+    #     else:
+    #         print(f"Representation '{use_rep}' not found in .obsm of adata.")
+    # adata_dict_fapply(adata_dict, calculate_umap, **kwargs)
+    adata_dict_fapply(adata_dict, sc.tl.umap, **kwargs)
     return adata_dict
+
 
 def plot_umap_adata_dict(adata_dict, **kwargs):
     """
@@ -568,6 +643,7 @@ def stable_label_adata_dict(adata_dict, feature_key, label_key, classifier_class
         }
 
     return stable_label_results
+
 
 def predict_labels_adata_dict(adata_dict, stable_label_results, feature_key):
     """
@@ -724,12 +800,14 @@ def simplify_obs_column(adata, column, new_column_name, simplification_level='')
     # Apply the mapping to create the new column in the AnnData object
     adata.obs[new_column_name] = adata.obs[column].map(label_mapping)
 
+    return label_mapping
+
 
 def simplify_obs_column_adata_dict(adata_dict, column, new_column_name, simplification_level=''):
     """
     Applies simplify_obs_column to each anndata in an anndict
     """
-    adata_dict_fapply(adata_dict, simplify_obs_column, column=column, new_column_name=new_column_name, simplification_level=simplification_level)
+    return adata_dict_fapply_return(adata_dict, simplify_obs_column, column=column, new_column_name=new_column_name, simplification_level=simplification_level)
 
 
 def simplify_var_index(adata, column, new_column_name, simplification_level=''):
@@ -761,12 +839,14 @@ def simplify_var_index(adata, column, new_column_name, simplification_level=''):
     # Apply the mapping to create the new column in the AnnData object
     adata.var[new_column_name] = adata.var.index.to_series().map(label_mapping).fillna(adata.var.index.to_series())
 
+    return label_mapping
 
-def simplify_obs_column_adata_dict(adata_dict, column, new_column_name, simplification_level=''):
+
+def simplify_var_index_adata_dict(adata_dict, column, new_column_name, simplification_level=''):
     """
     Applies simplify_var_index to each anndata in an anndict
     """
-    adata_dict_fapply(adata_dict, simplify_var_index, column=column, new_column_name=new_column_name, simplification_level=simplification_level)
+    return adata_dict_fapply_return(adata_dict, simplify_var_index, column=column, new_column_name=new_column_name, simplification_level=simplification_level)
 
 
 def ai_annotate(func, adata, groupby, n_top_genes, label_column):
@@ -817,7 +897,6 @@ def ai_annotate(func, adata, groupby, n_top_genes, label_column):
     return pd.DataFrame(results)
 
 
-
 def ai_annotate_cell_type(adata, groupby, n_top_genes, label_column='ai_cell_type'):
     """
     Annotate cell types based on the top marker genes for each cluster.
@@ -836,6 +915,7 @@ def ai_annotate_cell_type(adata, groupby, n_top_genes, label_column='ai_cell_typ
     pd.DataFrame A DataFrame with a column for the top marker genes for each cluster.
     """
     return ai_annotate(func=ai_cell_type, adata=adata, groupby=groupby, n_top_genes=n_top_genes, label_column=label_column)
+
 
 def ai_annotate_cell_type_adata_dict(adata_dict, groupby, n_top_genes=10, label_column='ai_cell_type'):
     """
