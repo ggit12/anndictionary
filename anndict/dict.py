@@ -95,8 +95,7 @@ def adata_dict_fapply(adata_dict, func, **kwargs_dicts):
     Parameters:
     - adata_dict: Dictionary of AnnData objects with keys as identifiers.
     - func: Function to apply to each AnnData object in the dictionary.
-    - kwargs_dicts: Additional keyword arguments to pass to the function, where each
-      argument can be a dictionary with keys matching the adata_dict or a single value.
+    - kwargs_dicts: Additional keyword arguments to pass to the function, where each argument can be a dictionary with keys matching the adata_dict or a single value.
 
     Returns:
     - None: The function modifies the AnnData objects in place.
@@ -129,8 +128,7 @@ def adata_dict_fapply_return(adata_dict, func, **kwargs_dicts):
     Parameters:
     - adata_dict: Dictionary of AnnData objects with keys as identifiers.
     - func: Function to apply to each AnnData object in the dictionary.
-    - kwargs_dicts: Additional keyword arguments to pass to the function, where each
-      argument can be a dictionary with keys matching the adata_dict or a single value.
+    - kwargs_dicts: Additional keyword arguments to pass to the function, where each argument can be a dictionary with keys matching the adata_dict or a single value.
 
     Returns:
     - dict: A dictionary with the same keys as adata_dict, containing the results of the function applied to each AnnData object.
