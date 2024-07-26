@@ -47,7 +47,9 @@ from .ai import (
     map_cell_type_labels_to_simplified_set, 
     map_gene_labels_to_simplified_set, 
     ai_biological_process, 
-    ai_cell_type
+    ai_cell_type,
+    ai_resolution_interpretation,
+    determine_sign_of_resolution_change
 )
 
 
@@ -84,50 +86,120 @@ class AdataDict(dict):
         return results
 
 
-def adata_dict_fapply(adata_dict, func, **kwargs):
+def adata_dict_fapply(adata_dict, func, **kwargs_dicts):
     """
-    Applies a given function to each AnnData object in the adata_dict.
+    Applies a given function to each AnnData object in the adata_dict, with additional
+    values from other dictionaries or single values. The other dictionaries should
+    be passed as keyword arguments where the keys are the argument names that func takes.
 
     Parameters:
     - adata_dict: Dictionary of AnnData objects with keys as identifiers.
     - func: Function to apply to each AnnData object in the dictionary.
-    - kwargs: Additional keyword arguments to pass to the function.
+    - kwargs_dicts: Additional keyword arguments to pass to the function, where each
+      argument can be a dictionary with keys matching the adata_dict or a single value.
 
     Returns:
     - None: The function modifies the AnnData objects in place.
     """
+    import inspect
     sig = inspect.signature(func)
     accepts_key = 'key' in sig.parameters
 
     for key, adata in adata_dict.items():
+        func_args = {}
+        for arg_name, arg_value in kwargs_dicts.items():
+            if isinstance(arg_value, dict):
+                if key in arg_value:
+                    func_args[arg_name] = arg_value[key]
+            else:
+                func_args[arg_name] = arg_value
+        
         if accepts_key:
-            func(adata, key=key, **kwargs)
+            func(adata, key=key, **func_args)
         else:
-            func(adata, **kwargs)
+            func(adata, **func_args)
 
 
-def adata_dict_fapply_return(adata_dict, func, **kwargs):
+def adata_dict_fapply_return(adata_dict, func, **kwargs_dicts):
     """
-    Applies a given function to each AnnData object in the adata_dict and returns the results in a dictionary.
+    Applies a given function to each AnnData object in the adata_dict, with additional
+    values from other dictionaries or single values. The other dictionaries should
+    be passed as keyword arguments where the keys are the argument names that func takes.
 
     Parameters:
-    - adata_dict (dict): Dictionary of AnnData objects with keys as identifiers.
+    - adata_dict: Dictionary of AnnData objects with keys as identifiers.
     - func: Function to apply to each AnnData object in the dictionary.
-    - kwargs: Additional keyword arguments to pass to the function.
+    - kwargs_dicts: Additional keyword arguments to pass to the function, where each
+      argument can be a dictionary with keys matching the adata_dict or a single value.
 
     Returns:
     - dict: A dictionary with the same keys as adata_dict, containing the results of the function applied to each AnnData object.
     """
+    import inspect
     sig = inspect.signature(func)
     accepts_key = 'key' in sig.parameters
 
     results = {}
     for key, adata in adata_dict.items():
+        func_args = {}
+        for arg_name, arg_value in kwargs_dicts.items():
+            if isinstance(arg_value, dict):
+                if key in arg_value:
+                    func_args[arg_name] = arg_value[key]
+            else:
+                func_args[arg_name] = arg_value
+        
         if accepts_key:
-            results[key] = func(adata, key=key, **kwargs)
+            results[key] = func(adata, key=key, **func_args)
         else:
-            results[key] = func(adata, **kwargs)
+            results[key] = func(adata, **func_args)
     return results
+        
+
+# def adata_dict_fapply(adata_dict, func, **kwargs):
+#     """
+#     Applies a given function to each AnnData object in the adata_dict.
+
+#     Parameters:
+#     - adata_dict: Dictionary of AnnData objects with keys as identifiers.
+#     - func: Function to apply to each AnnData object in the dictionary.
+#     - kwargs: Additional keyword arguments to pass to the function.
+
+#     Returns:
+#     - None: The function modifies the AnnData objects in place.
+#     """
+#     sig = inspect.signature(func)
+#     accepts_key = 'key' in sig.parameters
+
+#     for key, adata in adata_dict.items():
+#         if accepts_key:
+#             func(adata, key=key, **kwargs)
+#         else:
+#             func(adata, **kwargs)
+
+
+# def adata_dict_fapply_return(adata_dict, func, **kwargs):
+#     """
+#     Applies a given function to each AnnData object in the adata_dict and returns the results in a dictionary.
+
+#     Parameters:
+#     - adata_dict (dict): Dictionary of AnnData objects with keys as identifiers.
+#     - func: Function to apply to each AnnData object in the dictionary.
+#     - kwargs: Additional keyword arguments to pass to the function.
+
+#     Returns:
+#     - dict: A dictionary with the same keys as adata_dict, containing the results of the function applied to each AnnData object.
+#     """
+#     sig = inspect.signature(func)
+#     accepts_key = 'key' in sig.parameters
+
+#     results = {}
+#     for key, adata in adata_dict.items():
+#         if accepts_key:
+#             results[key] = func(adata, key=key, **kwargs)
+#         else:
+#             results[key] = func(adata, **kwargs)
+#     return results
 
 
 def check_and_create_strata(adata, strata_keys):
@@ -779,6 +851,67 @@ def harmony_label_transfer_adata_dict(adata_dict, master_data, master_susbet_col
 
 
 #AI integrations
+def ai_determine_leiden_resolution(adata, initial_resolution):
+    """
+    Adjusts the Leiden clustering resolution of an AnnData object based on AI feedback.
+
+    Args:
+        adata (AnnData): The annotated data matrix.
+        initial_resolution (float): The initial resolution for Leiden clustering.
+
+    Returns:
+        float: The final resolution value after adjustments based on AI interpretation.
+
+    This function iteratively performs Leiden clustering on the AnnData object,
+    generates a UMAP plot, and uses an AI model to interpret the plot and suggest
+    whether to increase, decrease, or maintain the current resolution. The resolution
+    is adjusted by ±0.1 based on the AI's suggestion until no further adjustment is needed.
+    """
+    resolution = initial_resolution
+    previous_sign_change = None
+    
+    k = 0
+    while k <= 10:
+        sc.tl.leiden(adata, resolution=resolution)
+        
+        # Plot UMAP colored by Leiden clusters
+        def plot_umap():
+            sc.pl.umap(adata, color='leiden', show=False)
+
+        # Get AI interpretation
+        annotation = ai_resolution_interpretation(plot_umap)
+        
+        # Determine the sign of resolution change
+        sign_change = determine_sign_of_resolution_change(annotation)
+        
+        # Check if the resolution needs to be adjusted
+        if sign_change == 0:
+            return resolution
+        elif previous_sign_change is not None and sign_change != previous_sign_change:
+            resolution = round(resolution + 0.15 * sign_change, 2)
+            return resolution
+        else:
+            resolution = round(resolution + 0.15 * sign_change, 2)
+        
+        previous_sign_change = sign_change
+        k = k + 1
+
+    return resolution
+
+
+def ai_determine_leiden_resolution_adata_dict(adata_dict, initial_resolution=1):
+    """
+    Adjusts Leiden clustering resolution for each AnnData object in a dictionary based on AI feedback.
+
+    Args:
+        adata_dict (dict): Dictionary of AnnData objects.
+        initial_resolution (float): Initial resolution for Leiden clustering (default is 1).
+
+    Returns: dict: Dictionary with final resolution values after AI-based adjustments.
+    """
+    return adata_dict_fapply_return(adata_dict, ai_determine_leiden_resolution, initial_resolution=initial_resolution)
+
+
 def simplify_obs_column(adata, column, new_column_name, simplification_level=''):
     """
     Simplifies labels in the specified column of the AnnData object and stores the result

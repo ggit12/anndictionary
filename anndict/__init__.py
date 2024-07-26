@@ -26,7 +26,9 @@ from .ai import (
     map_cell_type_labels_to_simplified_set, 
     map_gene_labels_to_simplified_set, 
     ai_biological_process, 
-    ai_cell_type
+    ai_cell_type,
+    ai_resolution_interpretation,
+    determine_sign_of_resolution_change
 )
 
 from .stablelabel import (
@@ -82,6 +84,8 @@ from .dict import (
     simplify_obs_column_adata_dict, 
     simplify_var_index, 
     simplify_var_index_adata_dict, 
+    ai_determine_leiden_resolution, 
+    ai_determine_leiden_resolution_adata_dict, 
     ai_annotate, 
     ai_annotate_cell_type, 
     ai_annotate_cell_type_adata_dict, 
@@ -192,6 +196,8 @@ __all__ = [
     'simplify_obs_column_adata_dict', 
     'simplify_var_index', 
     'simplify_var_index_adata_dict', 
+    'ai_determine_leiden_resolution', 
+    'ai_determine_leiden_resolution_adata_dict', 
     'ai_annotate', 
     'ai_annotate_cell_type', 
     'ai_annotate_cell_type_adata_dict', 
@@ -199,5 +205,7 @@ __all__ = [
     'ai_annotate_biological_process_adata_dict', 
     'ai_unify_labels',
     'set_var_index',
-    'set_obs_index'
+    'set_obs_index', 
+    'ai_resolution_interpretation', 
+    'determine_sign_of_resolution_change'
 ]
