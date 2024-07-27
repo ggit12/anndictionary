@@ -421,8 +421,8 @@ def plot_changes(adata, true_label_key, predicted_label_key, percentage=True, st
 
     Parameters:
     adata (AnnData): Annotated data matrix.
-    true_label_key (str): Key for the true labels in `adata.obs`.
-    predicted_label_key (str): Key for the predicted labels in `adata.obs`.
+    true_label_key (str): Key for the true labels in adata.obs.
+    predicted_label_key (str): Key for the predicted labels in adata.obs.
     percentage (bool, optional): If True, plot the percentage of labels changed. If False, plot the count of labels changed. Default is True.
     stratum (str, optional): Title for the plot, often used to indicate the stratum. Default is None.
 
@@ -679,12 +679,9 @@ def save_sankey(plot, filename, key = None):
     Save a Holoviews Sankey plot as an SVG file.
 
     Parameters:
-    plot : Holoviews plot
-        The Sankey plot to save.
-    filename : str
-        Base filename for the output SVG file.
-    key : str, optional
-        Optional identifier to append to the filename.
+    plot : Holoviews plot, The Sankey plot to save.
+    filename : str Base filename for the output SVG file.
+    key : str, optional Optional identifier to append to the filename.
     """
     import holoviews as hv
     from bokeh.io import export_svgs
