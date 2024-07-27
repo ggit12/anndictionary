@@ -7,6 +7,7 @@ from sklearn.preprocessing import LabelEncoder
 import scanpy as sc
 import anndata as ad
 import os
+import re
 import pandas as pd
 import random
 import itertools
@@ -21,6 +22,31 @@ import matplotlib.pyplot as plt
 from sklearn.metrics import confusion_matrix
 
 import subprocess
+
+
+def make_names(names):
+    """
+    Convert a list of names into valid and unique Python identifiers.
+
+    Args:
+        names (list of str): List of names to be transformed.
+
+    Returns:
+        list of str: Valid and unique Python identifiers.
+    """
+    # Equivalent of R's make.names() function in Python
+    valid_names = []
+    seen = {}
+    for name in names:
+        # Replace invalid characters with underscores
+        clean_name = re.sub(r'[^0-9a-zA-Z_]', '_', name)
+        if clean_name in seen:
+            seen[clean_name] += 1
+            clean_name = f"{clean_name}.{seen[clean_name]}"
+        else:
+            seen[clean_name] = 0
+        valid_names.append(clean_name)
+    return valid_names
 
 
 def add_label_to_adata(adata, indices, labels, new_label_key):
