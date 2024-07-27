@@ -12,6 +12,7 @@ from .metadata_summary import (
 )
 
 from .utils import (
+    make_names, 
     add_col_to_adata_obs,
     add_label_to_adata,
     create_color_map,
@@ -43,6 +44,8 @@ from .stablelabel import (
     plot_changes, 
     plot_confusion_matrix_from_adata, 
     plot_confusion_matrix,
+    plot_sankey, 
+    save_sankey,
     harmony_label_transfer
 )
 
@@ -91,7 +94,11 @@ from .dict import (
     ai_annotate_cell_type_adata_dict, 
     ai_annotate_biological_process, 
     ai_annotate_biological_process_adata_dict, 
-    ai_unify_labels
+    ai_unify_labels, 
+    create_label_hierarchy, 
+    create_label_hierarchy_adata_dict, 
+    plot_sankey_adata_dict, 
+    save_sankey_adata_dict
 )
 
 from .strata import (
@@ -207,5 +214,12 @@ __all__ = [
     'set_var_index',
     'set_obs_index', 
     'ai_resolution_interpretation', 
-    'determine_sign_of_resolution_change'
+    'determine_sign_of_resolution_change', 
+    'plot_sankey', 
+    'plot_sankey_adata_dict',
+    'create_label_hierarchy',
+    'create_label_hierarchy_adata_dict',
+    'make_names',
+    'save_sankey',
+    'save_sankey_adata_dict'
 ]

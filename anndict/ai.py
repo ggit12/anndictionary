@@ -7,6 +7,7 @@ from sklearn.preprocessing import LabelEncoder
 import scanpy as sc
 import anndata as ad
 import os
+import re
 import pandas as pd
 import random
 import itertools
@@ -145,7 +146,7 @@ def map_cell_type_labels_to_simplified_set(labels, simplification_level=''):
 
     # Prepare the messages for the Chat Completions API
     messages = [
-        {"role": "system", "content": f"You are a python dictionary mapping generatory that takes a list of categories and provides a mapping to a {simplification_level} simplified set as a dictionary. The string you return must be valid python and will be directly evaluated as eval(str). Example: Fibroblast    Fibrolasts.    CD8-positive T Cells    CD4-positive T Cells -> {{'Fibroblast':'Fibroblast','Fibrolasts.':'Fibroblast','CD8-positive T Cells':'T Cell','CD4-positive T Cells':'T Cell'}}"},
+        {"role": "system", "content": f"You are a python dictionary mapping generator that takes a list of categories and provides a mapping to a {simplification_level} simplified set as a dictionary. The string you return must be valid python and will be directly evaluated as eval(str). Example: Fibroblast    Fibrolasts.    CD8-positive T Cells    CD4-positive T Cells -> {{'Fibroblast':'Fibroblast','Fibrolasts.':'Fibroblast','CD8-positive T Cells':'T Cell','CD4-positive T Cells':'T Cell'}}"},
         {"role": "user", "content": f"{labels_str} -> "}
     ]
 

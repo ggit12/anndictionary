@@ -21,7 +21,9 @@ setup(
         'matplotlib',
         'squidpy',
         'harmonypy', 
-        'openai'
+        'openai',
+        'bokeh',
+        'holoviews'
     ],
     classifiers=[
         # Trove classifiers

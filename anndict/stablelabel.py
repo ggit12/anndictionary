@@ -7,6 +7,7 @@ from sklearn.preprocessing import LabelEncoder
 import scanpy as sc
 import anndata as ad
 import os
+import re
 import pandas as pd
 import random
 import itertools
@@ -14,10 +15,12 @@ from IPython.display import HTML, display
 
 from sklearn.decomposition import PCA
 from scipy.stats import gaussian_kde
+from scipy.optimize import linear_sum_assignment
 
 import seaborn as sns
 import matplotlib
 import matplotlib.pyplot as plt
+import matplotlib.colors as mcolors
 from sklearn.metrics import confusion_matrix
 
 import harmonypy as hm
@@ -457,7 +460,7 @@ def plot_changes(adata, true_label_key, predicted_label_key, percentage=True, st
 
 
 def plot_confusion_matrix_from_adata(adata, true_label_key, predicted_label_key, title='Confusion Matrix',
-                                     row_color_keys=None, col_color_keys=None, figsize=None):
+                                     row_color_keys=None, col_color_keys=None, figsize=None, diagonalize=False):
     """
     Wrapper function to plot a confusion matrix from an AnnData object, with optional row and column colors.
     
@@ -513,25 +516,14 @@ def plot_confusion_matrix_from_adata(adata, true_label_key, predicted_label_key,
     plot_confusion_matrix(true_labels_encoded, predicted_labels_encoded, label_encoder, color_map, title,
                           row_color_keys=row_color_keys, col_color_keys=col_color_keys,
                           true_label_color_dict=true_label_color_dict, predicted_label_color_dict=predicted_label_color_dict,
-                          true_labels=true_labels, predicted_labels=predicted_labels, figsize=figsize)
+                          true_labels=true_labels, predicted_labels=predicted_labels, figsize=figsize, diagonalize=diagonalize)
 
 
 def plot_confusion_matrix(true_labels_encoded, predicted_labels_encoded, label_encoder, color_map, title='Confusion Matrix', 
                           row_color_keys=None, col_color_keys=None,
                           true_label_color_dict=None, predicted_label_color_dict=None,
-                          true_labels=None, predicted_labels=None, figsize=None):
-    """
-    Plots a confusion matrix using seaborn clustermap with optional row and column colors and clustering turned off.
-    
-    Parameters:
-    - true_labels_encoded: array-like, encoded true class labels.
-    - predicted_labels_encoded: array-like, encoded classifier's predicted labels.
-    - labels: list, a list of label names corresponding to the class indices.
-    - title: str, title of the plot.
-    - row_colors: array-like, colors for each row.
-    - col_colors: array-like, colors for each column.
-    """
-        
+                          true_labels=None, predicted_labels=None, figsize=None,
+                          diagonalize=False):
     labels_true = np.unique(true_labels_encoded)
     labels_pred = np.unique(predicted_labels_encoded)
     
@@ -541,36 +533,43 @@ def plot_confusion_matrix(true_labels_encoded, predicted_labels_encoded, label_e
     # Normalize the confusion matrix by row (i.e., by the number of samples in each class)
     cm_normalized = cm.astype('float') / cm.sum(axis=1, keepdims=True)
     cm_normalized = pd.DataFrame(cm_normalized[np.ix_(labels_true, labels_pred)], 
-                             index=label_encoder.inverse_transform(labels_true), 
-                             columns=label_encoder.inverse_transform(labels_pred))
+                                 index=label_encoder.inverse_transform(labels_true), 
+                                 columns=label_encoder.inverse_transform(labels_pred))
 
+    if diagonalize:
+        # Sorting the confusion matrix to make it as diagonal as possible
+        cost_matrix = -cm_normalized.values  # We need to minimize the cost, hence the negative sign
+        row_ind, col_ind = linear_sum_assignment(cost_matrix)
 
-    # Function to map labels to their respective colors remains unchanged
+        # Concatenate the optimal indices with the non-optimal ones
+        row_ind = np.concatenate((row_ind, np.setdiff1d(np.arange(cm_normalized.shape[0]), row_ind)))
+        col_ind = np.concatenate((col_ind, np.setdiff1d(np.arange(cm_normalized.shape[1]), col_ind)))
+        
+        cm_normalized = cm_normalized.iloc[row_ind, col_ind]
+        labels_true_sorted = label_encoder.inverse_transform(labels_true)[row_ind]
+        labels_pred_sorted = label_encoder.inverse_transform(labels_pred)[col_ind]
+    else:
+        labels_true_sorted = label_encoder.inverse_transform(labels_true)
+        labels_pred_sorted = label_encoder.inverse_transform(labels_pred)
+
     def map_labels_to_colors(labels, label_color_dict, color_map):
-        # Create a list of color codes according to the order of labels
         color_list = []
         for label in labels:
             color_dict = label_color_dict.get(label, {})
-            # Map each metadata key to its color, priority given by order in keys
-            colors = [color_map.get(key).get(color_dict.get(key, None), '#FFFFFF') for key in keys]
+            colors = [color_map.get(key).get(color_dict.get(key, None), '#FFFFFF') for key in color_map]
             color_list.append(colors)
         return color_list
 
     row_colors = None
     if row_color_keys:
-        # Applying the function to true and predicted labels using the decoded labels
-        row_colors = map_labels_to_colors(label_encoder.inverse_transform(labels_true), true_label_color_dict, color_map)
-        
-        # Convert lists of color lists to DataFrame (needed for clustermap)
-        row_colors = pd.DataFrame(row_colors, index=label_encoder.inverse_transform(labels_true))
+        row_colors = map_labels_to_colors(labels_true_sorted, true_label_color_dict, color_map)
+        row_colors = pd.DataFrame(row_colors, index=labels_true_sorted)
     
-    #Do the same for cols
     col_colors = None
     if col_color_keys:
-        col_colors = map_labels_to_colors(label_encoder.inverse_transform(labels_pred), predicted_label_color_dict, color_map)
-        col_colors = pd.DataFrame(col_colors, index=label_encoder.inverse_transform(labels_pred))
+        col_colors = map_labels_to_colors(labels_pred_sorted, predicted_label_color_dict, color_map)
+        col_colors = pd.DataFrame(col_colors, index=labels_pred_sorted)
 
-    # Set size-specific params
     xticklabels = True if len(labels_pred) <= 30 else False
     yticklabels = True if len(labels_true) <= 30 else False
     annot = True if len(labels_true) <= 30 and len(labels_pred) <= 30 else False
@@ -584,7 +583,122 @@ def plot_confusion_matrix(true_labels_encoded, predicted_labels_encoded, label_e
     g.ax_heatmap.set_ylabel('True label')
     g.ax_heatmap.set_xlabel('Predicted label')
     plt.show()
+
+def plot_sankey(adata, cols, params=None):
+
+    import holoviews as hv
+    from collections import defaultdict
+    hv.extension('bokeh')
+
+    def f(plot, element):
+        plot.handles['plot'].sizing_mode = 'scale_width'
+        plot.handles['plot'].x_range.start = -1000
+        plot.handles['plot'].x_range.end = 1500
+
+
+    if params is None:
+        params = {}
     
+    obs = adata.obs[cols]
+    
+    # Creating unique labels for each column
+    unique_labels = []
+    label_dict = defaultdict(dict)
+    for col_index, col in enumerate(cols):
+        col_data = obs[col].astype(str).tolist()
+        for item in col_data:
+            if item not in label_dict[col_index]:
+                unique_label = f"{item} ({col})"
+                label_dict[col_index][item] = unique_label
+                unique_labels.append(unique_label)
+    
+    # Creating source, target and value lists
+    source = []
+    target = []
+    value = []
+    for i in range(len(cols) - 1):
+        ct_dict = defaultdict(int)
+        for a, b in zip(obs[cols[i]].astype(str), obs[cols[i+1]].astype(str)):
+            ct_dict[(a, b)] += 1
+        for (a, b), v in ct_dict.items():
+            source.append(label_dict[i][a])
+            target.append(label_dict[i+1][b])
+            value.append(v)
+    
+    # Creating DataFrame for Sankey
+    sankey_data = pd.DataFrame({
+        'source': source,
+        'target': target,
+        'value': value
+    })
+    
+    # Appearance parameters
+    cmap = params.get('cmap', 'Colorblind')
+    label_position = params.get('label_position', 'outer')
+    edge_line_width = params.get('edge_line_width', 0)
+    edge_color = params.get('edge_color', 'value')  # allows grey edges
+    show_values = params.get('show_values', False)
+    node_padding = params.get('node_padding', 12)
+    node_alpha = params.get('node_alpha', 1.0)
+    node_width = params.get('node_width', 30)
+    node_sort = params.get('node_sort', True)
+    frame_height = params.get('frame_height', 1000)
+    frame_width = params.get('frame_width', 2000)
+    bgcolor = params.get('bgcolor', 'white')
+    apply_ranges = params.get('apply_ranges', True)
+    align_thr = params.get('align_thr', -0.1)
+    label_font_size = params.get('label_font_size', '12pt')
+
+    colormap_max = max(sankey_data['value'])
+    norm = plt.Normalize(vmin=0, vmax=colormap_max)
+    colors = plt.cm.plasma(norm(np.linspace(0, colormap_max, 128)))
+    
+    replace_these = np.where(norm(np.linspace(0, colormap_max, 128)) <= align_thr)[0]
+    if replace_these.size > 0:
+        colors[replace_these] = [[1, 1, 1, 0] for _ in range(len(replace_these))]
+    
+    edge_cmap = mcolors.LinearSegmentedColormap.from_list('my_colormap', colors)
+    
+    if edge_color == "grey":
+        edge_color = "grey"  # Set edge_color to grey
+        edge_cmap = None  # No colormap for grey edges
+    
+    sankey = hv.Sankey(sankey_data, kdims=["source", "target"], vdims=["value"])
+    sankey = sankey.opts(
+        cmap=cmap, label_position=label_position, edge_color=edge_color, edge_cmap=edge_cmap, colorbar=True if edge_cmap else False,
+        edge_line_width=edge_line_width, show_values=show_values, node_padding=node_padding, node_alpha=node_alpha,
+        node_width=node_width, node_sort=node_sort, frame_height=frame_height, frame_width=frame_width,
+        bgcolor=bgcolor, apply_ranges=apply_ranges, label_text_font_size=label_font_size, hooks=[f]
+    )
+    sankey = sankey.opts(clim=(0, colormap_max))
+
+    return sankey
+
+def save_sankey(plot, filename, key = None):
+    """
+    Save a Holoviews Sankey plot as an SVG file.
+
+    Parameters:
+    plot : Holoviews plot
+        The Sankey plot to save.
+    filename : str
+        Base filename for the output SVG file.
+    key : str, optional
+        Optional identifier to append to the filename.
+    """
+    import holoviews as hv
+    from bokeh.io import export_svgs
+
+    # Remove '.svg' if it exists and append '{key}.svg'
+    filename = os.path.splitext(filename)[0]
+    if key:
+        filename += f"_{key}"
+    filename += ".svg"
+
+    plot = hv.render(plot)
+    plot.output_backend = "svg"
+
+    export_svgs(plot, filename=filename)
 
 #harmony label functions
 def harmony_label_transfer(adata_to_label, master_data, master_subset_column, label_column):

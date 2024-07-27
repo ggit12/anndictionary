@@ -7,6 +7,7 @@ from sklearn.preprocessing import LabelEncoder
 import scanpy as sc
 import anndata as ad
 import os
+import re
 import pandas as pd
 import random
 import itertools
@@ -14,6 +15,7 @@ from IPython.display import HTML, display
 
 from sklearn.decomposition import PCA
 from scipy.stats import gaussian_kde
+from scipy.optimize import linear_sum_assignment
 
 import seaborn as sns
 import matplotlib
@@ -36,9 +38,11 @@ from .stablelabel import (
     plot_changes,
     plot_confusion_matrix_from_adata,
     plot_confusion_matrix,
+    plot_sankey,
+    save_sankey,
     harmony_label_transfer
 )
-from .utils import add_label_to_adata, create_color_map
+from .utils import make_names, add_label_to_adata, create_color_map
 from .ai import (
     set_openai_api_key, 
     get_openai_client, 
@@ -825,7 +829,7 @@ def plot_changes_adata_dict(adata_dict, true_label_key, predicted_label_key, per
 
 
 def plot_confusion_matrix_adata_dict(adata_dict, true_label_key, predicted_label_key,
-                                     row_color_keys=None, col_color_keys=None, figsize=(10,10)):
+                                     row_color_keys=None, col_color_keys=None, figsize=(10,10), diagonalize=False):
     """
     Applies the plot_confusion_matrix_from_adata function to each AnnData object in adata_dict.
 
@@ -841,7 +845,7 @@ def plot_confusion_matrix_adata_dict(adata_dict, true_label_key, predicted_label
         # Customize title for each subset
         subset_title = f"Confusion Matrix for {stratum}"
         plot_confusion_matrix_from_adata(adata, true_label_key, predicted_label_key, title=subset_title,
-                                         row_color_keys=row_color_keys, col_color_keys=col_color_keys, figsize=figsize)
+                                         row_color_keys=row_color_keys, col_color_keys=col_color_keys, figsize=figsize, diagonalize=diagonalize)
 
 
 def harmony_label_transfer_adata_dict(adata_dict, master_data, master_susbet_column='tissue', label_column='cell_type'):
@@ -939,6 +943,23 @@ def simplify_obs_column_adata_dict(adata_dict, column, new_column_name, simplifi
     Applies simplify_obs_column to each anndata in an anndict
     """
     return adata_dict_fapply_return(adata_dict, simplify_obs_column, column=column, new_column_name=new_column_name, simplification_level=simplification_level)
+
+
+def create_label_hierarchy(adata, col, simplification_levels):
+    base_col_name = col
+    simplified_mapping = {}
+    for level in simplification_levels:
+        new_col_name = f"{base_col_name}_{make_names([level])[0]}"
+        simplified_mapping[new_col_name] = simplify_obs_column(adata, col, new_col_name, simplification_level=level)
+        col = new_col_name
+    return simplified_mapping
+
+
+def create_label_hierarchy_adata_dict(adata_dict, col, simplification_levels):
+    """
+    Applies create_label_hierarchy to each anndata in an anndict
+    """
+    return adata_dict_fapply_return(adata_dict, create_label_hierarchy, col = col, simplification_levels = simplification_levels)
 
 
 def simplify_var_index(adata, column, new_column_name, simplification_level=''):
@@ -1117,3 +1138,17 @@ def ai_unify_labels(adata_dict, label_columns, new_label_column, simplification_
         apply_mapping_to_adata(adata_dict[key], mapping_dict, label_columns[key], new_label_column)
 
     return mapping_dict
+
+
+def plot_sankey_adata_dict(adata_dict, cols, params=None):
+    """
+    Applies plot_sankey to each anndata in an anndict
+    """
+    return adata_dict_fapply_return(adata_dict, plot_sankey, cols=cols, params=params)
+
+
+def save_sankey_adata_dict(plot_dict, filename):
+    """
+    Saves each sankey plot in a dictionary (i.e. the return value of plot_sankey_adata_dict)
+    """
+    adata_dict_fapply(plot_dict, save_sankey, filename=filename)
