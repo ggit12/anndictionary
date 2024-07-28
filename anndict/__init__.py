@@ -22,12 +22,17 @@ from .utils import (
 from .ai import (
     set_openai_api_key, 
     get_openai_client, 
+    enforce_semantic_list, 
+    extract_dictionary_from_ai_string, 
     attempt_ai_integration, 
     generate_file_key, 
     map_cell_type_labels_to_simplified_set, 
     map_gene_labels_to_simplified_set, 
     ai_biological_process, 
     ai_cell_type,
+    ai_compare_cell_types_binary,
+    ai_compare_cell_types_categorical,
+    encode_plot_for_openai, 
     ai_resolution_interpretation,
     determine_sign_of_resolution_change
 )
@@ -46,6 +51,7 @@ from .stablelabel import (
     plot_confusion_matrix,
     plot_sankey, 
     save_sankey,
+    plot_grouped_average, 
     harmony_label_transfer
 )
 
@@ -95,10 +101,15 @@ from .dict import (
     ai_annotate_biological_process, 
     ai_annotate_biological_process_adata_dict, 
     ai_unify_labels, 
+    create_label_df, 
+    ai_label_agreement, 
+    ai_compare_cell_type_labels, 
+    ai_compare_cell_type_labels_adata_dict, 
     create_label_hierarchy, 
     create_label_hierarchy_adata_dict, 
     plot_sankey_adata_dict, 
-    save_sankey_adata_dict
+    save_sankey_adata_dict, 
+    plot_grouped_average_adata_dict
 )
 
 from .strata import (
@@ -213,6 +224,7 @@ __all__ = [
     'ai_unify_labels',
     'set_var_index',
     'set_obs_index', 
+    'encode_plot_for_openai', 
     'ai_resolution_interpretation', 
     'determine_sign_of_resolution_change', 
     'plot_sankey', 
@@ -221,5 +233,15 @@ __all__ = [
     'create_label_hierarchy_adata_dict',
     'make_names',
     'save_sankey',
-    'save_sankey_adata_dict'
+    'save_sankey_adata_dict',
+    'ai_compare_cell_types_binary',
+    'ai_compare_cell_types_categorical'
+    'create_label_df', 
+    'ai_label_agreement', 
+    'ai_compare_cell_type_labels', 
+    'ai_compare_cell_type_labels_adata_dict', 
+    'plot_grouped_average', 
+    'plot_grouped_average_adata_dict',
+    'enforce_semantic_list', 
+    'extract_dictionary_from_ai_string'
 ]

@@ -40,6 +40,7 @@ from .stablelabel import (
     plot_confusion_matrix,
     plot_sankey,
     save_sankey,
+    plot_grouped_average,
     harmony_label_transfer
 )
 from .utils import make_names, add_label_to_adata, create_color_map
@@ -52,6 +53,8 @@ from .ai import (
     map_gene_labels_to_simplified_set, 
     ai_biological_process, 
     ai_cell_type,
+    ai_compare_cell_types_binary,
+    ai_compare_cell_types_categorical,
     ai_resolution_interpretation,
     determine_sign_of_resolution_change
 )
@@ -1140,6 +1143,76 @@ def ai_unify_labels(adata_dict, label_columns, new_label_column, simplification_
     return mapping_dict
 
 
+def create_label_df(adata, cols):
+    """
+    Create a DataFrame of unique rows from specified columns in adata.obs.
+    
+    Parameters:
+    adata: AnnData object containing the data.
+    cols: List of column names to extract and deduplicate.
+    
+    Returns:
+    pd.DataFrame: DataFrame with unique rows based on the specified columns.
+    """
+    data = adata.obs[cols]
+    unique_df = data.drop_duplicates().reset_index(drop=True)
+    return unique_df
+
+
+def ai_label_agreement(adata, cols, new_col_name, func):
+    """
+    Apply a function row-wise to the unique rows of specified columns in adata.obs.
+    
+    Parameters:
+    adata: AnnData object The AnnData object containing the data.
+    cols: list List of column names to extract and deduplicate.
+    new_col_name: str Name of the new column to store the function results.
+    func: function Function to apply to each row, which takes two string arguments.
+    
+    Returns:
+    pd.DataFrame DataFrame with an additional column for the function results.
+    """
+    unique_df = create_label_df(adata, cols)
+    unique_df[new_col_name] = unique_df.apply(lambda row: func(row[0], row[1]), axis=1)
+    return unique_df
+
+def ai_compare_cell_type_labels(adata, cols, new_col_name='agreement', comparison_level='binary'):
+    """
+    Compare cell type labels using a specified comparison function.
+    
+    Parameters:
+    adata: AnnData object containing the data.
+    cols: List of two column names to extract and compare.
+    comparison_level: 'binary' or 'categorical', determines which comparison function to use.
+    
+    Returns:
+    pd.DataFrame: DataFrame with an additional column for the comparison results.
+    """
+     # Check if cols is of length 2
+    if len(cols) != 2:
+        raise ValueError("The 'cols' parameter must contain exactly two elements. Simultaneous comparison between more than 2 columns may be added in the future.")
+    
+    # Check if comparison_level is valid
+    if comparison_level not in ['binary', 'categorical']:
+        raise ValueError("comparison_level must be either 'binary' or 'categorical'.")
+    
+    if comparison_level == 'binary':
+        label_agreement = ai_label_agreement(adata, cols, new_col_name, ai_compare_cell_types_binary)
+    elif comparison_level == 'categorical':
+        label_agreement = ai_label_agreement(adata, cols, new_col_name, ai_compare_cell_types_categorical)
+
+    # Merge 'agreement' column of label_agreement back to adata.obs
+    adata.obs = adata.obs.merge(label_agreement, on=cols, how='left')
+
+    return label_agreement
+
+def ai_compare_cell_type_labels_adata_dict(adata_dict, cols, new_col_name='agreement', comparison_level='binary'):
+    """
+    Applies ai_compare_cell_type_labels to each anndata in an anndict.
+    """
+    return adata_dict_fapply_return(adata_dict, ai_compare_cell_type_labels, cols=cols, new_col_name=new_col_name, comparison_level=comparison_level)
+
+
 def plot_sankey_adata_dict(adata_dict, cols, params=None):
     """
     Applies plot_sankey to each anndata in an anndict
@@ -1152,3 +1225,9 @@ def save_sankey_adata_dict(plot_dict, filename):
     Saves each sankey plot in a dictionary (i.e. the return value of plot_sankey_adata_dict)
     """
     adata_dict_fapply(plot_dict, save_sankey, filename=filename)
+
+def plot_grouped_average_adata_dict(adata_dict, label_value):
+    """
+    plots the grouped average of a value for each group of a label. label_value must be a dictionary of dictionaries. For example, if adata_dict has two anndata with keys 'ad1' and 'ad2', then setting label_value = {'ad1':{'cell_type':'pct_counts_mt'}, 'ad2':{'cell_type':'pct_counts_mt'}} would plot the average of pct_counts_mt for each cell type in the anndata on separate plots for each anndata in adata_dict.
+    """
+    adata_dict_fapply(adata_dict, plot_grouped_average, label_value=label_value)

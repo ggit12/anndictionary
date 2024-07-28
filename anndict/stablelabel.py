@@ -357,8 +357,6 @@ def update_adata_labels_with_results(adata, results, new_label_key='stable_cell_
     add_label_to_adata(adata, all_indices, all_labels, new_label_key)
 
 
-
-
 def plot_training_history(results, separate=True):
     """
     Plot the training history of a model, showing percent label change versus iteration.
@@ -660,7 +658,7 @@ def plot_sankey(adata, cols, params=None):
     edge_cmap = mcolors.LinearSegmentedColormap.from_list('my_colormap', colors)
     
     if edge_color == "grey":
-        edge_color = "grey"  # Set edge_color to grey
+        # edge_color = "grey"  # Set edge_color to grey
         edge_cmap = None  # No colormap for grey edges
     
     sankey = hv.Sankey(sankey_data, kdims=["source", "target"], vdims=["value"])
@@ -696,6 +694,39 @@ def save_sankey(plot, filename, key = None):
     plot.output_backend = "svg"
 
     export_svgs(plot, filename=filename)
+
+def plot_grouped_average(adata, label_value, key=None):
+    """
+    Plots the average values specified in label_value across each group of label_keys in an AnnData object.
+
+    Parameters:
+    - adata: AnnData object containing the data.
+    - label_value: dict, keys are the keys in adata.obs for grouping, values are the keys in adata.obs for the values to average.
+    - key: to print specified key
+    """
+    print(key)
+    if not all(label in adata.obs for label in label_value.keys()):
+        missing_keys = [label for label in label_value.keys() if label not in adata.obs]
+        raise ValueError(f"Label key(s) {missing_keys} not found in adata.obs.")
+    if not all(value in adata.obs for value in label_value.values()):
+        missing_values = [value for value in label_value.values() if value not in adata.obs]
+        raise ValueError(f"Value key(s) {missing_values} not found in adata.obs.")
+    
+    grouped_means = {}
+    for label, value in label_value.items():
+        grouped_means[label] = adata.obs.groupby(label)[value].mean()
+
+    # Create a DataFrame from the grouped means
+    df = pd.DataFrame(grouped_means)
+    
+    # Plot the results
+    df.plot(kind='bar', figsize=(12, 8), color=plt.cm.Paired.colors)
+    plt.xlabel('Groups')
+    plt.ylabel('Average Scores')
+    plt.title('Average Scores across Groups')
+    plt.xticks(rotation=90)
+    plt.legend(title='Scores')
+    plt.show()
 
 #harmony label functions
 def harmony_label_transfer(adata_to_label, master_data, master_subset_column, label_column):
