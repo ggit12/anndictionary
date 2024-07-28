@@ -97,8 +97,13 @@
 <li class="toctree-l2"><a class="reference internal" href="#anndict.dict.ai_annotate_biological_process"><code class="docutils literal notranslate"><span class="pre">ai_annotate_biological_process()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#anndict.dict.ai_annotate_biological_process_adata_dict"><code class="docutils literal notranslate"><span class="pre">ai_annotate_biological_process_adata_dict()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#anndict.dict.ai_unify_labels"><code class="docutils literal notranslate"><span class="pre">ai_unify_labels()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#anndict.dict.create_label_df"><code class="docutils literal notranslate"><span class="pre">create_label_df()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#anndict.dict.ai_label_agreement"><code class="docutils literal notranslate"><span class="pre">ai_label_agreement()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#anndict.dict.ai_compare_cell_type_labels"><code class="docutils literal notranslate"><span class="pre">ai_compare_cell_type_labels()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#anndict.dict.ai_compare_cell_type_labels_adata_dict"><code class="docutils literal notranslate"><span class="pre">ai_compare_cell_type_labels_adata_dict()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#anndict.dict.plot_sankey_adata_dict"><code class="docutils literal notranslate"><span class="pre">plot_sankey_adata_dict()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#anndict.dict.save_sankey_adata_dict"><code class="docutils literal notranslate"><span class="pre">save_sankey_adata_dict()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#anndict.dict.plot_grouped_average_adata_dict"><code class="docutils literal notranslate"><span class="pre">plot_grouped_average_adata_dict()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#anndict.strata.preprocess_adata_strata"><code class="docutils literal notranslate"><span class="pre">preprocess_adata_strata()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#anndict.strata.stable_label_adata_strata"><code class="docutils literal notranslate"><span class="pre">stable_label_adata_strata()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#anndict.strata.plot_confusion_matrix_across_strata"><code class="docutils literal notranslate"><span class="pre">plot_confusion_matrix_across_strata()</span></code></a></li>
@@ -111,6 +116,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#anndict.ai.set_openai_api_key"><code class="docutils literal notranslate"><span class="pre">set_openai_api_key()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#anndict.ai.get_openai_client"><code class="docutils literal notranslate"><span class="pre">get_openai_client()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#anndict.ai.enforce_semantic_list"><code class="docutils literal notranslate"><span class="pre">enforce_semantic_list()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#anndict.ai.extract_dictionary_from_ai_string"><code class="docutils literal notranslate"><span class="pre">extract_dictionary_from_ai_string()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#anndict.ai.attempt_ai_integration"><code class="docutils literal notranslate"><span class="pre">attempt_ai_integration()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#anndict.ai.generate_file_key"><code class="docutils literal notranslate"><span class="pre">generate_file_key()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#anndict.ai.map_cell_type_labels_to_simplified_set"><code class="docutils literal notranslate"><span class="pre">map_cell_type_labels_to_simplified_set()</span></code></a></li>
@@ -137,6 +143,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#anndict.stablelabel.plot_confusion_matrix"><code class="docutils literal notranslate"><span class="pre">plot_confusion_matrix()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#anndict.stablelabel.plot_sankey"><code class="docutils literal notranslate"><span class="pre">plot_sankey()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#anndict.stablelabel.save_sankey"><code class="docutils literal notranslate"><span class="pre">save_sankey()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#anndict.stablelabel.plot_grouped_average"><code class="docutils literal notranslate"><span class="pre">plot_grouped_average()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#anndict.stablelabel.harmony_label_transfer"><code class="docutils literal notranslate"><span class="pre">harmony_label_transfer()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#anndict.spatial_dict.read_data"><code class="docutils literal notranslate"><span class="pre">read_data()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#anndict.spatial_dict.get_steps_and_coords"><code class="docutils literal notranslate"><span class="pre">get_steps_and_coords()</span></code></a></li>
@@ -751,6 +758,48 @@ dict: A mapping dictionary where the keys are the original labels and the values
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="anndict.dict.create_label_df">
+<span class="sig-prename descclassname"><span class="pre">anndict.dict.</span></span><span class="sig-name descname"><span class="pre">create_label_df</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cols</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/dict.html#create_label_df"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.dict.create_label_df" title="Link to this definition"></a></dt>
+<dd><p>Create a DataFrame of unique rows from specified columns in adata.obs.</p>
+<p>Parameters:
+adata: AnnData object containing the data.
+cols: List of column names to extract and deduplicate.</p>
+<p>Returns:
+pd.DataFrame: DataFrame with unique rows based on the specified columns.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="anndict.dict.ai_label_agreement">
+<span class="sig-prename descclassname"><span class="pre">anndict.dict.</span></span><span class="sig-name descname"><span class="pre">ai_label_agreement</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cols</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_col_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">func</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/dict.html#ai_label_agreement"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.dict.ai_label_agreement" title="Link to this definition"></a></dt>
+<dd><p>Apply a function row-wise to the unique rows of specified columns in adata.obs.</p>
+<p>Parameters:
+adata: AnnData object The AnnData object containing the data.
+cols: list List of column names to extract and deduplicate.
+new_col_name: str Name of the new column to store the function results.
+func: function Function to apply to each row, which takes two string arguments.</p>
+<p>Returns:
+pd.DataFrame DataFrame with an additional column for the function results.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="anndict.dict.ai_compare_cell_type_labels">
+<span class="sig-prename descclassname"><span class="pre">anndict.dict.</span></span><span class="sig-name descname"><span class="pre">ai_compare_cell_type_labels</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cols</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_col_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'agreement'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comparison_level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'binary'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/dict.html#ai_compare_cell_type_labels"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.dict.ai_compare_cell_type_labels" title="Link to this definition"></a></dt>
+<dd><p>Compare cell type labels using a specified comparison function.</p>
+<p>Parameters:
+adata: AnnData object containing the data.
+cols: List of two column names to extract and compare.
+comparison_level: ‘binary’ or ‘categorical’, determines which comparison function to use.</p>
+<p>Returns:
+pd.DataFrame: DataFrame with an additional column for the comparison results.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="anndict.dict.ai_compare_cell_type_labels_adata_dict">
+<span class="sig-prename descclassname"><span class="pre">anndict.dict.</span></span><span class="sig-name descname"><span class="pre">ai_compare_cell_type_labels_adata_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cols</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_col_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'agreement'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comparison_level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'binary'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/dict.html#ai_compare_cell_type_labels_adata_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.dict.ai_compare_cell_type_labels_adata_dict" title="Link to this definition"></a></dt>
+<dd><p>Applies ai_compare_cell_type_labels to each anndata in an anndict.</p>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="anndict.dict.plot_sankey_adata_dict">
 <span class="sig-prename descclassname"><span class="pre">anndict.dict.</span></span><span class="sig-name descname"><span class="pre">plot_sankey_adata_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cols</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/dict.html#plot_sankey_adata_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.dict.plot_sankey_adata_dict" title="Link to this definition"></a></dt>
 <dd><p>Applies plot_sankey to each anndata in an anndict</p>
@@ -760,6 +809,12 @@ dict: A mapping dictionary where the keys are the original labels and the values
 <dt class="sig sig-object py" id="anndict.dict.save_sankey_adata_dict">
 <span class="sig-prename descclassname"><span class="pre">anndict.dict.</span></span><span class="sig-name descname"><span class="pre">save_sankey_adata_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plot_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/dict.html#save_sankey_adata_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.dict.save_sankey_adata_dict" title="Link to this definition"></a></dt>
 <dd><p>Saves each sankey plot in a dictionary (i.e. the return value of plot_sankey_adata_dict)</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="anndict.dict.plot_grouped_average_adata_dict">
+<span class="sig-prename descclassname"><span class="pre">anndict.dict.</span></span><span class="sig-name descname"><span class="pre">plot_grouped_average_adata_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label_value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/dict.html#plot_grouped_average_adata_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.dict.plot_grouped_average_adata_dict" title="Link to this definition"></a></dt>
+<dd><p>plots the grouped average of a value for each group of a label. label_value must be a dictionary of dictionaries. For example, if adata_dict has two anndata with keys ‘ad1’ and ‘ad2’, then setting label_value = {‘ad1’:{‘cell_type’:’pct_counts_mt’}, ‘ad2’:{‘cell_type’:’pct_counts_mt’}} would plot the average of pct_counts_mt for each cell type in the anndata on separate plots for each anndata in adata_dict.</p>
 </dd></dl>
 
 <dl class="py function" id="module-anndict.strata">
@@ -912,6 +967,17 @@ UCE_adata([“../dat/liver.h5ad”, “../dat/kidney.h5ad”])</p>
 <dt class="sig sig-object py" id="anndict.ai.enforce_semantic_list">
 <span class="sig-prename descclassname"><span class="pre">anndict.ai.</span></span><span class="sig-name descname"><span class="pre">enforce_semantic_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lst</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/ai.html#enforce_semantic_list"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.ai.enforce_semantic_list" title="Link to this definition"></a></dt>
 <dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="anndict.ai.extract_dictionary_from_ai_string">
+<span class="sig-prename descclassname"><span class="pre">anndict.ai.</span></span><span class="sig-name descname"><span class="pre">extract_dictionary_from_ai_string</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ai_string</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/ai.html#extract_dictionary_from_ai_string"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.ai.extract_dictionary_from_ai_string" title="Link to this definition"></a></dt>
+<dd><p>Cleans a generated string by removing everything before the first ‘{’
+and everything after the last ‘}’.</p>
+<p>Args:
+generated_string (str): The string generated by GPT-4o which includes unwanted characters or code.</p>
+<p>Returns:
+str: A cleaned string that can be evaluated as a dictionary.</p>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="anndict.ai.attempt_ai_integration">
@@ -1282,6 +1348,16 @@ None</p>
 plot : Holoviews plot, The Sankey plot to save.
 filename : str Base filename for the output SVG file.
 key : str, optional Optional identifier to append to the filename.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="anndict.stablelabel.plot_grouped_average">
+<span class="sig-prename descclassname"><span class="pre">anndict.stablelabel.</span></span><span class="sig-name descname"><span class="pre">plot_grouped_average</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label_value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/stablelabel.html#plot_grouped_average"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.stablelabel.plot_grouped_average" title="Link to this definition"></a></dt>
+<dd><p>Plots the average values specified in label_value across each group of label_keys in an AnnData object.</p>
+<p>Parameters:
+- adata: AnnData object containing the data.
+- label_value: dict, keys are the keys in adata.obs for grouping, values are the keys in adata.obs for the values to average.
+- key: to print specified key</p>
 </dd></dl>
 
 <dl class="py function">
