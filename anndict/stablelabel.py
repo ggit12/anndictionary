@@ -568,9 +568,9 @@ def plot_confusion_matrix(true_labels_encoded, predicted_labels_encoded, label_e
         col_colors = map_labels_to_colors(labels_pred_sorted, predicted_label_color_dict, color_map)
         col_colors = pd.DataFrame(col_colors, index=labels_pred_sorted)
 
-    xticklabels = True if len(labels_pred) <= 30 else False
-    yticklabels = True if len(labels_true) <= 30 else False
-    annot = True if len(labels_true) <= 30 and len(labels_pred) <= 30 else False
+    xticklabels = True if len(labels_pred) <= 40 else False
+    yticklabels = True if len(labels_true) <= 40 else False
+    annot = True if len(labels_true) <= 40 and len(labels_pred) <= 40 else False
 
     g = sns.clustermap(cm_normalized, annot=annot, fmt=".2f", cmap="Blues",
                        row_colors=row_colors, col_colors=col_colors,
