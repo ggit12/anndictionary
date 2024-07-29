@@ -851,8 +851,8 @@ def plot_confusion_matrix_adata_dict(adata_dict, true_label_key, predicted_label
                                          row_color_keys=row_color_keys, col_color_keys=col_color_keys, figsize=figsize, diagonalize=diagonalize)
 
 
-def harmony_label_transfer_adata_dict(adata_dict, master_data, master_susbet_column='tissue', label_column='cell_type'):
-    adata_dict_fapply(adata_dict, harmony_label_transfer, master_data=master_data, master_susbet_column=master_susbet_column, label_column=label_column)
+def harmony_label_transfer_adata_dict(adata_dict, master_data, master_subset_column='tissue', label_column='cell_type'):
+    adata_dict_fapply(adata_dict, harmony_label_transfer, master_data=master_data, master_subset_column=master_subset_column, label_column=label_column)
 
 
 #AI integrations
