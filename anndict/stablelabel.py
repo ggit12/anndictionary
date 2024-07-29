@@ -682,7 +682,11 @@ def save_sankey(plot, filename, key = None):
     key : str, optional Optional identifier to append to the filename.
     """
     import holoviews as hv
+    from bokeh.io.webdriver import webdriver_control
     from bokeh.io import export_svgs
+
+    # Reset web driver because sometimes the max connections is hit when writing plots
+    webdriver_control.reset()
 
     # Remove '.svg' if it exists and append '{key}.svg'
     filename = os.path.splitext(filename)[0]
