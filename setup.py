@@ -20,8 +20,9 @@ setup(
         'seaborn',
         'matplotlib',
         'squidpy',
-        'harmonypy', 
+        'harmonypy',
         'openai',
+        'anthropic',
         'bokeh',
         'holoviews'
     ],

@@ -24,36 +24,210 @@ from sklearn.metrics import confusion_matrix
 import subprocess
 
 from openai import OpenAI
+from anthropic import Anthropic
 
 import base64
 import matplotlib.pyplot as plt
 from io import BytesIO
 
+from typing import Optional
 
-def set_openai_api_key(api_key):
+#LLM configuration
+def configure_llm_backend(provider: str, model: str, api_key: str):
     """
-    Sets the OpenAI API key as an environment variable.
-    
+    Configures the LLM backend by setting environment variables.
+
     Args:
-        api_key (str): The OpenAI API key.
-    """
-    os.environ['OPENAI_API_KEY'] = api_key
+        provider (str): The name of the provider ('anthropic' or 'openai').
+        model (str): The model name to use.
+        api_key (str): The API key for the provider.
 
-def get_openai_client():
+    Raises:
+        ValueError: If an unsupported provider is specified.
     """
-    Retrieves the OpenAI API key from the environment variable and initializes the OpenAI client.
+    provider = provider.lower()
+    if provider not in ['openai', 'anthropic']:
+        raise ValueError(f"Unsupported provider: {provider}. Supported providers are: openai, anthropic")
+
+    os.environ['LLM_PROVIDER'] = provider
+    os.environ['LLM_MODEL'] = model
+    os.environ[f"{provider.upper()}_API_KEY"] = api_key
+
+
+def get_llm_config():
+    """
+    Retrieves the LLM configuration from environment variables.
+
+    Returns:
+        dict: A dictionary containing the LLM configuration.
+
+    Raises:
+        ValueError: If the LLM configuration is not set.
+    """
+    provider = os.getenv('LLM_PROVIDER')
+    model = os.getenv('LLM_MODEL')
+    api_key = os.getenv(f"{provider.upper()}_API_KEY") if provider else None
+
+    if not all([provider, model, api_key]):
+        raise ValueError("LLM configuration is not set. Please call configure_llm_backend() first.")
+
+    return {
+        'provider': provider,
+        'model': model,
+        'api_key': api_key
+    }
+
+
+def get_client(provider: Optional[str] = None):
+    """
+    Retrieves the appropriate client for the specified provider.
+
+    Args:
+        provider (str, optional): The name of the provider ('anthropic' or 'openai').
+                                  If None, uses the configured provider.
+
+    Returns:
+        An instance of the appropriate client initialized with the API key.
+
+    Raises:
+        ValueError: If an unsupported provider is specified or if the LLM backend is not configured.
+    """
+    config = get_llm_config()
+    provider = provider or config['provider']
+
+    provider = provider.lower()
+    provider_functions = {
+        'openai': get_openai_client,
+        'anthropic': get_anthropic_client
+    }
+    if provider in provider_functions:
+        return provider_functions[provider](config)
+    else:
+        raise ValueError(f"Unsupported provider: {provider}. Supported providers are: {', '.join(provider_functions.keys())}")
+
+
+def get_openai_client(config):
+    """
+    Initializes and returns the OpenAI client using the configured API key.
+
+    Args:
+        config (dict): The LLM configuration dictionary.
 
     Returns:
         OpenAI: An instance of the OpenAI client initialized with the API key.
+    """
+    return OpenAI(api_key=config['api_key'])
+
+
+def get_anthropic_client(config):
+    """
+    Initializes and returns the Anthropic client using the configured API key.
+
+    Args:
+        config (dict): The LLM configuration dictionary.
+
+    Returns:
+        Anthropic: An instance of the Anthropic client initialized with the API key.
+    """
+    return Anthropic(api_key=config['api_key'])
+
+
+def call_llm(messages, **kwargs):
+    """
+    Calls the configured LLM provider with the given parameters.
+
+    Args:
+        messages (list): The list of message dictionaries.
+        **kwargs: Additional keyword arguments to pass to the provider-specific function.
+
+    Returns:
+        str: The generated response from the LLM.
 
     Raises:
-        ValueError: If the OpenAI API key is not set in the environment variable.
+        ValueError: If the LLM configuration is not set or if an unsupported provider is specified.
     """
-    api_key = os.getenv("OPENAI_API_KEY")
-    if not api_key:
-        raise ValueError("The OpenAI API key is not set. Please set the OPENAI_API_KEY environment variable. This can be done by running `export OPENAI_API_KEY='your-openai-api-key'` in terminal or using anndict.ai.set_openai_api_key('my-api-key')")
+    config = get_llm_config()
+    provider = config['provider']
+    model = config['model']
+    client = get_client()
+
+    provider_functions = {
+        'openai': call_openai_llm,
+        'anthropic': call_anthropic_llm
+    }
+
+    if provider in provider_functions:
+        return provider_functions[provider](client, model, messages, **kwargs)
+    else:
+        raise ValueError(f"Unsupported provider: {provider}. Supported providers are: {', '.join(provider_functions.keys())}")
+
+
+def call_openai_llm(client, model, messages, **kwargs):
+    """
+    Calls the OpenAI LLM with the given parameters.
+
+    Args:
+        client (OpenAI): The OpenAI client instance.
+        model (str): The model name to use.
+        messages (list): The list of message dictionaries.
+        **kwargs: Additional keyword arguments to pass to the OpenAI API.
+
+    Returns:
+        str: The generated response from the OpenAI LLM.
+    """
+    response = client.chat.completions.create(
+        model=model,
+        messages=messages,
+        **kwargs
+    )
+    return response.choices[0].message.content.strip()
+
+
+def call_anthropic_llm(client, model, messages, **kwargs):
+    """
+    Calls the Anthropic LLM with the given parameters.
+
+    Args:
+        client (Anthropic): The Anthropic client instance.
+        model (str): The model name to use.
+        messages (list): The list of message dictionaries.
+        **kwargs: Additional keyword arguments to pass to the Anthropic API.
+
+    Returns:
+        str: The generated response from the Anthropic LLM.
+    """
+    prompt = convert_messages_to_anthropic_prompt(messages)
     
-    return OpenAI(api_key=api_key)
+    # Rename 'max_tokens' to 'max_tokens_to_sample' for Anthropic API
+    if 'max_tokens' in kwargs:
+        kwargs['max_tokens_to_sample'] = kwargs.pop('max_tokens')
+    
+    response = client.completions.create(
+        model=model,
+        prompt=prompt,
+        **kwargs
+    )
+    return response.completion.strip()
+
+
+def convert_messages_to_anthropic_prompt(messages):
+    """
+    Converts a list of message dictionaries to Anthropic's prompt format.
+
+    Args:
+        messages (list): The list of message dictionaries.
+
+    Returns:
+        str: The formatted prompt string for Anthropic.
+    """
+    prompt = ""
+    for message in messages:
+        if message["role"] in ["system", "user"]:
+            prompt += f"{Anthropic.HUMAN_PROMPT} {message['content']} {Anthropic.AI_PROMPT}"
+        elif message["role"] == "assistant":
+            prompt += f"{message['content']}\n"
+    return prompt
+
 
 def enforce_semantic_list(lst):
     error_message = "gene_list appears to contain numeric or numeric cast as string. Please ensure you are passing semantic labels (i.e. gene symbols or cell types) and not integer labels for AI interpretation."
@@ -67,6 +241,7 @@ def enforce_semantic_list(lst):
     except ValueError:
         return True
     
+
 def extract_dictionary_from_ai_string(ai_string):
     """
     Cleans a generated string by removing everything before the first '{'
@@ -105,43 +280,33 @@ def attempt_ai_integration(ai_func, fallback_func, *args, **kwargs):
     except Exception as e:
         print(f"AI integration failed: {e}")
         return fallback_func()
+    
 
 def generate_file_key(file_path):
     """
-    Generates a concise, descriptive name for a file using the OpenAI Chat Completions API based on its file path.
+    Generates a concise, descriptive name for a file based on its file path using the configured AI model.
 
     Args:
         file_path (str): The path to the file for which to generate a name.
 
     Returns:
         str: A generated name for the file that can be used as a dictionary key.
-
-    Example:
-        >>> file_key = generate_file_key('example.txt')
-        >>> print(file_key)
-        'ExampleFileName'
     """
-    # Prepare the messages for the Chat Completions API
+    # Prepare the messages for the LLM
     messages = [
         {"role": "system", "content": "You are a python dictionary key generator. Examples: /Users/john/data/single_cell_liver_data.h5ad -> liver, /Users/john/data/single_cell_heart_normalized.h5ad -> heart_normalized"},
         {"role": "user", "content": f"{file_path} -> "}
     ]
 
-    # Initialize the OpenAI client
-    client = get_openai_client()
-
-    # Call the OpenAI Chat Completions API to generate a name
-    response = client.chat.completions.create(
-        model="gpt-4o-mini",
+    # Call the LLM using the call_llm function
+    generated_name = call_llm(
         messages=messages,
-        max_tokens=10,  # Limit the response to a reasonable length for a name
-        temperature=0.2  # Adjust the creativity of the response
+        max_tokens=10,
+        temperature=0.1
     )
-    
-    # Extract the generated name from the response
-    generated_name = response.choices[0].message.content.strip()
 
     return generated_name
+
 
 #Label simplification functions
 def map_cell_type_labels_to_simplified_set(labels, simplification_level=''):
@@ -171,19 +336,12 @@ def map_cell_type_labels_to_simplified_set(labels, simplification_level=''):
         {"role": "user", "content": f"{labels_str} -> "}
     ]
 
-    # Initialize the OpenAI client
-    client = get_openai_client()
-
-    # Call the OpenAI Chat Completions API to generate the mapping
-    response = client.chat.completions.create(
-        model="gpt-4o",
+    # Call the LLM using the call_llm function
+    generated_mapping = call_llm(
         messages=messages,
-        max_tokens=500,  # Adjust max tokens as needed
-        temperature=0  # Adjust the creativity of the response
+        max_tokens=500,
+        temperature=0
     )
-    
-    # Extract the generated mapping from the response
-    generated_mapping = response.choices[0].message.content.strip()
     
     # Clean the response
     cleaned_mapping = extract_dictionary_from_ai_string(generated_mapping)
@@ -192,6 +350,7 @@ def map_cell_type_labels_to_simplified_set(labels, simplification_level=''):
     mapping_dict = eval(cleaned_mapping)
 
     return mapping_dict
+
 
 def map_gene_labels_to_simplified_set(labels, simplification_level=''):
     """
@@ -216,19 +375,12 @@ def map_gene_labels_to_simplified_set(labels, simplification_level=''):
         {"role": "user", "content": f"{labels_str} -> "}
     ]
 
-    # Initialize the OpenAI client
-    client = get_openai_client()
-
-    # Call the OpenAI Chat Completions API to generate the mapping
-    response = client.chat.completions.create(
-        model="gpt-4o",
+    # Call the LLM using the call_llm function
+    generated_mapping = call_llm(
         messages=messages,
-        max_tokens=500,  # Adjust max tokens as needed
-        temperature=0  # Adjust the creativity of the response
+        max_tokens=500,
+        temperature=0
     )
-    
-    # Extract the generated mapping from the response
-    generated_mapping = response.choices[0].message.content.strip()
 
     # Clean the response
     cleaned_mapping = extract_dictionary_from_ai_string(generated_mapping)
@@ -237,6 +389,7 @@ def map_gene_labels_to_simplified_set(labels, simplification_level=''):
     mapping_dict = eval(cleaned_mapping)
 
     return mapping_dict
+
 
 #Biological inference functions
 def ai_biological_process(gene_list):
@@ -265,21 +418,15 @@ def ai_biological_process(gene_list):
         {"role": "user", "content": gpt_prompt}
     ]
 
-    # Initialize the OpenAI client
-    client = get_openai_client()
-
-    # Call the OpenAI Chat Completions API to generate the annotation
-    gpt_annotation = client.chat.completions.create(
-        model="gpt-4o",
+    # Call the LLM using the call_llm function
+    annotation = call_llm(
         messages=messages,
         max_tokens=100,
         temperature=0
     )
 
-    # Extract the generated annotation from the response
-    annotation = gpt_annotation.choices[0].message.content.strip()
-
     return annotation
+
 
 def ai_cell_type(gene_list):
     """
@@ -310,19 +457,12 @@ def ai_cell_type(gene_list):
         {"role": "user", "content": gpt_prompt}
     ]
 
-    # Initialize the OpenAI client
-    client = get_openai_client()
-
-    # Call the OpenAI Chat Completions API to generate the annotation
-    gpt_annotation = client.chat.completions.create(
-        model="gpt-4o",
+    # Call the LLM using the call_llm function
+    annotation = call_llm(
         messages=messages,
         max_tokens=100,
         temperature=0
     )
-
-    # Extract the generated annotation from the response
-    annotation = gpt_annotation.choices[0].message.content.strip()
 
     return annotation
 
@@ -347,19 +487,12 @@ def ai_compare_cell_types_binary(label1, label2):
         {"role": "user", "content": gpt_prompt}
     ]
 
-    # Initialize the OpenAI client
-    client = get_openai_client()
-
-    # Call the OpenAI Chat Completions API to generate the comparison
-    gpt_comparison = client.chat.completions.create(
-        model="gpt-4o",
+    # Call the LLM using the call_llm function
+    comparison_result = call_llm(
         messages=messages,
         max_tokens=10,
         temperature=0
     )
-
-    # Extract the generated comparison from the response
-    comparison_result = gpt_comparison.choices[0].message.content.strip()
 
     return comparison_result
 
@@ -384,19 +517,12 @@ def ai_compare_cell_types_categorical(label1, label2):
         {"role": "user", "content": gpt_prompt}
     ]
 
-    # Initialize the OpenAI client
-    client = get_openai_client()
-
-    # Call the OpenAI Chat Completions API to generate the comparison
-    gpt_comparison = client.chat.completions.create(
-        model="gpt-4o",
+    # Call the LLM using the call_llm function
+    comparison_result = call_llm(
         messages=messages,
         max_tokens=10,
         temperature=0
     )
-
-    # Extract the generated comparison from the response
-    comparison_result = gpt_comparison.choices[0].message.content.strip()
 
     return comparison_result
 
@@ -454,19 +580,12 @@ def ai_resolution_interpretation(plot):
 
             # {"role": "system", "content": "A true cluster is an island of points. A subsplit cluster is when a true cluster has multiple labels assigned to it; this calls for resolution to be decreased. An undersplit cluster is when multiple true clusters have been assigned to the same label; this calls for resolution to be increased. Based on an image of a plot, decide if the clustering resolution should be 1) decreased 2) increased 3) unchanged. You only respond with one of these three words."},
 
-    # Initialize the OpenAI client
-    client = get_openai_client()
-
-    # Call the OpenAI Chat Completions API to generate the annotation
-    gpt_annotation = client.chat.completions.create(
-        model="gpt-4o",
+    # Call the LLM using the call_llm function
+    annotation = call_llm(
         messages=messages,
         max_tokens=20,
         temperature=0
     )
-
-    # Extract the generated annotation from the response
-    annotation = gpt_annotation.choices[0].message.content.strip()
 
     return annotation
 
