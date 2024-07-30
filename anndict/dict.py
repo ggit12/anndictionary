@@ -614,6 +614,38 @@ def leiden_adata_dict(adata_dict, **kwargs):
     adata_dict_fapply(adata_dict, sc.tl.leiden, **kwargs)
 
 
+def leiden_subcluster(adata, groupby, **kwargs):
+    """
+    Perform Leiden clustering on subgroups of cells.
+    This function applies Leiden clustering to subgroups of cells defined by the groupby parameter.
+
+    Parameters:
+    adata : AnnData Annotated data matrix.
+    groupby : str Column name in adata.obs for grouping cells before subclustering.
+    kwargs : dict Additional keyword arguments to pass to the leiden_adata_dict function.
+
+    Returns:
+    None, The function modifies the input AnnData object in-place.
+    adata_dict = build_adata_dict(adata, strata_keys=[groupby])
+    leiden_adata_dict(adata_dict, **kwargs)
+    """
+
+def leiden_subcluster_adata_dict(adata_dict, groupby, **kwargs):
+    """
+    This function applies the leiden_subcluster function to each AnnData object
+    in the provided dictionary.
+    
+    Parameters:
+    adata_dict : dict Dictionary of AnnData objects.
+    groupby : str Column name in adata.obs for grouping cells before subclustering.
+    kwargs : dict Additional keyword arguments to pass to the leiden_subcluster function.
+
+    Returns:
+    None The function modifies the input AnnData objects in-place.
+    """
+    adata_dict_fapply(adata_dict, leiden_subcluster, groupby=groupby, **kwargs)
+
+
 def calculate_umap_adata_dict(adata_dict, **kwargs):
     """
     Calculates UMAP embeddings for each subset in the adata_dict.
@@ -949,6 +981,22 @@ def simplify_obs_column_adata_dict(adata_dict, column, new_column_name, simplifi
 
 
 def create_label_hierarchy(adata, col, simplification_levels):
+    """
+    Create a hierarchy of simplified labels based on a given column in AnnData.
+
+    This function generates multiple levels of simplified labels from an original
+    column in the AnnData object. Each level of simplification is created using
+    the specified simplification levels.
+
+    Parameters:
+    adata : AnnData Annotated data matrix containing the column to be simplified.
+    col : str Name of the column in adata.obs to be simplified.
+    simplification_levels : list List of simplification levels to apply. Each level should be a value that can be used by the simplify_obs_column function.
+
+    Returns:
+    --------
+    dict A dictionary mapping new column names to their corresponding simplified label mappings. The keys are the names of the new columns created for each simplification level, and the values are the mappings returned by simplify_obs_column for each level.
+    """
     base_col_name = col
     simplified_mapping = {}
     for level in simplification_levels:
@@ -1078,6 +1126,78 @@ def ai_annotate_cell_type_adata_dict(adata_dict, groupby, n_top_genes=10, label_
     """
     return adata_dict_fapply_return(adata_dict, ai_annotate_cell_type, groupby=groupby, n_top_genes=n_top_genes, label_column=label_column)
 
+
+def ai_annotate_cell_type_by_comparison(adata, groupby, n_top_genes, label_column='ai_cell_sub_type'):
+    """
+    Annotate cell types by comparison using AI.
+
+    This function wraps the ai_annotate function to perform cell type annotation
+    based on comparison of gene expression profiles.
+
+    Parameters:
+    adata : AnnData Annotated data matrix.
+    groupby : str Column name in adata.obs for grouping cells.
+    n_top_genes : int Number of top genes to consider for annotation.
+    label_column : str, optional Name of the column to store the AI-generated cell type labels (default: 'ai_cell_sub_type').
+
+    Returns:
+    AnnData Annotated data with AI-generated cell type labels.
+    """
+    return ai_annotate(func=ai_annotate_cell_type_by_comparison, adata=adata, groupby=groupby, n_top_genes=n_top_genes, label_column=label_column)
+
+
+def ai_annotate_cell_type_by_comparison_adata_dict(adata_dict, groupby, n_top_genes=10, label_column='ai_cell_sub_type'):
+    """
+    Applies ai_annotate_cell_type_by_comparison to each anndata in an anndict
+    """
+    return adata_dict_fapply_return(adata_dict, ai_annotate_cell_type_by_comparison, groupby=groupby, n_top_genes=n_top_genes, label_column=label_column)
+
+
+def ai_annotate_cell_sub_type(adata, cell_type_col, sub_cluster_col, new_label_col):
+    """
+    Annotate cell subtypes using AI.
+
+    This function performs AI-based annotation of cell subtypes by first grouping cells
+    by their main cell type, then annotating subtypes within each group.
+
+    Parameters:
+    adata : AnnData Annotated data matrix.
+    cell_type_col : str Column name in adata.obs containing main cell type labels.
+    sub_cluster_col : str Column name in adata.obs containing sub-cluster information.
+    new_label_col : str Name of the column to store the AI-generated subtype labels.
+
+    Returns:
+    --------
+    tuple A tuple containing:
+    AnnData: Concatenated annotated data with AI-generated subtype labels.
+    dict: Mapping of original labels to AI-generated labels.
+    """
+    #build adata_dict based on cell_type_col
+    adata_dict = build_adata_dict(adata, strata_keys=cell_type_col)
+
+    label_mappings = ai_annotate_cell_type_by_comparison_adata_dict(adata_dict, groupby=sub_cluster_col, n_top_genes=10, label_column=new_label_col)
+
+    adata = concatenate_adata_dict(adata_dict)
+
+    return adata, label_mappings
+
+def ai_annotate_cell_subtype_adata_dict(adata_dict, cell_type_col, new_label_col):
+    """
+    Annotate cell subtypes for a dictionary of AnnData objects.
+
+    This function applies the ai_annotate_cell_sub_type function to each AnnData object
+    in the provided dictionary.
+
+    Parameters:
+    adata_dict : dict Dictionary of AnnData objects.
+    cell_type_col : str Column name in adata.obs containing main cell type labels.
+    new_label_col : str Name of the column to store the AI-generated subtype labels.
+
+    Returns:
+    dict Dictionary of annotated AnnData objects with AI-generated subtype labels.
+    """
+
+    return adata_dict_fapply_return(adata_dict, ai_annotate_cell_sub_type, cell_type_col=cell_type_col, new_label_col=new_label_col)
 
 def ai_annotate_biological_process(adata, groupby, n_top_genes, label_column='ai_biological_process'):
     """
