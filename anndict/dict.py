@@ -45,14 +45,13 @@ from .stablelabel import (
 )
 from .utils import make_names, add_label_to_adata, create_color_map
 from .ai import (
-    set_openai_api_key, 
-    get_openai_client, 
     attempt_ai_integration, 
     generate_file_key, 
     map_cell_type_labels_to_simplified_set, 
     map_gene_labels_to_simplified_set, 
     ai_biological_process, 
     ai_cell_type,
+    ai_cell_types_by_comparison,
     ai_compare_cell_types_binary,
     ai_compare_cell_types_categorical,
     ai_resolution_interpretation,
@@ -626,9 +625,11 @@ def leiden_subcluster(adata, groupby, **kwargs):
 
     Returns:
     None, The function modifies the input AnnData object in-place.
+    """
     adata_dict = build_adata_dict(adata, strata_keys=[groupby])
     leiden_adata_dict(adata_dict, **kwargs)
-    """
+    
+    
 
 def leiden_subcluster_adata_dict(adata_dict, groupby, **kwargs):
     """
