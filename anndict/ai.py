@@ -23,210 +23,102 @@ from sklearn.metrics import confusion_matrix
 
 import subprocess
 
-from openai import OpenAI
-from anthropic import Anthropic
-
 import base64
 import matplotlib.pyplot as plt
 from io import BytesIO
 
-from typing import Optional
+import importlib
+from typing import List, Dict, Any
+from langchain.llms.base import BaseLLM
+from langchain.schema import HumanMessage, AIMessage, SystemMessage, BaseMessage
 
 #LLM configuration
+PROVIDER_MAPPING = {
+    'openai': {
+        'class': 'ChatOpenAI',
+        'api_key_env_var': 'OPENAI_API_KEY'
+    },
+    'anthropic': {
+        'class': 'ChatAnthropic',
+        'api_key_env_var': 'ANTHROPIC_API_KEY'
+    },
+    'google': {
+        'class': 'ChatGoogle',
+        'api_key_env_var': 'GOOGLE_API_KEY'
+    },
+    'meta': {
+        'class': 'ChatMeta',
+        'api_key_env_var': 'META_API_KEY'
+    },
+    'grok': {
+        'class': 'ChatGrok',
+        'api_key_env_var': 'GROK_API_KEY'
+    },
+    'mistral': {
+        'class': 'ChatMistral',
+        'api_key_env_var': 'MISTRAL_API_KEY'
+    }
+}
+
 def configure_llm_backend(provider, model, api_key):
-    """
-    Configures the LLM backend by setting environment variables.
+    """Configures the LLM backend by setting environment variables."""
+    provider_info = PROVIDER_MAPPING.get(provider.lower())
+    if not provider_info:
+        raise ValueError(f"Unsupported provider: {provider}")
 
-    Args:
-        provider (str): The name of the provider ('anthropic' or 'openai').
-        model (str): The model name to use.
-        api_key (str): The API key for the provider.
-
-    Raises:
-        ValueError: If an unsupported provider is specified.
-    """
-    provider = provider.lower()
-    if provider not in ['openai', 'anthropic']:
-        raise ValueError(f"Unsupported provider: {provider}. Supported providers are: openai, anthropic")
-
-    os.environ['LLM_PROVIDER'] = provider
+    os.environ['LLM_PROVIDER'] = provider.lower()
     os.environ['LLM_MODEL'] = model
-    os.environ[f"{provider.upper()}_API_KEY"] = api_key
-
+    os.environ[provider_info['api_key_env_var']] = api_key
 
 def get_llm_config():
-    """
-    Retrieves the LLM configuration from environment variables.
-
-    Returns:
-        dict: A dictionary containing the LLM configuration.
-
-    Raises:
-        ValueError: If the LLM configuration is not set.
-    """
+    """Retrieves the LLM configuration from environment variables."""
     provider = os.getenv('LLM_PROVIDER')
     model = os.getenv('LLM_MODEL')
-    api_key = os.getenv(f"{provider.upper()}_API_KEY") if provider else None
+    provider_info = PROVIDER_MAPPING.get(provider)
+    
+    if not provider_info:
+        raise ValueError(f"Unsupported provider: {provider}")
+
+    api_key = os.getenv(provider_info['api_key_env_var'])
 
     if not all([provider, model, api_key]):
         raise ValueError("LLM configuration is not set. Please call configure_llm_backend() first.")
 
-    return {
-        'provider': provider,
-        'model': model,
-        'api_key': api_key
-    }
+    return {'provider': provider, 'model': model, 'api_key': api_key, 'class': provider_info['class']}
 
+_llm_instance = None
 
-def get_client():
-    """
-    Retrieves the appropriate client for the specified provider.
+def get_llm():
+    """Dynamically retrieves the appropriate LLM based on the configuration."""
+    global _llm_instance
+    if _llm_instance is not None:
+        return _llm_instance
 
-    Args:
-        provider (str, optional): The name of the provider ('anthropic' or 'openai').
-                                  If None, uses the configured provider.
-
-    Returns:
-        An instance of the appropriate client initialized with the API key.
-
-    Raises:
-        ValueError: If an unsupported provider is specified or if the LLM backend is not configured.
-    """
     config = get_llm_config()
-    provider = config['provider']
-
-    provider = provider.lower()
-    provider_functions = {
-        'openai': get_openai_client,
-        'anthropic': get_anthropic_client
-    }
-    if provider in provider_functions:
-        return provider_functions[provider](config)
-    else:
-        raise ValueError(f"Unsupported provider: {provider}. Supported providers are: {', '.join(provider_functions.keys())}")
-
-
-def get_openai_client(config):
-    """
-    Initializes and returns the OpenAI client using the configured API key.
-
-    Args:
-        config (dict): The LLM configuration dictionary.
-
-    Returns:
-        OpenAI: An instance of the OpenAI client initialized with the API key.
-    """
-    return OpenAI(api_key=config['api_key'])
-
-
-def get_anthropic_client(config):
-    """
-    Initializes and returns the Anthropic client using the configured API key.
-
-    Args:
-        config (dict): The LLM configuration dictionary.
-
-    Returns:
-        Anthropic: An instance of the Anthropic client initialized with the API key.
-    """
-    return Anthropic(api_key=config['api_key'])
-
+    try:
+        module = importlib.import_module("langchain_community.chat_models")
+        llm_class = getattr(module, config['class'])
+        _llm_instance = llm_class(model=config['model'], api_key=config['api_key'])
+        return _llm_instance
+    except (ImportError, AttributeError):
+        raise ValueError(f"Unsupported provider: {config['provider']}. Ensure the provider is supported by LangChain.")
 
 def call_llm(messages, **kwargs):
-    """
-    Calls the configured LLM provider with the given parameters.
-
-    Args:
-        messages (list): The list of message dictionaries.
-        **kwargs: Additional keyword arguments to pass to the provider-specific function.
-
-    Returns:
-        str: The generated response from the LLM.
-
-    Raises:
-        ValueError: If the LLM configuration is not set or if an unsupported provider is specified.
-    """
-    config = get_llm_config()
-    provider = config['provider']
-    model = config['model']
-    client = get_client()
-
-    provider_functions = {
-        'openai': call_openai_llm,
-        'anthropic': call_anthropic_llm
+    """Calls the configured LLM provider with the given parameters."""
+    llm = get_llm()
+    
+    message_types = {
+        'system': SystemMessage,
+        'user': HumanMessage,
+        'assistant': AIMessage
     }
-
-    if provider in provider_functions:
-        return provider_functions[provider](client, model, messages, **kwargs)
-    else:
-        raise ValueError(f"Unsupported provider: {provider}. Supported providers are: {', '.join(provider_functions.keys())}")
-
-
-def call_openai_llm(client, model, messages, **kwargs):
-    """
-    Calls the OpenAI LLM with the given parameters.
-
-    Args:
-        client (OpenAI): The OpenAI client instance.
-        model (str): The model name to use.
-        messages (list): The list of message dictionaries.
-        **kwargs: Additional keyword arguments to pass to the OpenAI API.
-
-    Returns:
-        str: The generated response from the OpenAI LLM.
-    """
-    response = client.chat.completions.create(
-        model=model,
-        messages=messages,
-        **kwargs
-    )
-    return response.choices[0].message.content.strip()
-
-
-def call_anthropic_llm(client, model, messages, **kwargs):
-    """
-    Calls the Anthropic LLM with the given parameters.
-
-    Args:
-        client (Anthropic): The Anthropic client instance.
-        model (str): The model name to use.
-        messages (list): The list of message dictionaries.
-        **kwargs: Additional keyword arguments to pass to the Anthropic API.
-
-    Returns:
-        str: The generated response from the Anthropic LLM.
-    """
-    prompt = convert_messages_to_anthropic_prompt(messages)
+    langchain_messages = [
+        message_types.get(msg['role'], HumanMessage)(content=msg['content'])
+        for msg in messages
+    ]
     
-    # Rename 'max_tokens' to 'max_tokens_to_sample' for Anthropic API
-    if 'max_tokens' in kwargs:
-        kwargs['max_tokens_to_sample'] = kwargs.pop('max_tokens')
-    
-    response = client.completions.create(
-        model=model,
-        prompt=prompt,
-        **kwargs
-    )
-    return response.completion.strip()
-
-
-def convert_messages_to_anthropic_prompt(messages):
-    """
-    Converts a list of message dictionaries to Anthropic's prompt format.
-
-    Args:
-        messages (list): The list of message dictionaries.
-
-    Returns:
-        str: The formatted prompt string for Anthropic.
-    """
-    prompt = ""
-    for message in messages:
-        if message["role"] in ["system", "user"]:
-            prompt += f"{Anthropic.HUMAN_PROMPT} {message['content']} {Anthropic.AI_PROMPT}"
-        elif message["role"] == "assistant":
-            prompt += f"{message['content']}\n"
-    return prompt
+    response = llm(langchain_messages, **kwargs)
+    return response.content.strip()
 
 
 def enforce_semantic_list(lst):
