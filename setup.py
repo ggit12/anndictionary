@@ -21,8 +21,8 @@ setup(
         'matplotlib',
         'squidpy',
         'harmonypy',
-        'openai',
-        'anthropic',
+        'langchain', 
+        'langchain-community', 
         'bokeh',
         'holoviews'
     ],
