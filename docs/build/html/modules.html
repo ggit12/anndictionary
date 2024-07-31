@@ -62,6 +62,8 @@
 <li class="toctree-l2"><a class="reference internal" href="#anndict.dict.display_html_summary_adata_dict"><code class="docutils literal notranslate"><span class="pre">display_html_summary_adata_dict()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#anndict.dict.set_var_index"><code class="docutils literal notranslate"><span class="pre">set_var_index()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#anndict.dict.set_obs_index"><code class="docutils literal notranslate"><span class="pre">set_obs_index()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#anndict.dict.remove_genes"><code class="docutils literal notranslate"><span class="pre">remove_genes()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#anndict.dict.remove_genes_adata_dict"><code class="docutils literal notranslate"><span class="pre">remove_genes_adata_dict()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#anndict.dict.subsample_adata_dict"><code class="docutils literal notranslate"><span class="pre">subsample_adata_dict()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#anndict.dict.resample_adata"><code class="docutils literal notranslate"><span class="pre">resample_adata()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#anndict.dict.resample_adata_dict"><code class="docutils literal notranslate"><span class="pre">resample_adata_dict()</span></code></a></li>
@@ -72,8 +74,8 @@
 <li class="toctree-l2"><a class="reference internal" href="#anndict.dict.pca_adata_dict"><code class="docutils literal notranslate"><span class="pre">pca_adata_dict()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#anndict.dict.neighbors_adata_dict"><code class="docutils literal notranslate"><span class="pre">neighbors_adata_dict()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#anndict.dict.leiden_adata_dict"><code class="docutils literal notranslate"><span class="pre">leiden_adata_dict()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#anndict.dict.leiden_subcluster"><code class="docutils literal notranslate"><span class="pre">leiden_subcluster()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#anndict.dict.leiden_subcluster_adata_dict"><code class="docutils literal notranslate"><span class="pre">leiden_subcluster_adata_dict()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#anndict.dict.leiden_sub_cluster"><code class="docutils literal notranslate"><span class="pre">leiden_sub_cluster()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#anndict.dict.leiden_sub_cluster_adata_dict"><code class="docutils literal notranslate"><span class="pre">leiden_sub_cluster_adata_dict()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#anndict.dict.calculate_umap_adata_dict"><code class="docutils literal notranslate"><span class="pre">calculate_umap_adata_dict()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#anndict.dict.plot_umap_adata_dict"><code class="docutils literal notranslate"><span class="pre">plot_umap_adata_dict()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#anndict.dict.write_h5ad_adata_dict"><code class="docutils literal notranslate"><span class="pre">write_h5ad_adata_dict()</span></code></a></li>
@@ -93,15 +95,16 @@
 <li class="toctree-l2"><a class="reference internal" href="#anndict.dict.create_label_hierarchy_adata_dict"><code class="docutils literal notranslate"><span class="pre">create_label_hierarchy_adata_dict()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#anndict.dict.simplify_var_index"><code class="docutils literal notranslate"><span class="pre">simplify_var_index()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#anndict.dict.simplify_var_index_adata_dict"><code class="docutils literal notranslate"><span class="pre">simplify_var_index_adata_dict()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#anndict.dict.ai_annotate"><code class="docutils literal notranslate"><span class="pre">ai_annotate()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#anndict.dict.ai_annotate_cell_type"><code class="docutils literal notranslate"><span class="pre">ai_annotate_cell_type()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#anndict.dict.ai_annotate_cell_type_adata_dict"><code class="docutils literal notranslate"><span class="pre">ai_annotate_cell_type_adata_dict()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#anndict.dict.ai_annotate_cell_type_by_comparison"><code class="docutils literal notranslate"><span class="pre">ai_annotate_cell_type_by_comparison()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#anndict.dict.ai_annotate_cell_type_by_comparison_adata_dict"><code class="docutils literal notranslate"><span class="pre">ai_annotate_cell_type_by_comparison_adata_dict()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#anndict.dict.ai_annotate_cell_sub_type_adata_dict"><code class="docutils literal notranslate"><span class="pre">ai_annotate_cell_sub_type_adata_dict()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#anndict.dict.ai_annotate_cell_sub_type"><code class="docutils literal notranslate"><span class="pre">ai_annotate_cell_sub_type()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#anndict.dict.ai_annotate_cell_subtype_adata_dict"><code class="docutils literal notranslate"><span class="pre">ai_annotate_cell_subtype_adata_dict()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#anndict.dict.ai_annotate_cell_type_by_comparison_adata_dict"><code class="docutils literal notranslate"><span class="pre">ai_annotate_cell_type_by_comparison_adata_dict()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#anndict.dict.ai_annotate_cell_type_by_comparison"><code class="docutils literal notranslate"><span class="pre">ai_annotate_cell_type_by_comparison()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#anndict.dict.ai_annotate_biological_process"><code class="docutils literal notranslate"><span class="pre">ai_annotate_biological_process()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#anndict.dict.ai_annotate_biological_process_adata_dict"><code class="docutils literal notranslate"><span class="pre">ai_annotate_biological_process_adata_dict()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#anndict.dict.ai_annotate_by_comparison"><code class="docutils literal notranslate"><span class="pre">ai_annotate_by_comparison()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#anndict.dict.ai_annotate"><code class="docutils literal notranslate"><span class="pre">ai_annotate()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#anndict.dict.ai_unify_labels"><code class="docutils literal notranslate"><span class="pre">ai_unify_labels()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#anndict.dict.create_label_df"><code class="docutils literal notranslate"><span class="pre">create_label_df()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#anndict.dict.ai_label_agreement"><code class="docutils literal notranslate"><span class="pre">ai_label_agreement()</span></code></a></li>
@@ -117,6 +120,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#anndict.utils.add_label_to_adata"><code class="docutils literal notranslate"><span class="pre">add_label_to_adata()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#anndict.utils.add_col_to_adata_obs"><code class="docutils literal notranslate"><span class="pre">add_col_to_adata_obs()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#anndict.utils.add_col_to_adata_var"><code class="docutils literal notranslate"><span class="pre">add_col_to_adata_var()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#anndict.utils.convert_obs_col_to_category"><code class="docutils literal notranslate"><span class="pre">convert_obs_col_to_category()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#anndict.utils.create_color_map"><code class="docutils literal notranslate"><span class="pre">create_color_map()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#anndict.utils.UCE_adata"><code class="docutils literal notranslate"><span class="pre">UCE_adata()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#anndict.ai.configure_llm_backend"><code class="docutils literal notranslate"><span class="pre">configure_llm_backend()</span></code></a></li>
@@ -371,6 +375,28 @@ dict: A dictionary with the same structure as adata_dict, where the obs attribut
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="anndict.dict.remove_genes">
+<span class="sig-prename descclassname"><span class="pre">anndict.dict.</span></span><span class="sig-name descname"><span class="pre">remove_genes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">genes_to_remove</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/dict.html#remove_genes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.dict.remove_genes" title="Link to this definition"></a></dt>
+<dd><p>Remove specified genes from an AnnData object in-place.</p>
+<p>Parameters:
+adata (anndata.AnnData): The AnnData object to modify.
+genes_to_remove (list): A list of gene names to remove.</p>
+<p>Returns:
+None</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="anndict.dict.remove_genes_adata_dict">
+<span class="sig-prename descclassname"><span class="pre">anndict.dict.</span></span><span class="sig-name descname"><span class="pre">remove_genes_adata_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">genes_to_remove</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/dict.html#remove_genes_adata_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.dict.remove_genes_adata_dict" title="Link to this definition"></a></dt>
+<dd><p>Remove specified genes from each AnnData object in adata_dict.</p>
+<p>Parameters:
+adata_dict : dict A dictionary where keys are identifiers and values are AnnData objects.
+genes_to_remove : list A list of gene names to remove from each AnnData object.</p>
+<p>Returns:
+None</p>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="anndict.dict.subsample_adata_dict">
 <span class="sig-prename descclassname"><span class="pre">anndict.dict.</span></span><span class="sig-name descname"><span class="pre">subsample_adata_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata_dict</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/dict.html#subsample_adata_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.dict.subsample_adata_dict" title="Link to this definition"></a></dt>
 <dd><p>Subsamples each AnnData object in the dictionary using Scanpy’s subsample function.</p>
@@ -487,8 +513,8 @@ dict: Dictionary of resampled AnnData objects after filtering.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="anndict.dict.leiden_subcluster">
-<span class="sig-prename descclassname"><span class="pre">anndict.dict.</span></span><span class="sig-name descname"><span class="pre">leiden_subcluster</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">groupby</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/dict.html#leiden_subcluster"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.dict.leiden_subcluster" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="anndict.dict.leiden_sub_cluster">
+<span class="sig-prename descclassname"><span class="pre">anndict.dict.</span></span><span class="sig-name descname"><span class="pre">leiden_sub_cluster</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">groupby</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/dict.html#leiden_sub_cluster"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.dict.leiden_sub_cluster" title="Link to this definition"></a></dt>
 <dd><p>Perform Leiden clustering on subgroups of cells.
 This function applies Leiden clustering to subgroups of cells defined by the groupby parameter.</p>
 <p>Parameters:
@@ -500,14 +526,14 @@ None, The function modifies the input AnnData object in-place.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="anndict.dict.leiden_subcluster_adata_dict">
-<span class="sig-prename descclassname"><span class="pre">anndict.dict.</span></span><span class="sig-name descname"><span class="pre">leiden_subcluster_adata_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">groupby</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/dict.html#leiden_subcluster_adata_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.dict.leiden_subcluster_adata_dict" title="Link to this definition"></a></dt>
-<dd><p>This function applies the leiden_subcluster function to each AnnData object
+<dt class="sig sig-object py" id="anndict.dict.leiden_sub_cluster_adata_dict">
+<span class="sig-prename descclassname"><span class="pre">anndict.dict.</span></span><span class="sig-name descname"><span class="pre">leiden_sub_cluster_adata_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">groupby</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/dict.html#leiden_sub_cluster_adata_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.dict.leiden_sub_cluster_adata_dict" title="Link to this definition"></a></dt>
+<dd><p>This function applies the leiden_sub_cluster function to each AnnData object
 in the provided dictionary.</p>
 <p>Parameters:
 adata_dict : dict Dictionary of AnnData objects.
 groupby : str Column name in adata.obs for grouping cells before subclustering.
-kwargs : dict Additional keyword arguments to pass to the leiden_subcluster function.</p>
+kwargs : dict Additional keyword arguments to pass to the leiden_sub_cluster function.</p>
 <p>Returns:
 None The function modifies the input AnnData objects in-place.</p>
 </dd></dl>
@@ -738,22 +764,6 @@ ValueError: If more than 1000 genes are selected for simplification or if the co
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="anndict.dict.ai_annotate">
-<span class="sig-prename descclassname"><span class="pre">anndict.dict.</span></span><span class="sig-name descname"><span class="pre">ai_annotate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">groupby</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_top_genes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label_column</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/dict.html#ai_annotate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.dict.ai_annotate" title="Link to this definition"></a></dt>
-<dd><p>Annotate clusters based on the top marker genes for each cluster.</p>
-<p>This function performs differential expression analysis to identify marker genes for each cluster
-and applies func to determine the label for each cluster based on the top n
-marker genes. The results are added to the AnnData object and returned as a DataFrame.</p>
-<p>Parameters:
-adata : AnnData
-groupby : str Column in adata.obs to group by for differential expression analysis.
-n_top_genes : int The number of top marker genes to consider for each cluster.
-label_column : str The name of the new column in adata.obs where the annotations will be stored.</p>
-<p>Returns:
-pd.DataFrame A DataFrame with a column for the top marker genes for each cluster.</p>
-</dd></dl>
-
-<dl class="py function">
 <dt class="sig sig-object py" id="anndict.dict.ai_annotate_cell_type">
 <span class="sig-prename descclassname"><span class="pre">anndict.dict.</span></span><span class="sig-name descname"><span class="pre">ai_annotate_cell_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">groupby</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_top_genes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label_column</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ai_cell_type'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/dict.html#ai_annotate_cell_type"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.dict.ai_annotate_cell_type" title="Link to this definition"></a></dt>
 <dd><p>Annotate cell types based on the top marker genes for each cluster.</p>
@@ -776,29 +786,22 @@ pd.DataFrame A DataFrame with a column for the top marker genes for each cluster
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="anndict.dict.ai_annotate_cell_type_by_comparison">
-<span class="sig-prename descclassname"><span class="pre">anndict.dict.</span></span><span class="sig-name descname"><span class="pre">ai_annotate_cell_type_by_comparison</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">groupby</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_top_genes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label_column</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ai_cell_sub_type'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/dict.html#ai_annotate_cell_type_by_comparison"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.dict.ai_annotate_cell_type_by_comparison" title="Link to this definition"></a></dt>
-<dd><p>Annotate cell types by comparison using AI.</p>
-<p>This function wraps the ai_annotate function to perform cell type annotation
-based on comparison of gene expression profiles.</p>
+<dt class="sig sig-object py" id="anndict.dict.ai_annotate_cell_sub_type_adata_dict">
+<span class="sig-prename descclassname"><span class="pre">anndict.dict.</span></span><span class="sig-name descname"><span class="pre">ai_annotate_cell_sub_type_adata_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cell_type_col</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sub_cluster_col</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_label_col</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tissue_of_origin_col</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/dict.html#ai_annotate_cell_sub_type_adata_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.dict.ai_annotate_cell_sub_type_adata_dict" title="Link to this definition"></a></dt>
+<dd><p>Annotate cell subtypes for a dictionary of AnnData objects.</p>
+<p>This function applies the ai_annotate_cell_sub_type function to each AnnData object
+in the provided dictionary.</p>
 <p>Parameters:
-adata : AnnData Annotated data matrix.
-groupby : str Column name in adata.obs for grouping cells.
-n_top_genes : int Number of top genes to consider for annotation.
-label_column : str, optional Name of the column to store the AI-generated cell type labels (default: ‘ai_cell_sub_type’).</p>
+adata_dict : dict Dictionary of AnnData objects.
+cell_type_col : str Column name in adata.obs containing main cell type labels.
+new_label_col : str Name of the column to store the AI-generated subtype labels.</p>
 <p>Returns:
-AnnData Annotated data with AI-generated cell type labels.</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="anndict.dict.ai_annotate_cell_type_by_comparison_adata_dict">
-<span class="sig-prename descclassname"><span class="pre">anndict.dict.</span></span><span class="sig-name descname"><span class="pre">ai_annotate_cell_type_by_comparison_adata_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">groupby</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_top_genes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label_column</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ai_cell_sub_type'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/dict.html#ai_annotate_cell_type_by_comparison_adata_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.dict.ai_annotate_cell_type_by_comparison_adata_dict" title="Link to this definition"></a></dt>
-<dd><p>Applies ai_annotate_cell_type_by_comparison to each anndata in an anndict</p>
+dict Dictionary of annotated AnnData objects with AI-generated subtype labels.</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="anndict.dict.ai_annotate_cell_sub_type">
-<span class="sig-prename descclassname"><span class="pre">anndict.dict.</span></span><span class="sig-name descname"><span class="pre">ai_annotate_cell_sub_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cell_type_col</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sub_cluster_col</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_label_col</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/dict.html#ai_annotate_cell_sub_type"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.dict.ai_annotate_cell_sub_type" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">anndict.dict.</span></span><span class="sig-name descname"><span class="pre">ai_annotate_cell_sub_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cell_type_col</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sub_cluster_col</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_label_col</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tissue_of_origin_col</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/dict.html#ai_annotate_cell_sub_type"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.dict.ai_annotate_cell_sub_type" title="Link to this definition"></a></dt>
 <dd><p>Annotate cell subtypes using AI.</p>
 <p>This function performs AI-based annotation of cell subtypes by first grouping cells
 by their main cell type, then annotating subtypes within each group.</p>
@@ -816,17 +819,24 @@ dict: Mapping of original labels to AI-generated labels.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="anndict.dict.ai_annotate_cell_subtype_adata_dict">
-<span class="sig-prename descclassname"><span class="pre">anndict.dict.</span></span><span class="sig-name descname"><span class="pre">ai_annotate_cell_subtype_adata_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cell_type_col</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_label_col</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/dict.html#ai_annotate_cell_subtype_adata_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.dict.ai_annotate_cell_subtype_adata_dict" title="Link to this definition"></a></dt>
-<dd><p>Annotate cell subtypes for a dictionary of AnnData objects.</p>
-<p>This function applies the ai_annotate_cell_sub_type function to each AnnData object
-in the provided dictionary.</p>
+<dt class="sig sig-object py" id="anndict.dict.ai_annotate_cell_type_by_comparison_adata_dict">
+<span class="sig-prename descclassname"><span class="pre">anndict.dict.</span></span><span class="sig-name descname"><span class="pre">ai_annotate_cell_type_by_comparison_adata_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">groupby</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_top_genes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label_column</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ai_cell_sub_type'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tissue_of_origin_col</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/dict.html#ai_annotate_cell_type_by_comparison_adata_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.dict.ai_annotate_cell_type_by_comparison_adata_dict" title="Link to this definition"></a></dt>
+<dd><p>Applies ai_annotate_cell_type_by_comparison to each anndata in an anndict</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="anndict.dict.ai_annotate_cell_type_by_comparison">
+<span class="sig-prename descclassname"><span class="pre">anndict.dict.</span></span><span class="sig-name descname"><span class="pre">ai_annotate_cell_type_by_comparison</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">groupby</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_top_genes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label_column</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ai_cell_sub_type'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tissue_of_origin_col</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/dict.html#ai_annotate_cell_type_by_comparison"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.dict.ai_annotate_cell_type_by_comparison" title="Link to this definition"></a></dt>
+<dd><p>Annotate cell types by comparison using AI.</p>
+<p>This function wraps the ai_annotate function to perform cell type annotation
+based on comparison of gene expression profiles.</p>
 <p>Parameters:
-adata_dict : dict Dictionary of AnnData objects.
-cell_type_col : str Column name in adata.obs containing main cell type labels.
-new_label_col : str Name of the column to store the AI-generated subtype labels.</p>
+adata : AnnData Annotated data matrix.
+groupby : str Column name in adata.obs for grouping cells.
+n_top_genes : int Number of top genes to consider for annotation.
+label_column : str, optional Name of the column to store the AI-generated cell type labels (default: ‘ai_cell_sub_type’).</p>
 <p>Returns:
-dict Dictionary of annotated AnnData objects with AI-generated subtype labels.</p>
+AnnData Annotated data with AI-generated cell type labels.</p>
 </dd></dl>
 
 <dl class="py function">
@@ -849,6 +859,38 @@ pd.DataFrame A DataFrame with a column for the top marker genes for each cluster
 <dt class="sig sig-object py" id="anndict.dict.ai_annotate_biological_process_adata_dict">
 <span class="sig-prename descclassname"><span class="pre">anndict.dict.</span></span><span class="sig-name descname"><span class="pre">ai_annotate_biological_process_adata_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">groupby</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_top_genes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label_column</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ai_biological_process'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/dict.html#ai_annotate_biological_process_adata_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.dict.ai_annotate_biological_process_adata_dict" title="Link to this definition"></a></dt>
 <dd><p>Applies ai_annotate_biological_process to each anndata in an anndict</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="anndict.dict.ai_annotate_by_comparison">
+<span class="sig-prename descclassname"><span class="pre">anndict.dict.</span></span><span class="sig-name descname"><span class="pre">ai_annotate_by_comparison</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">groupby</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_top_genes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label_column</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/dict.html#ai_annotate_by_comparison"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.dict.ai_annotate_by_comparison" title="Link to this definition"></a></dt>
+<dd><p>Annotate clusters based on the top marker genes for each cluster.</p>
+<p>This uses marker genes for each cluster and applies func to determine the label for each cluster based on the top n
+marker genes. The results are added to the AnnData object and returned as a DataFrame.</p>
+<p>If rank_genes_groups hasn’t been run on the adata, this function will automatically run sc.tl.rank_genes_groups</p>
+<p>Parameters:
+adata : AnnData
+groupby : str Column in adata.obs to group by for differential expression analysis.
+n_top_genes : int The number of top marker genes to consider for each cluster.
+label_column : str The name of the new column in adata.obs where the annotations will be stored.</p>
+<p>Returns:
+pd.DataFrame A DataFrame with a column for the top marker genes for each cluster.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="anndict.dict.ai_annotate">
+<span class="sig-prename descclassname"><span class="pre">anndict.dict.</span></span><span class="sig-name descname"><span class="pre">ai_annotate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">groupby</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_top_genes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label_column</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/dict.html#ai_annotate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.dict.ai_annotate" title="Link to this definition"></a></dt>
+<dd><p>Annotate clusters based on the top marker genes for each cluster.</p>
+<p>This uses marker genes for each cluster and applies func to determine the label for each cluster based on the top n
+marker genes. The results are added to the AnnData object and returned as a DataFrame.</p>
+<p>If rank_genes_groups hasn’t been run on the adata, this function will automatically run sc.tl.rank_genes_groups</p>
+<p>Parameters:
+adata : AnnData
+groupby : str Column in adata.obs to group by for differential expression analysis.
+n_top_genes : int The number of top marker genes to consider for each cluster.
+label_column : str The name of the new column in adata.obs where the annotations will be stored.</p>
+<p>Returns:
+pd.DataFrame A DataFrame with a column for the top marker genes for each cluster.</p>
 </dd></dl>
 
 <dl class="py function">
@@ -1016,6 +1058,17 @@ ValueError: If no strata meet the minimum cell requirement after filtering.</p>
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="anndict.utils.convert_obs_col_to_category">
+<span class="sig-prename descclassname"><span class="pre">anndict.utils.</span></span><span class="sig-name descname"><span class="pre">convert_obs_col_to_category</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">col_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/utils.html#convert_obs_col_to_category"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.utils.convert_obs_col_to_category" title="Link to this definition"></a></dt>
+<dd><p>Convert a column in AnnData.obs to category dtype.</p>
+<p>Parameters:
+adata (AnnData): The AnnData object.
+col_name (str): The name of the column in adata.obs to convert.</p>
+<p>Returns:
+None: The function modifies the adata object in-place.</p>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="anndict.utils.create_color_map">
 <span class="sig-prename descclassname"><span class="pre">anndict.utils.</span></span><span class="sig-name descname"><span class="pre">create_color_map</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keys</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/utils.html#create_color_map"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.utils.create_color_map" title="Link to this definition"></a></dt>
 <dd><p>Creates a unified color map for given keys from an AnnData object, differentiating
@@ -1043,7 +1096,7 @@ UCE_adata([“../dat/liver.h5ad”, “../dat/kidney.h5ad”])</p>
 
 <dl class="py function" id="module-anndict.ai">
 <dt class="sig sig-object py" id="anndict.ai.configure_llm_backend">
-<span class="sig-prename descclassname"><span class="pre">anndict.ai.</span></span><span class="sig-name descname"><span class="pre">configure_llm_backend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">provider</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">api_key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/ai.html#configure_llm_backend"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.ai.configure_llm_backend" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">anndict.ai.</span></span><span class="sig-name descname"><span class="pre">configure_llm_backend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">provider</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">api_key</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/ai.html#configure_llm_backend"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.ai.configure_llm_backend" title="Link to this definition"></a></dt>
 <dd><p>Configures the LLM backend by setting environment variables.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1078,7 +1131,7 @@ UCE_adata([“../dat/liver.h5ad”, “../dat/kidney.h5ad”])</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="anndict.ai.get_client">
-<span class="sig-prename descclassname"><span class="pre">anndict.ai.</span></span><span class="sig-name descname"><span class="pre">get_client</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">provider</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/ai.html#get_client"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.ai.get_client" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">anndict.ai.</span></span><span class="sig-name descname"><span class="pre">get_client</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/ai.html#get_client"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.ai.get_client" title="Link to this definition"></a></dt>
 <dd><p>Retrieves the appropriate client for the specified provider.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1335,7 +1388,7 @@ str: The cell type label generated by AI</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="anndict.ai.ai_cell_types_by_comparison">
-<span class="sig-prename descclassname"><span class="pre">anndict.ai.</span></span><span class="sig-name descname"><span class="pre">ai_cell_types_by_comparison</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gene_lists</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tissue</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/ai.html#ai_cell_types_by_comparison"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.ai.ai_cell_types_by_comparison" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">anndict.ai.</span></span><span class="sig-name descname"><span class="pre">ai_cell_types_by_comparison</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gene_lists</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cell_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tissue</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/ai.html#ai_cell_types_by_comparison"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.ai.ai_cell_types_by_comparison" title="Link to this definition"></a></dt>
 <dd><p>Returns cell type labels for multiple lists of marker genes as determined by AI using the OpenAI API.</p>
 <p>Args:
 gene_lists (list of lists): A list containing multiple lists of genes to be described.
