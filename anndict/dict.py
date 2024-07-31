@@ -1409,9 +1409,9 @@ def ai_label_agreement(adata, cols, new_col_name, func):
     Returns:
     pd.DataFrame DataFrame with an additional column for the function results.
     """
-    unique_df = create_label_df(adata, cols)
-    unique_df[new_col_name] = unique_df.apply(lambda row: func(row[0], row[1]), axis=1)
-    return unique_df
+    unique_label_combinations = create_label_df(adata, cols)
+    unique_label_combinations[new_col_name] = unique_label_combinations.apply(lambda row: func(row[0], row[1]), axis=1)
+    return unique_label_combinations
 
 def ai_compare_cell_type_labels(adata, cols, new_col_name='agreement', comparison_level='binary'):
     """
@@ -1433,11 +1433,16 @@ def ai_compare_cell_type_labels(adata, cols, new_col_name='agreement', compariso
     if comparison_level not in ['binary', 'categorical']:
         raise ValueError("comparison_level must be either 'binary' or 'categorical'.")
     
-    if comparison_level == 'binary':
-        label_agreement = ai_label_agreement(adata, cols, new_col_name, ai_compare_cell_types_binary)
-    elif comparison_level == 'categorical':
-        label_agreement = ai_label_agreement(adata, cols, new_col_name, ai_compare_cell_types_categorical)
+    raw_col_name = f"raw_{new_col_name}"
 
+    #todo: add separate filter functions for each agreement type instead of directly calculating here
+    if comparison_level == 'binary':
+        label_agreement = ai_label_agreement(adata, cols, raw_col_name, ai_compare_cell_types_binary)
+        label_agreement[new_col_name] = label_agreement[raw_col_name].str.lower().apply(lambda x: 1 if x == 'yes' else 0 if x == 'no' else None)
+    elif comparison_level == 'categorical':
+        label_agreement = ai_label_agreement(adata, cols, raw_col_name, ai_compare_cell_types_categorical)
+        label_agreement[new_col_name] = label_agreement[raw_col_name].str.lower().apply(lambda x: 0 if x == 'no match' else 1 if x == 'partial match' else 2 if x == 'perfect match' else None)
+    
     # Merge 'agreement' column of label_agreement back to adata.obs
     adata.obs = adata.obs.merge(label_agreement, on=cols, how='left')
 
