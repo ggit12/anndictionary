@@ -119,8 +119,6 @@ def convert_obs_col_to_category(adata, col_name):
         raise ValueError(f"Column '{col_name}' not found in adata.obs")
     
     adata.obs[col_name] = adata.obs[col_name].astype('category')
-    
-    print(f"Column '{col_name}' has been converted to category dtype.")
 
 
 def create_color_map(adata, keys):
