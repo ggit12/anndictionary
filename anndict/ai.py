@@ -33,7 +33,7 @@ from io import BytesIO
 from typing import Optional
 
 #LLM configuration
-def configure_llm_backend(provider: str, model: str, api_key: str):
+def configure_llm_backend(provider, model, api_key):
     """
     Configures the LLM backend by setting environment variables.
 
@@ -78,7 +78,7 @@ def get_llm_config():
     }
 
 
-def get_client(provider: Optional[str] = None):
+def get_client():
     """
     Retrieves the appropriate client for the specified provider.
 
@@ -93,7 +93,7 @@ def get_client(provider: Optional[str] = None):
         ValueError: If an unsupported provider is specified or if the LLM backend is not configured.
     """
     config = get_llm_config()
-    provider = provider or config['provider']
+    provider = config['provider']
 
     provider = provider.lower()
     provider_functions = {
@@ -469,7 +469,7 @@ def ai_cell_type(gene_list, tissue=None):
 
     return annotation
 
-def ai_cell_types_by_comparison(gene_lists, tissue=None):
+def ai_cell_types_by_comparison(gene_lists, cell_type=None, tissue=None):
     """
     Returns cell type labels for multiple lists of marker genes as determined by AI using the OpenAI API.
     
@@ -486,21 +486,24 @@ def ai_cell_types_by_comparison(gene_lists, tissue=None):
     
     cell_types = []
     
+    print(f"annotating {tissue if tissue else ''} {cell_type if cell_type else ''}")
+    print(f"number of gene lists being compared (i.e. subclusters of {cell_type if cell_type else ''}): {len(gene_lists)}")
     # Prepare the base prompt
-    base_prompt = "In a few words and without restating any part of the question, describe the single most likely cell type represented by each of the following sets of marker genes. Contrast the gene sets to provide a cell type label for each set:"
-    
-    # Add tissue information if provided
-    if tissue:
-        base_prompt += f" Consider that these cells are from {tissue} tissue."
-    
+    #  {f'These cells are from {tissue} tissue. ' if tissue else ''}
+    system_prompt = f"You are a terse molecular biologist. In a few words and without restating any part of the question, describe the single most likely cell subtype represented by each of the following sets of marker genes. Contrast the gene sets to provide a subtype label for each set. Example:\n{f'{tissue} ' if tissue else ' '}{'T cells' if cell_type else ''}\nCD4    CD28    CXCR4    IL7R\nCD8A    GZMB    PRF1    IFNG\nFOXP3    IL2RA    CTLA4    TNFRSF18\n->\nCD4+ T helper cells\nCD8+ Cytotoxic T cells\nRegulatory T cells"
+
     # Add gene lists to the prompt
+    base_prompt=('\n' + tissue if tissue else '') + ' '
+    base_prompt+=(cell_type if cell_type else '') + '\n'
     for i, gene_list in enumerate(gene_lists, 1):
         genes_str = "    ".join(gene_list)
-        base_prompt += f"\nSet {i}: {genes_str}"
-    
+        base_prompt += f"{genes_str}\n"
+    base_prompt+="->\n"
+    print(f"base_prompt:\n{base_prompt}")
+
     # Prepare the messages for the Chat Completions API
     messages = [
-        {"role": "system", "content": "You are a terse molecular biologist."},
+        {"role": "system", "content": system_prompt},
         {"role": "user", "content": base_prompt}
     ]
     
@@ -512,8 +515,8 @@ def ai_cell_types_by_comparison(gene_lists, tissue=None):
     )
     
     # Parse the annotation to extract individual cell type labels
-    cell_types = annotation.strip().split('\n')
-    
+    cell_types = [line.strip() for line in annotation.split('\n')]
+    print(cell_types)
     return cell_types
 
 

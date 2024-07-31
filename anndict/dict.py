@@ -43,7 +43,7 @@ from .stablelabel import (
     plot_grouped_average,
     harmony_label_transfer
 )
-from .utils import make_names, add_label_to_adata, create_color_map
+from .utils import make_names, add_label_to_adata, convert_obs_col_to_category, create_color_map
 from .ai import (
     attempt_ai_integration, 
     generate_file_key, 
@@ -432,6 +432,38 @@ def set_obs_index(adata_dict, column):
 
     return adata_dict_fapply_return(adata_dict, set_obs_index_main, column=column)
 
+def remove_genes(adata, genes_to_remove, key=None):
+    """
+    Remove specified genes from an AnnData object in-place.
+    
+    Parameters:
+    adata (anndata.AnnData): The AnnData object to modify.
+    genes_to_remove (list): A list of gene names to remove.
+    
+    Returns:
+    None
+    """
+    # Get the list of genes to remove that are actually in the dataset
+    genes_to_remove = adata.var_names.intersection(genes_to_remove)
+    
+    # Remove the specified genes
+    adata._inplace_subset_var(~adata.var_names.isin(genes_to_remove))
+    
+    print(f"Removed {len(genes_to_remove)} genes from {key}. {adata.n_vars} genes remaining.")
+
+def remove_genes_adata_dict(adata_dict, genes_to_remove):
+    """
+    Remove specified genes from each AnnData object in adata_dict.
+
+    Parameters:
+    adata_dict : dict A dictionary where keys are identifiers and values are AnnData objects.
+    genes_to_remove : list A list of gene names to remove from each AnnData object.
+
+    Returns:
+    None
+    """
+    adata_dict_fapply(adata_dict, remove_genes, genes_to_remove=genes_to_remove)
+
 
 def subsample_adata_dict(adata_dict, **kwargs):
     """
@@ -613,7 +645,7 @@ def leiden_adata_dict(adata_dict, **kwargs):
     adata_dict_fapply(adata_dict, sc.tl.leiden, **kwargs)
 
 
-def leiden_subcluster(adata, groupby, **kwargs):
+def leiden_sub_cluster(adata, groupby, **kwargs):
     """
     Perform Leiden clustering on subgroups of cells.
     This function applies Leiden clustering to subgroups of cells defined by the groupby parameter.
@@ -628,23 +660,24 @@ def leiden_subcluster(adata, groupby, **kwargs):
     """
     adata_dict = build_adata_dict(adata, strata_keys=[groupby])
     leiden_adata_dict(adata_dict, **kwargs)
-    
-    
+    adata = concatenate_adata_dict(adata_dict)
+    return adata
 
-def leiden_subcluster_adata_dict(adata_dict, groupby, **kwargs):
+
+def leiden_sub_cluster_adata_dict(adata_dict, groupby, **kwargs):
     """
-    This function applies the leiden_subcluster function to each AnnData object
+    This function applies the leiden_sub_cluster function to each AnnData object
     in the provided dictionary.
     
     Parameters:
     adata_dict : dict Dictionary of AnnData objects.
     groupby : str Column name in adata.obs for grouping cells before subclustering.
-    kwargs : dict Additional keyword arguments to pass to the leiden_subcluster function.
+    kwargs : dict Additional keyword arguments to pass to the leiden_sub_cluster function.
 
     Returns:
     None The function modifies the input AnnData objects in-place.
     """
-    adata_dict_fapply(adata_dict, leiden_subcluster, groupby=groupby, **kwargs)
+    return adata_dict_fapply_return(adata_dict, leiden_sub_cluster, groupby=groupby, **kwargs)
 
 
 def calculate_umap_adata_dict(adata_dict, **kwargs):
@@ -971,6 +1004,9 @@ def simplify_obs_column(adata, column, new_column_name, simplification_level='')
     # Apply the mapping to create the new column in the AnnData object
     adata.obs[new_column_name] = adata.obs[column].map(label_mapping)
 
+    #Convert annotation to categorical dtype
+    convert_obs_col_to_category(adata, new_column_name)
+
     return label_mapping
 
 
@@ -1053,52 +1089,7 @@ def simplify_var_index_adata_dict(adata_dict, column, new_column_name, simplific
     return adata_dict_fapply_return(adata_dict, simplify_var_index, column=column, new_column_name=new_column_name, simplification_level=simplification_level)
 
 
-def ai_annotate(func, adata, groupby, n_top_genes, label_column):
-    """
-    Annotate clusters based on the top marker genes for each cluster.
 
-    This function performs differential expression analysis to identify marker genes for each cluster
-    and applies func to determine the label for each cluster based on the top n
-    marker genes. The results are added to the AnnData object and returned as a DataFrame.
-
-    Parameters:
-    adata : AnnData
-    groupby : str Column in adata.obs to group by for differential expression analysis.
-    n_top_genes : int The number of top marker genes to consider for each cluster.
-    label_column : str The name of the new column in adata.obs where the annotations will be stored.
-
-    Returns:
-    pd.DataFrame A DataFrame with a column for the top marker genes for each cluster.
-    """
-    #run the differential expression analysis
-    sc.tl.rank_genes_groups(adata, groupby, method='t-test')
-
-    # Initialize a dictionary to store cell type annotations
-    cell_type_annotations = {}
-
-    # Initialize a list to store the results
-    results = []
-
-    # Get the rank genes groups result
-    rank_genes_groups = adata.uns['rank_genes_groups']
-    clusters = rank_genes_groups['names'].dtype.names  # List of clusters
-
-    # Loop through each cluster and get the top n marker genes
-    for cluster in clusters:
-        top_genes = rank_genes_groups['names'][cluster][:n_top_genes]
-        cell_type = func(top_genes)
-        cell_type_annotations[cluster] = cell_type
-
-        results.append({
-            groupby: cluster,
-            label_column: cell_type,
-            f"top_{n_top_genes}_genes": list(top_genes)
-        })
-
-    # Create a new column in .obs for cell type annotations
-    adata.obs[label_column] = adata.obs[groupby].map(cell_type_annotations)
-
-    return pd.DataFrame(results)
 
 
 def ai_annotate_cell_type(adata, groupby, n_top_genes, label_column='ai_cell_type'):
@@ -1128,33 +1119,29 @@ def ai_annotate_cell_type_adata_dict(adata_dict, groupby, n_top_genes=10, label_
     return adata_dict_fapply_return(adata_dict, ai_annotate_cell_type, groupby=groupby, n_top_genes=n_top_genes, label_column=label_column)
 
 
-def ai_annotate_cell_type_by_comparison(adata, groupby, n_top_genes, label_column='ai_cell_sub_type'):
+def ai_annotate_cell_sub_type_adata_dict(adata_dict, cell_type_col, sub_cluster_col, new_label_col, tissue_of_origin_col=None):
     """
-    Annotate cell types by comparison using AI.
+    Annotate cell subtypes for a dictionary of AnnData objects.
 
-    This function wraps the ai_annotate function to perform cell type annotation
-    based on comparison of gene expression profiles.
+    This function applies the ai_annotate_cell_sub_type function to each AnnData object
+    in the provided dictionary.
 
     Parameters:
-    adata : AnnData Annotated data matrix.
-    groupby : str Column name in adata.obs for grouping cells.
-    n_top_genes : int Number of top genes to consider for annotation.
-    label_column : str, optional Name of the column to store the AI-generated cell type labels (default: 'ai_cell_sub_type').
+    adata_dict : dict Dictionary of AnnData objects.
+    cell_type_col : str Column name in adata.obs containing main cell type labels.
+    new_label_col : str Name of the column to store the AI-generated subtype labels.
 
     Returns:
-    AnnData Annotated data with AI-generated cell type labels.
+    dict Dictionary of annotated AnnData objects with AI-generated subtype labels.
     """
-    return ai_annotate(func=ai_annotate_cell_type_by_comparison, adata=adata, groupby=groupby, n_top_genes=n_top_genes, label_column=label_column)
+    results = adata_dict_fapply_return(adata_dict, ai_annotate_cell_sub_type, cell_type_col=cell_type_col, sub_cluster_col=sub_cluster_col, new_label_col=new_label_col, tissue_of_origin_col=tissue_of_origin_col)
+    annotated_adata_dict = {key: result[0] for key, result in results.items()}
+    label_mappings_dict = {key: result[1] for key, result in results.items()}
+
+    return annotated_adata_dict, label_mappings_dict
 
 
-def ai_annotate_cell_type_by_comparison_adata_dict(adata_dict, groupby, n_top_genes=10, label_column='ai_cell_sub_type'):
-    """
-    Applies ai_annotate_cell_type_by_comparison to each anndata in an anndict
-    """
-    return adata_dict_fapply_return(adata_dict, ai_annotate_cell_type_by_comparison, groupby=groupby, n_top_genes=n_top_genes, label_column=label_column)
-
-
-def ai_annotate_cell_sub_type(adata, cell_type_col, sub_cluster_col, new_label_col):
+def ai_annotate_cell_sub_type(adata, cell_type_col, sub_cluster_col, new_label_col, tissue_of_origin_col=None):
     """
     Annotate cell subtypes using AI.
 
@@ -1176,29 +1163,47 @@ def ai_annotate_cell_sub_type(adata, cell_type_col, sub_cluster_col, new_label_c
     #build adata_dict based on cell_type_col
     adata_dict = build_adata_dict(adata, strata_keys=cell_type_col)
 
-    label_mappings = ai_annotate_cell_type_by_comparison_adata_dict(adata_dict, groupby=sub_cluster_col, n_top_genes=10, label_column=new_label_col)
+    label_mappings = ai_annotate_cell_type_by_comparison_adata_dict(adata_dict, groupby=sub_cluster_col, n_top_genes=10, label_column=new_label_col, tissue_of_origin_col=tissue_of_origin_col)
 
     adata = concatenate_adata_dict(adata_dict)
 
     return adata, label_mappings
 
-def ai_annotate_cell_subtype_adata_dict(adata_dict, cell_type_col, new_label_col):
-    """
-    Annotate cell subtypes for a dictionary of AnnData objects.
 
-    This function applies the ai_annotate_cell_sub_type function to each AnnData object
-    in the provided dictionary.
+def ai_annotate_cell_type_by_comparison_adata_dict(adata_dict, groupby, n_top_genes=10, label_column='ai_cell_sub_type', tissue_of_origin_col=None):
+    """
+    Applies ai_annotate_cell_type_by_comparison to each anndata in an anndict
+    """
+    return adata_dict_fapply_return(adata_dict, ai_annotate_cell_type_by_comparison, groupby=groupby, n_top_genes=n_top_genes, label_column=label_column, tissue_of_origin_col=tissue_of_origin_col)
+
+
+def ai_annotate_cell_type_by_comparison(adata, groupby, n_top_genes, label_column='ai_cell_sub_type', tissue_of_origin_col=None, key=None):
+    """
+    Annotate cell types by comparison using AI.
+
+    This function wraps the ai_annotate function to perform cell type annotation
+    based on comparison of gene expression profiles.
 
     Parameters:
-    adata_dict : dict Dictionary of AnnData objects.
-    cell_type_col : str Column name in adata.obs containing main cell type labels.
-    new_label_col : str Name of the column to store the AI-generated subtype labels.
+    adata : AnnData Annotated data matrix.
+    groupby : str Column name in adata.obs for grouping cells.
+    n_top_genes : int Number of top genes to consider for annotation.
+    label_column : str, optional Name of the column to store the AI-generated cell type labels (default: 'ai_cell_sub_type').
 
     Returns:
-    dict Dictionary of annotated AnnData objects with AI-generated subtype labels.
+    AnnData Annotated data with AI-generated cell type labels.
     """
+    print(f"number of unique categories: {len(adata.obs[groupby].unique())}")
+    if tissue_of_origin_col:
+        tissue = adata.obs[tissue_of_origin_col].unique()
+        if len(tissue == 1):
+            tissue = tissue[0]
+        else:
+            raise ValueError(f"Multiple tissues of_origin found in adata.obs[{tissue_of_origin_col}]. Currently must have only one tissue of origin per cell type. Pick a different tissue of origin column or set tissue_of_origin_col=None")
+    else:
+        tissue = None
+    return ai_annotate_by_comparison(func=ai_cell_types_by_comparison, adata=adata, groupby=groupby, n_top_genes=n_top_genes, label_column=label_column, cell_type=key, tissue=tissue)
 
-    return adata_dict_fapply_return(adata_dict, ai_annotate_cell_sub_type, cell_type_col=cell_type_col, new_label_col=new_label_col)
 
 def ai_annotate_biological_process(adata, groupby, n_top_genes, label_column='ai_biological_process'):
     """
@@ -1225,6 +1230,117 @@ def ai_annotate_biological_process_adata_dict(adata_dict, groupby, n_top_genes=1
     Applies ai_annotate_biological_process to each anndata in an anndict
     """
     return adata_dict_fapply_return(adata_dict, ai_annotate_biological_process, groupby=groupby, n_top_genes=n_top_genes, label_column=label_column)
+
+
+def ai_annotate_by_comparison(func, adata, groupby, n_top_genes, label_column, **kwargs):
+    """
+    Annotate clusters based on the top marker genes for each cluster.
+
+    This uses marker genes for each cluster and applies func to determine the label for each cluster based on the top n
+    marker genes. The results are added to the AnnData object and returned as a DataFrame.
+
+    If rank_genes_groups hasn't been run on the adata, this function will automatically run sc.tl.rank_genes_groups
+
+    Parameters:
+    adata : AnnData
+    groupby : str Column in adata.obs to group by for differential expression analysis.
+    n_top_genes : int The number of top marker genes to consider for each cluster.
+    label_column : str The name of the new column in adata.obs where the annotations will be stored.
+
+    Returns:
+    pd.DataFrame A DataFrame with a column for the top marker genes for each cluster.
+    """
+    # Check if rank_genes_groups has already been run
+    if 'rank_genes_groups' not in adata.uns or adata.uns['rank_genes_groups']['params']['groupby'] != groupby:
+        # Run the differential expression analysis
+        sc.tl.rank_genes_groups(adata, groupby, method='t-test')
+
+    # Initialize a dictionary to store cell type annotations
+    cell_type_annotations = {}
+
+    # Initialize a list to store the results
+    results = []
+
+    # Get the rank genes groups result
+    rank_genes_groups = adata.uns['rank_genes_groups']
+    clusters = rank_genes_groups['names'].dtype.names  # List of clusters
+
+    # Create a list of lists for top genes
+    top_genes = [list(rank_genes_groups['names'][cluster][:n_top_genes]) for cluster in clusters]
+
+    # Call func with the list of lists
+    annotations = func(top_genes, **kwargs)
+
+    # Loop through each cluster and annotation
+    for cluster, annotation in zip(clusters, annotations):
+        cell_type_annotations[cluster] = annotation
+        results.append({
+            groupby: cluster,
+            label_column: annotation,
+            f"top_{n_top_genes}_genes": top_genes[clusters.index(cluster)]
+        })
+
+
+    # Create a new column in .obs for cell type annotations
+    adata.obs[label_column] = adata.obs[groupby].map(cell_type_annotations)
+
+    #Convert annotation to categorical dtype
+    convert_obs_col_to_category(adata, label_column)
+
+    return pd.DataFrame(results)
+
+def ai_annotate(func, adata, groupby, n_top_genes, label_column, **kwargs):
+    """
+    Annotate clusters based on the top marker genes for each cluster.
+
+    This uses marker genes for each cluster and applies func to determine the label for each cluster based on the top n
+    marker genes. The results are added to the AnnData object and returned as a DataFrame.
+
+    If rank_genes_groups hasn't been run on the adata, this function will automatically run sc.tl.rank_genes_groups
+
+    Parameters:
+    adata : AnnData
+    groupby : str Column in adata.obs to group by for differential expression analysis.
+    n_top_genes : int The number of top marker genes to consider for each cluster.
+    label_column : str The name of the new column in adata.obs where the annotations will be stored.
+
+    Returns:
+    pd.DataFrame A DataFrame with a column for the top marker genes for each cluster.
+    """
+    # Check if rank_genes_groups has already been run
+    if 'rank_genes_groups' not in adata.uns or adata.uns['rank_genes_groups']['params']['groupby'] != groupby:
+        # Run the differential expression analysis
+        sc.tl.rank_genes_groups(adata, groupby, method='t-test')
+
+    # Initialize a dictionary to store cell type annotations
+    cell_type_annotations = {}
+
+    # Initialize a list to store the results
+    results = []
+
+    # Get the rank genes groups result
+    rank_genes_groups = adata.uns['rank_genes_groups']
+    clusters = rank_genes_groups['names'].dtype.names  # List of clusters
+
+    # Loop through each cluster and get the top n marker genes
+    for cluster in clusters:
+        top_genes = rank_genes_groups['names'][cluster][:n_top_genes]
+        annotation = func(top_genes, **kwargs)
+        cell_type_annotations[cluster] = annotation
+
+        results.append({
+            groupby: cluster,
+            label_column: annotation,
+            f"top_{n_top_genes}_genes": list(top_genes)
+        })
+
+    # Create a new column in .obs for cell type annotations
+    adata.obs[label_column] = adata.obs[groupby].map(cell_type_annotations)
+
+    #Convert annotation to categorical dtype
+    convert_obs_col_to_category(adata, label_column)
+
+    return pd.DataFrame(results)
 
 
 def ai_unify_labels(adata_dict, label_columns, new_label_column, simplification_level='unified, typo-fixed'):

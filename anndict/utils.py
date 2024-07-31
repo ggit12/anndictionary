@@ -104,6 +104,25 @@ def add_col_to_adata_var(adata, indices, values, new_col_name):
     adata.var.loc[indices, new_col_name] = values
 
 
+def convert_obs_col_to_category(adata, col_name):
+    """
+    Convert a column in AnnData.obs to category dtype.
+    
+    Parameters:
+    adata (AnnData): The AnnData object.
+    col_name (str): The name of the column in adata.obs to convert.
+    
+    Returns:
+    None: The function modifies the adata object in-place.
+    """
+    if col_name not in adata.obs.columns:
+        raise ValueError(f"Column '{col_name}' not found in adata.obs")
+    
+    adata.obs[col_name] = adata.obs[col_name].astype('category')
+    
+    print(f"Column '{col_name}' has been converted to category dtype.")
+
+
 def create_color_map(adata, keys):
     """
     Creates a unified color map for given keys from an AnnData object, differentiating
