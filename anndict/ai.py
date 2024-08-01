@@ -50,13 +50,29 @@ PROVIDER_MAPPING = {
         'class': 'ChatMeta',
         'api_key_env_var': 'META_API_KEY'
     },
-    'grok': {
-        'class': 'ChatGrok',
-        'api_key_env_var': 'GROK_API_KEY'
-    },
     'mistral': {
         'class': 'ChatMistral',
         'api_key_env_var': 'MISTRAL_API_KEY'
+    },
+    'cohere': {
+        'class': 'ChatCohere',
+        'api_key_env_var': 'COHERE_API_KEY'
+    },
+    'ai21': {
+        'class': 'ChatAI21',
+        'api_key_env_var': 'AI21_API_KEY'
+    },
+    'huggingface': {
+        'class': 'ChatHuggingFace',
+        'api_key_env_var': 'HUGGINGFACE_API_KEY'
+    },
+    'nvidia_bionemo': {
+        'class': 'ChatBioNeMo',
+        'api_key_env_var': 'NVIDIA_BIONEMO_API_KEY'
+    },
+    'ibm_watson': {
+        'class': 'ChatIBMWatson',
+        'api_key_env_var': 'IBM_WATSON_API_KEY'
     }
 }
 
