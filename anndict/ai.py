@@ -33,6 +33,19 @@ from langchain.llms.base import BaseLLM
 from langchain.schema import HumanMessage, AIMessage, SystemMessage, BaseMessage
 
 #LLM configuration
+PROVIDERS = [
+    'openai',
+    'anthropic',
+    'google',
+    'meta',
+    'mistral',
+    'cohere',
+    'ai21',
+    'huggingface',
+    'nvidia_bionemo',
+    'ibm_watson'
+]
+
 PROVIDER_MAPPING = {
     'openai': {
         'class': 'ChatOpenAI',
@@ -74,6 +87,119 @@ PROVIDER_MAPPING = {
         'class': 'ChatIBMWatson',
         'api_key_env_var': 'IBM_WATSON_API_KEY'
     }
+}
+
+#list of models provided for reference:
+PROVIDER_MODELS = {
+    'openai': [
+        'gpt-4o',  
+        'gpt-4o-mini', 
+        'gpt-4-0125-preview',  
+        'gpt-4-1106-preview',
+        'gpt-4-vision-preview',
+        'gpt-4',
+        'gpt-4-32k',
+        'gpt-3.5-turbo-0125',
+        'gpt-3.5-turbo-1106',
+        'gpt-3.5-turbo',
+        'gpt-3.5-turbo-16k',
+        'text-davinci-003',
+        'text-davinci-002',
+        'text-curie-001',
+        'text-babbage-001',
+        'text-ada-001'
+    ],
+    'anthropic': [
+        'claude-3-opus-20240229',
+        'claude-3.5-sonnet-20240229',
+        'claude-3-sonnet-20240229',
+        'claude-3-haiku-20240307',
+        'claude-2.1',
+        'claude-2.0',
+        'claude-instant-1.2'
+    ],
+    'google': [
+        'gemini-1.0-pro',
+        'gemini-1.0-pro-vision',
+        'gemini-1.0-ultra',
+        'gemini-1.5-pro',  
+        'gemini-1.5-pro-vision',  
+        'gemini-ultra',  
+        'palm-2',
+        'text-bison-001',
+        'chat-bison-001',
+        'codechat-bison-001'
+    ],
+    'meta': [
+        'llama-3-70b-chat',  
+        'llama-3-13b-chat',  
+        'llama-3-7b-chat',  
+        'llama-3-70b',  
+        'llama-3-13b',  
+        'llama-3-7b',  
+        'llama-3.1-70b-chat',  
+        'llama-3.1-13b-chat',  
+        'llama-3.1-7b-chat',  
+        'llama-3.1-70b',  
+        'llama-3.1-13b',  
+        'llama-3.1-7b',  
+        'meta-llama-3.1-405b-instruct',  
+        'llama-2-70b-chat',
+        'llama-2-13b-chat',
+        'llama-2-7b-chat',
+        'llama-2-70b',
+        'llama-2-13b',
+        'llama-2-7b'
+    ],
+    'mistral': [
+        'mistral-large-latest',
+        'mistral-medium-latest',
+        'mistral-small-latest',
+        'mistral-tiny-latest'
+    ],
+    'cohere': [
+        'command',
+        'command-light',
+        'command-nightly',
+        'command-light-nightly',
+        'embed-english-v3.0',
+        'embed-multilingual-v3.0'
+    ],
+    'ai21': [
+        'j2-ultra-v2',
+        'j2-mid-v2',
+        'j2-light-v2',
+        'j3-ultra',  
+        'j3-mid',  
+        'j3-light',  
+        'j2-ultra',
+        'j2-mid',
+        'j2-light'
+    ],
+    'huggingface': [
+        'falcon-40b',
+        'falcon-7b',
+        'bloom',
+        'gpt-neox-20b',
+        'gpt2-xl',
+        'gpt2-large',
+        'gpt2-medium',
+        'gpt2',
+        'roberta-large',
+        'roberta-base'
+    ],
+    'nvidia_bionemo': [
+        'bionemo-dna-v1',
+        'bionemo-protein-v1',
+        'bionemo-clinical-v1'
+    ],
+    'ibm_watson': [
+        'watson-assistant',
+        'watson-discovery',
+        'watson-natural-language-understanding',
+        'watson-speech-to-text',
+        'watson-text-to-speech'
+    ]
 }
 
 def configure_llm_backend(provider, model, api_key):
@@ -407,7 +533,7 @@ def ai_cell_types_by_comparison(gene_lists, cell_type=None, tissue=None):
         genes_str = "    ".join(gene_list)
         base_prompt += f"{genes_str}\n"
     base_prompt+="->\n"
-    print(f"base_prompt:\n{base_prompt}")
+    # print(f"base_prompt:\n{base_prompt}")
 
     # Prepare the messages for the Chat Completions API
     messages = [
@@ -424,7 +550,7 @@ def ai_cell_types_by_comparison(gene_lists, cell_type=None, tissue=None):
     
     # Parse the annotation to extract individual cell type labels
     cell_types = [line.strip() for line in annotation.split('\n')]
-    print(cell_types)
+    # print(cell_types)
     return cell_types
 
 
