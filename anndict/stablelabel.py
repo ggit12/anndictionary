@@ -732,6 +732,61 @@ def plot_grouped_average(adata, label_value, key=None):
     plt.legend(title='Scores')
     plt.show()
 
+def plot_model_agreement(adata, group_by, sub_group_by, model_cols, granularity=2):
+    """
+    Plots the average values of specified model columns across varying levels of granularity.
+
+    Parameters:
+    - adata: AnnData object containing the data.
+    - group_by: str, key in adata.obs for the main grouping (e.g., 'cell_type').
+    - sub_group_by: str, key in adata.obs for the sub-grouping (e.g., 'tissue').
+    - model_cols: list of str, column names for the models (e.g., ['agreement_model_1', 'agreement_model_2']).
+    - granularity: int, level of detail in the plot (0 = models only, 1 = models within cell types, 2 = models within cell types and tissues).
+    """
+    if not all(col in adata.obs for col in model_cols):
+        missing_cols = [col for col in model_cols if col not in adata.obs]
+        raise ValueError(f"Columns {missing_cols} not found in adata.obs.")
+    if group_by not in adata.obs:
+        raise ValueError(f"Group key '{group_by}' not found in adata.obs.")
+    if sub_group_by not in adata.obs:
+        raise ValueError(f"Sub-group key '{sub_group_by}' not found in adata.obs.")
+    
+    # Pivot longer to get columns: group_by, sub_group_by, agreement, model_name
+    melted = adata.obs.melt(id_vars=[group_by, sub_group_by], value_vars=model_cols, 
+                            var_name='model_name', value_name='agreement')
+    
+    if granularity == 0:
+        # Calculate the average scores across all groups within each model
+        grouped_means = melted.groupby('model_name')['agreement'].mean()
+    elif granularity == 1:
+        # Calculate the average scores within each model and cell type
+        grouped_means = melted.groupby([group_by, 'model_name'])['agreement'].mean().unstack()
+    elif granularity == 2:
+        # Calculate the average scores within each model, cell type, and tissue
+        grouped_means = melted.groupby([group_by, sub_group_by, 'model_name'])['agreement'].mean().unstack(level=[1,2])
+    else:
+        raise ValueError("Granularity must be 0, 1, or 2.")
+    
+    # # Plot the results
+    # if granularity == 0:
+    #     grouped_means.plot(kind='bar', figsize=(14, 8), colormap='Paired')
+    # else:
+    grouped_means.plot(kind='bar', figsize=(14, 8), colormap='Paired')
+        
+    plt.xlabel(group_by if granularity > 0 else 'Model')
+    plt.ylabel('Average Scores')
+    title = 'Average model agreement'
+    if granularity == 0:
+        title += ''
+    elif granularity == 1:
+        title += f' by {group_by}'
+    elif granularity == 2:
+        title += f' by {group_by} and {sub_group_by}'
+    plt.title(title)
+    plt.xticks(rotation=90)
+    plt.legend(title='Models' + ('' if granularity == 0 else ' and Tissues'))
+    plt.show()
+
 #harmony label functions
 def harmony_label_transfer(adata_to_label, master_data, master_subset_column, label_column):
     """

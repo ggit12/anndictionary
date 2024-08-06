@@ -14,6 +14,10 @@ from .metadata_summary import (
 from .utils import (
     make_names, 
     add_col_to_adata_obs,
+    add_col_to_adata_var,
+    convert_obs_col_to_category,
+    convert_obs_col_to_string,
+    convert_obs_index_to_str,
     add_label_to_adata,
     create_color_map,
     UCE_adata
@@ -54,7 +58,8 @@ from .stablelabel import (
     plot_confusion_matrix,
     plot_sankey, 
     save_sankey,
-    plot_grouped_average, 
+    plot_grouped_average,
+    plot_model_agreement,  
     harmony_label_transfer
 )
 
@@ -117,6 +122,8 @@ from .dict import (
     ai_label_agreement, 
     ai_compare_cell_type_labels, 
     ai_compare_cell_type_labels_adata_dict, 
+    ai_compare_cell_type_labels_pairwise,
+    ai_compare_cell_type_labels_pairwise_adata_dict,
     create_label_hierarchy, 
     create_label_hierarchy_adata_dict, 
     plot_sankey_adata_dict, 
@@ -251,6 +258,8 @@ __all__ = [
     'ai_label_agreement', 
     'ai_compare_cell_type_labels', 
     'ai_compare_cell_type_labels_adata_dict', 
+    'ai_compare_cell_type_labels_pairwise', 
+    'ai_compare_cell_type_labels_pairwise_adata_dict', 
     'plot_grouped_average', 
     'plot_grouped_average_adata_dict',
     'enforce_semantic_list', 
@@ -268,5 +277,11 @@ __all__ = [
     'configure_llm_backend', 
     'get_llm_config', 
     'get_llm', 
-    'call_llm', 
+    'call_llm',
+    'add_col_to_adata_var',
+    'convert_obs_col_to_category',
+    'convert_obs_col_to_string',
+    'plot_model_agreement',
+    'convert_obs_index_to_str', 
+
 ]
