@@ -38,7 +38,7 @@ The main function in this package is `adata_dict_fapply()` (and its cousin `adat
 - `func` is a function to apply over each element of the dictionary.
 - `**kwargs` are arguments that `func` takes.
 
-You can have `func` take the argument `key` (i.e., `func(adata, key=None)`) if you want the dictionary key to be available within `func`.
+You can have `func` take the argument `adt_key` (i.e., `func(adata, adt_key=None)`) if you want the dictionary key to be available within `func`.
 
 Many functions in `anndict` are built around `adata_dict_fapply()`, and the package provides prebuilt wrappers for several common Scanpy functions, as well as functions to build and concatenate `adata` dictionaries.
 

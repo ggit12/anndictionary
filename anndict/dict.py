@@ -108,7 +108,7 @@ def adata_dict_fapply(adata_dict, func, **kwargs_dicts):
     """
     import inspect
     sig = inspect.signature(func)
-    accepts_key = 'key' in sig.parameters
+    accepts_key = 'adt_key' in sig.parameters
 
     for key, adata in adata_dict.items():
         func_args = {}
@@ -120,7 +120,7 @@ def adata_dict_fapply(adata_dict, func, **kwargs_dicts):
                 func_args[arg_name] = arg_value
         
         if accepts_key:
-            func(adata, key=key, **func_args)
+            func(adata, adt_key=key, **func_args)
         else:
             func(adata, **func_args)
 
@@ -141,7 +141,7 @@ def adata_dict_fapply_return(adata_dict, func, **kwargs_dicts):
     """
     import inspect
     sig = inspect.signature(func)
-    accepts_key = 'key' in sig.parameters
+    accepts_key = 'adt_key' in sig.parameters
 
     results = {}
     for key, adata in adata_dict.items():
@@ -154,7 +154,7 @@ def adata_dict_fapply_return(adata_dict, func, **kwargs_dicts):
                 func_args[arg_name] = arg_value
         
         if accepts_key:
-            results[key] = func(adata, key=key, **func_args)
+            results[key] = func(adata, adt_key=key, **func_args)
         else:
             results[key] = func(adata, **func_args)
     return results
@@ -442,7 +442,7 @@ def set_obs_index(adata_dict, column):
 
     return adata_dict_fapply_return(adata_dict, set_obs_index_main, column=column)
 
-def remove_genes(adata, genes_to_remove, key=None):
+def remove_genes(adata, genes_to_remove, adt_key=None):
     """
     Remove specified genes from an AnnData object in-place.
     
@@ -725,14 +725,14 @@ def plot_umap_adata_dict(adata_dict, **kwargs):
     Returns:
     - None: The function creates plots for the AnnData objects.
     """
-    def plot_umap(adata, key=None, **kwargs):
-        print(f"Plotting UMAP for key: {key}")
+    def plot_umap(adata, adt_key=None, **kwargs):
+        print(f"Plotting UMAP for key: {adt_key}")
         color_by = kwargs.get('color_by')
         if 'X_umap' in adata.obsm:
             title = [f"{color}" for color in color_by]
             sc.pl.umap(adata, color=color_by, title=title)
         else:
-            print(f"UMAP not computed for adata with key {key}. Please compute UMAP before plotting.")
+            print(f"UMAP not computed for adata with key {adt_key}. Please compute UMAP before plotting.")
     adata_dict_fapply(adata_dict, plot_umap, **kwargs)
 
 
@@ -1185,7 +1185,7 @@ def ai_annotate_cell_type_by_comparison_adata_dict(adata_dict, groupby, n_top_ge
     return adata_dict_fapply_return(adata_dict, ai_annotate_cell_type_by_comparison, groupby=groupby, n_top_genes=n_top_genes, label_column=label_column, tissue_of_origin_col=tissue_of_origin_col)
 
 
-def ai_annotate_cell_type_by_comparison(adata, groupby, n_top_genes, label_column='ai_cell_sub_type', tissue_of_origin_col=None, key=None):
+def ai_annotate_cell_type_by_comparison(adata, groupby, n_top_genes, label_column='ai_cell_sub_type', tissue_of_origin_col=None, adt_key=None):
     """
     Annotate cell types by comparison using AI.
 
@@ -1210,7 +1210,7 @@ def ai_annotate_cell_type_by_comparison(adata, groupby, n_top_genes, label_colum
             raise ValueError(f"Multiple tissues of_origin found in adata.obs[{tissue_of_origin_col}]. Currently must have only one tissue of origin per cell type. Pick a different tissue of origin column or set tissue_of_origin_col=None")
     else:
         tissue = None
-    return ai_annotate_by_comparison(func=ai_cell_types_by_comparison, adata=adata, groupby=groupby, n_top_genes=n_top_genes, label_column=label_column, cell_type=key, tissue=tissue)
+    return ai_annotate_by_comparison(func=ai_cell_types_by_comparison, adata=adata, groupby=groupby, n_top_genes=n_top_genes, label_column=label_column, cell_type=adt_key, tissue=tissue)
 
 
 def ai_annotate_biological_process(adata, groupby, n_top_genes, label_column='ai_biological_process'):
@@ -1367,7 +1367,7 @@ def ai_unify_labels(adata_dict, label_columns, new_label_column, simplification_
     def get_unique_labels_from_obs_column(adata, label_column):
         return adata.obs[label_column].unique().tolist()
 
-    def apply_mapping_to_adata(adata, mapping_dict, original_column, new_column, key=None):
+    def apply_mapping_to_adata(adata, mapping_dict, original_column, new_column, adt_key=None):
         adata.obs[new_column] = adata.obs[original_column].map(mapping_dict)
 
     # Step 1: Aggregate all labels

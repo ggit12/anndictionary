@@ -672,14 +672,14 @@ def plot_sankey(adata, cols, params=None):
 
     return sankey
 
-def save_sankey(plot, filename, key = None):
+def save_sankey(plot, filename, adt_key=None):
     """
     Save a Holoviews Sankey plot as an SVG file.
 
     Parameters:
     plot : Holoviews plot, The Sankey plot to save.
     filename : str Base filename for the output SVG file.
-    key : str, optional Optional identifier to append to the filename.
+    adt_key : str, optional Optional identifier to append to the filename.
     """
     import holoviews as hv
     from bokeh.io.webdriver import webdriver_control
@@ -688,10 +688,10 @@ def save_sankey(plot, filename, key = None):
     # Reset web driver because sometimes the max connections is hit when writing plots
     webdriver_control.reset()
 
-    # Remove '.svg' if it exists and append '{key}.svg'
+    # Remove '.svg' if it exists and append '{adt_key}.svg'
     filename = os.path.splitext(filename)[0]
-    if key:
-        filename += f"_{key}"
+    if adt_key:
+        filename += f"_{adt_key}"
     filename += ".svg"
 
     plot = hv.render(plot)
@@ -699,7 +699,7 @@ def save_sankey(plot, filename, key = None):
 
     export_svgs(plot, filename=filename)
 
-def plot_grouped_average(adata, label_value, key=None):
+def plot_grouped_average(adata, label_value, adt_key=None):
     """
     Plots the average values specified in label_value across each group of label_keys in an AnnData object.
 
@@ -708,7 +708,7 @@ def plot_grouped_average(adata, label_value, key=None):
     - label_value: dict, keys are the keys in adata.obs for grouping, values are the keys in adata.obs for the values to average.
     - key: to print specified key
     """
-    print(key)
+    print(adt_key)
     if not all(label in adata.obs for label in label_value.keys()):
         missing_keys = [label for label in label_value.keys() if label not in adata.obs]
         raise ValueError(f"Label key(s) {missing_keys} not found in adata.obs.")
