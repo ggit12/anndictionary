@@ -127,6 +127,10 @@
 <li class="toctree-l2"><a class="reference internal" href="#anndict.utils.convert_obs_index_to_str"><code class="docutils literal notranslate"><span class="pre">convert_obs_index_to_str()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#anndict.utils.create_color_map"><code class="docutils literal notranslate"><span class="pre">create_color_map()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#anndict.utils.UCE_adata"><code class="docutils literal notranslate"><span class="pre">UCE_adata()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#anndict.ai.configure_boto3_client"><code class="docutils literal notranslate"><span class="pre">configure_boto3_client()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#anndict.ai.bedrock_init"><code class="docutils literal notranslate"><span class="pre">bedrock_init()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#anndict.ai.azureml_init"><code class="docutils literal notranslate"><span class="pre">azureml_init()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#anndict.ai.default_init"><code class="docutils literal notranslate"><span class="pre">default_init()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#anndict.ai.configure_llm_backend"><code class="docutils literal notranslate"><span class="pre">configure_llm_backend()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#anndict.ai.get_llm_config"><code class="docutils literal notranslate"><span class="pre">get_llm_config()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#anndict.ai.get_llm"><code class="docutils literal notranslate"><span class="pre">get_llm()</span></code></a></li>
@@ -1133,8 +1137,46 @@ UCE_adata([“../dat/liver.h5ad”, “../dat/kidney.h5ad”])</p>
 </dd></dl>
 
 <dl class="py function" id="module-anndict.ai">
+<dt class="sig sig-object py" id="anndict.ai.configure_boto3_client">
+<span class="sig-prename descclassname"><span class="pre">anndict.ai.</span></span><span class="sig-name descname"><span class="pre">configure_boto3_client</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">service_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">region_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aws_access_key_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aws_secret_access_key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/ai.html#configure_boto3_client"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.ai.configure_boto3_client" title="Link to this definition"></a></dt>
+<dd><p>Configures and returns a boto3 client for the specified AWS service.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>service_name</strong> – Name of the AWS service (e.g., ‘bedrock-runtime’)</p></li>
+<li><p><strong>region_name</strong> – AWS region name</p></li>
+<li><p><strong>aws_access_key_id</strong> – AWS access key ID</p></li>
+<li><p><strong>aws_secret_access_key</strong> – AWS secret access key</p></li>
+<li><p><strong>kwargs</strong> – Additional arguments to pass to boto3.client</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Configured boto3 client</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="anndict.ai.bedrock_init">
+<span class="sig-prename descclassname"><span class="pre">anndict.ai.</span></span><span class="sig-name descname"><span class="pre">bedrock_init</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">constructor_args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/ai.html#bedrock_init"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.ai.bedrock_init" title="Link to this definition"></a></dt>
+<dd><p>Initialization function for Bedrock</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="anndict.ai.azureml_init">
+<span class="sig-prename descclassname"><span class="pre">anndict.ai.</span></span><span class="sig-name descname"><span class="pre">azureml_init</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">constructor_args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/anndict/ai.html#azureml_init"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.ai.azureml_init" title="Link to this definition"></a></dt>
+<dd><p>Initialization function for AzureML Endpoint</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="anndict.ai.default_init">
+<span class="sig-prename descclassname"><span class="pre">anndict.ai.</span></span><span class="sig-name descname"><span class="pre">default_init</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">constructor_args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/ai.html#default_init"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.ai.default_init" title="Link to this definition"></a></dt>
+<dd><p>Default initialization function that does nothing</p>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="anndict.ai.configure_llm_backend">
-<span class="sig-prename descclassname"><span class="pre">anndict.ai.</span></span><span class="sig-name descname"><span class="pre">configure_llm_backend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">provider</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">api_key</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/ai.html#configure_llm_backend"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.ai.configure_llm_backend" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">anndict.ai.</span></span><span class="sig-name descname"><span class="pre">configure_llm_backend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">provider</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/ai.html#configure_llm_backend"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.ai.configure_llm_backend" title="Link to this definition"></a></dt>
 <dd><p>Configures the LLM backend by setting environment variables.</p>
 </dd></dl>
 
