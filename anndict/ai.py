@@ -31,48 +31,45 @@ import importlib
 from typing import List, Dict, Any
 from langchain.llms.base import BaseLLM
 from langchain.schema import HumanMessage, AIMessage, SystemMessage, BaseMessage
+import boto3
+import json
 
 #LLM configuration
-def configure_boto3_client(service_name, region_name=None, aws_access_key_id=None, aws_secret_access_key=None, **kwargs):
-    """
-    Configures and returns a boto3 client for the specified AWS service.
-    
-    :param service_name: Name of the AWS service (e.g., 'bedrock-runtime')
-    :param region_name: AWS region name
-    :param aws_access_key_id: AWS access key ID
-    :param aws_secret_access_key: AWS secret access key
-    :param kwargs: Additional arguments to pass to boto3.client
-    :return: Configured boto3 client
-    """
-    import boto3
-    
-    client_kwargs = {}
-    if region_name:
-        client_kwargs['region_name'] = region_name
-    if aws_access_key_id and aws_secret_access_key:
-        client_kwargs['aws_access_key_id'] = aws_access_key_id
-        client_kwargs['aws_secret_access_key'] = aws_secret_access_key
-    
-    # Add any additional kwargs
-    client_kwargs.update(kwargs)
-    
-    return boto3.client(service_name, **client_kwargs)
-
-def bedrock_init(constructor_args):
+def bedrock_init(constructor_args: Dict[str, Any]) -> Dict[str, Any]:
     """Initialization function for Bedrock"""
-    region_name = constructor_args.pop('region_name', None)
-    aws_access_key_id = constructor_args.pop('aws_access_key_id', None)
-    aws_secret_access_key = constructor_args.pop('aws_secret_access_key', None)
+    # Retrieve values from environment variables
+    region_name = os.environ.get('LLM_REGION_NAME')
+    aws_access_key_id = os.environ.get('LLM_AWS_ACCESS_KEY_ID')
+    aws_secret_access_key = os.environ.get('LLM_AWS_SECRET_ACCESS_KEY')
+    model_id = os.environ.get('LLM_MODEL')  # This comes from the 'model' parameter in configure_llm_backend
     
-    if not all([region_name, aws_access_key_id, aws_secret_access_key]):
-        raise ValueError("Bedrock requires region_name, aws_access_key_id, and aws_secret_access_key to be set.")
+    if not region_name:
+        raise ValueError("Bedrock requires LLM_REGION_NAME to be set in environment variables.")
     
-    bedrock_client = configure_boto3_client('bedrock-runtime', 
-                                            region_name=region_name,
-                                            aws_access_key_id=aws_access_key_id,
-                                            aws_secret_access_key=aws_secret_access_key)
-    constructor_args['client'] = bedrock_client
-    return constructor_args
+    if not model_id:
+        raise ValueError("model_id (LLM_MODEL) is required for BedrockChat")
+    
+    # Create a boto3 session with explicit credentials if provided
+    session = boto3.Session(
+        aws_access_key_id=aws_access_key_id,
+        aws_secret_access_key=aws_secret_access_key,
+        region_name=region_name
+    )
+    
+    bedrock_client = session.client('bedrock-runtime')
+    
+    # Create a new dict with only the allowed parameters
+    allowed_params = ['model', 'client', 'streaming', 'callbacks']
+    filtered_args = {k: v for k, v in constructor_args.items() if k in allowed_params}
+    
+    # filtered_args['model_id'] = model_id
+    filtered_args['client'] = bedrock_client
+    
+    # Add a debug print to see what's being passed to BedrockChat
+    # print(f"BedrockChat constructor args: {json.dumps(filtered_args, default=str, indent=2)}")
+    
+    return filtered_args
+
 
 def azureml_init(constructor_args: Dict[str, Any]) -> Dict[str, Any]:
     """Initialization function for AzureML Endpoint"""
@@ -131,8 +128,8 @@ PROVIDER_MAPPING = {
         'init_func': default_init
     },
     'bedrock': {
-        'class': 'BedrockChat',
-        'module': 'langchain_community.chat_models.bedrock',
+        'class': 'ChatBedrockConverse',
+        'module': 'langchain_aws.chat_models.bedrock_converse',
         'init_func': bedrock_init
     },
     'cohere': {
@@ -218,32 +215,44 @@ PROVIDER_MODELS = {
         'codechat-bison-001'
     ],
     'bedrock' :[
-        
-    ],
-    'mistral': [
-        'mistral-large-latest',
-        'mistral-medium-latest',
-        'mistral-small-latest',
-        'mistral-tiny-latest'
-    ],
-    'cohere': [
-        'command',
-        'command-light',
-        'command-nightly',
-        'command-light-nightly',
-        'embed-english-v3.0',
-        'embed-multilingual-v3.0'
-    ],
-    'ai21': [
-        'j2-ultra-v2',
-        'j2-mid-v2',
-        'j2-light-v2',
-        'j3-ultra',  
-        'j3-mid',  
-        'j3-light',  
-        'j2-ultra',
-        'j2-mid',
-        'j2-light'
+        'ai21.jamba-instruct-v1:0',
+        'ai21.j2-mid-v1',
+        'ai21.j2-ultra-v1',
+        'amazon.titan-text-express-v1',
+        'amazon.titan-text-lite-v1',
+        'amazon.titan-text-premier-v1:0',
+        'amazon.titan-embed-text-v1',
+        'amazon.titan-embed-text-v2:0',
+        'amazon.titan-embed-image-v1',
+        'amazon.titan-image-generator-v1',
+        'amazon.titan-image-generator-v2:0',
+        'anthropic.claude-v2',
+        'anthropic.claude-v2:1',
+        'anthropic.claude-3-sonnet-20240229-v1:0',
+        'anthropic.claude-3-5-sonnet-20240620-v1:0',
+        'anthropic.claude-3-haiku-20240307-v1:0',
+        'anthropic.claude-3-opus-20240229-v1:0',
+        'anthropic.claude-instant-v1',
+        'cohere.command-text-v14',
+        'cohere.command-light-text-v14',
+        'cohere.command-r-v1:0',
+        'cohere.command-r-plus-v1:0',
+        'cohere.embed-english-v3',
+        'cohere.embed-multilingual-v3',
+        'meta.llama2-13b-chat-v1',
+        'meta.llama2-70b-chat-v1',
+        'meta.llama3-8b-instruct-v1:0',
+        'meta.llama3-70b-instruct-v1:0',
+        'meta.llama3-1-8b-instruct-v1:0',
+        'meta.llama3-1-70b-instruct-v1:0',
+        'meta.llama3-1-405b-instruct-v1:0',
+        'mistral.mistral-7b-instruct-v0:2',
+        'mistral.mixtral-8x7b-instruct-v0:1',
+        'mistral.mistral-large-2402-v1:0',
+        'mistral.mistral-large-2407-v1:0',
+        'mistral.mistral-small-2402-v1:0',
+        'stability.stable-diffusion-xl-v0',
+        'stability.stable-diffusion-xl-v1'
     ],
     'huggingface': [
         'falcon-40b',
@@ -273,15 +282,23 @@ PROVIDER_MODELS = {
 
 def configure_llm_backend(provider, model, **kwargs):
     """Configures the LLM backend by setting environment variables."""
+    global _llm_instance
     provider_info = PROVIDER_MAPPING.get(provider.lower())
     if not provider_info:
         raise ValueError(f"Unsupported provider: {provider}")
+    
+    # Clean up old LLM_ environment variables
+    for key in list(os.environ.keys()):
+        if key.startswith('LLM_'):
+            del os.environ[key]
     
     os.environ['LLM_PROVIDER'] = provider.lower()
     os.environ['LLM_MODEL'] = model
     
     for key, value in kwargs.items():
         os.environ[f'LLM_{key.upper()}'] = str(value)
+
+    _llm_instance = None
 
 #Reference configure_llm_backend calls
 
@@ -367,6 +384,29 @@ def call_llm(messages, **kwargs):
     
     response = llm(langchain_messages, **kwargs)
     return response.content.strip()
+
+# def call_llm(messages, **kwargs):
+#     """Calls the configured LLM provider with the given parameters."""
+#     llm = get_llm()
+#     message_types = {
+#         'system': SystemMessage,
+#         'user': HumanMessage,
+#         'assistant': AIMessage
+#     }
+#     langchain_messages = [
+#         message_types.get(msg['role'], HumanMessage)(content=msg['content'])
+#         for msg in messages
+#     ]
+    
+#     try:
+#         response = llm.invoke(langchain_messages, **kwargs)
+#         return response.content.strip()
+#     except Exception as e:
+#         print(f"Error calling LLM: {str(e)}")
+#         print(f"LLM type: {type(llm)}")
+#         print(f"Messages: {json.dumps(messages, indent=2)}")
+#         print(f"Additional kwargs: {json.dumps(kwargs, default=str, indent=2)}")
+#         raise
 
 
 def enforce_semantic_list(lst):
