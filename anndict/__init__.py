@@ -24,6 +24,10 @@ from .utils import (
 )
 
 from .ai import (
+    configure_boto3_client,
+    bedrock_init,
+    azureml_init,
+    default_init,
     configure_llm_backend, 
     get_llm_config, 
     get_llm, 
@@ -283,5 +287,8 @@ __all__ = [
     'convert_obs_col_to_string',
     'plot_model_agreement',
     'convert_obs_index_to_str', 
-
+    'configure_boto3_client',
+    'bedrock_init',
+    'azureml_init',
+    'default_init'
 ]
