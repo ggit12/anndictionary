@@ -23,6 +23,10 @@ setup(
         'harmonypy',
         'langchain', 
         'langchain-community', 
+        'langchain-openai',
+        'langchain-anthropic',
+        'langchain-google-genai', 
+        'langchain-aws',
         'boto3',
         'bokeh',
         'holoviews'
