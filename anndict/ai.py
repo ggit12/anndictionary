@@ -35,7 +35,7 @@ import boto3
 import json
 
 #LLM configuration
-def bedrock_init(constructor_args: Dict[str, Any]) -> Dict[str, Any]:
+def bedrock_init(constructor_args: Dict[str, Any], **kwargs) -> Dict[str, Any]:
     """Initialization function for Bedrock"""
     # Retrieve values from environment variables
     region_name = os.environ.get('LLM_REGION_NAME')
@@ -68,10 +68,10 @@ def bedrock_init(constructor_args: Dict[str, Any]) -> Dict[str, Any]:
     # Add a debug print to see what's being passed to BedrockChat
     # print(f"BedrockChat constructor args: {json.dumps(filtered_args, default=str, indent=2)}")
     
-    return filtered_args
+    return filtered_args, kwargs
 
 
-def azureml_init(constructor_args: Dict[str, Any]) -> Dict[str, Any]:
+def azureml_init(constructor_args: Dict[str, Any], **kwargs) -> Dict[str, Any]:
     """Initialization function for AzureML Endpoint"""
     from langchain_community.chat_models.azureml_endpoint import (
         AzureMLEndpointApiType,
@@ -90,21 +90,30 @@ def azureml_init(constructor_args: Dict[str, Any]) -> Dict[str, Any]:
     constructor_args['endpoint_api_key'] = api_key
     constructor_args['content_formatter'] = LlamaChatContentFormatter()
     
-    return constructor_args
+    return constructor_args, kwargs
 
-def default_init(constructor_args):
+def google_genai_init(constructor_args, **kwargs):
+    """Initialization function for Google (Gemini) API."""
+    if 'max_tokens' in kwargs:
+        constructor_args['max_output_tokens'] = kwargs.pop('max_tokens')
+    if 'temperature' in kwargs:
+        constructor_args['temperature'] = kwargs.pop('temperature')
+    # For Google, we've handled these in the constructor, so we return empty kwargs
+    return constructor_args, {}
+
+def default_init(constructor_args, **kwargs):
     """Default initialization function that does nothing"""
-    return constructor_args
+    return constructor_args, kwargs
 
 PROVIDER_MAPPING = {
     'openai': {
         'class': 'ChatOpenAI',
-        'module': 'langchain_community.chat_models.openai',
+        'module': 'langchain_openai.chat_models',
         'init_func': default_init
     },
     'anthropic': {
         'class': 'ChatAnthropic',
-        'module': 'langchain_community.chat_models.anthropic',
+        'module': 'langchain_anthropic.chat_models',
         'init_func': default_init
     },
     'azure_openai': {
@@ -118,9 +127,9 @@ PROVIDER_MAPPING = {
         'init_func': azureml_init
     },
     'google': {
-        'class': 'ChatGoogle',
-        'module': 'langchain_community.chat_models.google',
-        'init_func': default_init
+        'class': 'ChatGoogleGenerativeAI',
+        'module': 'langchain_google_genai.chat_models',
+        'init_func': google_genai_init
     },
     'google_palm': {
         'class': 'ChatGooglePalm',
@@ -190,7 +199,7 @@ PROVIDER_MODELS = {
     ],
     'anthropic': [
         'claude-3-opus-20240229',
-        'claude-3.5-sonnet-20240620',
+        'claude-3-5-sonnet-20240620',
         'claude-3-sonnet-20240229',
         'claude-3-haiku-20240307',
         'claude-2.1',
@@ -204,15 +213,8 @@ PROVIDER_MODELS = {
     ],
     'google': [
         'gemini-1.0-pro',
-        'gemini-1.0-pro-vision',
-        'gemini-1.0-ultra',
-        'gemini-1.5-pro',  
-        'gemini-1.5-pro-vision',  
-        'gemini-ultra',  
-        'palm-2',
-        'text-bison-001',
-        'chat-bison-001',
-        'codechat-bison-001'
+        'gemini-1.5-pro', 
+        'gemini-1.5-flash'
     ],
     'bedrock' :[
         'ai21.jamba-instruct-v1:0',
@@ -344,11 +346,11 @@ def get_llm_config():
 
 _llm_instance = None
 
-def get_llm():
+def get_llm(**kwargs):
     """Dynamically retrieves the appropriate LLM based on the configuration."""
     global _llm_instance
-    if _llm_instance is not None:
-        return _llm_instance
+    # if _llm_instance is not None:
+    #     return _llm_instance
     
     config = get_llm_config()
     try:
@@ -360,8 +362,8 @@ def get_llm():
         
         # Run provider-specific initialization
         init_func = PROVIDER_MAPPING[config['provider']]['init_func']
-        constructor_args = init_func(constructor_args)
-        
+        constructor_args, _ = init_func(constructor_args, **kwargs)
+        # print(constructor_args)
         _llm_instance = llm_class(**constructor_args)
         
         return _llm_instance
@@ -370,7 +372,8 @@ def get_llm():
 
 def call_llm(messages, **kwargs):
     """Calls the configured LLM provider with the given parameters."""
-    llm = get_llm()
+    config = get_llm_config()
+    llm = get_llm(**kwargs)
     
     message_types = {
         'system': SystemMessage,
@@ -381,8 +384,13 @@ def call_llm(messages, **kwargs):
         message_types.get(msg['role'], HumanMessage)(content=msg['content'])
         for msg in messages
     ]
+
+        # Get the provider-specific parameter handler
+    _, kwargs = PROVIDER_MAPPING[config['provider']]['init_func']({}, **kwargs)
     
+    # Call the LLM with the processed parameters
     response = llm(langchain_messages, **kwargs)
+
     return response.content.strip()
 
 # def call_llm(messages, **kwargs):
