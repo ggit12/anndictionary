@@ -33,63 +33,145 @@ from langchain.llms.base import BaseLLM
 from langchain.schema import HumanMessage, AIMessage, SystemMessage, BaseMessage
 
 #LLM configuration
+def configure_boto3_client(service_name, region_name=None, aws_access_key_id=None, aws_secret_access_key=None, **kwargs):
+    """
+    Configures and returns a boto3 client for the specified AWS service.
+    
+    :param service_name: Name of the AWS service (e.g., 'bedrock-runtime')
+    :param region_name: AWS region name
+    :param aws_access_key_id: AWS access key ID
+    :param aws_secret_access_key: AWS secret access key
+    :param kwargs: Additional arguments to pass to boto3.client
+    :return: Configured boto3 client
+    """
+    import boto3
+    
+    client_kwargs = {}
+    if region_name:
+        client_kwargs['region_name'] = region_name
+    if aws_access_key_id and aws_secret_access_key:
+        client_kwargs['aws_access_key_id'] = aws_access_key_id
+        client_kwargs['aws_secret_access_key'] = aws_secret_access_key
+    
+    # Add any additional kwargs
+    client_kwargs.update(kwargs)
+    
+    return boto3.client(service_name, **client_kwargs)
+
+def bedrock_init(constructor_args):
+    """Initialization function for Bedrock"""
+    region_name = constructor_args.pop('region_name', None)
+    aws_access_key_id = constructor_args.pop('aws_access_key_id', None)
+    aws_secret_access_key = constructor_args.pop('aws_secret_access_key', None)
+    
+    if not all([region_name, aws_access_key_id, aws_secret_access_key]):
+        raise ValueError("Bedrock requires region_name, aws_access_key_id, and aws_secret_access_key to be set.")
+    
+    bedrock_client = configure_boto3_client('bedrock-runtime', 
+                                            region_name=region_name,
+                                            aws_access_key_id=aws_access_key_id,
+                                            aws_secret_access_key=aws_secret_access_key)
+    constructor_args['client'] = bedrock_client
+    return constructor_args
+
+def azureml_init(constructor_args: Dict[str, Any]) -> Dict[str, Any]:
+    """Initialization function for AzureML Endpoint"""
+    from langchain_community.chat_models.azureml_endpoint import (
+        AzureMLEndpointApiType,
+        LlamaChatContentFormatter,
+    )
+    
+    endpoint_name = constructor_args.pop('endpoint_name', None)
+    region = constructor_args.pop('region', None)
+    api_key = constructor_args.pop('api_key', None)
+    
+    if not all([endpoint_name, region, api_key]):
+        raise ValueError("AzureML requires endpoint_name, region, and api_key to be set.")
+    
+    constructor_args['endpoint_url'] = f"https://{endpoint_name}.{region}.inference.ai.azure.com/v1/chat/completions"
+    constructor_args['endpoint_api_type'] = AzureMLEndpointApiType.serverless
+    constructor_args['endpoint_api_key'] = api_key
+    constructor_args['content_formatter'] = LlamaChatContentFormatter()
+    
+    return constructor_args
+
+def default_init(constructor_args):
+    """Default initialization function that does nothing"""
+    return constructor_args
+
+PROVIDER_MAPPING = {
+    'openai': {
+        'class': 'ChatOpenAI',
+        'module': 'langchain_community.chat_models.openai',
+        'init_func': default_init
+    },
+    'anthropic': {
+        'class': 'ChatAnthropic',
+        'module': 'langchain_community.chat_models.anthropic',
+        'init_func': default_init
+    },
+    'azure_openai': {
+        'class': 'AzureChatOpenAI',
+        'module': 'langchain_community.chat_models.azure_openai',
+        'init_func': default_init
+    },
+    'azureml_endpoint': {
+        'class': 'AzureMLChatOnlineEndpoint',
+        'module': 'langchain_community.chat_models.azureml_endpoint',
+        'init_func': azureml_init
+    },
+    'google': {
+        'class': 'ChatGoogle',
+        'module': 'langchain_community.chat_models.google',
+        'init_func': default_init
+    },
+    'google_palm': {
+        'class': 'ChatGooglePalm',
+        'module': 'langchain_community.chat_models.google_palm',
+        'init_func': default_init
+    },
+    'bedrock': {
+        'class': 'BedrockChat',
+        'module': 'langchain_community.chat_models.bedrock',
+        'init_func': bedrock_init
+    },
+    'cohere': {
+        'class': 'ChatCohere',
+        'module': 'langchain_community.chat_models.cohere',
+        'init_func': default_init
+    },
+    'huggingface': {
+        'class': 'ChatHuggingFace',
+        'module': 'langchain_community.chat_models.huggingface',
+        'init_func': default_init
+    },
+    'vertexai': {
+        'class': 'ChatVertexAI',
+        'module': 'langchain_community.chat_models.vertexai',
+        'init_func': default_init
+    },
+    'ollama': {
+        'class': 'ChatOllama',
+        'module': 'langchain_community.chat_models.ollama',
+        'init_func': default_init
+    }
+}
+
+#list of models and providers for reference (PROVIDERS and PROVIDER_MODELS are not used in the code):
 PROVIDERS = [
     'openai',
     'anthropic',
     'google',
-    'meta',
     'mistral',
     'cohere',
     'ai21',
     'huggingface',
     'nvidia_bionemo',
-    'ibm_watson'
+    'ibm_watson',
+    'azureml_endpoint',
+    'bedrock'
 ]
 
-PROVIDER_MAPPING = {
-    'openai': {
-        'class': 'ChatOpenAI',
-        'api_key_env_var': 'OPENAI_API_KEY'
-    },
-    'anthropic': {
-        'class': 'ChatAnthropic',
-        'api_key_env_var': 'ANTHROPIC_API_KEY'
-    },
-    'google': {
-        'class': 'ChatGoogle',
-        'api_key_env_var': 'GOOGLE_API_KEY'
-    },
-    'meta': {
-        'class': 'ChatMeta',
-        'api_key_env_var': 'META_API_KEY'
-    },
-    'mistral': {
-        'class': 'ChatMistral',
-        'api_key_env_var': 'MISTRAL_API_KEY'
-    },
-    'cohere': {
-        'class': 'ChatCohere',
-        'api_key_env_var': 'COHERE_API_KEY'
-    },
-    'ai21': {
-        'class': 'ChatAI21',
-        'api_key_env_var': 'AI21_API_KEY'
-    },
-    'huggingface': {
-        'class': 'ChatHuggingFace',
-        'api_key_env_var': 'HUGGINGFACE_API_KEY'
-    },
-    'nvidia_bionemo': {
-        'class': 'ChatBioNeMo',
-        'api_key_env_var': 'NVIDIA_BIONEMO_API_KEY'
-    },
-    'ibm_watson': {
-        'class': 'ChatIBMWatson',
-        'api_key_env_var': 'IBM_WATSON_API_KEY'
-    }
-}
-
-#list of models provided for reference:
 PROVIDER_MODELS = {
     'openai': [
         'gpt-4o',  
@@ -118,6 +200,11 @@ PROVIDER_MODELS = {
         'claude-2.0',
         'claude-instant-1.2'
     ],
+    'azureml_endpoint': [
+        'Meta-Llama-3.1-405B-Instruct-adt',
+        'Meta-Llama-3.1-70B-Instruct-adt',
+        'Meta-Llama-3.1-8B-Instruct-adt'
+    ],
     'google': [
         'gemini-1.0-pro',
         'gemini-1.0-pro-vision',
@@ -130,26 +217,8 @@ PROVIDER_MODELS = {
         'chat-bison-001',
         'codechat-bison-001'
     ],
-    'meta': [
-        'llama-3-70b-chat',  
-        'llama-3-13b-chat',  
-        'llama-3-7b-chat',  
-        'llama-3-70b',  
-        'llama-3-13b',  
-        'llama-3-7b',  
-        'llama-3.1-70b-chat',  
-        'llama-3.1-13b-chat',  
-        'llama-3.1-7b-chat',  
-        'llama-3.1-70b',  
-        'llama-3.1-13b',  
-        'llama-3.1-7b',  
-        'meta-llama-3.1-405b-instruct',  
-        'llama-2-70b-chat',
-        'llama-2-13b-chat',
-        'llama-2-7b-chat',
-        'llama-2-70b',
-        'llama-2-13b',
-        'llama-2-7b'
+    'bedrock' :[
+        
     ],
     'mistral': [
         'mistral-large-latest',
@@ -202,15 +271,41 @@ PROVIDER_MODELS = {
     ]
 }
 
-def configure_llm_backend(provider, model, api_key):
+def configure_llm_backend(provider, model, **kwargs):
     """Configures the LLM backend by setting environment variables."""
     provider_info = PROVIDER_MAPPING.get(provider.lower())
     if not provider_info:
         raise ValueError(f"Unsupported provider: {provider}")
-
+    
     os.environ['LLM_PROVIDER'] = provider.lower()
     os.environ['LLM_MODEL'] = model
-    os.environ[provider_info['api_key_env_var']] = api_key
+    
+    for key, value in kwargs.items():
+        os.environ[f'LLM_{key.upper()}'] = str(value)
+
+#Reference configure_llm_backend calls
+
+# General (for most providers)
+# configure_llm_backend('your-provider-name', # see keys of PROVIDER_MAPPING for valid providers
+#                       'your-provider-model-name', #see PROVIDER_MODELS for valid models from each provider
+#                       api_key='your-provider-api-key') #this is a provider-specific API key that you will have to obtain from your specified provider
+
+#For general example
+# configure_llm_backend('openai', 'gpt-3.5-turbo', api_key='your-openai-api-key')
+
+# AzureML Endpoint and Bedrock are currently the only two providers with special configuration calls:
+
+# For AzureML Endpoint
+# configure_llm_backend('azureml_endpoint', 'llama-2',
+#                       endpoint_name='your-endpoint-name',
+#                       region='your-region',
+#                       api_key='your-api-key')
+
+# For Bedrock
+# configure_llm_backend('bedrock', 'anthropic.claude-v2', 
+#                       region_name='us-west-2',
+#                       aws_access_key_id='your-access-key-id',
+#                       aws_secret_access_key='your-secret-access-key')
 
 def get_llm_config():
     """Retrieves the LLM configuration from environment variables."""
@@ -220,13 +315,15 @@ def get_llm_config():
     
     if not provider_info:
         raise ValueError(f"Unsupported provider: {provider}")
-
-    api_key = os.getenv(provider_info['api_key_env_var'])
-
-    if not all([provider, model, api_key]):
-        raise ValueError("LLM configuration is not set. Please call configure_llm_backend() first.")
-
-    return {'provider': provider, 'model': model, 'api_key': api_key, 'class': provider_info['class']}
+    
+    config = {'provider': provider, 'model': model, 'class': provider_info['class'], 'module': provider_info['module']}
+    
+    # Add all LLM_ prefixed environment variables to the config
+    for key, value in os.environ.items():
+        if key.startswith('LLM_') and key not in ['LLM_PROVIDER', 'LLM_MODEL']:
+            config[key[4:].lower()] = value
+    
+    return config
 
 _llm_instance = None
 
@@ -235,15 +332,24 @@ def get_llm():
     global _llm_instance
     if _llm_instance is not None:
         return _llm_instance
-
+    
     config = get_llm_config()
     try:
-        module = importlib.import_module("langchain_community.chat_models")
+        module = importlib.import_module(config['module'])
         llm_class = getattr(module, config['class'])
-        _llm_instance = llm_class(model=config['model'], api_key=config['api_key'])
+        
+        # Remove 'class' and 'module' from config before passing to the constructor
+        constructor_args = {k: v for k, v in config.items() if k not in ['class', 'module', 'provider']}
+        
+        # Run provider-specific initialization
+        init_func = PROVIDER_MAPPING[config['provider']]['init_func']
+        constructor_args = init_func(constructor_args)
+        
+        _llm_instance = llm_class(**constructor_args)
+        
         return _llm_instance
-    except (ImportError, AttributeError):
-        raise ValueError(f"Unsupported provider: {config['provider']}. Ensure the provider is supported by LangChain.")
+    except (ImportError, AttributeError) as e:
+        raise ValueError(f"Error initializing provider {config['provider']}: {str(e)}")
 
 def call_llm(messages, **kwargs):
     """Calls the configured LLM provider with the given parameters."""
