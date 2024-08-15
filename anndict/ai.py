@@ -93,13 +93,17 @@ def azureml_init(constructor_args: Dict[str, Any], **kwargs) -> Dict[str, Any]:
     return constructor_args, kwargs
 
 def google_genai_init(constructor_args, **kwargs):
-    """Initialization function for Google (Gemini) API."""
+    """Initialization function for Google (Gemini) API. Among other things, sets GRPC_VERBOSITY env variable to ERROR."""
     if 'max_tokens' in kwargs:
         constructor_args['max_output_tokens'] = kwargs.pop('max_tokens')
     if 'temperature' in kwargs:
         constructor_args['temperature'] = kwargs.pop('temperature')
 
     constructor_args['convert_system_message_to_human'] = True
+
+    #Google API will send ignorable warnings if you are on mac, so supress them by setting this env var
+    os.environ['GRPC_VERBOSITY'] = 'ERROR'
+
     # For Google, we've handled these in the constructor, so we return empty kwargs
     return constructor_args, {}
 
@@ -401,7 +405,7 @@ def call_llm(messages, **kwargs):
         for msg in messages
     ]
 
-        # Get the provider-specific parameter handler
+    # Get the provider-specific parameter handler
     _, kwargs = PROVIDER_MAPPING[config['provider']]['init_func']({}, **kwargs)
     
     # Call the LLM with the processed parameters
@@ -732,8 +736,8 @@ def ai_cell_types_by_comparison(gene_lists, cell_type=None, tissue=None):
     
     cell_types = []
     
-    print(f"annotating {tissue if tissue else ''} {cell_type if cell_type else ''}")
-    print(f"number of gene lists being compared (i.e. subclusters of {cell_type if cell_type else ''}): {len(gene_lists)}")
+    # print(f"annotating {tissue if tissue else ''} {cell_type if cell_type else ''}")
+    # print(f"number of gene lists being compared (i.e. subclusters of {cell_type if cell_type else ''}): {len(gene_lists)}")
     # Prepare the base prompt
     #  {f'These cells are from {tissue} tissue. ' if tissue else ''}
     system_prompt = f"You are a terse molecular biologist. In a few words and without restating any part of the question, describe the single most likely cell subtype represented by each of the following sets of marker genes by comparing the gene sets. Repeat labels if necessary to provide one label per input gene set. Example:\n{f'{tissue} ' if tissue else ' '}{'T cells' if cell_type else ''}\nCD4    CD28    CXCR4    IL7R\nCD8A    GZMB    PRF1    IFNG\nCD8A    GZMB    PRF1    CD3D\nFOXP3    IL2RA    CTLA4    TNFRSF18\n->\nCD4+ T helper cells\nCD8+ Cytotoxic T cells\nCD8+ Cytotoxic T cells\nRegulatory T cells"
