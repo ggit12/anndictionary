@@ -1201,7 +1201,7 @@ def ai_annotate_cell_type_by_comparison(adata, groupby, n_top_genes, label_colum
     Returns:
     AnnData Annotated data with AI-generated cell type labels.
     """
-    print(f"number of unique categories: {len(adata.obs[groupby].unique())}")
+    # print(f"number of unique categories: {len(adata.obs[groupby].unique())}")
     if tissue_of_origin_col:
         tissue = adata.obs[tissue_of_origin_col].unique()
         if len(tissue == 1):
@@ -1452,8 +1452,8 @@ def ai_compare_cell_type_labels(adata, cols, new_col_name='agreement', compariso
         label_agreement[new_col_name] = label_agreement[raw_col_name].str.lower().apply(lambda x: 0 if x == 'no match' else 1 if x == 'partial match' else 2 if x == 'perfect match' else None)
     
     # Merge 'agreement' column of label_agreement back to adata.obs
-    print(label_agreement)
-    print(cols)
+    # print(label_agreement)
+    # print(cols)
     adata.obs = adata.obs.merge(label_agreement, on=cols, how='left')
 
     return label_agreement
