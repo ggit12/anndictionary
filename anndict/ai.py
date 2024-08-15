@@ -413,6 +413,43 @@ def call_llm(messages, **kwargs):
 
     return response.content.strip()
 
+def retry_llm_call(messages, process_response, failure_handler, max_attempts=10, llm_kwargs=None, failure_kwargs=None):
+    """
+    A generic wrapper for LLM calls that implements retry logic with custom processing and failure handling.
+    
+    Args:
+    messages (list): The messages or prompt to send to the LLM.
+    process_response (callable): A function that takes the LLM output and attempts to process it into the desired result.
+    failure_handler (callable): A function to call if max_attempts is reached without successful processing.
+    max_attempts (int): Maximum number of attempts before calling the failure_handler function.
+    llm_kwargs (dict): Keyword arguments to pass to the LLM call function.
+    failure_kwargs (dict): Keyword arguments to pass to the failure_handler function.
+    
+    Returns:
+    The result of process_response if successful, or the result of failure_handler if not.
+    """
+    llm_kwargs = llm_kwargs or {}
+    failure_kwargs = failure_kwargs or {}
+
+    for attempt in range(1, max_attempts + 1):
+        # Adjust temperature if it's in llm_kwargs
+        if 'temperature' in llm_kwargs:
+            llm_kwargs['temperature'] = 0 if attempt <= 2 else (attempt - 2) * 0.025
+        
+        # Call the LLM
+        response = call_llm(messages=messages, **llm_kwargs)
+        
+        # Attempt to process the response
+        try:
+            processed_result = process_response(response)
+            return processed_result
+        except Exception as e:
+            print(f"Attempt {attempt} failed: {str(e)}. Retrying...")
+            print(f"Response from failed attempt\n:{response}")
+    
+    # If we've exhausted all attempts, call the failure handler
+    print(f"All {max_attempts} attempts failed. Calling failure handler.")
+    return failure_handler(**failure_kwargs)
 
 def enforce_semantic_list(lst):
     error_message = "gene_list appears to contain numeric or numeric cast as string. Please ensure you are passing semantic labels (i.e. gene symbols or cell types) and not integer labels for AI interpretation."
@@ -510,42 +547,48 @@ def generate_file_key(file_path):
 def map_cell_type_labels_to_simplified_set(labels, simplification_level=''):
     """
     Maps a list of labels to a smaller set of labels using the AI.
-
     Args:
-        labels (list of str): The list of labels to be mapped.
-        labels (str): A qualitative description of how much you want the labels to be simplified. Or a direction about how to simplify the labels. Could be anything, like  'extremely', 'barely', 'compartment-level', 'remove-typos'
-
+    labels (list of str): The list of labels to be mapped.
+    simplification_level (str): A qualitative description of how much you want the labels to be simplified. Or a direction about how to simplify the labels. Could be anything, like 'extremely', 'barely', 'compartment-level', 'remove-typos'
     Returns:
-        dict: A dictionary mapping the original labels to the smaller set of labels.
+    dict: A dictionary mapping the original labels to the smaller set of labels.
     """
     #todo, could allow passing custom examples
-
     #enforce that labels are semantic
     enforce_semantic_list(labels)
-
+    
     # Prepare the prompt
     labels_str = "    ".join(labels)
-
+    
     # Prepare the messages for the Chat Completions API
-
-    # The string you return must be valid python and will be directly evaluated as eval(str).
     messages = [
         {"role": "system", "content": f"You are a python dictionary mapping generator that takes a list of categories and provides a mapping to a {simplification_level} simplified set as a dictionary. Example: Fibroblast    Fibrolasts.    CD8-positive T Cells    CD4-positive T Cells -> {{'Fibroblast':'Fibroblast','Fibrolasts.':'Fibroblast','CD8-positive T Cells':'T Cell','CD4-positive T Cells':'T Cell'}}"},
         {"role": "user", "content": f"{labels_str} -> "}
     ]
 
-    # Call the LLM using the call_llm function
-    generated_mapping = call_llm(
-        messages=messages,
-        max_tokens=500,
-        temperature=0
-    )
-    
-    # Clean the response
-    cleaned_mapping = extract_dictionary_from_ai_string(generated_mapping)
+    def process_response(response):
+        cleaned_mapping = extract_dictionary_from_ai_string(response)
+        return eval(cleaned_mapping)
 
-    # Convert the generated mapping to a dictionary
-    mapping_dict = eval(cleaned_mapping)
+    def failure_handler(labels):
+        print(f"Simplification failed for labels: {labels}")
+        return {label: label for label in labels}
+
+    llm_kwargs = {
+        'max_tokens': 500,
+        'temperature': 0
+    }
+
+    failure_kwargs = {'labels': labels}
+
+    # Use retry_llm_call instead of direct call_llm
+    mapping_dict = retry_llm_call(
+        messages=messages,
+        process_response=process_response,
+        failure_handler=failure_handler,
+        llm_kwargs=llm_kwargs,
+        failure_kwargs=failure_kwargs
+    )
 
     return mapping_dict
 
@@ -553,38 +596,47 @@ def map_cell_type_labels_to_simplified_set(labels, simplification_level=''):
 def map_gene_labels_to_simplified_set(labels, simplification_level=''):
     """
     Maps a list of genes to a smaller set of labels using AI.
-
     Args:
-        labels (list of str): The list of labels to be mapped.
-        labels (str): A qualitative description of how much you want the labels to be simplified. Could be anything, like  'extremely', 'barely', or 'compartment-level'
-
+    labels (list of str): The list of labels to be mapped.
+    simplification_level (str): A qualitative description of how much you want the labels to be simplified. Could be anything, like 'extremely', 'barely', or 'compartment-level'
     Returns:
-        dict: A dictionary mapping the original labels to the smaller set of labels.
+    dict: A dictionary mapping the original labels to the smaller set of labels.
     """
     #enforce that labels are semantic
     enforce_semantic_list(labels)
-
+    
     # Prepare the prompt
     labels_str = "    ".join(labels)
-
+    
     # Prepare the messages for the Chat Completions API
     messages = [
-        {"role": "system", "content": f"You are a python dictionary mapping generatory that takes a list of genes and provides a mapping to a {simplification_level} simplified set as a dictionary. Example: HSP90AA1    HSPA1A    HSPA1B    CLOCK    ARNTL    PER1    IL1A    IL6 -> {{'HSP90AA1':'Heat Shock Proteins','HSPA1A':'Heat Shock Proteins','HSPA1B':'Heat Shock Proteins','CLOCK':'Circadian Rhythm','ARNTL':'Circadian Rhythm','PER1':'Circadian Rhythm','IL1A':'Interleukins','IL6':'Interleukins'}}"},
+        {"role": "system", "content": f"You are a python dictionary mapping generator that takes a list of genes and provides a mapping to a {simplification_level} simplified set as a dictionary. Example: HSP90AA1    HSPA1A    HSPA1B    CLOCK    ARNTL    PER1    IL1A    IL6 -> {{'HSP90AA1':'Heat Shock Proteins','HSPA1A':'Heat Shock Proteins','HSPA1B':'Heat Shock Proteins','CLOCK':'Circadian Rhythm','ARNTL':'Circadian Rhythm','PER1':'Circadian Rhythm','IL1A':'Interleukins','IL6':'Interleukins'}}"},
         {"role": "user", "content": f"{labels_str} -> "}
     ]
 
-    # Call the LLM using the call_llm function
-    generated_mapping = call_llm(
+    def process_response(response):
+        cleaned_mapping = extract_dictionary_from_ai_string(response)
+        return eval(cleaned_mapping)
+
+    def failure_handler(labels):
+        print(f"Simplification failed for gene labels: {labels}")
+        return {label: label for label in labels}
+
+    llm_kwargs = {
+        'max_tokens': 500,
+        'temperature': 0
+    }
+
+    failure_kwargs = {'labels': labels}
+
+    # Use retry_llm_call instead of direct call_llm
+    mapping_dict = retry_llm_call(
         messages=messages,
-        max_tokens=500,
-        temperature=0
+        process_response=process_response,
+        failure_handler=failure_handler,
+        llm_kwargs=llm_kwargs,
+        failure_kwargs=failure_kwargs
     )
-
-    # Clean the response
-    cleaned_mapping = extract_dictionary_from_ai_string(generated_mapping)
-
-    # Convert the generated mapping to a dictionary
-    mapping_dict = eval(cleaned_mapping)
 
     return mapping_dict
 
@@ -722,71 +774,60 @@ def ai_cell_type(gene_list, tissue=None):
 def ai_cell_types_by_comparison(gene_lists, cell_type=None, tissue=None):
     """
     Returns cell type labels for multiple lists of marker genes as determined by AI.
-    
     Args:
     gene_lists (list of lists): A list containing multiple lists of genes to be described.
+    cell_type (str, optional): The cell type to provide context for the AI.
     tissue (str, optional): The tissue of origin to provide context for the AI.
-    
     Returns:
     list of str: The cell type labels generated by AI for each gene list.
     """
-    # enforce_semantic_list for each gene list
+    # Enforce semantic_list for each gene list
     for gene_list in gene_lists:
         enforce_semantic_list(gene_list)
-    
-    cell_types = []
-    
-    # print(f"annotating {tissue if tissue else ''} {cell_type if cell_type else ''}")
-    # print(f"number of gene lists being compared (i.e. subclusters of {cell_type if cell_type else ''}): {len(gene_lists)}")
-    # Prepare the base prompt
-    #  {f'These cells are from {tissue} tissue. ' if tissue else ''}
-    system_prompt = f"You are a terse molecular biologist. In a few words and without restating any part of the question, describe the single most likely cell subtype represented by each of the following sets of marker genes by comparing the gene sets. Repeat labels if necessary to provide one label per input gene set. Example:\n{f'{tissue} ' if tissue else ' '}{'T cells' if cell_type else ''}\nCD4    CD28    CXCR4    IL7R\nCD8A    GZMB    PRF1    IFNG\nCD8A    GZMB    PRF1    CD3D\nFOXP3    IL2RA    CTLA4    TNFRSF18\n->\nCD4+ T helper cells\nCD8+ Cytotoxic T cells\nCD8+ Cytotoxic T cells\nRegulatory T cells"
 
-    # Add gene lists to the prompt
-    base_prompt=('\n' + tissue if tissue else '') + ' '
-    base_prompt+=(cell_type if cell_type else '') + '\n'
-    for i, gene_list in enumerate(gene_lists, 1):
+    # Prepare the base prompt
+    system_prompt = f"You are a terse molecular biologist. In a few words and without restating any part of the question, describe the single most likely cell subtype represented by each of the following sets of marker genes by comparing the gene sets. Repeat labels if necessary to provide one label per input gene set. Example:\n{f'{tissue} ' if tissue else ' '}{'T cells' if cell_type else ''}\nCD4    CD28    CXCR4    IL7R\nCD8A    GZMB PRF1    IFNG\nCD8A    GZMB    PRF1    CD3D\nFOXP3    IL2RA    CTLA4    TNFRSF18\n->\nCD4+ T helper cells\nCD8+ Cytotoxic T cells\nCD8+ Cytotoxic T cells\nRegulatory T cells"
+
+    base_prompt = ('\n' + tissue if tissue else '') + ' '
+    base_prompt += (cell_type if cell_type else '') + '\n'
+    for gene_list in gene_lists:
         genes_str = "    ".join(gene_list)
         base_prompt += f"{genes_str}\n"
-    base_prompt+="->\n"
-    # print(f"base_prompt:\n{base_prompt}")
+    base_prompt += "->\n"
 
     # Prepare the messages for the Chat Completions API
     messages = [
         {"role": "system", "content": system_prompt},
         {"role": "user", "content": base_prompt}
     ]
-    
-    k = 1
-    temperature=0
-    while k<=10:
-        if k > 2:
-            temperature += 0.025
-        
-        # Call the LLM using the call_llm function
-        annotation = call_llm(
-            messages=messages,
-            max_tokens=100 * len(gene_lists),  # Adjust max_tokens based on the number of gene lists
-            temperature=temperature
-        )
-    
-        # print(f"celltypes_by_comparison_response:\n{annotation}")
-        # Parse the annotation to extract individual cell type labels
+
+    def process_response(annotation):
         cell_types = [line.strip() for line in annotation.split('\n')]
+        if len(cell_types) != len(gene_lists):
+            raise ValueError("Mismatch in number of cell types returned.")
+        return cell_types
 
-        # Check if cell_types length matches gene_lists length
-        if len(cell_types) == len(gene_lists):
-            break
+    def failure_handler(cell_type, gene_lists):
+        print(f"Subtype labelling failed after multiple attempts, falling back to parent label")
+        return [cell_type for _ in gene_lists]
 
-        # print(f"Mismatch in number of cell types returned. Retrying {k} time...")
-        k += 1
+    llm_kwargs = {
+        'max_tokens': 100 * len(gene_lists),
+        'temperature': 0
+    }
 
-        if k > 10:
-            #If ai failed to generate enough labels, just call all classes as the parent class
-            print(f"Subtype labelling failed after {k-1} attempts, falling back to parent label")
-            cell_types = [cell_type for i in gene_lists]
-    
-    return cell_types
+    failure_kwargs = {
+        'cell_type': cell_type,
+        'gene_lists': gene_lists
+    }
+
+    return retry_llm_call(
+        messages=messages,
+        process_response=process_response,
+        failure_handler=failure_handler,
+        llm_kwargs=llm_kwargs,
+        failure_kwargs=failure_kwargs
+    )
 
 
 def ai_compare_cell_types_binary(label1, label2):
