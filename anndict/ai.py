@@ -286,20 +286,40 @@ def configure_llm_backend(provider, model, **kwargs):
     """
     Configures the LLM backend by setting environment variables.
     
+    See keys of PROVIDER_MODELS for valid providers.
+    
+    See values of PROVIDER_MODELS for valid models from each provider.
+
+    To view PROVIDER_MODELS:
+
+    import anndict as adt
+
+    adt.PROVIDER_MODELS
+
+    
+    api_key is a provider-specific API key that you will have to obtain from your specified provider
+
+    
     Examples:
-    # General (for most providers)
-    configure_llm_backend('your-provider-name',  # see keys of PROVIDER_MAPPING for valid providers
-    'your-provider-model-name',  # see PROVIDER_MODELS for valid models from each provider
-    api_key='your-provider-api-key')  # this is a provider-specific API key that you will have to obtain from your specified provider
 
-    # For general example (OpenAI)
-    configure_llm_backend('openai', 'gpt-3.5-turbo', api_key='your-openai-api-key')
+        # General (for most providers)
 
-    # For AzureML Endpoint
-    configure_llm_backend('azureml_endpoint', 'llama-2', endpoint_name='your-endpoint-name', region='your-region', api_key='your-api-key')
+        configure_llm_backend('your-provider-name',
+        'your-provider-model-name',
+        api_key='your-provider-api-key')
 
-    # For Bedrock
-    configure_llm_backend('bedrock', 'anthropic.claude-v2', region_name='us-west-2', aws_access_key_id='your-access-key-id', aws_secret_access_key='your-secret-access-key')
+        # For general example (OpenAI), works the same for providers google and anthropic.
+
+        configure_llm_backend('openai', 'gpt-3.5-turbo', api_key='your-openai-api-key')
+        configure_llm_backend('anthropic', 'claude-3-5-sonnet-20240620', api_key='your-anthropic-api-key')
+
+        # For AzureML Endpoint
+
+        configure_llm_backend('azureml_endpoint', 'llama-2', endpoint_name='your-endpoint-name', region='your-region', api_key='your-api-key')
+
+        # For Bedrock
+
+        configure_llm_backend('bedrock', 'anthropic.claude-v2', region_name='us-west-2', aws_access_key_id='your-access-key-id', aws_secret_access_key='your-secret-access-key')
     """
     global _llm_instance
     provider_info = PROVIDER_MAPPING.get(provider.lower())
@@ -319,29 +339,6 @@ def configure_llm_backend(provider, model, **kwargs):
 
     _llm_instance = None
 
-#Reference configure_llm_backend calls
-
-# General (for most providers)
-# configure_llm_backend('your-provider-name', # see keys of PROVIDER_MAPPING for valid providers
-#                       'your-provider-model-name', #see PROVIDER_MODELS for valid models from each provider
-#                       api_key='your-provider-api-key') #this is a provider-specific API key that you will have to obtain from your specified provider
-
-#For general example
-# configure_llm_backend('openai', 'gpt-3.5-turbo', api_key='your-openai-api-key')
-
-# AzureML Endpoint and Bedrock are currently the only two providers with special configuration calls:
-
-# For AzureML Endpoint
-# configure_llm_backend('azureml_endpoint', 'llama-2',
-#                       endpoint_name='your-endpoint-name',
-#                       region='your-region',
-#                       api_key='your-api-key')
-
-# For Bedrock
-# configure_llm_backend('bedrock', 'anthropic.claude-v2', 
-#                       region_name='us-west-2',
-#                       aws_access_key_id='your-access-key-id',
-#                       aws_secret_access_key='your-secret-access-key')
 
 def get_llm_config():
     """Retrieves the LLM configuration from environment variables."""

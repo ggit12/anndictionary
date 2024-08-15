@@ -1164,17 +1164,24 @@ UCE_adata([“../dat/liver.h5ad”, “../dat/kidney.h5ad”])</p>
 <dt class="sig sig-object py" id="anndict.ai.configure_llm_backend">
 <span class="sig-prename descclassname"><span class="pre">anndict.ai.</span></span><span class="sig-name descname"><span class="pre">configure_llm_backend</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">provider</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/ai.html#configure_llm_backend"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.ai.configure_llm_backend" title="Link to this definition"></a></dt>
 <dd><p>Configures the LLM backend by setting environment variables.</p>
-<p>Examples:
-# General (for most providers)
-configure_llm_backend(‘your-provider-name’,  # see keys of PROVIDER_MAPPING for valid providers
-‘your-provider-model-name’,  # see PROVIDER_MODELS for valid models from each provider
-api_key=’your-provider-api-key’)  # this is a provider-specific API key that you will have to obtain from your specified provider</p>
-<p># For general example (OpenAI)
-configure_llm_backend(‘openai’, ‘gpt-3.5-turbo’, api_key=’your-openai-api-key’)</p>
-<p># For AzureML Endpoint
-configure_llm_backend(‘azureml_endpoint’, ‘llama-2’, endpoint_name=’your-endpoint-name’, region=’your-region’, api_key=’your-api-key’)</p>
-<p># For Bedrock
-configure_llm_backend(‘bedrock’, ‘anthropic.claude-v2’, region_name=’us-west-2’, aws_access_key_id=’your-access-key-id’, aws_secret_access_key=’your-secret-access-key’)</p>
+<p>See keys of PROVIDER_MODELS for valid providers.</p>
+<p>See values of PROVIDER_MODELS for valid models from each provider.</p>
+<p>To view PROVIDER_MODELS:</p>
+<p>import anndict as adt</p>
+<p>adt.PROVIDER_MODELS</p>
+<p>api_key is a provider-specific API key that you will have to obtain from your specified provider</p>
+<p class="rubric">Examples</p>
+<p># General (for most providers)</p>
+<p>configure_llm_backend(‘your-provider-name’,
+‘your-provider-model-name’,
+api_key=’your-provider-api-key’)</p>
+<p># For general example (OpenAI), works the same for providers google and anthropic.</p>
+<p>configure_llm_backend(‘openai’, ‘gpt-3.5-turbo’, api_key=’your-openai-api-key’)
+configure_llm_backend(‘anthropic’, ‘claude-3-5-sonnet-20240620’, api_key=’your-anthropic-api-key’)</p>
+<p># For AzureML Endpoint</p>
+<p>configure_llm_backend(‘azureml_endpoint’, ‘llama-2’, endpoint_name=’your-endpoint-name’, region=’your-region’, api_key=’your-api-key’)</p>
+<p># For Bedrock</p>
+<p>configure_llm_backend(‘bedrock’, ‘anthropic.claude-v2’, region_name=’us-west-2’, aws_access_key_id=’your-access-key-id’, aws_secret_access_key=’your-secret-access-key’)</p>
 </dd></dl>
 
 <dl class="py function">
