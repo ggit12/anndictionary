@@ -283,7 +283,24 @@ PROVIDER_MODELS = {
 }
 
 def configure_llm_backend(provider, model, **kwargs):
-    """Configures the LLM backend by setting environment variables."""
+    """
+    Configures the LLM backend by setting environment variables.
+    
+    Examples:
+    # General (for most providers)
+    configure_llm_backend('your-provider-name',  # see keys of PROVIDER_MAPPING for valid providers
+    'your-provider-model-name',  # see PROVIDER_MODELS for valid models from each provider
+    api_key='your-provider-api-key')  # this is a provider-specific API key that you will have to obtain from your specified provider
+
+    # For general example (OpenAI)
+    configure_llm_backend('openai', 'gpt-3.5-turbo', api_key='your-openai-api-key')
+
+    # For AzureML Endpoint
+    configure_llm_backend('azureml_endpoint', 'llama-2', endpoint_name='your-endpoint-name', region='your-region', api_key='your-api-key')
+
+    # For Bedrock
+    configure_llm_backend('bedrock', 'anthropic.claude-v2', region_name='us-west-2', aws_access_key_id='your-access-key-id', aws_secret_access_key='your-secret-access-key')
+    """
     global _llm_instance
     provider_info = PROVIDER_MAPPING.get(provider.lower())
     if not provider_info:
@@ -392,29 +409,6 @@ def call_llm(messages, **kwargs):
     response = llm(langchain_messages, **kwargs)
 
     return response.content.strip()
-
-# def call_llm(messages, **kwargs):
-#     """Calls the configured LLM provider with the given parameters."""
-#     llm = get_llm()
-#     message_types = {
-#         'system': SystemMessage,
-#         'user': HumanMessage,
-#         'assistant': AIMessage
-#     }
-#     langchain_messages = [
-#         message_types.get(msg['role'], HumanMessage)(content=msg['content'])
-#         for msg in messages
-#     ]
-    
-#     try:
-#         response = llm.invoke(langchain_messages, **kwargs)
-#         return response.content.strip()
-#     except Exception as e:
-#         print(f"Error calling LLM: {str(e)}")
-#         print(f"LLM type: {type(llm)}")
-#         print(f"Messages: {json.dumps(messages, indent=2)}")
-#         print(f"Additional kwargs: {json.dumps(kwargs, default=str, indent=2)}")
-#         raise
 
 
 def enforce_semantic_list(lst):
