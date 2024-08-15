@@ -98,6 +98,8 @@ def google_genai_init(constructor_args, **kwargs):
         constructor_args['max_output_tokens'] = kwargs.pop('max_tokens')
     if 'temperature' in kwargs:
         constructor_args['temperature'] = kwargs.pop('temperature')
+
+    constructor_args['convert_system_message_to_human'] = True
     # For Google, we've handled these in the constructor, so we return empty kwargs
     return constructor_args, {}
 
