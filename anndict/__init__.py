@@ -33,6 +33,7 @@ from .ai import (
     get_llm_config, 
     get_llm, 
     call_llm, 
+    retry_llm_call, 
     ai_cell_types_by_comparison, 
     enforce_semantic_list, 
     extract_dictionary_from_ai_string, 
@@ -292,5 +293,6 @@ __all__ = [
     'azureml_init',
     'google_genai_init',
     'default_init',
-    'PROVIDER_MODELS'
+    'PROVIDER_MODELS',
+    'retry_llm_call'
 ]
