@@ -135,6 +135,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#anndict.ai.get_llm_config"><code class="docutils literal notranslate"><span class="pre">get_llm_config()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#anndict.ai.get_llm"><code class="docutils literal notranslate"><span class="pre">get_llm()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#anndict.ai.call_llm"><code class="docutils literal notranslate"><span class="pre">call_llm()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#anndict.ai.retry_llm_call"><code class="docutils literal notranslate"><span class="pre">retry_llm_call()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#anndict.ai.enforce_semantic_list"><code class="docutils literal notranslate"><span class="pre">enforce_semantic_list()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#anndict.ai.extract_dictionary_from_ai_string"><code class="docutils literal notranslate"><span class="pre">extract_dictionary_from_ai_string()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#anndict.ai.attempt_ai_integration"><code class="docutils literal notranslate"><span class="pre">attempt_ai_integration()</span></code></a></li>
@@ -1203,6 +1204,21 @@ configure_llm_backend(‘anthropic’, ‘claude-3-5-sonnet-20240620’, api_key
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="anndict.ai.retry_llm_call">
+<span class="sig-prename descclassname"><span class="pre">anndict.ai.</span></span><span class="sig-name descname"><span class="pre">retry_llm_call</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">messages</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">process_response</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">failure_handler</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_attempts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">llm_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">failure_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/ai.html#retry_llm_call"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.ai.retry_llm_call" title="Link to this definition"></a></dt>
+<dd><p>A generic wrapper for LLM calls that implements retry logic with custom processing and failure handling.</p>
+<p>Args:
+messages (list): The messages or prompt to send to the LLM.
+process_response (callable): A function that takes the LLM output and attempts to process it into the desired result.
+failure_handler (callable): A function to call if max_attempts is reached without successful processing.
+max_attempts (int): Maximum number of attempts before calling the failure_handler function.
+llm_kwargs (dict): Keyword arguments to pass to the LLM call function.
+failure_kwargs (dict): Keyword arguments to pass to the failure_handler function.</p>
+<p>Returns:
+The result of process_response if successful, or the result of failure_handler if not.</p>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="anndict.ai.enforce_semantic_list">
 <span class="sig-prename descclassname"><span class="pre">anndict.ai.</span></span><span class="sig-name descname"><span class="pre">enforce_semantic_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lst</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/ai.html#enforce_semantic_list"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.ai.enforce_semantic_list" title="Link to this definition"></a></dt>
 <dd></dd></dl>
@@ -1258,41 +1274,23 @@ runs the fallback function instead.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="anndict.ai.map_cell_type_labels_to_simplified_set">
 <span class="sig-prename descclassname"><span class="pre">anndict.ai.</span></span><span class="sig-name descname"><span class="pre">map_cell_type_labels_to_simplified_set</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">labels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simplification_level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/ai.html#map_cell_type_labels_to_simplified_set"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.ai.map_cell_type_labels_to_simplified_set" title="Link to this definition"></a></dt>
-<dd><p>Maps a list of labels to a smaller set of labels using the AI.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>labels</strong> (<em>str</em>) – The list of labels to be mapped.</p></li>
-<li><p><strong>labels</strong> – A qualitative description of how much you want the labels to be simplified. Or a direction about how to simplify the labels. Could be anything, like  ‘extremely’, ‘barely’, ‘compartment-level’, ‘remove-typos’</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>A dictionary mapping the original labels to the smaller set of labels.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>dict</p>
-</dd>
-</dl>
+<dd><p>Maps a list of labels to a smaller set of labels using the AI.
+Args:
+labels (list of str): The list of labels to be mapped.
+simplification_level (str): A qualitative description of how much you want the labels to be simplified. Or a direction about how to simplify the labels. Could be anything, like ‘extremely’, ‘barely’, ‘compartment-level’, ‘remove-typos’
+Returns:
+dict: A dictionary mapping the original labels to the smaller set of labels.</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="anndict.ai.map_gene_labels_to_simplified_set">
 <span class="sig-prename descclassname"><span class="pre">anndict.ai.</span></span><span class="sig-name descname"><span class="pre">map_gene_labels_to_simplified_set</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">labels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simplification_level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/ai.html#map_gene_labels_to_simplified_set"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.ai.map_gene_labels_to_simplified_set" title="Link to this definition"></a></dt>
-<dd><p>Maps a list of genes to a smaller set of labels using AI.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>labels</strong> (<em>str</em>) – The list of labels to be mapped.</p></li>
-<li><p><strong>labels</strong> – A qualitative description of how much you want the labels to be simplified. Could be anything, like  ‘extremely’, ‘barely’, or ‘compartment-level’</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>A dictionary mapping the original labels to the smaller set of labels.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>dict</p>
-</dd>
-</dl>
+<dd><p>Maps a list of genes to a smaller set of labels using AI.
+Args:
+labels (list of str): The list of labels to be mapped.
+simplification_level (str): A qualitative description of how much you want the labels to be simplified. Could be anything, like ‘extremely’, ‘barely’, or ‘compartment-level’
+Returns:
+dict: A dictionary mapping the original labels to the smaller set of labels.</p>
 </dd></dl>
 
 <dl class="py function">
@@ -1326,11 +1324,12 @@ str: The cell type label generated by AI</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="anndict.ai.ai_cell_types_by_comparison">
 <span class="sig-prename descclassname"><span class="pre">anndict.ai.</span></span><span class="sig-name descname"><span class="pre">ai_cell_types_by_comparison</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gene_lists</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cell_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tissue</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/ai.html#ai_cell_types_by_comparison"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.ai.ai_cell_types_by_comparison" title="Link to this definition"></a></dt>
-<dd><p>Returns cell type labels for multiple lists of marker genes as determined by AI.</p>
-<p>Args:
+<dd><p>Returns cell type labels for multiple lists of marker genes as determined by AI.
+Args:
 gene_lists (list of lists): A list containing multiple lists of genes to be described.
-tissue (str, optional): The tissue of origin to provide context for the AI.</p>
-<p>Returns:
+cell_type (str, optional): The cell type to provide context for the AI.
+tissue (str, optional): The tissue of origin to provide context for the AI.
+Returns:
 list of str: The cell type labels generated by AI for each gene list.</p>
 </dd></dl>
 
