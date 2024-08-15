@@ -26,6 +26,8 @@ from .utils import (
 from .ai import (
     bedrock_init,
     azureml_init,
+    google_genai_init,
+    PROVIDER_MODELS,
     default_init,
     configure_llm_backend, 
     get_llm_config, 
@@ -288,5 +290,7 @@ __all__ = [
     'convert_obs_index_to_str', 
     'bedrock_init',
     'azureml_init',
-    'default_init'
+    'google_genai_init',
+    'default_init',
+    'PROVIDER_MODELS'
 ]
