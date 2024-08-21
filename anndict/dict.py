@@ -459,7 +459,7 @@ def remove_genes(adata, genes_to_remove, adt_key=None):
     # Remove the specified genes
     adata._inplace_subset_var(~adata.var_names.isin(genes_to_remove))
     
-    print(f"Removed {len(genes_to_remove)} genes from {key}. {adata.n_vars} genes remaining.")
+    print(f"Removed {len(genes_to_remove)} genes from {adt_key}. {adata.n_vars} genes remaining.")
 
 def remove_genes_adata_dict(adata_dict, genes_to_remove):
     """
