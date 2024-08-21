@@ -413,7 +413,7 @@ def call_llm(messages, **kwargs):
 
     return response.content.strip()
 
-def retry_llm_call(messages, process_response, failure_handler, max_attempts=10, llm_kwargs=None, failure_kwargs=None):
+def retry_llm_call(messages, process_response, failure_handler, max_attempts=5, llm_kwargs=None, failure_kwargs=None):
     """
     A generic wrapper for LLM calls that implements retry logic with custom processing and failure handling.
     
