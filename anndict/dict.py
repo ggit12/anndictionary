@@ -110,17 +110,17 @@ def adata_dict_fapply(adata_dict, func, **kwargs_dicts):
     sig = inspect.signature(func)
     accepts_key = 'adt_key' in sig.parameters
 
-    for key, adata in adata_dict.items():
+    for adt_key, adata in adata_dict.items():
         func_args = {}
         for arg_name, arg_value in kwargs_dicts.items():
             if isinstance(arg_value, dict):
-                if key in arg_value:
-                    func_args[arg_name] = arg_value[key]
+                if adt_key in arg_value:
+                    func_args[arg_name] = arg_value[adt_key]
             else:
                 func_args[arg_name] = arg_value
         
         if accepts_key:
-            func(adata, adt_key=key, **func_args)
+            func(adata, adt_key=adt_key, **func_args)
         else:
             func(adata, **func_args)
 
@@ -144,19 +144,19 @@ def adata_dict_fapply_return(adata_dict, func, **kwargs_dicts):
     accepts_key = 'adt_key' in sig.parameters
 
     results = {}
-    for key, adata in adata_dict.items():
+    for adt_key, adata in adata_dict.items():
         func_args = {}
         for arg_name, arg_value in kwargs_dicts.items():
             if isinstance(arg_value, dict):
-                if key in arg_value:
-                    func_args[arg_name] = arg_value[key]
+                if adt_key in arg_value:
+                    func_args[arg_name] = arg_value[adt_key]
             else:
                 func_args[arg_name] = arg_value
         
         if accepts_key:
-            results[key] = func(adata, adt_key=key, **func_args)
+            results[adt_key] = func(adata, adt_key=adt_key, **func_args)
         else:
-            results[key] = func(adata, **func_args)
+            results[adt_key] = func(adata, **func_args)
     return results
         
 
