@@ -24,6 +24,7 @@ from sklearn.metrics import confusion_matrix
 import harmonypy as hm
 
 import inspect
+import warnings
 
 from .metadata_summary import summarize_metadata, display_html_summary
 from .stablelabel import (
@@ -586,7 +587,7 @@ def log_transform_adata_dict(adata_dict, **kwargs):
     adata_dict_fapply(adata_dict, sc.pp.log1p, **kwargs)
 
 
-def set_high_variance_genes(adata_dict, **kwargs):
+def set_high_variance_genes_adata_dict(adata_dict, **kwargs):
     """
     Identifies high-variance genes in each AnnData object in the dictionary.
 
@@ -598,6 +599,19 @@ def set_high_variance_genes(adata_dict, **kwargs):
     - None: The function modifies the input AnnData objects in place.
     """
     adata_dict_fapply(adata_dict, sc.pp.highly_variable_genes, **kwargs)
+
+def rank_genes_groups_adata_dict(adata_dict, **kwargs):
+    """
+    Identifies differentially expressed genes in each AnnData object in the dictionary.
+
+    Parameters:
+    - adata_dict (dict): Dictionary of AnnData objects with keys as identifiers.
+    - kwargs: Additional keyword arguments to pass to the rank_genes_groups function.
+
+    Returns:
+    - None: The function modifies the input AnnData objects in place.
+    """
+    adata_dict_fapply(adata_dict, sc.tl.rank_genes_groups, **kwargs)
 
 
 def scale_adata_dict(adata_dict, **kwargs):
@@ -1315,6 +1329,17 @@ def ai_annotate(func, adata, groupby, n_top_genes, label_column, **kwargs):
     Returns:
     pd.DataFrame A DataFrame with a column for the top marker genes for each cluster.
     """
+    # Ensure the groupby column is categorical
+    if not pd.api.types.is_categorical_dtype(adata.obs[groupby]):
+        adata.obs[groupby] = adata.obs[groupby].astype('category')
+    
+    # Get the number of categories in the groupby column
+    n_categories = len(adata.obs[groupby].cat.categories)
+    
+    # Warn if there are more than 50 categories
+    if n_categories > 50:
+        warnings.warn(f"The '{groupby}' column has {n_categories} groups, which may result in slow runtimes. Ensure that {groupby} is not continuous data.", UserWarning)
+
     # Check if rank_genes_groups has already been run
     if 'rank_genes_groups' not in adata.uns or adata.uns['rank_genes_groups']['params']['groupby'] != groupby:
         # Run the differential expression analysis
