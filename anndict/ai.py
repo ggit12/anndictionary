@@ -732,7 +732,7 @@ def ai_cell_types_by_comparison(gene_lists, cell_type=None, tissue=None):
     """
     # Enforce semantic_list for each gene list
     for gene_list in gene_lists:
-        adt.enforce_semantic_list(gene_list)
+        enforce_semantic_list(gene_list)
 
     # Prepare the system prompt
     system_prompt = (
@@ -754,7 +754,7 @@ def ai_cell_types_by_comparison(gene_lists, cell_type=None, tissue=None):
     ]
 
     # Get the initial contrast response
-    contrast_response = adt.retry_llm_call(
+    contrast_response = retry_llm_call(
         messages=messages,
         process_response=lambda x: x,
         failure_handler=lambda: "Failed to contrast gene sets",
@@ -774,7 +774,7 @@ def ai_cell_types_by_comparison(gene_lists, cell_type=None, tissue=None):
         messages.append({"role": "user", "content": gene_set_prompt})
 
         # Get the subtype label
-        subtype_label = adt.retry_llm_call(
+        subtype_label = retry_llm_call(
             messages=messages,
             process_response=lambda x: x.strip(),
             failure_handler=lambda: cell_type if cell_type else "Unknown",
@@ -785,7 +785,7 @@ def ai_cell_types_by_comparison(gene_lists, cell_type=None, tissue=None):
         cell_subtype_labels.append(subtype_label)
         messages.append({"role": "assistant", "content": subtype_label})
 
-    print(f"{messages}")
+    # print(f"{messages}")
     return cell_subtype_labels
 
 
