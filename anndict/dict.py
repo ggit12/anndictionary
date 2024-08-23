@@ -364,19 +364,24 @@ def subsplit_adata_dict(adata_dict, strata_keys, desired_strata):
 
 def concatenate_adata_dict(adata_dict, **kwargs):
     """
-    Concatenates all AnnData objects in adata_dict into a single AnnData object. join defualts to "outer" and index_unique defaults to "-".
+    Concatenates all AnnData objects in adata_dict into a single AnnData object.
+    If only a single AnnData object is present, returns it as is.
 
     Parameters:
     - adata_dict (dict): Dictionary of AnnData objects with keys as identifiers.
-    - kwargs: Additional keyword arguments, including 'join' which specifies the join method for concatenation.
+    - kwargs: Additional keyword arguments for concatenation.
 
     Returns:
-    - AnnData: A single AnnData object that combines all the subsets in adata_dict.
+    - AnnData: A single AnnData object or the original AnnData object if only one is provided.
     """
     kwargs.setdefault('join', 'outer')
-    kwargs.setdefault('index_unique', '-')
-    
+    kwargs.setdefault('index_unique', None)  # Ensure original indices are kept
+
     adatas = list(adata_dict.values())
+    
+    if len(adatas) == 1:
+        return adatas[0]  # Return the single AnnData object as is
+    
     if adatas:
         return sc.concat(adatas, **kwargs)
     else:
