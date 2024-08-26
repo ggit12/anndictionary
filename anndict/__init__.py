@@ -19,6 +19,7 @@ from .utils import (
     convert_obs_col_to_string,
     convert_obs_index_to_str,
     add_label_to_adata,
+    get_adata_columns,
     create_color_map,
     UCE_adata
 )
@@ -296,5 +297,6 @@ __all__ = [
     'google_genai_init',
     'default_init',
     'PROVIDER_MODELS',
-    'retry_llm_call'
+    'retry_llm_call',
+    'get_adata_columns'
 ]
