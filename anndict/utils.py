@@ -147,6 +147,25 @@ def convert_obs_index_to_str(adata):
 
 def get_adata_columns(adata, col_startswith=None, col_endswith=None, col_contains=None, 
                       not_col_startswith=None, not_col_endswith=None, not_col_contains=None):
+    """
+    Extract columns from an AnnData object's observation dataframe (`adata.obs`) based on specified filtering criteria.
+
+    Parameters:
+    adata : AnnData The AnnData object containing the observation dataframe (adata.obs) from which columns are selected.
+    col_{startswith, endswith, contains} : list of str, optional
+    Lists of substrings to positively filter columns. 
+    - col_startswith: Select columns that start with any of these strings.
+    - col_endswith: Select columns that end with any of these strings.
+    - col_contains: Select columns that contain any of these strings.
+    not_col_{startswith, endswith, contains} : list of str, optional
+    Lists of substrings to negatively filter columns from the previously selected ones. 
+    - not_col_startswith: Exclude columns that start with any of these strings.
+    - not_col_endswith: Exclude columns that end with any of these strings.
+    - not_col_contains: Exclude columns that contain any of these strings.
+
+    Returns:
+    list of str A list of unique column names from adata.obs that match the specified criteria.
+    """
     columns = adata.obs.columns
     matched_columns = []
 
