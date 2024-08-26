@@ -104,7 +104,6 @@ def add_col_to_adata_var(adata, indices, values, new_col_name):
     adata.var.loc[indices, new_col_name] = values
 
 
-
 def convert_obs_col_to_category(adata, col_name):
     """
     Convert a column in AnnData.obs to category dtype.
@@ -145,6 +144,37 @@ def convert_obs_index_to_str(adata):
     """
     adata.obs.index = adata.obs.index.astype(str)
 
+
+def get_adata_columns(adata, col_startswith=None, col_endswith=None, col_contains=None, 
+                      not_col_startswith=None, not_col_endswith=None, not_col_contains=None):
+    columns = adata.obs.columns
+    matched_columns = []
+
+    if col_startswith:
+        for start in col_startswith:
+            matched_columns.extend([col for col in columns if col.startswith(start)])
+
+    if col_endswith:
+        for end in col_endswith:
+            matched_columns.extend([col for col in columns if col.endswith(end)])
+
+    if col_contains:
+        for contain in col_contains:
+            matched_columns.extend([col for col in columns if contain in col])
+
+    if not_col_startswith:
+        for start in not_col_startswith:
+            matched_columns = [col for col in matched_columns if not col.startswith(start)]
+
+    if not_col_endswith:
+        for end in not_col_endswith:
+            matched_columns = [col for col in matched_columns if not col.endswith(end)]
+
+    if not_col_contains:
+        for contain in not_col_contains:
+            matched_columns = [col for col in matched_columns if contain not in col]
+
+    return list(set(matched_columns))
 
 def create_color_map(adata, keys):
     """
