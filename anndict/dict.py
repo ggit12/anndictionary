@@ -1083,7 +1083,7 @@ def ai_determine_leiden_resolution_adata_dict(adata_dict, initial_resolution=1):
 
     Returns: dict: Dictionary with final resolution values after AI-based adjustments.
     """
-    return adata_dict_fapply_return(adata_dict, ai_determine_leiden_resolution, initial_resolution=initial_resolution)
+    return adata_dict_fapply_return(adata_dict, ai_determine_leiden_resolution, max_retries=3, initial_resolution=initial_resolution)
 
 
 def simplify_obs_column(adata, column, new_column_name, simplification_level=''):
@@ -1117,7 +1117,7 @@ def simplify_obs_column_adata_dict(adata_dict, column, new_column_name, simplifi
     """
     Applies simplify_obs_column to each anndata in an anndict
     """
-    return adata_dict_fapply_return(adata_dict, simplify_obs_column, column=column, new_column_name=new_column_name, simplification_level=simplification_level)
+    return adata_dict_fapply_return(adata_dict, simplify_obs_column, max_retries=3, column=column, new_column_name=new_column_name, simplification_level=simplification_level)
 
 
 def create_label_hierarchy(adata, col, simplification_levels):
@@ -1150,7 +1150,7 @@ def create_label_hierarchy_adata_dict(adata_dict, col, simplification_levels):
     """
     Applies create_label_hierarchy to each anndata in an anndict
     """
-    return adata_dict_fapply_return(adata_dict, create_label_hierarchy, col = col, simplification_levels = simplification_levels)
+    return adata_dict_fapply_return(adata_dict, create_label_hierarchy, max_retries=3, col=col, simplification_levels=simplification_levels)
 
 
 def simplify_var_index(adata, column, new_column_name, simplification_level=''):
@@ -1189,7 +1189,7 @@ def simplify_var_index_adata_dict(adata_dict, column, new_column_name, simplific
     """
     Applies simplify_var_index to each anndata in an anndict
     """
-    return adata_dict_fapply_return(adata_dict, simplify_var_index, column=column, new_column_name=new_column_name, simplification_level=simplification_level)
+    return adata_dict_fapply_return(adata_dict, simplify_var_index, max_retries=3, column=column, new_column_name=new_column_name, simplification_level=simplification_level)
 
 
 def ai_annotate_cell_type(adata, groupby, n_top_genes, label_column='ai_cell_type'):
@@ -1216,7 +1216,7 @@ def ai_annotate_cell_type_adata_dict(adata_dict, groupby, n_top_genes=10, label_
     """
     Applies ai_annotate_cell_type to each anndata in an anndict
     """
-    return adata_dict_fapply_return(adata_dict, ai_annotate_cell_type, groupby=groupby, n_top_genes=n_top_genes, label_column=label_column)
+    return adata_dict_fapply_return(adata_dict, ai_annotate_cell_type, max_retries=3, groupby=groupby, n_top_genes=n_top_genes, label_column=label_column)
 
 
 def ai_annotate_cell_sub_type_adata_dict(adata_dict, cell_type_col, sub_cluster_col, new_label_col, tissue_of_origin_col=None, n_top_genes=10):
@@ -1234,7 +1234,7 @@ def ai_annotate_cell_sub_type_adata_dict(adata_dict, cell_type_col, sub_cluster_
     Returns:
     dict Dictionary of annotated AnnData objects with AI-generated subtype labels.
     """
-    results = adata_dict_fapply_return(adata_dict, ai_annotate_cell_sub_type, cell_type_col=cell_type_col, sub_cluster_col=sub_cluster_col, new_label_col=new_label_col, tissue_of_origin_col=tissue_of_origin_col)
+    results = adata_dict_fapply_return(adata_dict, ai_annotate_cell_sub_type, max_retries=3, cell_type_col=cell_type_col, sub_cluster_col=sub_cluster_col, new_label_col=new_label_col, tissue_of_origin_col=tissue_of_origin_col)
     annotated_adata_dict = {key: result[0] for key, result in results.items()}
     label_mappings_dict = {key: result[1] for key, result in results.items()}
 
@@ -1274,7 +1274,7 @@ def ai_annotate_cell_type_by_comparison_adata_dict(adata_dict, groupby, n_top_ge
     """
     Applies ai_annotate_cell_type_by_comparison to each anndata in an anndict
     """
-    return adata_dict_fapply_return(adata_dict, ai_annotate_cell_type_by_comparison, groupby=groupby, n_top_genes=n_top_genes, label_column=label_column, tissue_of_origin_col=tissue_of_origin_col)
+    return adata_dict_fapply_return(adata_dict, ai_annotate_cell_type_by_comparison, max_retries=3, groupby=groupby, n_top_genes=n_top_genes, label_column=label_column, tissue_of_origin_col=tissue_of_origin_col)
 
 
 def ai_annotate_cell_type_by_comparison(adata, groupby, n_top_genes, label_column='ai_cell_sub_type', tissue_of_origin_col=None, adt_key=None):
@@ -1329,7 +1329,7 @@ def ai_annotate_biological_process_adata_dict(adata_dict, groupby, n_top_genes=1
     """
     Applies ai_annotate_biological_process to each anndata in an anndict
     """
-    return adata_dict_fapply_return(adata_dict, ai_annotate_biological_process, groupby=groupby, n_top_genes=n_top_genes, label_column=label_column)
+    return adata_dict_fapply_return(adata_dict, ai_annotate_biological_process, max_retries=3, groupby=groupby, n_top_genes=n_top_genes, label_column=label_column)
 
 
 def ai_annotate_by_comparison(func, adata, groupby, n_top_genes, label_column, **kwargs):
@@ -1565,7 +1565,7 @@ def ai_compare_cell_type_labels_adata_dict(adata_dict, cols, new_col_name='agree
     """
     Applies ai_compare_cell_type_labels to each anndata in an anndict.
     """
-    return adata_dict_fapply_return(adata_dict, ai_compare_cell_type_labels, cols=cols, new_col_name=new_col_name, comparison_level=comparison_level)
+    return adata_dict_fapply_return(adata_dict, ai_compare_cell_type_labels, max_retries=3, cols=cols, new_col_name=new_col_name, comparison_level=comparison_level)
 
 
 def ai_compare_cell_type_labels_pairwise(adata, cols1, cols2, new_col_prefix='agreement', comparison_level='binary'):
@@ -1597,7 +1597,7 @@ def ai_compare_cell_type_labels_pairwise_adata_dict(adata_dict, cols1, cols2, ne
     """
     Applies ai_compare_cell_type_labels_pairwise to each anndata in an anndict.
     """
-    return adata_dict_fapply_return(adata_dict, ai_compare_cell_type_labels_pairwise, cols1=cols1, cols2=cols2, new_col_prefix=new_col_prefix, comparison_level=comparison_level)
+    return adata_dict_fapply_return(adata_dict, ai_compare_cell_type_labels_pairwise, max_retries=3, cols1=cols1, cols2=cols2, new_col_prefix=new_col_prefix, comparison_level=comparison_level)
 
 
 def plot_sankey_adata_dict(adata_dict, cols, params=None):
