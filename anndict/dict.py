@@ -24,6 +24,8 @@ from sklearn.metrics import confusion_matrix
 import harmonypy as hm
 
 import inspect
+from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor, as_completed
+
 import warnings
 
 from .metadata_summary import summarize_metadata, display_html_summary
@@ -93,25 +95,26 @@ class AdataDict(dict):
         return results
 
 
-def adata_dict_fapply(adata_dict, func, **kwargs_dicts):
+def adata_dict_fapply(adata_dict, func, use_processes=True, num_workers=None, max_retries=0, **kwargs_dicts):
     """
-    Applies a given function to each AnnData object in the adata_dict, with additional
-    values from other dictionaries or single values. The other dictionaries should
-    be passed as keyword arguments where the keys are the argument names that func takes.
+    Applies a given function to each AnnData object in the adata_dict, with error handling,
+    retry mechanism, and the option to use either threading or multiprocessing.
 
     Parameters:
     - adata_dict: Dictionary of AnnData objects with keys as identifiers.
     - func: Function to apply to each AnnData object in the dictionary.
+    - use_processes: If True, use ProcessPoolExecutor; if False, use ThreadPoolExecutor.
+    - num_workers: Number of worker processes or threads to use (default: number of CPUs available).
+    - max_retries: Maximum number of retries for a failed task.
     - kwargs_dicts: Additional keyword arguments to pass to the function, where each argument can be a dictionary with keys matching the adata_dict or a single value.
 
     Returns:
     - None: The function modifies the AnnData objects in place.
     """
-    import inspect
     sig = inspect.signature(func)
     accepts_key = 'adt_key' in sig.parameters
 
-    for adt_key, adata in adata_dict.items():
+    def apply_func(adt_key, adata):
         func_args = {}
         for arg_name, arg_value in kwargs_dicts.items():
             if isinstance(arg_value, dict):
@@ -119,33 +122,55 @@ def adata_dict_fapply(adata_dict, func, **kwargs_dicts):
                     func_args[arg_name] = arg_value[adt_key]
             else:
                 func_args[arg_name] = arg_value
-        
-        if accepts_key:
-            func(adata, adt_key=adt_key, **func_args)
-        else:
-            func(adata, **func_args)
+
+        attempts = 0
+        while attempts < max_retries:
+            try:
+                if accepts_key:
+                    func(adata, adt_key=adt_key, **func_args)
+                else:
+                    func(adata, **func_args)
+                return  # Success, exit the function
+            except Exception as e:
+                attempts += 1
+                print(f"Error processing {adt_key} on attempt {attempts}: {e}")
+                if attempts >= max_retries:
+                    print(f"Failed to process {adt_key} after {max_retries} attempts.")
+
+    Executor = ProcessPoolExecutor if use_processes else ThreadPoolExecutor
+    
+    with Executor(max_workers=num_workers) as executor:
+        futures = {executor.submit(apply_func, adt_key, adata): adt_key for adt_key, adata in adata_dict.items()}
+
+        for future in as_completed(futures):
+            adt_key = futures[future]
+            try:
+                future.result()  # Retrieve result to catch exceptions
+            except Exception as e:
+                print(f"Unhandled error processing {adt_key}: {e}")
 
 
-def adata_dict_fapply_return(adata_dict, func, **kwargs_dicts):
+def adata_dict_fapply_return(adata_dict, func, use_processes=True, num_workers=None, max_retries=0, **kwargs_dicts):
     """
-    Applies a given function to each AnnData object in the adata_dict, with additional
-    values from other dictionaries or single values. The other dictionaries should
-    be passed as keyword arguments where the keys are the argument names that func takes.
+    Applies a given function to each AnnData object in the adata_dict, with error handling,
+    retry mechanism, and the option to use either threading or multiprocessing. Returns
+    a dictionary with the results of the function applied to each AnnData object.
 
     Parameters:
     - adata_dict: Dictionary of AnnData objects with keys as identifiers.
     - func: Function to apply to each AnnData object in the dictionary.
+    - use_processes: If True, use ProcessPoolExecutor; if False, use ThreadPoolExecutor.
+    - num_workers: Number of worker processes or threads to use (default: number of CPUs available).
+    - max_retries: Maximum number of retries for a failed task.
     - kwargs_dicts: Additional keyword arguments to pass to the function, where each argument can be a dictionary with keys matching the adata_dict or a single value.
 
     Returns:
     - dict: A dictionary with the same keys as adata_dict, containing the results of the function applied to each AnnData object.
     """
-    import inspect
     sig = inspect.signature(func)
     accepts_key = 'adt_key' in sig.parameters
 
-    results = {}
-    for adt_key, adata in adata_dict.items():
+    def apply_func(adt_key, adata):
         func_args = {}
         for arg_name, arg_value in kwargs_dicts.items():
             if isinstance(arg_value, dict):
@@ -153,57 +178,105 @@ def adata_dict_fapply_return(adata_dict, func, **kwargs_dicts):
                     func_args[arg_name] = arg_value[adt_key]
             else:
                 func_args[arg_name] = arg_value
-        
-        if accepts_key:
-            results[adt_key] = func(adata, adt_key=adt_key, **func_args)
-        else:
-            results[adt_key] = func(adata, **func_args)
-    return results
-        
 
-# def adata_dict_fapply(adata_dict, func, **kwargs):
+        attempts = 0
+        while attempts < max_retries:
+            try:
+                if accepts_key:
+                    return func(adata, adt_key=adt_key, **func_args)
+                else:
+                    return func(adata, **func_args)
+            except Exception as e:
+                attempts += 1
+                print(f"Error processing {adt_key} on attempt {attempts}: {e}")
+                if attempts >= max_retries:
+                    print(f"Failed to process {adt_key} after {max_retries} attempts.")
+                    return None  # Optionally, return None or raise an error
+
+    Executor = ProcessPoolExecutor if use_processes else ThreadPoolExecutor
+
+    results = {}
+    with Executor(max_workers=num_workers) as executor:
+        futures = {executor.submit(apply_func, adt_key, adata): adt_key for adt_key, adata in adata_dict.items()}
+
+        for future in as_completed(futures):
+            adt_key = futures[future]
+            try:
+                result = future.result()  # Retrieve result to catch exceptions
+                if result is not None:
+                    results[adt_key] = result
+            except Exception as e:
+                print(f"Unhandled error processing {adt_key}: {e}")
+                results[adt_key] = None  # Optionally, return None or handle differently
+
+    return results
+
+
+# def adata_dict_fapply(adata_dict, func, **kwargs_dicts):
 #     """
-#     Applies a given function to each AnnData object in the adata_dict.
+#     Applies a given function to each AnnData object in the adata_dict, with additional
+#     values from other dictionaries or single values. The other dictionaries should
+#     be passed as keyword arguments where the keys are the argument names that func takes.
 
 #     Parameters:
 #     - adata_dict: Dictionary of AnnData objects with keys as identifiers.
 #     - func: Function to apply to each AnnData object in the dictionary.
-#     - kwargs: Additional keyword arguments to pass to the function.
+#     - kwargs_dicts: Additional keyword arguments to pass to the function, where each argument can be a dictionary with keys matching the adata_dict or a single value.
 
 #     Returns:
 #     - None: The function modifies the AnnData objects in place.
 #     """
+#     import inspect
 #     sig = inspect.signature(func)
-#     accepts_key = 'key' in sig.parameters
+#     accepts_key = 'adt_key' in sig.parameters
 
-#     for key, adata in adata_dict.items():
+#     for adt_key, adata in adata_dict.items():
+#         func_args = {}
+#         for arg_name, arg_value in kwargs_dicts.items():
+#             if isinstance(arg_value, dict):
+#                 if adt_key in arg_value:
+#                     func_args[arg_name] = arg_value[adt_key]
+#             else:
+#                 func_args[arg_name] = arg_value
+        
 #         if accepts_key:
-#             func(adata, key=key, **kwargs)
+#             func(adata, adt_key=adt_key, **func_args)
 #         else:
-#             func(adata, **kwargs)
+#             func(adata, **func_args)
 
 
-# def adata_dict_fapply_return(adata_dict, func, **kwargs):
+# def adata_dict_fapply_return(adata_dict, func, **kwargs_dicts):
 #     """
-#     Applies a given function to each AnnData object in the adata_dict and returns the results in a dictionary.
+#     Applies a given function to each AnnData object in the adata_dict, with additional
+#     values from other dictionaries or single values. The other dictionaries should
+#     be passed as keyword arguments where the keys are the argument names that func takes.
 
 #     Parameters:
-#     - adata_dict (dict): Dictionary of AnnData objects with keys as identifiers.
+#     - adata_dict: Dictionary of AnnData objects with keys as identifiers.
 #     - func: Function to apply to each AnnData object in the dictionary.
-#     - kwargs: Additional keyword arguments to pass to the function.
+#     - kwargs_dicts: Additional keyword arguments to pass to the function, where each argument can be a dictionary with keys matching the adata_dict or a single value.
 
 #     Returns:
 #     - dict: A dictionary with the same keys as adata_dict, containing the results of the function applied to each AnnData object.
 #     """
+#     import inspect
 #     sig = inspect.signature(func)
-#     accepts_key = 'key' in sig.parameters
+#     accepts_key = 'adt_key' in sig.parameters
 
 #     results = {}
-#     for key, adata in adata_dict.items():
+#     for adt_key, adata in adata_dict.items():
+#         func_args = {}
+#         for arg_name, arg_value in kwargs_dicts.items():
+#             if isinstance(arg_value, dict):
+#                 if adt_key in arg_value:
+#                     func_args[arg_name] = arg_value[adt_key]
+#             else:
+#                 func_args[arg_name] = arg_value
+        
 #         if accepts_key:
-#             results[key] = func(adata, key=key, **kwargs)
+#             results[adt_key] = func(adata, adt_key=adt_key, **func_args)
 #         else:
-#             results[key] = func(adata, **kwargs)
+#             results[adt_key] = func(adata, **func_args)
 #     return results
 
 
