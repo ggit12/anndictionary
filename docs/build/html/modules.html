@@ -126,6 +126,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#anndict.utils.convert_obs_col_to_category"><code class="docutils literal notranslate"><span class="pre">convert_obs_col_to_category()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#anndict.utils.convert_obs_col_to_string"><code class="docutils literal notranslate"><span class="pre">convert_obs_col_to_string()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#anndict.utils.convert_obs_index_to_str"><code class="docutils literal notranslate"><span class="pre">convert_obs_index_to_str()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#anndict.utils.get_adata_columns"><code class="docutils literal notranslate"><span class="pre">get_adata_columns()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#anndict.utils.create_color_map"><code class="docutils literal notranslate"><span class="pre">create_color_map()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#anndict.utils.UCE_adata"><code class="docutils literal notranslate"><span class="pre">UCE_adata()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#anndict.ai.bedrock_init"><code class="docutils literal notranslate"><span class="pre">bedrock_init()</span></code></a></li>
@@ -331,12 +332,13 @@ dict: Nested dictionary of AnnData objects split by the additional desired strat
 <dl class="py function">
 <dt class="sig sig-object py" id="anndict.dict.concatenate_adata_dict">
 <span class="sig-prename descclassname"><span class="pre">anndict.dict.</span></span><span class="sig-name descname"><span class="pre">concatenate_adata_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata_dict</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/dict.html#concatenate_adata_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.dict.concatenate_adata_dict" title="Link to this definition"></a></dt>
-<dd><p>Concatenates all AnnData objects in adata_dict into a single AnnData object. join defualts to “outer” and index_unique defaults to “-“.</p>
+<dd><p>Concatenates all AnnData objects in adata_dict into a single AnnData object.
+If only a single AnnData object is present, returns it as is.</p>
 <p>Parameters:
 - adata_dict (dict): Dictionary of AnnData objects with keys as identifiers.
-- kwargs: Additional keyword arguments, including ‘join’ which specifies the join method for concatenation.</p>
+- kwargs: Additional keyword arguments for concatenation.</p>
 <p>Returns:
-- AnnData: A single AnnData object that combines all the subsets in adata_dict.</p>
+- AnnData: A single AnnData object or the original AnnData object if only one is provided.</p>
 </dd></dl>
 
 <dl class="py function">
@@ -1124,6 +1126,26 @@ None: The function modifies the adata object in-place.</p>
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="anndict.utils.get_adata_columns">
+<span class="sig-prename descclassname"><span class="pre">anndict.utils.</span></span><span class="sig-name descname"><span class="pre">get_adata_columns</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">col_startswith</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">col_endswith</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">col_contains</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">not_col_startswith</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">not_col_endswith</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">not_col_contains</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/utils.html#get_adata_columns"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.utils.get_adata_columns" title="Link to this definition"></a></dt>
+<dd><p>Extract columns from an AnnData object’s observation dataframe (<cite>adata.obs</cite>) based on specified filtering criteria.</p>
+<p>Parameters:
+adata : AnnData The AnnData object containing the observation dataframe (adata.obs) from which columns are selected.
+col_{startswith, endswith, contains} : list of str, optional
+Lists of substrings to positively filter columns.
+- col_startswith: Select columns that start with any of these strings.
+- col_endswith: Select columns that end with any of these strings.
+- col_contains: Select columns that contain any of these strings.
+not_col_{startswith, endswith, contains} : list of str, optional
+Lists of substrings to negatively filter columns from the previously selected ones.
+- not_col_startswith: Exclude columns that start with any of these strings.
+- not_col_endswith: Exclude columns that end with any of these strings.
+- not_col_contains: Exclude columns that contain any of these strings.</p>
+<p>Returns:
+list of str A list of unique column names from adata.obs that match the specified criteria.</p>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="anndict.utils.create_color_map">
 <span class="sig-prename descclassname"><span class="pre">anndict.utils.</span></span><span class="sig-name descname"><span class="pre">create_color_map</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keys</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/utils.html#create_color_map"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.utils.create_color_map" title="Link to this definition"></a></dt>
 <dd><p>Creates a unified color map for given keys from an AnnData object, differentiating
@@ -1239,9 +1261,9 @@ The result of process_response if successful, or the result of failure_handler i
 <dt class="sig sig-object py" id="anndict.ai.extract_dictionary_from_ai_string">
 <span class="sig-prename descclassname"><span class="pre">anndict.ai.</span></span><span class="sig-name descname"><span class="pre">extract_dictionary_from_ai_string</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ai_string</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/ai.html#extract_dictionary_from_ai_string"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.ai.extract_dictionary_from_ai_string" title="Link to this definition"></a></dt>
 <dd><p>Cleans a generated string by removing everything before the first ‘{’
-and everything after the last ‘}’.</p>
+and everything after the first ‘}’.</p>
 <p>Args:
-generated_string (str): The string generated by GPT-4o which includes unwanted characters or code.</p>
+generated_string (str): The string generated by retry_call_llm which includes unwanted characters or code.</p>
 <p>Returns:
 str: A cleaned string that can be evaluated as a dictionary.</p>
 </dd></dl>
