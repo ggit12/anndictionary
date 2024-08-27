@@ -411,6 +411,10 @@ def call_llm(messages, **kwargs):
     # Call the LLM with the processed parameters
     response = llm(langchain_messages, **kwargs)
 
+    # Write the response to a file instead of printing it
+    with open(os.getenv("RESPONSE_PATH", "response.txt"), "w") as f:
+        f.write(response.content.strip())
+        
     return response.content.strip()
 
 def retry_llm_call(messages, process_response, failure_handler, max_attempts=5, llm_kwargs=None, failure_kwargs=None):
@@ -713,7 +717,7 @@ def ai_cell_type(gene_list, tissue=None):
     # Call the LLM using the call_llm function
     annotation = call_llm(
         messages=messages,
-        max_tokens=200,
+        max_tokens=100,
         temperature=0
     )
 
