@@ -412,9 +412,9 @@ def call_llm(messages, **kwargs):
     response = llm(langchain_messages, **kwargs)
 
     # Write the response to a file instead of printing it
-    with open(os.getenv("RESPONSE_PATH", "response.txt"), "w") as f:
-        f.write(response.content.strip())
-        
+    with open(os.getenv("RESPONSE_PATH", "response.txt"), "a") as f:
+        f.write(response)
+
     return response.content.strip()
 
 def retry_llm_call(messages, process_response, failure_handler, max_attempts=5, llm_kwargs=None, failure_kwargs=None):
