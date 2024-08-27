@@ -95,7 +95,23 @@ class AdataDict(dict):
         return results
 
 
-def adata_dict_fapply(adata_dict, func, use_processes=True, num_workers=None, max_retries=0, **kwargs_dicts):
+
+def apply_func(adt_key, adata, func, accepts_key, max_retries, **func_args):
+    attempts = -1
+    while attempts < max_retries:
+        try:
+            if accepts_key:
+                func(adata, adt_key=adt_key, **func_args)
+            else:
+                func(adata, **func_args)
+            return  # Success, exit the function
+        except Exception as e:
+            attempts += 1
+            print(f"Error processing {adt_key} on attempt {attempts}: {e}")
+            if attempts >= max_retries:
+                print(f"Failed to process {adt_key} after {max_retries} attempts.")
+
+def adata_dict_fapply(adata_dict, func, use_processes=False, num_workers=None, max_retries=0, **kwargs_dicts):
     """
     Applies a given function to each AnnData object in the adata_dict, with error handling,
     retry mechanism, and the option to use either threading or multiprocessing.
@@ -103,7 +119,7 @@ def adata_dict_fapply(adata_dict, func, use_processes=True, num_workers=None, ma
     Parameters:
     - adata_dict: Dictionary of AnnData objects with keys as identifiers.
     - func: Function to apply to each AnnData object in the dictionary.
-    - use_processes: If True, use ProcessPoolExecutor; if False, use ThreadPoolExecutor.
+    - use_processes: (Currently not implemented) If True, use ProcessPoolExecutor; if False, use ThreadPoolExecutor.
     - num_workers: Number of worker processes or threads to use (default: number of CPUs available).
     - max_retries: Maximum number of retries for a failed task.
     - kwargs_dicts: Additional keyword arguments to pass to the function, where each argument can be a dictionary with keys matching the adata_dict or a single value.
@@ -114,33 +130,18 @@ def adata_dict_fapply(adata_dict, func, use_processes=True, num_workers=None, ma
     sig = inspect.signature(func)
     accepts_key = 'adt_key' in sig.parameters
 
-    def apply_func(adt_key, adata):
-        func_args = {}
-        for arg_name, arg_value in kwargs_dicts.items():
-            if isinstance(arg_value, dict):
-                if adt_key in arg_value:
-                    func_args[arg_name] = arg_value[adt_key]
-            else:
-                func_args[arg_name] = arg_value
-
-        attempts = 0
-        while attempts < max_retries:
-            try:
-                if accepts_key:
-                    func(adata, adt_key=adt_key, **func_args)
-                else:
-                    func(adata, **func_args)
-                return  # Success, exit the function
-            except Exception as e:
-                attempts += 1
-                print(f"Error processing {adt_key} on attempt {attempts}: {e}")
-                if attempts >= max_retries:
-                    print(f"Failed to process {adt_key} after {max_retries} attempts.")
-
-    Executor = ProcessPoolExecutor if use_processes else ThreadPoolExecutor
+    # Executor = ProcessPoolExecutor if use_processes else ThreadPoolExecutor
+    Executor = ThreadPoolExecutor
     
     with Executor(max_workers=num_workers) as executor:
-        futures = {executor.submit(apply_func, adt_key, adata): adt_key for adt_key, adata in adata_dict.items()}
+        futures = {
+            executor.submit(
+                apply_func, adt_key, adata, func, accepts_key, max_retries, **{
+                    arg_name: (arg_value[adt_key] if isinstance(arg_value, dict) else arg_value)
+                    for arg_name, arg_value in kwargs_dicts.items()
+                }
+            ): adt_key for adt_key, adata in adata_dict.items()
+        }
 
         for future in as_completed(futures):
             adt_key = futures[future]
@@ -150,7 +151,23 @@ def adata_dict_fapply(adata_dict, func, use_processes=True, num_workers=None, ma
                 print(f"Unhandled error processing {adt_key}: {e}")
 
 
-def adata_dict_fapply_return(adata_dict, func, use_processes=True, num_workers=None, max_retries=0, **kwargs_dicts):
+def apply_func_return(adt_key, adata, func, accepts_key, max_retries, **func_args):
+    attempts = -1
+    while attempts < max_retries:
+        try:
+            if accepts_key:
+                return func(adata, adt_key=adt_key, **func_args)
+            else:
+                return func(adata, **func_args)
+        except Exception as e:
+            attempts += 1
+            print(f"Error processing {adt_key} on attempt {attempts}: {e}")
+            if attempts >= max_retries:
+                print(f"Failed to process {adt_key} after {max_retries} attempts.")
+                return f"Error: {e}"  # Optionally, return None or raise an error
+
+
+def adata_dict_fapply_return(adata_dict, func, use_processes=False, num_workers=None, max_retries=0, **kwargs_dicts):
     """
     Applies a given function to each AnnData object in the adata_dict, with error handling,
     retry mechanism, and the option to use either threading or multiprocessing. Returns
@@ -159,7 +176,7 @@ def adata_dict_fapply_return(adata_dict, func, use_processes=True, num_workers=N
     Parameters:
     - adata_dict: Dictionary of AnnData objects with keys as identifiers.
     - func: Function to apply to each AnnData object in the dictionary.
-    - use_processes: If True, use ProcessPoolExecutor; if False, use ThreadPoolExecutor.
+    - use_processes: (Currently not implemented) If True, use ProcessPoolExecutor; if False, use ThreadPoolExecutor.
     - num_workers: Number of worker processes or threads to use (default: number of CPUs available).
     - max_retries: Maximum number of retries for a failed task.
     - kwargs_dicts: Additional keyword arguments to pass to the function, where each argument can be a dictionary with keys matching the adata_dict or a single value.
@@ -170,34 +187,19 @@ def adata_dict_fapply_return(adata_dict, func, use_processes=True, num_workers=N
     sig = inspect.signature(func)
     accepts_key = 'adt_key' in sig.parameters
 
-    def apply_func(adt_key, adata):
-        func_args = {}
-        for arg_name, arg_value in kwargs_dicts.items():
-            if isinstance(arg_value, dict):
-                if adt_key in arg_value:
-                    func_args[arg_name] = arg_value[adt_key]
-            else:
-                func_args[arg_name] = arg_value
-
-        attempts = 0
-        while attempts < max_retries:
-            try:
-                if accepts_key:
-                    return func(adata, adt_key=adt_key, **func_args)
-                else:
-                    return func(adata, **func_args)
-            except Exception as e:
-                attempts += 1
-                print(f"Error processing {adt_key} on attempt {attempts}: {e}")
-                if attempts >= max_retries:
-                    print(f"Failed to process {adt_key} after {max_retries} attempts.")
-                    return None  # Optionally, return None or raise an error
-
-    Executor = ProcessPoolExecutor if use_processes else ThreadPoolExecutor
+    # Executor = ProcessPoolExecutor if use_processes else ThreadPoolExecutor
+    Executor = ThreadPoolExecutor
 
     results = {}
     with Executor(max_workers=num_workers) as executor:
-        futures = {executor.submit(apply_func, adt_key, adata): adt_key for adt_key, adata in adata_dict.items()}
+        futures = {
+            executor.submit(
+                apply_func_return, adt_key, adata, func, accepts_key, max_retries, **{
+                    arg_name: (arg_value[adt_key] if isinstance(arg_value, dict) else arg_value)
+                    for arg_name, arg_value in kwargs_dicts.items()
+                }
+            ): adt_key for adt_key, adata in adata_dict.items()
+        }
 
         for future in as_completed(futures):
             adt_key = futures[future]
@@ -1421,6 +1423,7 @@ def ai_annotate(func, adata, groupby, n_top_genes, label_column, **kwargs):
     # Check if rank_genes_groups has already been run
     if 'rank_genes_groups' not in adata.uns or adata.uns['rank_genes_groups']['params']['groupby'] != groupby:
         # Run the differential expression analysis
+        print(f"rerunning diffexp analysis because not found in adata.uns for adata.obs['{groupby}']. (run before annotating to avoid this)")
         sc.tl.rank_genes_groups(adata, groupby, method='t-test')
 
     # Initialize a dictionary to store cell type annotations
