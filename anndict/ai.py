@@ -112,7 +112,8 @@ def google_genai_init(constructor_args, **kwargs):
     if 'temperature' in kwargs:
         constructor_args['temperature'] = kwargs.pop('temperature')
 
-    constructor_args['convert_system_message_to_human'] = True
+    # constructor_args['convert_system_message_to_human'] = True
+    kwargs['supports_system_messages'] = False
 
     #Google API will send ignorable warnings if you are on mac, so supress them by setting this env var
     os.environ['GRPC_VERBOSITY'] = 'ERROR'
