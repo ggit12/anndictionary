@@ -49,7 +49,20 @@ def bedrock_init(constructor_args: Dict[str, Any], **kwargs) -> Dict[str, Any]:
     if not model_id:
         raise ValueError("model_id (LLM_MODEL) is required for BedrockChat")
     
-    # Create a boto3 session with explicit credentials if provided
+    #Define models that do not support system messages
+    models_not_supporting_system_messages = {
+        'amazon.titan-text-express-v1',
+        'amazon.titan-text-lite-v1',
+        'ai21.j2-ultra-v1'
+    }
+    
+    #Determine if the specific model does not support system messages
+    supports_system_messages = model_id not in models_not_supporting_system_messages
+    
+    #Add system message support flag to kwargs
+    kwargs['supports_system_messages'] = supports_system_messages
+    
+    #Create a boto3 session with explicit credentials if provided
     session = boto3.Session(
         aws_access_key_id=aws_access_key_id,
         aws_secret_access_key=aws_secret_access_key,
@@ -58,14 +71,14 @@ def bedrock_init(constructor_args: Dict[str, Any], **kwargs) -> Dict[str, Any]:
     
     bedrock_client = session.client('bedrock-runtime')
     
-    # Create a new dict with only the allowed parameters
+    #Create a new dict with only the allowed parameters
     allowed_params = ['model', 'client', 'streaming', 'callbacks']
     filtered_args = {k: v for k, v in constructor_args.items() if k in allowed_params}
     
     # filtered_args['model_id'] = model_id
     filtered_args['client'] = bedrock_client
     
-    # Add a debug print to see what's being passed to BedrockChat
+    #Add a debug print to see what's being passed to BedrockChat
     # print(f"BedrockChat constructor args: {json.dumps(filtered_args, default=str, indent=2)}")
     
     return filtered_args, kwargs
@@ -394,20 +407,24 @@ def call_llm(messages, **kwargs):
     """Calls the configured LLM provider with the given parameters."""
     config = get_llm_config()
     llm = get_llm(**kwargs)
+
+    # Get the provider-specific parameter handler
+    _, kwargs = PROVIDER_MAPPING[config['provider']]['init_func']({}, **kwargs)
+
+    # Check if this model doesn't support system messages
+    supports_system_messages = kwargs.pop('supports_system_messages', True)
     
     message_types = {
-        'system': SystemMessage,
+        'system': SystemMessage if supports_system_messages is not False else HumanMessage,
         'user': HumanMessage,
         'assistant': AIMessage
     }
+
     langchain_messages = [
         message_types.get(msg['role'], HumanMessage)(content=msg['content'])
         for msg in messages
     ]
 
-    # Get the provider-specific parameter handler
-    _, kwargs = PROVIDER_MAPPING[config['provider']]['init_func']({}, **kwargs)
-    
     # Call the LLM with the processed parameters
     response = llm(langchain_messages, **kwargs)
 
