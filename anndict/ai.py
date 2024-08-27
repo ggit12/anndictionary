@@ -413,7 +413,7 @@ def call_llm(messages, **kwargs):
 
     # Write the response to a file instead of printing it
     with open(os.getenv("RESPONSE_PATH", "response.txt"), "a") as f:
-        f.write(response)
+        f.write(f"{response}")
 
     return response.content.strip()
 
