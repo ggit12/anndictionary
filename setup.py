@@ -29,7 +29,8 @@ setup(
         'langchain-aws',
         'boto3',
         'bokeh',
-        'holoviews'
+        'holoviews',
+        'krippendorff'
     ],
     classifiers=[
         # Trove classifiers
