@@ -109,10 +109,11 @@
 <li class="toctree-l2"><a class="reference internal" href="#anndict.dict.ai_annotate_by_comparison"><code class="docutils literal notranslate"><span class="pre">ai_annotate_by_comparison()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#anndict.dict.ai_annotate"><code class="docutils literal notranslate"><span class="pre">ai_annotate()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#anndict.dict.ai_unify_labels"><code class="docutils literal notranslate"><span class="pre">ai_unify_labels()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#anndict.dict.normalize_label"><code class="docutils literal notranslate"><span class="pre">normalize_label()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#anndict.dict.ensure_label_consistency_adata_dict"><code class="docutils literal notranslate"><span class="pre">ensure_label_consistency_adata_dict()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#anndict.dict.ensure_label_consistency_adata"><code class="docutils literal notranslate"><span class="pre">ensure_label_consistency_adata()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#anndict.dict.ensure_label_consistency_main"><code class="docutils literal notranslate"><span class="pre">ensure_label_consistency_main()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#anndict.dict.create_label_df"><code class="docutils literal notranslate"><span class="pre">create_label_df()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#anndict.dict.ai_label_agreement"><code class="docutils literal notranslate"><span class="pre">ai_label_agreement()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#anndict.dict.ai_compare_cell_type_labels"><code class="docutils literal notranslate"><span class="pre">ai_compare_cell_type_labels()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#anndict.dict.ai_compare_cell_type_labels_adata_dict"><code class="docutils literal notranslate"><span class="pre">ai_compare_cell_type_labels_adata_dict()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#anndict.dict.ai_compare_cell_type_labels_pairwise"><code class="docutils literal notranslate"><span class="pre">ai_compare_cell_type_labels_pairwise()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#anndict.dict.ai_compare_cell_type_labels_pairwise_adata_dict"><code class="docutils literal notranslate"><span class="pre">ai_compare_cell_type_labels_pairwise_adata_dict()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#anndict.dict.plot_sankey_adata_dict"><code class="docutils literal notranslate"><span class="pre">plot_sankey_adata_dict()</span></code></a></li>
@@ -171,6 +172,8 @@
 <li class="toctree-l2"><a class="reference internal" href="#anndict.stablelabel.save_sankey"><code class="docutils literal notranslate"><span class="pre">save_sankey()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#anndict.stablelabel.plot_grouped_average"><code class="docutils literal notranslate"><span class="pre">plot_grouped_average()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#anndict.stablelabel.plot_model_agreement"><code class="docutils literal notranslate"><span class="pre">plot_model_agreement()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#anndict.stablelabel.kappa_adata"><code class="docutils literal notranslate"><span class="pre">kappa_adata()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#anndict.stablelabel.krippendorff_alpha_adata"><code class="docutils literal notranslate"><span class="pre">krippendorff_alpha_adata()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#anndict.stablelabel.harmony_label_transfer"><code class="docutils literal notranslate"><span class="pre">harmony_label_transfer()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#anndict.spatial_dict.read_data"><code class="docutils literal notranslate"><span class="pre">read_data()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#anndict.spatial_dict.get_steps_and_coords"><code class="docutils literal notranslate"><span class="pre">get_steps_and_coords()</span></code></a></li>
@@ -943,58 +946,70 @@ dict: A mapping dictionary where the keys are the original labels and the values
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="anndict.dict.normalize_label">
+<span class="sig-prename descclassname"><span class="pre">anndict.dict.</span></span><span class="sig-name descname"><span class="pre">normalize_label</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/dict.html#normalize_label"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.dict.normalize_label" title="Link to this definition"></a></dt>
+<dd><p>Function to normalize labels by stripping whitespace, converting to lowercase, etc.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="anndict.dict.ensure_label_consistency_adata_dict">
+<span class="sig-prename descclassname"><span class="pre">anndict.dict.</span></span><span class="sig-name descname"><span class="pre">ensure_label_consistency_adata_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cols</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simplification_level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'unified,</span> <span class="pre">typo-fixed'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_col_prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'consistent'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/dict.html#ensure_label_consistency_adata_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.dict.ensure_label_consistency_adata_dict" title="Link to this definition"></a></dt>
+<dd><p>Apply label consistency across multiple AnnData objects in a dictionary.</p>
+<p>This function applies ensure_label_consistency_adata to each AnnData in adata_dict.</p>
+<p>Parameters:
+adata_dict : dict Dictionary of AnnData objects.
+cols : list List of column names in adata.obs for which label consistency is enforced.
+simplification_level : str, optional Level of label simplification (default is ‘unified, typo-fixed’).
+new_col_prefix : str, optional Prefix for the new consistent label columns (default is ‘consistent’).</p>
+<p>See ensure_label_consistency_adata for details.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="anndict.dict.ensure_label_consistency_adata">
+<span class="sig-prename descclassname"><span class="pre">anndict.dict.</span></span><span class="sig-name descname"><span class="pre">ensure_label_consistency_adata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cols</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simplification_level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'unified,</span> <span class="pre">typo-fixed'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_col_prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'consistent'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/dict.html#ensure_label_consistency_adata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.dict.ensure_label_consistency_adata" title="Link to this definition"></a></dt>
+<dd><p>Wrapper function to ensure label consistency across specified columns in an AnnData object.</p>
+<p>Parameters:
+- adata: AnnData object
+- cols: List of column names in adata.obs to ensure label consistency
+- simplification_level: Level of simplification for label mapping
+- new_col_prefix: Prefix to create new columns in adata.obs. Default is “” (overwrites original columns).</p>
+<p>Returns:
+- Updated adata with consistent labels in adata.obs[new_col_prefix + cols]
+- label_map: Dictionary mapping original labels to the simplified labels</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="anndict.dict.ensure_label_consistency_main">
+<span class="sig-prename descclassname"><span class="pre">anndict.dict.</span></span><span class="sig-name descname"><span class="pre">ensure_label_consistency_main</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simplification_level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'unified,</span> <span class="pre">typo-fixed'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/dict.html#ensure_label_consistency_main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.dict.ensure_label_consistency_main" title="Link to this definition"></a></dt>
+<dd><p>Function to ensure label consistency across multiple columns in a DataFrame
+by mapping labels to a unified and simplified set.</p>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="anndict.dict.create_label_df">
-<span class="sig-prename descclassname"><span class="pre">anndict.dict.</span></span><span class="sig-name descname"><span class="pre">create_label_df</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cols</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/dict.html#create_label_df"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.dict.create_label_df" title="Link to this definition"></a></dt>
-<dd><p>Create a DataFrame of unique rows from specified columns in adata.obs.</p>
-<p>Parameters:
+<span class="sig-prename descclassname"><span class="pre">anndict.dict.</span></span><span class="sig-name descname"><span class="pre">create_label_df</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cols1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cols2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/dict.html#create_label_df"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.dict.create_label_df" title="Link to this definition"></a></dt>
+<dd><p>Create a DataFrame of unique label combinations from the specified columns in cols1 and cols2,
+only including combinations that exist in adata.obs.
+Parameters:
 adata: AnnData object containing the data.
-cols: List of column names to extract and deduplicate.</p>
-<p>Returns:
-pd.DataFrame: DataFrame with unique rows based on the specified columns.</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="anndict.dict.ai_label_agreement">
-<span class="sig-prename descclassname"><span class="pre">anndict.dict.</span></span><span class="sig-name descname"><span class="pre">ai_label_agreement</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cols</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_col_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">func</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/dict.html#ai_label_agreement"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.dict.ai_label_agreement" title="Link to this definition"></a></dt>
-<dd><p>Apply a function row-wise to the unique rows of specified columns in adata.obs.</p>
-<p>Parameters:
-adata: AnnData object The AnnData object containing the data.
-cols: list List of column names to extract and deduplicate.
-new_col_name: str Name of the new column to store the function results.
-func: function Function to apply to each row, which takes two string arguments.</p>
-<p>Returns:
-pd.DataFrame DataFrame with an additional column for the function results.</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="anndict.dict.ai_compare_cell_type_labels">
-<span class="sig-prename descclassname"><span class="pre">anndict.dict.</span></span><span class="sig-name descname"><span class="pre">ai_compare_cell_type_labels</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cols</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_col_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'agreement'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comparison_level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'binary'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/dict.html#ai_compare_cell_type_labels"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.dict.ai_compare_cell_type_labels" title="Link to this definition"></a></dt>
-<dd><p>Compare cell type labels using a specified comparison function.</p>
-<p>Parameters:
-adata: AnnData object containing the data.
-cols: List of two column names to extract and compare.
-comparison_level: ‘binary’ or ‘categorical’, determines which comparison function to use.</p>
-<p>Returns:
-pd.DataFrame: DataFrame with an additional column for the comparison results.</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="anndict.dict.ai_compare_cell_type_labels_adata_dict">
-<span class="sig-prename descclassname"><span class="pre">anndict.dict.</span></span><span class="sig-name descname"><span class="pre">ai_compare_cell_type_labels_adata_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cols</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_col_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'agreement'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comparison_level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'binary'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/dict.html#ai_compare_cell_type_labels_adata_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.dict.ai_compare_cell_type_labels_adata_dict" title="Link to this definition"></a></dt>
-<dd><p>Applies ai_compare_cell_type_labels to each anndata in an anndict.</p>
+cols1: List of columns to compare against cols2.
+cols2: List of columns to compare with cols1.
+Returns:
+pd.DataFrame: DataFrame containing unique combinations of the specified columns.</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="anndict.dict.ai_compare_cell_type_labels_pairwise">
 <span class="sig-prename descclassname"><span class="pre">anndict.dict.</span></span><span class="sig-name descname"><span class="pre">ai_compare_cell_type_labels_pairwise</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cols1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cols2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_col_prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'agreement'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comparison_level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'binary'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/dict.html#ai_compare_cell_type_labels_pairwise"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.dict.ai_compare_cell_type_labels_pairwise" title="Link to this definition"></a></dt>
-<dd><p>Compares all pairs of cols1 with cols2 using ai_compare_cell_type_labels.</p>
-<p>Parameters:
+<dd><p>Compare cell type labels by finding unique combinations between labels in cols1 and cols2,
+applying the comparison, and mapping the results back to adata.obs.
+Parameters:
 adata: AnnData object containing the data.
 cols1: List of columns to compare against cols2.
-cols2: List of column names to compare with cols1.
-new_col_name: The base name for the new comparison result columns.
-comparison_level: ‘binary’ or ‘categorical’, determines which comparison function to use.</p>
-<p>Returns:
+cols2: List of columns to compare with cols1.
+new_col_prefix: The base name for the new comparison result columns.
+comparison_level: ‘binary’ or ‘categorical’, determines which comparison function to use.
+Returns:
 dict: Dictionary with keys as tuples of (col1, col2) and values as DataFrames with the comparison results.</p>
 </dd></dl>
 
@@ -1658,6 +1673,33 @@ adt_key : str, optional Optional identifier to append to the filename.</p>
 - sub_group_by: str, key in adata.obs for the sub-grouping (e.g., ‘tissue’).
 - model_cols: list of str, column names for the models (e.g., [‘agreement_model_1’, ‘agreement_model_2’]).
 - granularity: int, level of detail in the plot (0 = models only, 1 = models within cell types, 2 = models within cell types and tissues).</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="anndict.stablelabel.kappa_adata">
+<span class="sig-prename descclassname"><span class="pre">anndict.stablelabel.</span></span><span class="sig-name descname"><span class="pre">kappa_adata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cols</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/stablelabel.html#kappa_adata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.stablelabel.kappa_adata" title="Link to this definition"></a></dt>
+<dd><p>Calculate pairwise Cohen’s Kappa, average pairwise Kappa, and Fleiss’ Kappa
+for categorical data in adata.obs[cols].</p>
+<p>Parameters:
+- adata: AnnData object.
+- cols: List of columns in adata.obs to use for calculating agreement.</p>
+<p>Returns:
+- Dictionary with keys ‘pairwise’, ‘average_pairwise’, and ‘fleiss’:
+- ‘pairwise’: A dictionary with pairwise Cohen’s Kappa values.
+- ‘average_pairwise’: A dictionary with the average pairwise Kappa for each rater.
+- ‘fleiss’: The Fleiss’ Kappa value for the overall agreement across all raters.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="anndict.stablelabel.krippendorff_alpha_adata">
+<span class="sig-prename descclassname"><span class="pre">anndict.stablelabel.</span></span><span class="sig-name descname"><span class="pre">krippendorff_alpha_adata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cols</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level_of_measurement</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'nominal'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/stablelabel.html#krippendorff_alpha_adata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.stablelabel.krippendorff_alpha_adata" title="Link to this definition"></a></dt>
+<dd><p>Calculate Krippendorff’s Alpha for categorical data in adata.obs[cols].</p>
+<p>Parameters:
+- adata: AnnData object.
+- cols: List of columns in adata.obs to use for calculating agreement.
+- level_of_measurement: The type of data (‘nominal’, ‘ordinal’, ‘interval’, ‘ratio’). Default is ‘nominal’ (for categorical data).</p>
+<p>Returns:
+- Krippendorff’s Alpha for the specified columns in adata.obs.</p>
 </dd></dl>
 
 <dl class="py function">
