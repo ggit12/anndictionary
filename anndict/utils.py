@@ -169,6 +169,15 @@ def get_adata_columns(adata, col_startswith=None, col_endswith=None, col_contain
     columns = adata.obs.columns
     matched_columns = []
 
+    #Get local variables and enforce that the filtering parameters are lists
+    filter_params = ['col_startswith', 'col_endswith', 'col_contains', 
+                     'not_col_startswith', 'not_col_endswith', 'not_col_contains']
+
+    for param in filter_params:
+        val = locals()[param]
+        if isinstance(val, str):
+            locals()[param] = [val]
+
     if col_startswith:
         for start in col_startswith:
             matched_columns.extend([col for col in columns if col.startswith(start)])
