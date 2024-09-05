@@ -67,7 +67,9 @@ from .stablelabel import (
     save_sankey,
     plot_grouped_average,
     plot_model_agreement,  
-    harmony_label_transfer
+    harmony_label_transfer,
+    kappa_adata,
+    krippendorff_alpha_adata
 )
 
 from .dict import (
@@ -126,17 +128,18 @@ from .dict import (
     ai_annotate_biological_process, 
     ai_annotate_biological_process_adata_dict, 
     ai_unify_labels, 
-    create_label_df, 
-    ai_label_agreement, 
-    ai_compare_cell_type_labels, 
-    ai_compare_cell_type_labels_adata_dict, 
+    create_label_df,
     ai_compare_cell_type_labels_pairwise,
     ai_compare_cell_type_labels_pairwise_adata_dict,
     create_label_hierarchy, 
     create_label_hierarchy_adata_dict, 
     plot_sankey_adata_dict, 
     save_sankey_adata_dict, 
-    plot_grouped_average_adata_dict
+    plot_grouped_average_adata_dict,
+    normalize_label,
+    ensure_label_consistency_adata_dict,
+    ensure_label_consistency_adata,
+    ensure_label_consistency_main
 )
 
 from .strata import (
@@ -264,9 +267,6 @@ __all__ = [
     'ai_compare_cell_types_binary',
     'ai_compare_cell_types_categorical'
     'create_label_df', 
-    'ai_label_agreement', 
-    'ai_compare_cell_type_labels', 
-    'ai_compare_cell_type_labels_adata_dict', 
     'ai_compare_cell_type_labels_pairwise', 
     'ai_compare_cell_type_labels_pairwise_adata_dict', 
     'plot_grouped_average', 
@@ -298,5 +298,11 @@ __all__ = [
     'default_init',
     'PROVIDER_MODELS',
     'retry_llm_call',
-    'get_adata_columns'
+    'get_adata_columns',
+    'kappa_adata',
+    'krippendorff_alpha_adata',
+    'normalize_label',
+    'ensure_label_consistency_adata_dict',
+    'ensure_label_consistency_adata',
+    'ensure_label_consistency_main'
 ]
