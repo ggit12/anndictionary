@@ -804,9 +804,9 @@ def kappa_adata(adata, cols):
 
     Returns:
     - Dictionary with keys 'pairwise', 'average_pairwise', and 'fleiss':
-        - 'pairwise': A dictionary with pairwise Cohen's Kappa values.
-        - 'average_pairwise': A dictionary with the average pairwise Kappa for each rater.
-        - 'fleiss': The Fleiss' Kappa value for the overall agreement across all raters.
+    - 'pairwise': A dictionary with pairwise Cohen's Kappa values.
+    - 'average_pairwise': A dictionary with the average pairwise Kappa for each rater.
+    - 'fleiss': The Fleiss' Kappa value for the overall agreement across all raters.
     """
     # Extract data from adata.obs based on the specified columns
     data = adata.obs[cols].to_numpy()
@@ -850,8 +850,7 @@ def krippendorff_alpha_adata(adata, cols, level_of_measurement='nominal'):
     Parameters:
     - adata: AnnData object.
     - cols: List of columns in adata.obs to use for calculating agreement.
-    - level_of_measurement: The type of data ('nominal', 'ordinal', 'interval', 'ratio').
-                            Default is 'nominal' (for categorical data).
+    - level_of_measurement: The type of data ('nominal', 'ordinal', 'interval', 'ratio'). Default is 'nominal' (for categorical data).
 
     Returns:
     - Krippendorff's Alpha for the specified columns in adata.obs.
