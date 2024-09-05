@@ -23,6 +23,12 @@ import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 from sklearn.metrics import confusion_matrix
 
+
+from sklearn.metrics import cohen_kappa_score
+from statsmodels.stats.inter_rater import fleiss_kappa
+import krippendorff
+
+
 import harmonypy as hm
 
 from .utils import create_color_map, add_label_to_adata
@@ -337,7 +343,6 @@ def stable_label_adata(adata, feature_key, label_key, classifier, max_iterations
     final_labels = label_encoder.inverse_transform(final_numeric_labels)
     
     return trained_classifier, history, iterations, final_labels, label_encoder
-
 
 
 def update_adata_labels_with_results(adata, results, new_label_key='stable_cell_type'):
@@ -786,6 +791,85 @@ def plot_model_agreement(adata, group_by, sub_group_by, model_cols, granularity=
     plt.xticks(rotation=90)
     plt.legend(title='Models' + ('' if granularity == 0 else ' and Tissues'))
     plt.show()
+
+
+def kappa_adata(adata, cols):
+    """
+    Calculate pairwise Cohen's Kappa, average pairwise Kappa, and Fleiss' Kappa
+    for categorical data in adata.obs[cols].
+
+    Parameters:
+    - adata: AnnData object.
+    - cols: List of columns in adata.obs to use for calculating agreement.
+
+    Returns:
+    - Dictionary with keys 'pairwise', 'average_pairwise', and 'fleiss':
+        - 'pairwise': A dictionary with pairwise Cohen's Kappa values.
+        - 'average_pairwise': A dictionary with the average pairwise Kappa for each rater.
+        - 'fleiss': The Fleiss' Kappa value for the overall agreement across all raters.
+    """
+    # Extract data from adata.obs based on the specified columns
+    data = adata.obs[cols].to_numpy()
+
+    num_raters = len(cols)
+    kappa_scores = {'pairwise': {}, 'average_pairwise': {}, 'fleiss': None}
+    
+    # Calculate pairwise Cohen's Kappa
+    for i in range(num_raters):
+        rater_kappas = []
+        for j in range(i + 1, num_raters):
+            kappa = cohen_kappa_score(data[:, i], data[:, j])
+            kappa_scores['pairwise'][(cols[i], cols[j])] = kappa
+            rater_kappas.append(kappa)
+        
+        # Average Kappa for this rater (with every other rater)
+        avg_kappa = np.mean(rater_kappas) if rater_kappas else None
+        kappa_scores['average_pairwise'][cols[i]] = avg_kappa
+
+    # Prepare data for Fleiss' Kappa: need to count each category occurrence per item
+    # Transpose the data to calculate category frequencies for each item (row)
+    unique_categories = np.unique(data)
+    fleiss_data = np.zeros((data.shape[0], len(unique_categories)))
+
+    # Count category occurrences per item (per row)
+    for i, item in enumerate(data):
+        for category in unique_categories:
+            fleiss_data[i, np.where(unique_categories == category)[0][0]] = np.sum(item == category)
+
+    # Calculate Fleiss' Kappa
+    fleiss_kappa_value = fleiss_kappa(fleiss_data)
+    kappa_scores['fleiss'] = fleiss_kappa_value
+
+    return kappa_scores
+
+
+def krippendorff_alpha_adata(adata, cols, level_of_measurement='nominal'):
+    """
+    Calculate Krippendorff's Alpha for categorical data in adata.obs[cols].
+
+    Parameters:
+    - adata: AnnData object.
+    - cols: List of columns in adata.obs to use for calculating agreement.
+    - level_of_measurement: The type of data ('nominal', 'ordinal', 'interval', 'ratio').
+                            Default is 'nominal' (for categorical data).
+
+    Returns:
+    - Krippendorff's Alpha for the specified columns in adata.obs.
+    """
+    # Extract data from adata.obs based on the specified columns
+    data = adata.obs[cols].to_numpy()
+
+    # Initialize LabelEncoder for each column
+    le = LabelEncoder()
+
+    # Encode categorical data to numerical values, per column
+    encoded_data = np.array([le.fit_transform(data[:, i]) for i in range(data.shape[1])]).T
+
+    # Calculate Krippendorff's Alpha
+    alpha = krippendorff.alpha(reliability_data=encoded_data, level_of_measurement=level_of_measurement)
+
+    return alpha
+
 
 #harmony label functions
 def harmony_label_transfer(adata_to_label, master_data, master_subset_column, label_column):

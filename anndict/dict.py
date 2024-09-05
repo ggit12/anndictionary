@@ -1493,106 +1493,194 @@ def ai_unify_labels(adata_dict, label_columns, new_label_column, simplification_
 
     return mapping_dict
 
+#the following functions also unify labels but serve a different purpose than ai_unify_labels.
+#ai_unify_labels is meant to unify labels across multiple adata
+#the following set of ensure_label functions are meant to operate within a single adata
+#and do not communicate across multiple adata in a dict
 
-def create_label_df(adata, cols):
+
+def normalize_label(label):
     """
-    Create a DataFrame of unique rows from specified columns in adata.obs.
+    Function to normalize labels by stripping whitespace, converting to lowercase, etc.
+    """
+    if pd.isna(label):  # Handle NaN values
+        return 'missing'
+    return label.strip().lower()
+
+
+def ensure_label_consistency_adata_dict(adata_dict, cols, simplification_level='unified, typo-fixed', new_col_prefix='consistent'):
+    """
+    Apply label consistency across multiple AnnData objects in a dictionary.
+
+    This function applies ensure_label_consistency_adata to each AnnData in adata_dict.
     
+    Parameters:
+    adata_dict : dict Dictionary of AnnData objects.
+    cols : list List of column names in adata.obs for which label consistency is enforced.
+    simplification_level : str, optional Level of label simplification (default is 'unified, typo-fixed').
+    new_col_prefix : str, optional Prefix for the new consistent label columns (default is 'consistent').
+
+    See ensure_label_consistency_adata for details.
+    """
+    return adata_dict_fapply_return(adata_dict, ensure_label_consistency_adata, cols=cols, simplification_level=simplification_level, new_col_prefix=new_col_prefix)
+
+
+def ensure_label_consistency_adata(adata, cols, simplification_level='unified, typo-fixed', new_col_prefix='consistent'):
+    """
+    Wrapper function to ensure label consistency across specified columns in an AnnData object.
+    
+    Parameters:
+    - adata: AnnData object
+    - cols: List of column names in adata.obs to ensure label consistency
+    - simplification_level: Level of simplification for label mapping
+    - new_col_prefix: Prefix to create new columns in adata.obs. Default is "" (overwrites original columns).
+    
+    Returns:
+    - Updated adata with consistent labels in adata.obs[new_col_prefix + cols]
+    - label_map: Dictionary mapping original labels to the simplified labels
+    """
+    # Step 1: Extract the relevant columns from adata.obs into a DataFrame
+    df = adata.obs[cols].copy()
+    
+    # Step 2: Ensure label consistency using the helper function
+    consistent_df, label_map = ensure_label_consistency_main(df, simplification_level)
+    
+    # Step 3: Create new columns in adata.obs with the prefix
+    for col in cols:
+        new_col_name = f"{new_col_prefix}_{col}"
+        adata.obs[new_col_name] = consistent_df[col]
+    
+    return label_map
+
+
+def ensure_label_consistency_main(df, simplification_level='unified, typo-fixed'):
+    """
+    Function to ensure label consistency across multiple columns in a DataFrame
+    by mapping labels to a unified and simplified set.
+    """
+    # Step 1: Normalize all labels in the DataFrame
+    for column in df.columns:
+        df[column] = df[column].apply(normalize_label)
+    
+    # Step 2: Create a unified set of unique labels across all columns
+    unique_labels = set()
+    for column in df.columns:
+        unique_labels.update(df[column].unique())
+    
+    # Step 3: Use the external function to map labels to a simplified set
+    unique_labels_list = list(unique_labels)
+    mapping_dict = map_cell_type_labels_to_simplified_set(unique_labels_list, simplification_level=simplification_level)
+    
+    # Step 4: Apply the mapping dictionary to all columns
+    for column in df.columns:
+        df[column] = df[column].map(mapping_dict)
+    
+    return df, mapping_dict
+
+
+def create_label_df(adata, cols1, cols2):
+    """
+    Create a DataFrame of unique label combinations from the specified columns in cols1 and cols2,
+    only including combinations that exist in adata.obs.
     Parameters:
     adata: AnnData object containing the data.
-    cols: List of column names to extract and deduplicate.
-    
+    cols1: List of columns to compare against cols2.
+    cols2: List of columns to compare with cols1.
     Returns:
-    pd.DataFrame: DataFrame with unique rows based on the specified columns.
+    pd.DataFrame: DataFrame containing unique combinations of the specified columns.
     """
-    data = adata.obs[cols]
-    unique_df = data.drop_duplicates().reset_index(drop=True)
-    return unique_df
-
-
-def ai_label_agreement(adata, cols, new_col_name, func):
-    """
-    Apply a function row-wise to the unique rows of specified columns in adata.obs.
+    # Combine all columns
+    all_cols = cols1 + cols2
     
-    Parameters:
-    adata: AnnData object The AnnData object containing the data.
-    cols: list List of column names to extract and deduplicate.
-    new_col_name: str Name of the new column to store the function results.
-    func: function Function to apply to each row, which takes two string arguments.
+    # Get unique combinations that exist in adata.obs
+    unique_combinations = adata.obs[all_cols].drop_duplicates()
     
-    Returns:
-    pd.DataFrame DataFrame with an additional column for the function results.
-    """
-    unique_label_combinations = create_label_df(adata, cols)
-    unique_label_combinations[new_col_name] = unique_label_combinations.apply(lambda row: func(row[0], row[1]), axis=1)
-    return unique_label_combinations
-
-def ai_compare_cell_type_labels(adata, cols, new_col_name='agreement', comparison_level='binary'):
-    """
-    Compare cell type labels using a specified comparison function.
+    # Melt the DataFrame to get all combinations in two columns
+    melted_df = pd.melt(unique_combinations, 
+                        id_vars=cols1, 
+                        value_vars=cols2, 
+                        var_name='col2_name', 
+                        value_name='col2')
     
-    Parameters:
-    adata: AnnData object containing the data.
-    cols: List of two column names to extract and compare.
-    comparison_level: 'binary' or 'categorical', determines which comparison function to use.
+    # Melt again to get col1 in a single column
+    result_df = pd.melt(melted_df,
+                        id_vars=['col2_name', 'col2'],
+                        value_vars=cols1,
+                        var_name='col1_name',
+                        value_name='col1')
     
-    Returns:
-    pd.DataFrame: DataFrame with an additional column for the comparison results.
-    """
-     # Check if cols is of length 2
-    if len(cols) != 2:
-        raise ValueError("The 'cols' parameter must contain exactly two elements. Simultaneous comparison between more than 2 columns may be added in the future.")
+    # Keep only the relevant columns and drop duplicates
+    result_df = result_df[['col1', 'col2']].drop_duplicates()
     
-    # Check if comparison_level is valid
-    if comparison_level not in ['binary', 'categorical']:
-        raise ValueError("comparison_level must be either 'binary' or 'categorical'.")
-    
-    raw_col_name = f"raw_{new_col_name}"
-
-    #todo: add separate filter functions for each agreement type instead of directly calculating here
-    if comparison_level == 'binary':
-        label_agreement = ai_label_agreement(adata, cols, raw_col_name, ai_compare_cell_types_binary)
-        label_agreement[new_col_name] = label_agreement[raw_col_name].str.lower().apply(lambda x: 1 if x == 'yes' else 0 if x == 'no' else None)
-    elif comparison_level == 'categorical':
-        label_agreement = ai_label_agreement(adata, cols, raw_col_name, ai_compare_cell_types_categorical)
-        label_agreement[new_col_name] = label_agreement[raw_col_name].str.lower().apply(lambda x: 0 if x == 'no match' else 1 if x == 'partial match' else 2 if x == 'perfect match' else None)
-    
-    # Merge 'agreement' column of label_agreement back to adata.obs
-    # print(label_agreement)
-    # print(cols)
-    adata.obs = adata.obs.merge(label_agreement, on=cols, how='left')
-
-    return label_agreement
-
-def ai_compare_cell_type_labels_adata_dict(adata_dict, cols, new_col_name='agreement', comparison_level='binary'):
-    """
-    Applies ai_compare_cell_type_labels to each anndata in an anndict.
-    """
-    return adata_dict_fapply_return(adata_dict, ai_compare_cell_type_labels, max_retries=3, cols=cols, new_col_name=new_col_name, comparison_level=comparison_level)
+    return result_df
 
 
 def ai_compare_cell_type_labels_pairwise(adata, cols1, cols2, new_col_prefix='agreement', comparison_level='binary'):
     """
-    Compares all pairs of cols1 with cols2 using ai_compare_cell_type_labels.
-    
+    Compare cell type labels by finding unique combinations between labels in cols1 and cols2,
+    applying the comparison, and mapping the results back to adata.obs.
     Parameters:
     adata: AnnData object containing the data.
     cols1: List of columns to compare against cols2.
-    cols2: List of column names to compare with cols1.
-    new_col_name: The base name for the new comparison result columns.
+    cols2: List of columns to compare with cols1.
+    new_col_prefix: The base name for the new comparison result columns.
     comparison_level: 'binary' or 'categorical', determines which comparison function to use.
-    
     Returns:
     dict: Dictionary with keys as tuples of (col1, col2) and values as DataFrames with the comparison results.
     """
+    # Check if comparison_level is valid
+    if comparison_level not in ['binary', 'categorical']:
+        raise ValueError("comparison_level must be either 'binary' or 'categorical'.")
+    
+    # Call create_label_df to generate the label combinations DataFrame
+    label_combinations = create_label_df(adata, cols1, cols2)
+
+    # Define the comparison and cleaning functions based on the level
+    if comparison_level == 'binary':
+        comparison_func = lambda row: ai_compare_cell_types_binary(row['col1'], row['col2'])
+        cleaning_func = lambda x: 1 if x.lower() == 'yes' else 0 if x.lower() == 'no' else None
+    elif comparison_level == 'categorical':
+        comparison_func = lambda row: ai_compare_cell_types_categorical(row['col1'], row['col2'])
+        cleaning_func = lambda x: 0 if x.lower() == 'no match' else 1 if x.lower() == 'partial match' else 2 if x.lower() == 'perfect match' else None
+
+    # Use ThreadPoolExecutor to apply the comparison function using threads
+    with ThreadPoolExecutor() as executor:
+        label_combinations['raw_agreement'] = list(executor.map(comparison_func, label_combinations.to_dict('records')))
+    
+    # Apply the cleaning function to the 'agreement' column
+    label_combinations['agreement'] = label_combinations['raw_agreement'].apply(cleaning_func)
+
+    # Initialize a dictionary to store results
     results = {}
+    
+    # Iterate over each pair of cols1 and cols2 and map the comparison results back
     for col1 in cols1:
         for col2 in cols2:
             if col1 == col2:
                 continue
-            col_pair = [col1, col2]
-            result = ai_compare_cell_type_labels(adata, col_pair, new_col_name=f"{new_col_prefix}_{col1}_{col2}", comparison_level=comparison_level)
-            results[(col1, col2)] = result
+            
+            # Define the new column name in adata.obs for this comparison
+            new_col_name = f"{new_col_prefix}_{col1}_{col2}"
+            
+            # Initialize the new column with a placeholder value
+            adata.obs[new_col_name] = pd.NA
+            
+            # Iterate over unique combinations in label_combinations
+            for _, row in label_combinations.iterrows():
+                label1, label2, agreement = row['col1'], row['col2'], row['agreement']
+                
+                # Create a boolean mask for the current label combination
+                mask = (adata.obs[col1] == label1) & (adata.obs[col2] == label2)
+                
+                # Assign the agreement value to the masked rows
+                adata.obs.loc[mask, new_col_name] = agreement
+            
+            # Store the result for this pair of columns in the results dictionary
+            results[(col1, col2)] = label_combinations[
+                (label_combinations['col1'].isin(adata.obs[col1])) &
+                (label_combinations['col2'].isin(adata.obs[col2]))
+            ]
+
     return results
 
 
