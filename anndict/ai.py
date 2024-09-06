@@ -31,6 +31,7 @@ import importlib
 from typing import List, Dict, Any
 from langchain.llms.base import BaseLLM
 from langchain.schema import HumanMessage, AIMessage, SystemMessage, BaseMessage
+from langchain_core.rate_limiters import InMemoryRateLimiter
 import boto3
 import json
 
@@ -77,7 +78,23 @@ def bedrock_init(constructor_args: Dict[str, Any], **kwargs) -> Dict[str, Any]:
     
     # filtered_args['model_id'] = model_id
     filtered_args['client'] = bedrock_client
+
+    # Extract rate limiter parameters from kwargs, or use defaults
+    requests_per_minute = kwargs.pop('requests_per_minute', 40)
+    requests_per_second = requests_per_minute / 60  # Convert to requests per second
+    check_every_n_seconds = kwargs.pop('check_every_n_seconds', 0.1)
+    max_bucket_size = kwargs.pop('max_bucket_size', requests_per_minute)
+
+    # Add rate limiter specific to Bedrock
+    rate_limiter = InMemoryRateLimiter(
+        requests_per_second=requests_per_second,
+        check_every_n_seconds=check_every_n_seconds,
+        max_bucket_size=max_bucket_size
+    )
     
+    # Add rate limiter to the constructor arguments
+    filtered_args['rate_limiter'] = rate_limiter
+
     #Add a debug print to see what's being passed to BedrockChat
     # print(f"BedrockChat constructor args: {json.dumps(filtered_args, default=str, indent=2)}")
     
@@ -118,11 +135,44 @@ def google_genai_init(constructor_args, **kwargs):
     #Google API will send ignorable warnings if you are on mac, so supress them by setting this env var
     os.environ['GRPC_VERBOSITY'] = 'ERROR'
 
+    # Extract rate limiter parameters from kwargs, or use defaults
+    requests_per_minute = kwargs.pop('requests_per_minute', 40)
+    requests_per_second = requests_per_minute / 60  # Convert to requests per second
+    check_every_n_seconds = kwargs.pop('check_every_n_seconds', 0.1)
+    max_bucket_size = kwargs.pop('max_bucket_size', requests_per_minute)
+
+    # Add a custom rate limiter for Google Gemini API
+    rate_limiter = InMemoryRateLimiter(
+        requests_per_second=requests_per_second, 
+        check_every_n_seconds=check_every_n_seconds,
+        max_bucket_size=max_bucket_size
+    )
+    
+    # Add rate limiter to constructor arguments
+    constructor_args['rate_limiter'] = rate_limiter
+
     # For Google, we've handled these in the constructor, so we return empty kwargs
     return constructor_args, {}
 
 def default_init(constructor_args, **kwargs):
-    """Default initialization function that does nothing"""
+    """Default initialization function that sets a rate limiter"""
+
+    # Extract rate limiter parameters from kwargs, or use defaults
+    requests_per_minute = kwargs.pop('requests_per_minute', 40)
+    requests_per_second = requests_per_minute / 60  # Convert to requests per second
+    check_every_n_seconds = kwargs.pop('check_every_n_seconds', 0.1)
+    max_bucket_size = kwargs.pop('max_bucket_size', requests_per_minute)
+
+    # Add a default rate limiter
+    rate_limiter = InMemoryRateLimiter(
+        requests_per_second=requests_per_second,
+        check_every_n_seconds=check_every_n_seconds,
+        max_bucket_size=max_bucket_size
+    )
+
+    # Add rate limiter to constructor arguments
+    constructor_args['rate_limiter'] = rate_limiter
+
     return constructor_args, kwargs
 
 PROVIDER_MAPPING = {
