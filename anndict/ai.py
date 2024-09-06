@@ -80,10 +80,10 @@ def bedrock_init(constructor_args: Dict[str, Any], **kwargs) -> Dict[str, Any]:
     filtered_args['client'] = bedrock_client
 
     # Extract rate limiter parameters from kwargs, or use defaults
-    requests_per_minute = kwargs.pop('requests_per_minute', 40)
+    requests_per_minute = float(constructor_args.pop('requests_per_minute', 40))
     requests_per_second = requests_per_minute / 60  # Convert to requests per second
-    check_every_n_seconds = kwargs.pop('check_every_n_seconds', 0.1)
-    max_bucket_size = kwargs.pop('max_bucket_size', requests_per_minute)
+    check_every_n_seconds = float(constructor_args.pop('check_every_n_seconds', 0.1))
+    max_bucket_size = float(constructor_args.pop('max_bucket_size', requests_per_minute))
 
     # Add rate limiter specific to Bedrock
     rate_limiter = InMemoryRateLimiter(
@@ -136,10 +136,10 @@ def google_genai_init(constructor_args, **kwargs):
     os.environ['GRPC_VERBOSITY'] = 'ERROR'
 
     # Extract rate limiter parameters from kwargs, or use defaults
-    requests_per_minute = kwargs.pop('requests_per_minute', 40)
+    requests_per_minute = float(constructor_args.pop('requests_per_minute', 40))
     requests_per_second = requests_per_minute / 60  # Convert to requests per second
-    check_every_n_seconds = kwargs.pop('check_every_n_seconds', 0.1)
-    max_bucket_size = kwargs.pop('max_bucket_size', requests_per_minute)
+    check_every_n_seconds = float(constructor_args.pop('check_every_n_seconds', 0.1))
+    max_bucket_size = float(constructor_args.pop('max_bucket_size', requests_per_minute))
 
     # Add a custom rate limiter for Google Gemini API
     rate_limiter = InMemoryRateLimiter(
@@ -158,10 +158,10 @@ def default_init(constructor_args, **kwargs):
     """Default initialization function that sets a rate limiter"""
 
     # Extract rate limiter parameters from kwargs, or use defaults
-    requests_per_minute = kwargs.pop('requests_per_minute', 40)
+    requests_per_minute = float(constructor_args.pop('requests_per_minute', 40))
     requests_per_second = requests_per_minute / 60  # Convert to requests per second
-    check_every_n_seconds = kwargs.pop('check_every_n_seconds', 0.1)
-    max_bucket_size = kwargs.pop('max_bucket_size', requests_per_minute)
+    check_every_n_seconds = float(constructor_args.pop('check_every_n_seconds', 0.1))
+    max_bucket_size = float(constructor_args.pop('max_bucket_size', requests_per_minute))
 
     # Add a default rate limiter
     rate_limiter = InMemoryRateLimiter(
