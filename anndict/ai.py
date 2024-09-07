@@ -834,7 +834,7 @@ def ai_cell_type(gene_list, tissue=None):
     return annotation
 
 
-def ai_cell_types_by_comparison(gene_lists, cell_type=None, tissue=None):
+def ai_cell_types_by_comparison(gene_lists, cell_types=None, tissues=None, subtype=False):
     """
     Returns cell type labels for multiple lists of marker genes as determined by AI.
     Args:
@@ -851,15 +851,18 @@ def ai_cell_types_by_comparison(gene_lists, cell_type=None, tissue=None):
     # Prepare the system prompt
     system_prompt = (
         "You are a terse molecular biologist. You respond in a few words and without restating any part of the question. "
-        "Compare and contrast gene sets to identify the most likely cell subtype based on marker genes."
+        f"Compare and contrast gene sets to identify the most likely cell {'sub' if subtype else ''}type based on marker genes."
     )
 
     # Prepare the initial user prompt for contrasting all gene lists
-    initial_prompt = f"Tissue: {tissue}, " if tissue else ""
-    initial_prompt += f"Cell Type: {cell_type}, " if cell_type else ""
-    initial_prompt += "Briefly compare and contrast the following gene sets:\n"
+    # initial_prompt = f"Tissue: {tissues}, " if tissue else ""
+    # initial_prompt += f"Cell Type: {cell_type}, " if cell_type else ""
+    initial_prompt = "Briefly compare and contrast the following gene sets:\n"
     for i, gene_list in enumerate(gene_lists, 1):
-        initial_prompt += f"{i}) {('    '.join(gene_list))}\n"
+        tissue_str = " " + ', '.join(tissues[i]) if tissues and tissues[i] else ""
+        cell_type_str = " " + ', '.join(cell_types[i]) if cell_types and cell_types[i] else ""
+
+        initial_prompt += f"{i}){tissue_str}{cell_type_str} {('    '.join(gene_list))}\n"
 
     # Initialize the conversation
     messages = [
@@ -883,15 +886,18 @@ def ai_cell_types_by_comparison(gene_lists, cell_type=None, tissue=None):
 
     # Process each gene list
     cell_subtype_labels = []
-    for gene_list in gene_lists:
-        gene_set_prompt = f"What is the {cell_type if cell_type else ''} cell subtype label for the gene set: {('    '.join(gene_list))}?"
+    for i, gene_list in enumerate(gene_lists, 1):
+        tissue_str = " " + ', '.join(tissues[i]) if tissues and tissues[i] else ""
+        cell_type_str = " " + ', '.join(cell_types[i]) if cell_types and cell_types[i] else ""
+
+        gene_set_prompt = f"What is the cell{tissue_str}{cell_type_str} {'sub' if subtype else ''}type label for the gene set: {('    '.join(gene_list))}?"
         messages.append({"role": "user", "content": gene_set_prompt})
 
         # Get the subtype label
         subtype_label = retry_llm_call(
             messages=messages,
             process_response=lambda x: x.strip(),
-            failure_handler=lambda: cell_type if cell_type else "Unknown",
+            failure_handler=lambda: cell_type_str if cell_types and cell_types[i] else "Unknown",
             llm_kwargs={'max_tokens': 50, 'temperature': 0},
             max_attempts=1
         )
