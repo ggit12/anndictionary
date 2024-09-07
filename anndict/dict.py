@@ -1194,7 +1194,7 @@ def simplify_var_index_adata_dict(adata_dict, column, new_column_name, simplific
     return adata_dict_fapply_return(adata_dict, simplify_var_index, max_retries=3, column=column, new_column_name=new_column_name, simplification_level=simplification_level)
 
 
-def ai_annotate_cell_type(adata, groupby, n_top_genes, label_column='ai_cell_type'):
+def ai_annotate_cell_type(adata, groupby, n_top_genes, label_column='ai_cell_type', tissue_of_origin_col=None):
     """
     Annotate cell types based on the top marker genes for each cluster.
 
@@ -1211,14 +1211,14 @@ def ai_annotate_cell_type(adata, groupby, n_top_genes, label_column='ai_cell_typ
     Returns:
     pd.DataFrame A DataFrame with a column for the top marker genes for each cluster.
     """
-    return ai_annotate(func=ai_cell_type, adata=adata, groupby=groupby, n_top_genes=n_top_genes, label_column=label_column)
+    return ai_annotate(func=ai_cell_type, adata=adata, groupby=groupby, n_top_genes=n_top_genes, label_column=label_column, tissue_of_origin_col=tissue_of_origin_col)
 
 
-def ai_annotate_cell_type_adata_dict(adata_dict, groupby, n_top_genes=10, label_column='ai_cell_type'):
+def ai_annotate_cell_type_adata_dict(adata_dict, groupby, n_top_genes=10, label_column='ai_cell_type', tissue_of_origin_col=None):
     """
     Applies ai_annotate_cell_type to each anndata in an anndict
     """
-    return adata_dict_fapply_return(adata_dict, ai_annotate_cell_type, max_retries=3, groupby=groupby, n_top_genes=n_top_genes, label_column=label_column)
+    return adata_dict_fapply_return(adata_dict, ai_annotate_cell_type, max_retries=3, groupby=groupby, n_top_genes=n_top_genes, label_column=label_column, tissue_of_origin_col=tissue_of_origin_col)
 
 
 def ai_annotate_cell_sub_type_adata_dict(adata_dict, cell_type_col, sub_cluster_col, new_label_col, tissue_of_origin_col=None, n_top_genes=10):
@@ -1236,7 +1236,7 @@ def ai_annotate_cell_sub_type_adata_dict(adata_dict, cell_type_col, sub_cluster_
     Returns:
     dict Dictionary of annotated AnnData objects with AI-generated subtype labels.
     """
-    results = adata_dict_fapply_return(adata_dict, ai_annotate_cell_sub_type, max_retries=3, cell_type_col=cell_type_col, sub_cluster_col=sub_cluster_col, new_label_col=new_label_col, tissue_of_origin_col=tissue_of_origin_col)
+    results = adata_dict_fapply_return(adata_dict, ai_annotate_cell_sub_type, max_retries=3, cell_type_col=cell_type_col, sub_cluster_col=sub_cluster_col, new_label_col=new_label_col, tissue_of_origin_col=tissue_of_origin_col, n_top_genes=n_top_genes)
     annotated_adata_dict = {key: result[0] for key, result in results.items()}
     label_mappings_dict = {key: result[1] for key, result in results.items()}
 
@@ -1265,21 +1265,21 @@ def ai_annotate_cell_sub_type(adata, cell_type_col, sub_cluster_col, new_label_c
     #build adata_dict based on cell_type_col
     adata_dict = build_adata_dict(adata, strata_keys=cell_type_col)
 
-    label_mappings = ai_annotate_cell_type_by_comparison_adata_dict(adata_dict, groupby=sub_cluster_col, n_top_genes=n_top_genes, label_column=new_label_col, tissue_of_origin_col=tissue_of_origin_col)
+    label_mappings = ai_annotate_cell_type_by_comparison_adata_dict(adata_dict, groupby=sub_cluster_col, n_top_genes=n_top_genes, label_column=new_label_col, tissue_of_origin_col=tissue_of_origin_col, subtype=True)
 
     adata = concatenate_adata_dict(adata_dict, index_unique=None) #setting index_unique=None avoids index modification
 
     return adata, label_mappings
 
 
-def ai_annotate_cell_type_by_comparison_adata_dict(adata_dict, groupby, n_top_genes=10, label_column='ai_cell_sub_type', tissue_of_origin_col=None):
+def ai_annotate_cell_type_by_comparison_adata_dict(adata_dict, groupby, n_top_genes=10, label_column='ai_cell_type_by_comparison', cell_type_of_origin_col=None, tissue_of_origin_col=None, **kwargs):
     """
     Applies ai_annotate_cell_type_by_comparison to each anndata in an anndict
     """
-    return adata_dict_fapply_return(adata_dict, ai_annotate_cell_type_by_comparison, max_retries=3, groupby=groupby, n_top_genes=n_top_genes, label_column=label_column, tissue_of_origin_col=tissue_of_origin_col)
+    return adata_dict_fapply_return(adata_dict, ai_annotate_cell_type_by_comparison, max_retries=3, groupby=groupby, n_top_genes=n_top_genes, label_column=label_column, cell_type_of_origin_col=cell_type_of_origin_col, tissue_of_origin_col=tissue_of_origin_col, **kwargs)
 
 
-def ai_annotate_cell_type_by_comparison(adata, groupby, n_top_genes, label_column='ai_cell_sub_type', tissue_of_origin_col=None, adt_key=None):
+def ai_annotate_cell_type_by_comparison(adata, groupby, n_top_genes, label_column='ai_cell_type_by_comparison', cell_type_of_origin_col=None, tissue_of_origin_col=None, adt_key=None, **kwargs):
     """
     Annotate cell types by comparison using AI.
 
@@ -1290,21 +1290,21 @@ def ai_annotate_cell_type_by_comparison(adata, groupby, n_top_genes, label_colum
     adata : AnnData Annotated data matrix.
     groupby : str Column name in adata.obs for grouping cells.
     n_top_genes : int Number of top genes to consider for annotation.
-    label_column : str, optional Name of the column to store the AI-generated cell type labels (default: 'ai_cell_sub_type').
+    label_column : str, optional Name of the column to store the AI-generated cell type labels (default: 'ai_cell_type_by_comparison').
 
     Returns:
     AnnData Annotated data with AI-generated cell type labels.
     """
     # print(f"number of unique categories: {len(adata.obs[groupby].unique())}")
-    if tissue_of_origin_col:
-        tissue = adata.obs[tissue_of_origin_col].unique()
-        if len(tissue == 1):
-            tissue = tissue[0]
-        else:
-            raise ValueError(f"Multiple tissues of_origin found in adata.obs[{tissue_of_origin_col}]. Currently must have only one tissue of origin per cell type. Pick a different tissue of origin column or set tissue_of_origin_col=None")
-    else:
-        tissue = None
-    return ai_annotate_by_comparison(func=ai_cell_types_by_comparison, adata=adata, groupby=groupby, n_top_genes=n_top_genes, label_column=label_column, cell_type=adt_key, tissue=tissue)
+    # if tissue_of_origin_col:
+    #     tissue = adata.obs[tissue_of_origin_col].unique()
+    #     if len(tissue == 1):
+    #         tissue = tissue[0]
+    #     else:
+    #         raise ValueError(f"Multiple tissues of_origin found in adata.obs[{tissue_of_origin_col}]. Currently must have only one tissue of origin per cell type. Pick a different tissue of origin column or set tissue_of_origin_col=None")
+    # else:
+    #     tissue = None
+    return ai_annotate_by_comparison(func=ai_cell_types_by_comparison, adata=adata, groupby=groupby, n_top_genes=n_top_genes, label_column=label_column, cell_type=adt_key, cell_type_of_origin_col=cell_type_of_origin_col, tissue_of_origin_col=tissue_of_origin_col, **kwargs)
 
 
 def ai_annotate_biological_process(adata, groupby, n_top_genes, label_column='ai_biological_process'):
@@ -1334,7 +1334,7 @@ def ai_annotate_biological_process_adata_dict(adata_dict, groupby, n_top_genes=1
     return adata_dict_fapply_return(adata_dict, ai_annotate_biological_process, max_retries=3, groupby=groupby, n_top_genes=n_top_genes, label_column=label_column)
 
 
-def ai_annotate_by_comparison(func, adata, groupby, n_top_genes, label_column, **kwargs):
+def ai_annotate_by_comparison(func, adata, groupby, n_top_genes, label_column, cell_type_of_origin_col=None, tissue_of_origin_col=None, **kwargs):
     """
     Annotate clusters based on the top marker genes for each cluster.
 
@@ -1367,8 +1367,36 @@ def ai_annotate_by_comparison(func, adata, groupby, n_top_genes, label_column, *
     rank_genes_groups = adata.uns['rank_genes_groups']
     clusters = rank_genes_groups['names'].dtype.names  # List of clusters
 
+
+    # Get mappings of clusters to tissues and cell types
+    cluster_to_tissue = {}
+    cluster_to_cell_type = {}
+
+    if tissue_of_origin_col or cell_type_of_origin_col:
+        for cluster in clusters:
+            mask = adata.obs[groupby] == cluster
+            
+            # Map the cluster to tissues if tissue_of_origin_col is provided
+            if tissue_of_origin_col:
+                cluster_to_tissue[cluster] = adata.obs.loc[mask, tissue_of_origin_col].unique().tolist()
+
+            # Map the cluster to cell types if cell_type_of_origin_col is provided
+            if cell_type_of_origin_col:
+                cluster_to_cell_type[cluster] = adata.obs.loc[mask, cell_type_of_origin_col].unique().tolist()
+
+
     # Create a list of lists for top genes
     top_genes = [list(rank_genes_groups['names'][cluster][:n_top_genes]) for cluster in clusters]
+
+    # Create a list of tissues for each cluster and add to kwargs if tissue_of_origin_col is provided
+    if tissue_of_origin_col:
+        tissues_per_cluster = [cluster_to_tissue[cluster] for cluster in clusters]
+        kwargs['tissues'] = tissues_per_cluster
+
+    # Create a list of cell types for each cluster and add to kwargs if cell_type_of_origin_col is provided
+    if cell_type_of_origin_col:
+        cell_types_per_cluster = [cluster_to_cell_type[cluster] for cluster in clusters]
+        kwargs['cell_types'] = cell_types_per_cluster
 
     # Call func with the list of lists
     annotations = func(top_genes, **kwargs)
@@ -1391,7 +1419,7 @@ def ai_annotate_by_comparison(func, adata, groupby, n_top_genes, label_column, *
 
     return pd.DataFrame(results)
 
-def ai_annotate(func, adata, groupby, n_top_genes, label_column, **kwargs):
+def ai_annotate(func, adata, groupby, n_top_genes, label_column, tissue_of_origin_col=None, **kwargs):
     """
     Annotate clusters based on the top marker genes for each cluster.
 
@@ -1426,19 +1454,38 @@ def ai_annotate(func, adata, groupby, n_top_genes, label_column, **kwargs):
         print(f"rerunning diffexp analysis because not found in adata.uns for adata.obs['{groupby}']. (run before annotating to avoid this)")
         sc.tl.rank_genes_groups(adata, groupby, method='t-test')
 
+    # Get the rank genes groups result
+    rank_genes_groups = adata.uns['rank_genes_groups']
+    clusters = rank_genes_groups['names'].dtype.names
+    
+    # Get mapping of cluster to tissue if tissue_of_origin_col is provided
+    cluster_to_tissue = {}
+    if tissue_of_origin_col:
+        for cluster in clusters:
+            tissue = adata.obs.loc[adata.obs[groupby] == cluster, tissue_of_origin_col].unique()
+            if len(tissue) > 1:
+                tissue = ", ".join(tissue)
+            else:
+                tissue = tissue[0]
+            cluster_to_tissue[cluster] = tissue
+
     # Initialize a dictionary to store cell type annotations
     cell_type_annotations = {}
 
     # Initialize a list to store the results
     results = []
 
-    # Get the rank genes groups result
-    rank_genes_groups = adata.uns['rank_genes_groups']
-    clusters = rank_genes_groups['names'].dtype.names  # List of clusters
 
-    # Loop through each cluster and get the top n marker genes
+    # Loop through each cluster and get the top n marker genes, then get cell type based on these marker genes
     for cluster in clusters:
+        # Add tissue to kwargs if tissue_of_origin_col is provided
+        if tissue_of_origin_col:
+            kwargs['tissue'] = cluster_to_tissue[cluster]
+
+        #Get top n genes
         top_genes = rank_genes_groups['names'][cluster][:n_top_genes]
+
+        #Get annotation via func
         annotation = func(top_genes, **kwargs)
         cell_type_annotations[cluster] = annotation
 
