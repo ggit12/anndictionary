@@ -40,12 +40,16 @@ def summarize_metadata(adata, columns):
             # Handle joint frequencies
             sub_cols = col.split('*')
             combined_data = adata.obs[sub_cols]
+
+            # Replace NaN with a placeholder to include them in groupby
+            combined_data = combined_data.fillna('NaN')
+
             joint_freq = combined_data.groupby(sub_cols).size().unstack(fill_value=0)
             joint_freq = combined_data.groupby(sub_cols, observed=True).size().unstack(fill_value=0)
             results[col.replace('*', ' x ')] = joint_freq
         else:
             # Calculate frequency for a single column
-            freq = adata.obs[col].value_counts().to_frame('count')
+            freq = adata.obs[col].value_counts(dropna=False).to_frame('count')
             results[col] = freq
     
     return results
