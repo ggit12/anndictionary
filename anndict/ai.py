@@ -35,9 +35,9 @@ from langchain_core.rate_limiters import InMemoryRateLimiter
 import boto3
 import json
 
-import time
-import csv
-import threading
+# import time
+# import csv
+# import threading
 
 #LLM configuration
 def bedrock_init(constructor_args: Dict[str, Any], **kwargs) -> Dict[str, Any]:
@@ -468,7 +468,7 @@ def get_llm(**kwargs):
         raise ValueError(f"Error initializing provider {config['provider']}: {str(e)}")
 
 # Define a global thread-safe lock
-csv_lock = threading.Lock()
+# csv_lock = threading.Lock()
 
 def call_llm(messages, **kwargs):
     """Calls the configured LLM provider with the given parameters."""
@@ -493,33 +493,33 @@ def call_llm(messages, **kwargs):
     ]
 
     # Log timestamp for when the request is sent
-    request_timestamp = time.time()
+    # request_timestamp = time.time()
 
     # Call the LLM with the processed parameters
     response = llm(langchain_messages, **kwargs)
 
     # Log timestamp for when the response is received
-    response_timestamp = time.time()
+    # response_timestamp = time.time()
 
     # Ensure thread-safe writing to CSV
-    csv_file = os.getenv("CSV_PATH", "responses_log.csv")
-    with csv_lock:
-        # Open the CSV file in append mode
-        file_exists = os.path.isfile(csv_file)
-        with open(csv_file, mode='a', newline='') as f:
-            csv_writer = csv.writer(f)
+    # csv_file = os.getenv("CSV_PATH", "responses_log.csv")
+    # with csv_lock:
+    #     # Open the CSV file in append mode
+    #     file_exists = os.path.isfile(csv_file)
+    #     with open(csv_file, mode='a', newline='') as f:
+    #         csv_writer = csv.writer(f)
             
-            # Write the header only if the file does not already exist
-            if not file_exists:
-                csv_writer.writerow(["request_made_time", "response_received_time", "elapsed_time", "response_content"])
+    #         # Write the header only if the file does not already exist
+    #         if not file_exists:
+    #             csv_writer.writerow(["request_made_time", "response_received_time", "elapsed_time", "response_content"])
             
-            # Write the timestamps and response content
-            csv_writer.writerow([
-                time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(request_timestamp)),
-                time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(response_timestamp)),
-                f"{response_timestamp - request_timestamp:.2f} seconds",
-                response.content.strip()
-            ])
+    #         # Write the timestamps and response content
+    #         csv_writer.writerow([
+    #             time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(request_timestamp)),
+    #             time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(response_timestamp)),
+    #             f"{response_timestamp - request_timestamp:.2f} seconds",
+    #             response.content.strip()
+    #         ])
 
     # Write the response to a file instead of printing it
     with open(os.getenv("RESPONSE_PATH", "response.txt"), "a") as f:
