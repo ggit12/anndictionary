@@ -527,7 +527,7 @@ def call_llm(messages, **kwargs):
 
     return response.content.strip()
 
-def retry_llm_call(messages, process_response, failure_handler, max_attempts=5, llm_kwargs=None, failure_kwargs=None):
+def retry_llm_call(messages, process_response, failure_handler, max_attempts=5, call_llm_kwargs=None, process_response_kwargs=None, failure_handler_kwargs=None):
     """
     A generic wrapper for LLM calls that implements retry logic with custom processing and failure handling.
     
@@ -536,26 +536,27 @@ def retry_llm_call(messages, process_response, failure_handler, max_attempts=5, 
     process_response (callable): A function that takes the LLM output and attempts to process it into the desired result.
     failure_handler (callable): A function to call if max_attempts is reached without successful processing.
     max_attempts (int): Maximum number of attempts before calling the failure_handler function.
-    llm_kwargs (dict): Keyword arguments to pass to the LLM call function.
-    failure_kwargs (dict): Keyword arguments to pass to the failure_handler function.
+    call_llm_kwargs (dict): Keyword arguments to pass to the LLM call function.
+    process_response_kwargs (dict): Keyword arguments to pass to the process_response function.
+    failure_handler_kwargs (dict): Keyword arguments to pass to the failure_handler function.
     
     Returns:
     The result of process_response if successful, or the result of failure_handler if not.
     """
-    llm_kwargs = llm_kwargs or {}
-    failure_kwargs = failure_kwargs or {}
+    call_llm_kwargs = call_llm_kwargs or {}
+    failure_handler_kwargs = failure_handler_kwargs or {}
 
     for attempt in range(1, max_attempts + 1):
-        # Adjust temperature if it's in llm_kwargs
-        if 'temperature' in llm_kwargs:
-            llm_kwargs['temperature'] = 0 if attempt <= 2 else (attempt - 2) * 0.025
+        # Adjust temperature if it's in call_llm_kwargs
+        if 'temperature' in call_llm_kwargs:
+            call_llm_kwargs['temperature'] = 0 if attempt <= 2 else (attempt - 2) * 0.025
         
         # Call the LLM
-        response = call_llm(messages=messages, **llm_kwargs)
+        response = call_llm(messages=messages, **call_llm_kwargs)
         
         # Attempt to process the response
         try:
-            processed_result = process_response(response)
+            processed_result = process_response(response, **process_response_kwargs)
             return processed_result
         except Exception as e:
             print(f"Attempt {attempt} failed: {str(e)}. Retrying...")
@@ -563,10 +564,10 @@ def retry_llm_call(messages, process_response, failure_handler, max_attempts=5, 
     
     # If we've exhausted all attempts, call the failure handler
     print(f"All {max_attempts} attempts failed. Calling failure handler.")
-    return failure_handler(**failure_kwargs)
+    return failure_handler(**failure_handler_kwargs)
 
 def enforce_semantic_list(lst):
-    error_message = "gene_list appears to contain numeric or numeric cast as string. Please ensure you are passing semantic labels (i.e. gene symbols or cell types) and not integer labels for AI interpretation."
+    error_message = "input list appears to contain any of: NaN, numeric, or numeric cast as string. Please ensure you are passing semantic labels (i.e. gene symbols or cell types) and not integer labels for AI interpretation."
     
     def get_context(lst, index):
         before = lst[index - 1] if index > 0 else None
@@ -676,7 +677,7 @@ def map_cell_type_labels_to_simplified_set(labels, simplification_level=''):
     
     # Prepare the messages for the Chat Completions API
     messages = [
-        {"role": "system", "content": f"You are a python dictionary mapping generator that takes a list of categories and provides a mapping to a {simplification_level} simplified set as a dictionary. Generate only a dictionary. Example: Fibroblast    Fibrolasts.    CD8-positive T Cells    CD4-positive T Cells -> {{'Fibroblast':'Fibroblast','Fibrolasts.':'Fibroblast','CD8-positive T Cells':'T Cell','CD4-positive T Cells':'T Cell'}}"},
+        {"role": "system", "content": f"You are a python dictionary mapping generator that takes a list of categories and provides a mapping to a {simplification_level} simplified set as a dictionary. Generate only a dictionary. Example: Fibroblast.    Fibroblasts.    CD8-positive T Cells.    CD4-positive T Cells. -> {{'Fibroblast.':'Fibroblast','Fibroblasts.':'Fibroblast','CD8-positive T Cells.':'T Cell','CD4-positive T Cells.':'T Cell'}}"},
         {"role": "user", "content": f"{labels_str} -> "}
     ]
 
@@ -688,20 +689,20 @@ def map_cell_type_labels_to_simplified_set(labels, simplification_level=''):
         print(f"Simplification failed for labels: {labels}")
         return {label: label for label in labels}
 
-    llm_kwargs = {
+    call_llm_kwargs = {
         'max_tokens': 1000,
         'temperature': 0
     }
 
-    failure_kwargs = {'labels': labels}
+    failure_handler_kwargs = {'labels': labels}
 
     # Use retry_llm_call instead of direct call_llm
     mapping_dict = retry_llm_call(
         messages=messages,
         process_response=process_response,
         failure_handler=failure_handler,
-        llm_kwargs=llm_kwargs,
-        failure_kwargs=failure_kwargs
+        call_llm_kwargs=call_llm_kwargs,
+        failure_handler_kwargs=failure_handler_kwargs
     )
 
     return mapping_dict
@@ -736,20 +737,20 @@ def map_gene_labels_to_simplified_set(labels, simplification_level=''):
         print(f"Simplification failed for gene labels: {labels}")
         return {label: label for label in labels}
 
-    llm_kwargs = {
+    call_llm_kwargs = {
         'max_tokens': 1000,
         'temperature': 0
     }
 
-    failure_kwargs = {'labels': labels}
+    failure_handler_kwargs = {'labels': labels}
 
     # Use retry_llm_call instead of direct call_llm
     mapping_dict = retry_llm_call(
         messages=messages,
         process_response=process_response,
         failure_handler=failure_handler,
-        llm_kwargs=llm_kwargs,
-        failure_kwargs=failure_kwargs
+        call_llm_kwargs=call_llm_kwargs,
+        failure_handler_kwargs=failure_handler_kwargs
     )
 
     return mapping_dict
@@ -875,7 +876,7 @@ def ai_cell_types_by_comparison(gene_lists, cell_types=None, tissues=None, subty
         messages=messages,
         process_response=lambda x: x,
         failure_handler=lambda: "Failed to contrast gene sets",
-        llm_kwargs={'max_tokens': 300, 'temperature': 0},
+        call_llm_kwargs={'max_tokens': 300, 'temperature': 0},
         max_attempts=1
     )
 
@@ -898,7 +899,7 @@ def ai_cell_types_by_comparison(gene_lists, cell_types=None, tissues=None, subty
             messages=messages,
             process_response=lambda x: x.strip(),
             failure_handler=lambda: cell_type_str if cell_types and cell_types[i] else "Unknown",
-            llm_kwargs={'max_tokens': 50, 'temperature': 0},
+            call_llm_kwargs={'max_tokens': 50, 'temperature': 0},
             max_attempts=1
         )
 
