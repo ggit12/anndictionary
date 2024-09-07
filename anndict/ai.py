@@ -35,6 +35,8 @@ from langchain_core.rate_limiters import InMemoryRateLimiter
 import boto3
 import json
 
+from difflib import get_close_matches
+
 # import time
 # import csv
 # import threading
@@ -657,6 +659,47 @@ def generate_file_key(file_path):
 
     return generated_name
 
+def process_llm_category_mapping(original_categories, llm_dict):
+    """
+    Map original categories to simplified categories using LLM output.
+
+    Normalizes strings, finds exact or close matches between original categories
+    and LLM-provided keys, and creates a mapping. If no match is found, the 
+    original category is used.
+
+    Args:
+    original_categories (list): List of original category strings.
+    llm_dict (dict): Dictionary of LLM-provided category mappings.
+
+    Returns:
+    dict: Mapping of original categories to simplified categories.
+    """
+    # Function to normalize strings
+    def normalize(s):
+        return re.sub(r'[^\w\s]', '', s.lower())
+    
+    # Normalize original categories and LLM keys
+    normalized_llm_keys = [normalize(key) for key in llm_dict.keys()]
+    
+    # Create mapping
+    final_mapping = {}
+    for original in original_categories:
+        normalized = normalize(original)
+        if normalized in normalized_llm_keys:
+            # Direct match found
+            index = normalized_llm_keys.index(normalized)
+            final_mapping[original] = llm_dict[list(llm_dict.keys())[index]]
+        else:
+            # Find closest match
+            matches = get_close_matches(normalized, normalized_llm_keys, n=1, cutoff=0.6)
+            if matches:
+                index = normalized_llm_keys.index(matches[0])
+                final_mapping[original] = llm_dict[list(llm_dict.keys())[index]]
+            else:
+                # No match found, use original category
+                final_mapping[original] = original
+    
+    return final_mapping
 
 #Label simplification functions
 def map_cell_type_labels_to_simplified_set(labels, simplification_level=''):
@@ -704,6 +747,8 @@ def map_cell_type_labels_to_simplified_set(labels, simplification_level=''):
         call_llm_kwargs=call_llm_kwargs,
         failure_handler_kwargs=failure_handler_kwargs
     )
+
+    mapping_dict = process_llm_category_mapping(labels, mapping_dict)
 
     return mapping_dict
 

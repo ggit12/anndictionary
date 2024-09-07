@@ -48,7 +48,8 @@ from .ai import (
     ai_compare_cell_types_categorical,
     encode_plot_for_openai, 
     ai_resolution_interpretation,
-    determine_sign_of_resolution_change
+    determine_sign_of_resolution_change,
+    process_llm_category_mapping
 )
 
 from .stablelabel import (
@@ -304,5 +305,6 @@ __all__ = [
     'normalize_label',
     'ensure_label_consistency_adata_dict',
     'ensure_label_consistency_adata',
-    'ensure_label_consistency_main'
+    'ensure_label_consistency_main',
+    'process_llm_category_mapping'
 ]
