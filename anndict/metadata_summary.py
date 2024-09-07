@@ -41,6 +41,11 @@ def summarize_metadata(adata, columns):
             sub_cols = col.split('*')
             combined_data = adata.obs[sub_cols]
 
+            # Convert categorical columns to string and replace NaN with a placeholder
+            for sub_col in sub_cols:
+                if pd.api.types.is_categorical_dtype(combined_data[sub_col]):
+                    combined_data[sub_col] = combined_data[sub_col].astype(str)
+
             # Replace NaN with a placeholder to include them in groupby
             combined_data = combined_data.fillna('NaN')
 
