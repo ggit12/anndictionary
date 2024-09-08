@@ -255,7 +255,10 @@ retry mechanism, and the option to use either threading or multiprocessing.</p>
 - use_processes: (Currently not implemented) If True, use ProcessPoolExecutor; if False, use ThreadPoolExecutor.
 - num_workers: Number of worker processes or threads to use (default: number of CPUs available).
 - max_retries: Maximum number of retries for a failed task.
-- kwargs_dicts: Additional keyword arguments to pass to the function, where each argument can be a dictionary with keys matching the adata_dict or a single value.</p>
+- kwargs_dicts: Additional keyword arguments to pass to the function, where each argument can be:
+1. A dictionary with keys matching or including all keys from adata_dict
+2. A dictionary to be used for all AnnData objects
+3. A single value to be used for all AnnData objects</p>
 <p>Returns:
 - None: The function modifies the AnnData objects in place.</p>
 </dd></dl>
@@ -277,7 +280,10 @@ a dictionary with the results of the function applied to each AnnData object.</p
 - use_processes: (Currently not implemented) If True, use ProcessPoolExecutor; if False, use ThreadPoolExecutor.
 - num_workers: Number of worker processes or threads to use (default: number of CPUs available).
 - max_retries: Maximum number of retries for a failed task.
-- kwargs_dicts: Additional keyword arguments to pass to the function, where each argument can be a dictionary with keys matching the adata_dict or a single value.</p>
+- kwargs_dicts: Additional keyword arguments to pass to the function, where each argument can be:
+1. A dictionary with keys matching or including all keys from adata_dict
+2. A dictionary to be used for all AnnData objects
+3. A single value to be used for all AnnData objects</p>
 <p>Returns:
 - dict: A dictionary with the same keys as adata_dict, containing the results of the function applied to each AnnData object.</p>
 </dd></dl>
