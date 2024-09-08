@@ -823,15 +823,15 @@ def ai_biological_process(gene_list):
 
     # Prepare the prompt
     if len(gene_list) == 1:
-        gpt_prompt = f"In a few words and without restating any part of the question, describe the single most prominent biological process represented by the gene: {gene_list[0]}"
+        base_prompt = f"In a few words and without restating any part of the question, describe the single most prominent biological process represented by the gene: {gene_list[0]}"
     else:
         genes_str = "    ".join(gene_list[:-1])
-        gpt_prompt = f"In a few words and without restating any part of the question, describe the single most prominent biological process represented by the genes: {genes_str}, and {gene_list[-1]}"
+        base_prompt = f"In a few words and without restating any part of the question, describe the single most prominent biological process represented by the genes: {genes_str}, and {gene_list[-1]}"
 
     # Prepare the messages for the Chat Completions API
     messages = [
         {"role": "system", "content": "You are a terse molecular biologist."},
-        {"role": "user", "content": gpt_prompt}
+        {"role": "user", "content": base_prompt}
     ]
 
     # Call the LLM using the call_llm function
