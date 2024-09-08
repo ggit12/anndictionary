@@ -700,9 +700,10 @@ def process_llm_category_mapping(original_categories, llm_dict):
             else:
                 # No match found, use original category
                 final_mapping[original] = original
-    print(f"\noriginal categories:\n{original_categories}")
-    print(f"\noriginal llm mapping:\n{llm_dict}")
-    print(f"\nfinal simplified mapping:\n{final_mapping}")
+
+    # print(f"\noriginal categories:\n{original_categories}")
+    # print(f"\noriginal llm mapping:\n{llm_dict}")
+    # print(f"\nfinal simplified mapping:\n{final_mapping}")
     
     return final_mapping
 
@@ -860,10 +861,10 @@ def ai_cell_type(gene_list, tissue=None):
 
     # Prepare the prompt
     if len(gene_list) == 1:
-        gpt_prompt = f"In a few words and without restating any part of the question, describe the single most likely cell type represented by the marker gene: {gene_list[0]}"
+        base_prompt = f"In a few words and without restating any part of the question, describe the single most likely cell type represented by the marker gene: {gene_list[0]}"
     else:
         genes_str = "    ".join(gene_list)
-        gpt_prompt = f"In a few words and without restating any part of the question, describe the single most likely cell type represented by the marker genes: {genes_str}"
+        base_prompt = f"In a few words and without restating any part of the question, describe the single most likely cell type represented by the marker genes: {genes_str}"
 
     # Add tissue information if provided
     if tissue:
@@ -872,7 +873,7 @@ def ai_cell_type(gene_list, tissue=None):
     # Prepare the messages for the Chat Completions API
     messages = [
         {"role": "system", "content": "You are a terse molecular biologist."},
-        {"role": "user", "content": gpt_prompt}
+        {"role": "user", "content": base_prompt}
     ]
 
     # Call the LLM using the call_llm function
