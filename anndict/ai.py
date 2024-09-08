@@ -546,6 +546,7 @@ def retry_llm_call(messages, process_response, failure_handler, max_attempts=5, 
     The result of process_response if successful, or the result of failure_handler if not.
     """
     call_llm_kwargs = call_llm_kwargs or {}
+    process_response_kwargs = process_response_kwargs or {}
     failure_handler_kwargs = failure_handler_kwargs or {}
 
     for attempt in range(1, max_attempts + 1):
