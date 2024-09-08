@@ -95,7 +95,6 @@ class AdataDict(dict):
         return results
 
 
-
 def apply_func(adt_key, adata, func, accepts_key, max_retries, **func_args):
     attempts = -1
     while attempts < max_retries:
@@ -111,6 +110,7 @@ def apply_func(adt_key, adata, func, accepts_key, max_retries, **func_args):
             if attempts >= max_retries:
                 print(f"Failed to process {adt_key} after {max_retries} attempts.")
 
+
 def adata_dict_fapply(adata_dict, func, use_processes=False, num_workers=None, max_retries=0, **kwargs_dicts):
     """
     Applies a given function to each AnnData object in the adata_dict, with error handling,
@@ -122,22 +122,32 @@ def adata_dict_fapply(adata_dict, func, use_processes=False, num_workers=None, m
     - use_processes: (Currently not implemented) If True, use ProcessPoolExecutor; if False, use ThreadPoolExecutor.
     - num_workers: Number of worker processes or threads to use (default: number of CPUs available).
     - max_retries: Maximum number of retries for a failed task.
-    - kwargs_dicts: Additional keyword arguments to pass to the function, where each argument can be a dictionary with keys matching the adata_dict or a single value.
+    - kwargs_dicts: Additional keyword arguments to pass to the function, where each argument can be:
+    1. A dictionary with keys matching or including all keys from adata_dict
+    2. A dictionary to be used for all AnnData objects
+    3. A single value to be used for all AnnData objects
 
     Returns:
     - None: The function modifies the AnnData objects in place.
     """
     sig = inspect.signature(func)
     accepts_key = 'adt_key' in sig.parameters
-
     # Executor = ProcessPoolExecutor if use_processes else ThreadPoolExecutor
     Executor = ThreadPoolExecutor
-    
+
+    def get_arg_value(arg_value, adt_key):
+        if isinstance(arg_value, dict):
+            if adt_key in arg_value:
+                return arg_value[adt_key]
+            elif not set(adata_dict.keys()).issubset(arg_value.keys()):
+                return arg_value  # Use the entire dictionary if it doesn't contain all adata_dict keys
+        return arg_value  # Use the value as is if it's not a dictionary or doesn't contain all adata_dict keys
+
     with Executor(max_workers=num_workers) as executor:
         futures = {
             executor.submit(
                 apply_func, adt_key, adata, func, accepts_key, max_retries, **{
-                    arg_name: (arg_value[adt_key] if isinstance(arg_value, dict) else arg_value)
+                    arg_name: get_arg_value(arg_value, adt_key)
                     for arg_name, arg_value in kwargs_dicts.items()
                 }
             ): adt_key for adt_key, adata in adata_dict.items()
@@ -179,23 +189,33 @@ def adata_dict_fapply_return(adata_dict, func, use_processes=False, num_workers=
     - use_processes: (Currently not implemented) If True, use ProcessPoolExecutor; if False, use ThreadPoolExecutor.
     - num_workers: Number of worker processes or threads to use (default: number of CPUs available).
     - max_retries: Maximum number of retries for a failed task.
-    - kwargs_dicts: Additional keyword arguments to pass to the function, where each argument can be a dictionary with keys matching the adata_dict or a single value.
+    - kwargs_dicts: Additional keyword arguments to pass to the function, where each argument can be:
+    1. A dictionary with keys matching or including all keys from adata_dict
+    2. A dictionary to be used for all AnnData objects
+    3. A single value to be used for all AnnData objects
 
     Returns:
     - dict: A dictionary with the same keys as adata_dict, containing the results of the function applied to each AnnData object.
     """
     sig = inspect.signature(func)
     accepts_key = 'adt_key' in sig.parameters
-
     # Executor = ProcessPoolExecutor if use_processes else ThreadPoolExecutor
     Executor = ThreadPoolExecutor
-
     results = {}
+
+    def get_arg_value(arg_value, adt_key):
+        if isinstance(arg_value, dict):
+            if adt_key in arg_value:
+                return arg_value[adt_key]
+            elif not set(adata_dict.keys()).issubset(arg_value.keys()):
+                return arg_value  # Use the entire dictionary if it doesn't contain all adata_dict keys
+        return arg_value  # Use the value as is if it's not a dictionary or doesn't contain all adata_dict keys
+
     with Executor(max_workers=num_workers) as executor:
         futures = {
             executor.submit(
                 apply_func_return, adt_key, adata, func, accepts_key, max_retries, **{
-                    arg_name: (arg_value[adt_key] if isinstance(arg_value, dict) else arg_value)
+                    arg_name: get_arg_value(arg_value, adt_key)
                     for arg_name, arg_value in kwargs_dicts.items()
                 }
             ): adt_key for adt_key, adata in adata_dict.items()
