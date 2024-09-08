@@ -1477,6 +1477,11 @@ def ai_annotate(func, adata, groupby, n_top_genes, label_column, tissue_of_origi
     # Get the rank genes groups result
     rank_genes_groups = adata.uns['rank_genes_groups']
     clusters = rank_genes_groups['names'].dtype.names
+
+    # Check if tissue_of_origin_col exists in adata.obs
+    if tissue_of_origin_col and tissue_of_origin_col not in adata.obs.columns:
+        warnings.warn(f"Tissue of origin column '{tissue_of_origin_col}' not found in adata.obs, will not consider tissue of origin for cell type annotation.", UserWarning)
+        tissue_of_origin_col = None
     
     # Get mapping of cluster to tissue if tissue_of_origin_col is provided
     cluster_to_tissue = {}
