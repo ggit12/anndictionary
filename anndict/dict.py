@@ -1387,6 +1387,16 @@ def ai_annotate_by_comparison(func, adata, groupby, n_top_genes, label_column, c
     rank_genes_groups = adata.uns['rank_genes_groups']
     clusters = rank_genes_groups['names'].dtype.names  # List of clusters
 
+    # Check if tissue_of_origin_col exists in adata.obs
+    if tissue_of_origin_col and tissue_of_origin_col not in adata.obs.columns:
+        warnings.warn(f"Tissue of origin column '{tissue_of_origin_col}' not found in adata.obs, will not consider tissue of origin for cell type annotation.", UserWarning)
+        tissue_of_origin_col = None
+
+    # Check if cell_type_of_origin_col exists in adata.obs
+    if cell_type_of_origin_col and cell_type_of_origin_col not in adata.obs.columns:
+        warnings.warn(f"Cell type of origin column '{cell_type_of_origin_col}' not found in adata.obs, will not consider cell type of origin for annotation.", UserWarning)
+        cell_type_of_origin_col = None
+    
 
     # Get mappings of clusters to tissues and cell types
     cluster_to_tissue = {}
