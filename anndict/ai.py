@@ -675,7 +675,7 @@ def process_llm_category_mapping(original_categories, llm_dict):
     Returns:
     dict: Mapping of original categories to simplified categories.
     """
-    print(f"original llm mapping:\n{llm_dict}")
+    
     # Function to normalize strings
     def normalize(s):
         return re.sub(r'[^\w\s]', '', s.lower())
