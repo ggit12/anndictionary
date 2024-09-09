@@ -710,103 +710,151 @@ def process_llm_category_mapping(original_categories, llm_dict):
     return final_mapping
 
 #Label simplification functions
-def map_cell_type_labels_to_simplified_set(labels, simplification_level=''):
+def map_cell_type_labels_to_simplified_set(labels, simplification_level='', batch_size=50):
     """
-    Maps a list of labels to a smaller set of labels using the AI.
+    Maps a list of labels to a smaller set of labels using the AI, processing in batches.
     Args:
     labels (list of str): The list of labels to be mapped.
     simplification_level (str): A qualitative description of how much you want the labels to be simplified. Or a direction about how to simplify the labels. Could be anything, like 'extremely', 'barely', 'compartment-level', 'remove-typos'
+    batch_size (int): The number of labels to process in each batch.
     Returns:
     dict: A dictionary mapping the original labels to the smaller set of labels.
     """
     #todo, could allow passing custom examples
     #enforce that labels are semantic
     enforce_semantic_list(labels)
-    
-    # Prepare the prompt
-    labels_str = "    ".join(labels)
+
+    # Prepare the initial prompt
+    initial_labels_str = "    ".join(labels)
     
     # Prepare the messages for the Chat Completions API
     messages = [
         {"role": "system", "content": f"You are a python dictionary mapping generator that takes a list of categories and provides a mapping to a {simplification_level} simplified set as a dictionary. Generate only a dictionary. Example: Fibroblast.    Fibroblasts.    CD8-positive T Cells.    CD4-positive T Cells. -> {{'Fibroblast.':'Fibroblast','Fibroblasts.':'Fibroblast','CD8-positive T Cells.':'T Cell','CD4-positive T Cells.':'T Cell'}}"},
-        {"role": "user", "content": f"{labels_str} -> "}
+        {"role": "user", "content": f"Here is the full list of labels to be simplified: {initial_labels_str}. Acknowledge that you've seen all labels. Do not provide the mapping yet."}
     ]
 
-    def process_response(response):
-        cleaned_mapping = extract_dictionary_from_ai_string(response)
-        return eval(cleaned_mapping)
-
-    def failure_handler(labels):
-        print(f"Simplification failed for labels: {labels}")
-        return {label: label for label in labels}
-
-    call_llm_kwargs = {
-        'max_tokens': min(100 + 15*len(labels), 4000),
-        'temperature': 0
-    }
-
-    failure_handler_kwargs = {'labels': labels}
-
-    # Use retry_llm_call instead of direct call_llm
-    mapping_dict = retry_llm_call(
+    # Get initial acknowledgment
+    initial_response = retry_llm_call(
         messages=messages,
-        process_response=process_response,
-        failure_handler=failure_handler,
-        call_llm_kwargs=call_llm_kwargs,
-        failure_handler_kwargs=failure_handler_kwargs
+        process_response=lambda x: x,
+        failure_handler=lambda: "Failed to process initial prompt",
+        call_llm_kwargs={'max_tokens': 30, 'temperature': 0},
+        max_attempts=1
     )
+    messages.append({"role": "assistant", "content": initial_response})
 
-    mapping_dict = process_llm_category_mapping(labels, mapping_dict)
+    def process_batch(batch_labels):
+        batch_str = "    ".join(batch_labels)
+        messages.append({"role": "user", "content": f"Provide a mapping for this batch of labels. Generate only a dictionary: {batch_str} -> "})
+        
+        def process_response(response):
+            cleaned_mapping = extract_dictionary_from_ai_string(response)
+            return eval(cleaned_mapping)
 
-    return mapping_dict
+        def failure_handler(labels):
+            print(f"Simplification failed for labels: {labels}")
+            return {label: label for label in labels}
+
+        call_llm_kwargs = {
+            'max_tokens': min(100 + 15*len(batch_labels), 2000),
+            'temperature': 0
+        }
+        failure_handler_kwargs = {'labels': batch_labels}
+
+        batch_mapping = retry_llm_call(
+            messages=messages,
+            process_response=process_response,
+            failure_handler=failure_handler,
+            call_llm_kwargs=call_llm_kwargs,
+            failure_handler_kwargs=failure_handler_kwargs
+        )
+        messages.append({"role": "assistant", "content": str(batch_mapping)})
+        return batch_mapping
+
+    # Process all labels in batches
+    full_mapping = {}
+    for i in range(0, len(labels), batch_size):
+        batch = labels[i:i+batch_size]
+        batch_mapping = process_batch(batch)
+        full_mapping.update(batch_mapping)
+
+    # Final pass to ensure consistency
+    final_mapping = process_llm_category_mapping(labels, full_mapping)
+    
+    return final_mapping
 
 
-def map_gene_labels_to_simplified_set(labels, simplification_level=''):
+def map_gene_labels_to_simplified_set(labels, simplification_level='', batch_size=50):
     """
-    Maps a list of genes to a smaller set of labels using AI.
+    Maps a list of genes to a smaller set of labels using AI, processing in batches.
     Args:
     labels (list of str): The list of labels to be mapped.
-    simplification_level (str): A qualitative description of how much you want the labels to be simplified. Could be anything, like 'extremely', 'barely', or 'compartment-level'
+    simplification_level (str): A qualitative description of how much you want the labels to be simplified.
+    batch_size (int): The number of labels to process in each batch.
     Returns:
     dict: A dictionary mapping the original labels to the smaller set of labels.
     """
-    #enforce that labels are semantic
+    # Enforce that labels are semantic
     enforce_semantic_list(labels)
-    
-    # Prepare the prompt
-    labels_str = "    ".join(labels)
+
+    # Prepare the initial prompt
+    initial_labels_str = "    ".join(labels)
     
     # Prepare the messages for the Chat Completions API
     messages = [
         {"role": "system", "content": f"You are a python dictionary mapping generator that takes a list of genes and provides a mapping to a {simplification_level} simplified set as a dictionary. Example: HSP90AA1    HSPA1A    HSPA1B    CLOCK    ARNTL    PER1    IL1A    IL6 -> {{'HSP90AA1':'Heat Shock Proteins','HSPA1A':'Heat Shock Proteins','HSPA1B':'Heat Shock Proteins','CLOCK':'Circadian Rhythm','ARNTL':'Circadian Rhythm','PER1':'Circadian Rhythm','IL1A':'Interleukins','IL6':'Interleukins'}}"},
-        {"role": "user", "content": f"{labels_str} -> "}
+        {"role": "user", "content": f"Here is the full list of gene labels to be simplified: {initial_labels_str}. Acknowledge that you've seen all labels. Do not provide the mapping yet."}
     ]
 
-    def process_response(response):
-        cleaned_mapping = extract_dictionary_from_ai_string(response)
-        return eval(cleaned_mapping)
-
-    def failure_handler(labels):
-        print(f"Simplification failed for gene labels: {labels}")
-        return {label: label for label in labels}
-
-    call_llm_kwargs = {
-        'max_tokens': min(100 + 15*len(labels), 4000),
-        'temperature': 0
-    }
-
-    failure_handler_kwargs = {'labels': labels}
-
-    # Use retry_llm_call instead of direct call_llm
-    mapping_dict = retry_llm_call(
+    # Get initial acknowledgment
+    initial_response = retry_llm_call(
         messages=messages,
-        process_response=process_response,
-        failure_handler=failure_handler,
-        call_llm_kwargs=call_llm_kwargs,
-        failure_handler_kwargs=failure_handler_kwargs
+        process_response=lambda x: x,
+        failure_handler=lambda: "Failed to process initial prompt",
+        call_llm_kwargs={'max_tokens': 30, 'temperature': 0},
+        max_attempts=1
     )
+    messages.append({"role": "assistant", "content": initial_response})
 
-    return mapping_dict
+    def process_batch(batch_labels):
+        batch_str = "    ".join(batch_labels)
+        messages.append({"role": "user", "content": f"Provide a mapping for this batch of gene labels. Generate only a dictionary: {batch_str} -> "})
+        
+        def process_response(response):
+            cleaned_mapping = extract_dictionary_from_ai_string(response)
+            return eval(cleaned_mapping)
+
+        def failure_handler(labels):
+            print(f"Simplification failed for gene labels: {labels}")
+            return {label: label for label in labels}
+
+        call_llm_kwargs = {
+            'max_tokens': min(100 + 15*len(batch_labels), 2000),
+            'temperature': 0
+        }
+        failure_handler_kwargs = {'labels': batch_labels}
+
+        batch_mapping = retry_llm_call(
+            messages=messages,
+            process_response=process_response,
+            failure_handler=failure_handler,
+            call_llm_kwargs=call_llm_kwargs,
+            failure_handler_kwargs=failure_handler_kwargs
+        )
+        messages.append({"role": "assistant", "content": str(batch_mapping)})
+        return batch_mapping
+
+    # Process all labels in batches
+    full_mapping = {}
+    for i in range(0, len(labels), batch_size):
+        batch = labels[i:i+batch_size]
+        batch_mapping = process_batch(batch)
+        full_mapping.update(batch_mapping)
+
+    # Final pass to ensure consistency
+    final_mapping = process_llm_category_mapping(labels, full_mapping)
+    
+    return final_mapping
 
 
 #Biological inference functions
