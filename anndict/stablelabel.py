@@ -772,14 +772,14 @@ def plot_model_agreement(adata, group_by, sub_group_by, model_cols, granularity=
     else:
         raise ValueError("Granularity must be 0, 1, or 2.")
     
-    # # Plot the results
-    # if granularity == 0:
-    #     grouped_means.plot(kind='bar', figsize=(14, 8), colormap='Paired')
-    # else:
-    grouped_means.plot(kind='bar', figsize=(14, 8), colormap='Paired')
+   # Create figure and axis objects
+    fig, ax = plt.subplots(figsize=(14, 8))
+    
+    # Plot the results
+    grouped_means.plot(kind='bar', ax=ax, colormap='Paired')
         
-    plt.xlabel(group_by if granularity > 0 else 'Model')
-    plt.ylabel('Average Scores')
+    ax.set_xlabel(group_by if granularity > 0 else 'Model')
+    ax.set_ylabel('Average Scores')
     title = 'Average model agreement'
     if granularity == 0:
         title += ''
@@ -787,10 +787,12 @@ def plot_model_agreement(adata, group_by, sub_group_by, model_cols, granularity=
         title += f' by {group_by}'
     elif granularity == 2:
         title += f' by {group_by} and {sub_group_by}'
-    plt.title(title)
-    plt.xticks(rotation=90)
-    plt.legend(title='Models' + ('' if granularity == 0 else ' and Tissues'))
-    plt.show()
+    ax.set_title(title)
+    ax.set_xticklabels(ax.get_xticklabels(), rotation=90)
+    ax.legend(title='Models' + ('' if granularity == 0 else ' and Tissues'))
+
+    # Return the figure and axis for further editing
+    return fig, ax
 
 
 def kappa_adata(adata, cols):
