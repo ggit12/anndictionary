@@ -1725,10 +1725,19 @@ def ai_compare_cell_type_labels_pairwise(adata, cols1, cols2, new_col_prefix='ag
         comparison_func = lambda row: ai_compare_cell_types_categorical(row['col1'], row['col2'])
         cleaning_func = lambda x: 0 if x.lower() == 'no match' else 1 if x.lower() == 'partial match' else 2 if x.lower() == 'perfect match' else None
 
-    # Use ThreadPoolExecutor to apply the comparison function using threads
+    # Convert the label_combinations DataFrame into a list of dictionaries for parallel processing
+    label_records = label_combinations.to_dict('records')
+
+    # Use ThreadPoolExecutor to apply the comparison function using threads for API calls
     with ThreadPoolExecutor() as executor:
-        label_combinations['raw_agreement'] = list(executor.map(comparison_func, label_combinations.to_dict('records')))
-    
+        # Submit comparison tasks in parallel
+        future_to_row = {executor.submit(comparison_func, row): row for row in label_records}
+
+        # Process the results as they are completed
+        for future in as_completed(future_to_row):
+            row = future_to_row[future]
+            row['raw_agreement'] = future.result()
+
     # Apply the cleaning function to the 'agreement' column
     label_combinations['agreement'] = label_combinations['raw_agreement'].apply(cleaning_func)
 
