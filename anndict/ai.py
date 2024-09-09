@@ -741,7 +741,7 @@ def map_cell_type_labels_to_simplified_set(labels, simplification_level=''):
         return {label: label for label in labels}
 
     call_llm_kwargs = {
-        'max_tokens': 1000,
+        'max_tokens': 100 + 15*len(labels),
         'temperature': 0
     }
 
@@ -791,7 +791,7 @@ def map_gene_labels_to_simplified_set(labels, simplification_level=''):
         return {label: label for label in labels}
 
     call_llm_kwargs = {
-        'max_tokens': 1000,
+        'max_tokens': min(100 + 15*len(labels), 4000),
         'temperature': 0
     }
 

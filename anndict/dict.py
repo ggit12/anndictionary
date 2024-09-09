@@ -1738,6 +1738,9 @@ def ai_compare_cell_type_labels_pairwise(adata, cols1, cols2, new_col_prefix='ag
             row = future_to_row[future]
             row['raw_agreement'] = future.result()
 
+    # Re-create the DataFrame from the processed records
+    label_combinations = pd.DataFrame(label_records)
+
     # Apply the cleaning function to the 'agreement' column
     label_combinations['agreement'] = label_combinations['raw_agreement'].apply(cleaning_func)
 
