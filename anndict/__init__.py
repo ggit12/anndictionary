@@ -49,7 +49,8 @@ from .ai import (
     encode_plot_for_openai, 
     ai_resolution_interpretation,
     determine_sign_of_resolution_change,
-    process_llm_category_mapping
+    process_llm_category_mapping,
+    parse_dict_with_unescaped_strings
 )
 
 from .stablelabel import (
@@ -306,5 +307,6 @@ __all__ = [
     'ensure_label_consistency_adata_dict',
     'ensure_label_consistency_adata',
     'ensure_label_consistency_main',
-    'process_llm_category_mapping'
+    'process_llm_category_mapping',
+    'parse_dict_with_unescaped_strings'
 ]
