@@ -12,6 +12,8 @@ from .metadata_summary import (
 )
 
 from .utils import (
+    normalize_string,
+    normalize_label,
     make_names, 
     add_col_to_adata_obs,
     add_col_to_adata_var,
@@ -49,8 +51,7 @@ from .ai import (
     encode_plot_for_openai, 
     ai_resolution_interpretation,
     determine_sign_of_resolution_change,
-    process_llm_category_mapping,
-    parse_dict_with_unescaped_strings
+    process_llm_category_mapping
 )
 
 from .stablelabel import (
@@ -138,7 +139,6 @@ from .dict import (
     plot_sankey_adata_dict, 
     save_sankey_adata_dict, 
     plot_grouped_average_adata_dict,
-    normalize_label,
     ensure_label_consistency_adata_dict,
     ensure_label_consistency_adata,
     ensure_label_consistency_main
@@ -303,6 +303,7 @@ __all__ = [
     'get_adata_columns',
     'kappa_adata',
     'krippendorff_alpha_adata',
+    'normalize_string',
     'normalize_label',
     'ensure_label_consistency_adata_dict',
     'ensure_label_consistency_adata',

@@ -46,7 +46,7 @@ from .stablelabel import (
     plot_grouped_average,
     harmony_label_transfer
 )
-from .utils import make_names, add_label_to_adata, convert_obs_col_to_category, create_color_map
+from .utils import normalize_string, normalize_label, make_names, add_label_to_adata, convert_obs_col_to_category, create_color_map
 from .ai import (
     attempt_ai_integration, 
     generate_file_key, 
@@ -1579,16 +1579,6 @@ def ai_unify_labels(adata_dict, label_columns, new_label_column, simplification_
 #ai_unify_labels is meant to unify labels across multiple adata
 #the following set of ensure_label functions are meant to operate within a single adata
 #and do not communicate across multiple adata in a dict
-
-
-def normalize_label(label):
-    """
-    Function to normalize labels by stripping whitespace, converting to lowercase, etc.
-    """
-    if pd.isna(label):  # Handle NaN values
-        return 'missing'
-    return label.strip().lower()
-
 
 def ensure_label_consistency_adata_dict(adata_dict, cols, simplification_level='unified, typo-fixed', new_col_prefix='consistent'):
     """
