@@ -38,6 +38,7 @@ import json
 from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor, as_completed
 
 from difflib import get_close_matches
+import ast
 
 # import time
 # import csv
@@ -666,6 +667,38 @@ def generate_file_key(file_path):
 def normalize_string(s):
     return re.sub(r'[^\w\s]', '', s.lower())
 
+def parse_dict_with_unescaped_strings(s):
+    def parse_string(s):
+        return ast.literal_eval(f"'''{s}'''")
+
+    # Remove leading/trailing whitespace and braces
+    s = s.strip()
+    if s.startswith('{'):
+        s = s[1:]
+    if s.endswith('}'):
+        s = s[:-1]
+
+    # Split the string into key-value pairs
+    pairs = re.findall(r'([^:]+):\s*([^,]+)(?:,|$)', s)
+
+    result = {}
+    for key, value in pairs:
+        # Strip whitespace and quotes from key and value
+        key = key.strip().strip('\'"')
+        value = value.strip().strip('\'"')
+        
+        # Use ast.literal_eval to safely evaluate the strings
+        try:
+            parsed_key = parse_string(key)
+            parsed_value = parse_string(value)
+            result[parsed_key] = parsed_value
+        except (SyntaxError, ValueError) as e:
+            print(f"Error parsing key-value pair ({key}: {value}): {e}")
+            # Fall back to using the strings as-is if parsing fails
+            result[key] = value
+
+    return result
+
 def process_llm_category_mapping(original_categories, llm_dict):
     """
     Map original categories to simplified categories using LLM output.
@@ -702,10 +735,6 @@ def process_llm_category_mapping(original_categories, llm_dict):
             else:
                 # No match found, use original category
                 final_mapping[original] = original
-
-    # print(f"\noriginal categories:\n{original_categories}")
-    # print(f"\noriginal llm mapping:\n{llm_dict}")
-    # print(f"\nfinal simplified mapping:\n{final_mapping}")
     
     return final_mapping
 
@@ -749,7 +778,11 @@ def map_cell_type_labels_to_simplified_set(labels, simplification_level='', batc
         
         def process_response(response):
             cleaned_mapping = extract_dictionary_from_ai_string(response)
-            return eval(cleaned_mapping)
+            try:
+                return parse_dict_with_unescaped_strings(cleaned_mapping)
+            except (SyntaxError, ValueError) as e:
+                print(f"Error parsing dictionary: {e}")
+                return {label: label for label in batch_labels}
 
         def failure_handler(labels):
             print(f"Simplification failed for labels: {labels}")
@@ -822,7 +855,11 @@ def map_gene_labels_to_simplified_set(labels, simplification_level='', batch_siz
         
         def process_response(response):
             cleaned_mapping = extract_dictionary_from_ai_string(response)
-            return eval(cleaned_mapping)
+            try:
+                return parse_dict_with_unescaped_strings(cleaned_mapping)
+            except (SyntaxError, ValueError) as e:
+                print(f"Error parsing dictionary: {e}")
+                return {label: label for label in batch_labels}
 
         def failure_handler(labels):
             print(f"Simplification failed for gene labels: {labels}")
