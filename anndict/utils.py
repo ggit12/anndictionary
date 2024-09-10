@@ -49,6 +49,18 @@ def make_names(names):
     return valid_names
 
 
+def normalize_string(s):
+    """Removes non-alphanumeric characters and converts to lowercase."""
+    return re.sub(r'[^\w\s]', '', s.lower())
+
+def normalize_label(label):
+    """
+    Calls normalize-string and handles NaN values.
+    """
+    if pd.isna(label):  # Handle NaN values
+        return 'missing'
+    return normalize_string(label.strip())
+
 def add_label_to_adata(adata, indices, labels, new_label_key):
     """
     Adds a label to the AnnData object in a specified column for given indices.
