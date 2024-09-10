@@ -810,33 +810,35 @@ def kappa_adata(adata, cols):
     - 'average_pairwise': A dictionary with the average pairwise Kappa for each rater.
     - 'fleiss': The Fleiss' Kappa value for the overall agreement across all raters.
     """
-    # Extract data from adata.obs based on the specified columns
+    #Extract data from adata.obs based on the specified columns
     data = adata.obs[cols].to_numpy()
-
     num_raters = len(cols)
     kappa_scores = {'pairwise': {}, 'average_pairwise': {}, 'fleiss': None}
     
-    # Calculate pairwise Cohen's Kappa
+    #Calculate pairwise Cohen's Kappa
+    pairwise_kappas = np.zeros((num_raters, num_raters))
     for i in range(num_raters):
         rater_kappas = []
         for j in range(i + 1, num_raters):
+            # Calculate Cohen's Kappa for each pair
             kappa = cohen_kappa_score(data[:, i], data[:, j])
             kappa_scores['pairwise'][(cols[i], cols[j])] = kappa
+            pairwise_kappas[i, j] = kappa
             rater_kappas.append(kappa)
         
-        # Average Kappa for this rater (with every other rater)
+        #Average Kappa for this rater (with every other rater)
         avg_kappa = np.mean(rater_kappas) if rater_kappas else None
         kappa_scores['average_pairwise'][cols[i]] = avg_kappa
 
-    # Prepare data for Fleiss' Kappa: need to count each category occurrence per item
-    # Transpose the data to calculate category frequencies for each item (row)
+    #Fleiss' Kappa calculation
     unique_categories = np.unique(data)
+    category_map = {cat: idx for idx, cat in enumerate(unique_categories)}
     fleiss_data = np.zeros((data.shape[0], len(unique_categories)))
 
-    # Count category occurrences per item (per row)
-    for i, item in enumerate(data):
-        for category in unique_categories:
-            fleiss_data[i, np.where(unique_categories == category)[0][0]] = np.sum(item == category)
+    # Count category occurrences per item (per row) using vectorized operations
+    for i in range(data.shape[0]):
+        row = np.array([category_map[val] for val in data[i]])
+        fleiss_data[i] = np.bincount(row, minlength=len(unique_categories))
 
     # Calculate Fleiss' Kappa
     fleiss_kappa_value = fleiss_kappa(fleiss_data)
