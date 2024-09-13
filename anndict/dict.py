@@ -111,29 +111,24 @@ def apply_func(adt_key, adata, func, accepts_key, max_retries, **func_args):
                 print(f"Failed to process {adt_key} after {max_retries} attempts.")
 
 
-def adata_dict_fapply(adata_dict, func, use_processes=False, num_workers=None, max_retries=0, **kwargs_dicts):
+def adata_dict_fapply(adata_dict, func, use_multithreading=True, num_workers=None, max_retries=0, **kwargs_dicts):
     """
     Applies a given function to each AnnData object in the adata_dict, with error handling,
-    retry mechanism, and the option to use either threading or multiprocessing.
+    retry mechanism, and the option to use either threading or sequential execution.
 
     Parameters:
     - adata_dict: Dictionary of AnnData objects with keys as identifiers.
     - func: Function to apply to each AnnData object in the dictionary.
-    - use_processes: (Currently not implemented) If True, use ProcessPoolExecutor; if False, use ThreadPoolExecutor.
-    - num_workers: Number of worker processes or threads to use (default: number of CPUs available).
+    - use_multithreading: If True, use ThreadPoolExecutor; if False, execute sequentially.
+    - num_workers: Number of worker threads to use (default: number of CPUs available).
     - max_retries: Maximum number of retries for a failed task.
-    - kwargs_dicts: Additional keyword arguments to pass to the function, where each argument can be:
-    1. A dictionary with keys matching or including all keys from adata_dict
-    2. A dictionary to be used for all AnnData objects
-    3. A single value to be used for all AnnData objects
+    - kwargs_dicts: Additional keyword arguments to pass to the function.
 
     Returns:
     - None: The function modifies the AnnData objects in place.
     """
     sig = inspect.signature(func)
     accepts_key = 'adt_key' in sig.parameters
-    # Executor = ProcessPoolExecutor if use_processes else ThreadPoolExecutor
-    Executor = ThreadPoolExecutor
 
     def get_arg_value(arg_value, adt_key):
         if isinstance(arg_value, dict):
@@ -143,20 +138,30 @@ def adata_dict_fapply(adata_dict, func, use_processes=False, num_workers=None, m
                 return arg_value  # Use the entire dictionary if it doesn't contain all adata_dict keys
         return arg_value  # Use the value as is if it's not a dictionary or doesn't contain all adata_dict keys
 
-    with Executor(max_workers=num_workers) as executor:
-        futures = {
-            executor.submit(
-                apply_func, adt_key, adata, func, accepts_key, max_retries, **{
+    if use_multithreading:
+        with ThreadPoolExecutor(max_workers=num_workers) as executor:
+            futures = {
+                executor.submit(
+                    apply_func, adt_key, adata, func, accepts_key, max_retries, **{
+                        arg_name: get_arg_value(arg_value, adt_key)
+                        for arg_name, arg_value in kwargs_dicts.items()
+                    }
+                ): adt_key for adt_key, adata in adata_dict.items()
+            }
+
+            for future in as_completed(futures):
+                adt_key = futures[future]
+                try:
+                    future.result()  # Retrieve result to catch exceptions
+                except Exception as e:
+                    print(f"Unhandled error processing {adt_key}: {e}")
+    else:
+        for adt_key, adata in adata_dict.items():
+            try:
+                apply_func(adt_key, adata, func, accepts_key, max_retries, **{
                     arg_name: get_arg_value(arg_value, adt_key)
                     for arg_name, arg_value in kwargs_dicts.items()
-                }
-            ): adt_key for adt_key, adata in adata_dict.items()
-        }
-
-        for future in as_completed(futures):
-            adt_key = futures[future]
-            try:
-                future.result()  # Retrieve result to catch exceptions
+                })
             except Exception as e:
                 print(f"Unhandled error processing {adt_key}: {e}")
 
@@ -177,30 +182,25 @@ def apply_func_return(adt_key, adata, func, accepts_key, max_retries, **func_arg
                 return f"Error: {e}"  # Optionally, return None or raise an error
 
 
-def adata_dict_fapply_return(adata_dict, func, use_processes=False, num_workers=None, max_retries=0, **kwargs_dicts):
+def adata_dict_fapply_return(adata_dict, func, use_multithreading=True, num_workers=None, max_retries=0, **kwargs_dicts):
     """
     Applies a given function to each AnnData object in the adata_dict, with error handling,
-    retry mechanism, and the option to use either threading or multiprocessing. Returns
+    retry mechanism, and the option to use either threading or sequential execution. Returns
     a dictionary with the results of the function applied to each AnnData object.
 
     Parameters:
     - adata_dict: Dictionary of AnnData objects with keys as identifiers.
     - func: Function to apply to each AnnData object in the dictionary.
-    - use_processes: (Currently not implemented) If True, use ProcessPoolExecutor; if False, use ThreadPoolExecutor.
-    - num_workers: Number of worker processes or threads to use (default: number of CPUs available).
+    - use_multithreading: If True, use ThreadPoolExecutor; if False, execute sequentially.
+    - num_workers: Number of worker threads to use (default: number of CPUs available).
     - max_retries: Maximum number of retries for a failed task.
-    - kwargs_dicts: Additional keyword arguments to pass to the function, where each argument can be:
-    1. A dictionary with keys matching or including all keys from adata_dict
-    2. A dictionary to be used for all AnnData objects
-    3. A single value to be used for all AnnData objects
+    - kwargs_dicts: Additional keyword arguments to pass to the function.
 
     Returns:
     - dict: A dictionary with the same keys as adata_dict, containing the results of the function applied to each AnnData object.
     """
     sig = inspect.signature(func)
     accepts_key = 'adt_key' in sig.parameters
-    # Executor = ProcessPoolExecutor if use_processes else ThreadPoolExecutor
-    Executor = ThreadPoolExecutor
     results = {}
 
     def get_arg_value(arg_value, adt_key):
@@ -211,22 +211,33 @@ def adata_dict_fapply_return(adata_dict, func, use_processes=False, num_workers=
                 return arg_value  # Use the entire dictionary if it doesn't contain all adata_dict keys
         return arg_value  # Use the value as is if it's not a dictionary or doesn't contain all adata_dict keys
 
-    with Executor(max_workers=num_workers) as executor:
-        futures = {
-            executor.submit(
-                apply_func_return, adt_key, adata, func, accepts_key, max_retries, **{
+    if use_multithreading:
+        with ThreadPoolExecutor(max_workers=num_workers) as executor:
+            futures = {
+                executor.submit(
+                    apply_func_return, adt_key, adata, func, accepts_key, max_retries, **{
+                        arg_name: get_arg_value(arg_value, adt_key)
+                        for arg_name, arg_value in kwargs_dicts.items()
+                    }
+                ): adt_key for adt_key, adata in adata_dict.items()
+            }
+
+            for future in as_completed(futures):
+                adt_key = futures[future]
+                try:
+                    result = future.result()  # Retrieve result to catch exceptions
+                    results[adt_key] = result
+                except Exception as e:
+                    print(f"Unhandled error processing {adt_key}: {e}")
+                    results[adt_key] = None  # Optionally, return None or handle differently
+    else:
+        for adt_key, adata in adata_dict.items():
+            try:
+                result = apply_func_return(adt_key, adata, func, accepts_key, max_retries, **{
                     arg_name: get_arg_value(arg_value, adt_key)
                     for arg_name, arg_value in kwargs_dicts.items()
-                }
-            ): adt_key for adt_key, adata in adata_dict.items()
-        }
-
-        for future in as_completed(futures):
-            adt_key = futures[future]
-            try:
-                result = future.result()  # Retrieve result to catch exceptions
-                if result is not None:
-                    results[adt_key] = result
+                })
+                results[adt_key] = result
             except Exception as e:
                 print(f"Unhandled error processing {adt_key}: {e}")
                 results[adt_key] = None  # Optionally, return None or handle differently
@@ -828,7 +839,7 @@ def calculate_umap_adata_dict(adata_dict, **kwargs):
     return adata_dict
 
 
-def plot_umap_adata_dict(adata_dict, **kwargs):
+def plot_umap_adata_dict(adata_dict, color_by, **kwargs):
     """
     Plots UMAP embeddings for each AnnData object in adata_dict, colored by a specified variable.
 
@@ -842,6 +853,8 @@ def plot_umap_adata_dict(adata_dict, **kwargs):
     def plot_umap(adata, adt_key=None, **kwargs):
         print(f"Plotting UMAP for key: {adt_key}")
         color_by = kwargs.get('color_by')
+        if color_by is None:
+            raise ValueError("The 'color_by' parameter must be provided.")
         if 'X_umap' in adata.obsm:
             title = [f"{color}" for color in color_by]
             sc.pl.umap(adata, color=color_by, title=title)
