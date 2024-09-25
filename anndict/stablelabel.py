@@ -779,7 +779,7 @@ def plot_model_agreement(adata, group_by, sub_group_by, model_cols, granularity=
     grouped_means.plot(kind='bar', ax=ax, colormap='Paired')
         
     ax.set_xlabel(group_by if granularity > 0 else 'Model')
-    ax.set_ylabel('Average Scores')
+    ax.set_ylabel('Agreement')
     title = 'Average model agreement'
     if granularity == 0:
         title += ''
