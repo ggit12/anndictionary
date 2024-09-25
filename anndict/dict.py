@@ -860,7 +860,7 @@ def plot_umap_adata_dict(adata_dict, color_by, **kwargs):
             sc.pl.umap(adata, color=color_by, title=title)
         else:
             print(f"UMAP not computed for adata with key {adt_key}. Please compute UMAP before plotting.")
-    adata_dict_fapply(adata_dict, plot_umap, **kwargs)
+    adata_dict_fapply(adata_dict, plot_umap, use_multithreading=False, **kwargs)
 
 
 def write_h5ad_adata_dict(adata_dict, directory, file_prefix=""):
@@ -1755,27 +1755,31 @@ def ai_compare_cell_type_labels_pairwise(adata, cols1, cols2, new_col_prefix='ag
         for col2 in cols2:
             if col1 == col2:
                 continue
-            
+
             # Define the new column name in adata.obs for this comparison
             new_col_name = f"{new_col_prefix}_{col1}_{col2}"
-            
-            # Initialize the new column with a placeholder value
-            adata.obs[new_col_name] = pd.NA
-            
-            # Iterate over unique combinations in label_combinations
-            for _, row in label_combinations.iterrows():
-                label1, label2, agreement = row['col1'], row['col2'], row['agreement']
-                
-                # Create a boolean mask for the current label combination
-                mask = (adata.obs[col1] == label1) & (adata.obs[col2] == label2)
-                
-                # Assign the agreement value to the masked rows
-                adata.obs.loc[mask, new_col_name] = agreement
-            
-            # Store the result for this pair of columns in the results dictionary
+
+            # Prepare a temporary DataFrame from adata.obs
+            temp_obs = adata.obs[[col1, col2]].copy()
+            temp_obs.reset_index(inplace=True)  # Reset index to preserve cell indices
+            temp_obs.columns = ['index', 'col1_label', 'col2_label']
+
+            # Merge temp_obs with label_combinations on the label columns
+            merged_df = pd.merge(
+                temp_obs,
+                label_combinations[['col1', 'col2', 'agreement']],
+                left_on=['col1_label', 'col2_label'],
+                right_on=['col1', 'col2'],
+                how='left'
+            )
+
+            # Assign the 'agreement' values back to adata.obs
+            adata.obs[new_col_name] = merged_df['agreement'].values
+
+            # Store the relevant portion of label_combinations in the results dictionary
             results[(col1, col2)] = label_combinations[
-                (label_combinations['col1'].isin(adata.obs[col1])) &
-                (label_combinations['col2'].isin(adata.obs[col2]))
+                label_combinations['col1'].isin(adata.obs[col1]) &
+                label_combinations['col2'].isin(adata.obs[col2])
             ]
 
     return results
