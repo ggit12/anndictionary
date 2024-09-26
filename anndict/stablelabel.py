@@ -463,7 +463,8 @@ def plot_changes(adata, true_label_key, predicted_label_key, percentage=True, st
 
 
 def plot_confusion_matrix_from_adata(adata, true_label_key, predicted_label_key, title='Confusion Matrix',
-                                     row_color_keys=None, col_color_keys=None, figsize=None, diagonalize=False):
+                                     row_color_keys=None, col_color_keys=None, figsize=None, diagonalize=False,
+                                     true_ticklabels=None, predicted_ticklabels=None, annot=None):
     """
     Wrapper function to plot a confusion matrix from an AnnData object, with optional row and column colors.
     
@@ -516,17 +517,18 @@ def plot_confusion_matrix_from_adata(adata, true_label_key, predicted_label_key,
     color_map = create_color_map(adata, keys)
 
     # Call the main plot function
-    plot_confusion_matrix(true_labels_encoded, predicted_labels_encoded, label_encoder, color_map, title,
+    return plot_confusion_matrix(true_labels_encoded, predicted_labels_encoded, label_encoder, color_map, title,
                           row_color_keys=row_color_keys, col_color_keys=col_color_keys,
                           true_label_color_dict=true_label_color_dict, predicted_label_color_dict=predicted_label_color_dict,
-                          true_labels=true_labels, predicted_labels=predicted_labels, figsize=figsize, diagonalize=diagonalize)
+                          true_labels=true_labels, predicted_labels=predicted_labels, figsize=figsize, diagonalize=diagonalize,
+                          true_ticklabels=true_ticklabels, predicted_ticklabels=predicted_ticklabels, annot=annot)
 
 
 def plot_confusion_matrix(true_labels_encoded, predicted_labels_encoded, label_encoder, color_map, title='Confusion Matrix', 
                           row_color_keys=None, col_color_keys=None,
                           true_label_color_dict=None, predicted_label_color_dict=None,
                           true_labels=None, predicted_labels=None, figsize=None,
-                          diagonalize=False):
+                          diagonalize=False, true_ticklabels=None, predicted_ticklabels=None, annot=None):
     labels_true = np.unique(true_labels_encoded)
     labels_pred = np.unique(predicted_labels_encoded)
     
@@ -573,9 +575,10 @@ def plot_confusion_matrix(true_labels_encoded, predicted_labels_encoded, label_e
         col_colors = map_labels_to_colors(labels_pred_sorted, predicted_label_color_dict, color_map)
         col_colors = pd.DataFrame(col_colors, index=labels_pred_sorted)
 
-    xticklabels = True if len(labels_pred) <= 40 else False
-    yticklabels = True if len(labels_true) <= 40 else False
-    annot = True if len(labels_true) <= 40 and len(labels_pred) <= 40 else False
+    xticklabels = predicted_ticklabels if predicted_ticklabels is not None else (True if len(labels_pred) <= 40 else False)
+    yticklabels = true_ticklabels if true_ticklabels is not None else (True if len(labels_true) <= 40 else False)
+    annot = annot if annot is not None else (True if len(labels_true) <= 40 and len(labels_pred) <= 40 else False)
+
 
     g = sns.clustermap(cm_normalized, annot=annot, fmt=".2f", cmap="Blues",
                        row_colors=row_colors, col_colors=col_colors,
@@ -586,6 +589,8 @@ def plot_confusion_matrix(true_labels_encoded, predicted_labels_encoded, label_e
     g.ax_heatmap.set_ylabel('True label')
     g.ax_heatmap.set_xlabel('Predicted label')
     plt.show()
+
+    return g
 
 def plot_sankey(adata, cols, params=None):
 
