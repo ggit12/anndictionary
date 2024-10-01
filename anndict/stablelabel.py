@@ -804,38 +804,35 @@ def kappa_adata(adata, cols):
     """
     Calculate pairwise Cohen's Kappa, average pairwise Kappa, and Fleiss' Kappa
     for categorical data in adata.obs[cols].
-
     Parameters:
     - adata: AnnData object.
     - cols: List of columns in adata.obs to use for calculating agreement.
-
     Returns:
     - Dictionary with keys 'pairwise', 'average_pairwise', and 'fleiss':
     - 'pairwise': A dictionary with pairwise Cohen's Kappa values.
     - 'average_pairwise': A dictionary with the average pairwise Kappa for each rater.
     - 'fleiss': The Fleiss' Kappa value for the overall agreement across all raters.
     """
-    #Extract data from adata.obs based on the specified columns
+    # Extract data from adata.obs based on the specified columns
     data = adata.obs[cols].to_numpy()
     num_raters = len(cols)
     kappa_scores = {'pairwise': {}, 'average_pairwise': {}, 'fleiss': None}
-    
-    #Calculate pairwise Cohen's Kappa
-    pairwise_kappas = np.zeros((num_raters, num_raters))
+
+    # Calculate pairwise Cohen's Kappa
     for i in range(num_raters):
         rater_kappas = []
-        for j in range(i + 1, num_raters):
-            # Calculate Cohen's Kappa for each pair
-            kappa = cohen_kappa_score(data[:, i], data[:, j])
-            kappa_scores['pairwise'][(cols[i], cols[j])] = kappa
-            pairwise_kappas[i, j] = kappa
-            rater_kappas.append(kappa)
+        for j in range(num_raters):
+            if i != j:
+                # Calculate Cohen's Kappa for each pair
+                kappa = cohen_kappa_score(data[:, i], data[:, j])
+                kappa_scores['pairwise'][(cols[i], cols[j])] = kappa
+                rater_kappas.append(kappa)
         
-        #Average Kappa for this rater (with every other rater)
+        # Average Kappa for this rater (with every other rater)
         avg_kappa = np.mean(rater_kappas) if rater_kappas else None
         kappa_scores['average_pairwise'][cols[i]] = avg_kappa
 
-    #Fleiss' Kappa calculation
+    # Fleiss' Kappa calculation
     unique_categories = np.unique(data)
     category_map = {cat: idx for idx, cat in enumerate(unique_categories)}
     fleiss_data = np.zeros((data.shape[0], len(unique_categories)))
