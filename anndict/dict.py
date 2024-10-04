@@ -839,7 +839,7 @@ def calculate_umap_adata_dict(adata_dict, **kwargs):
     return adata_dict
 
 
-def plot_umap_adata_dict(adata_dict, color_by, **kwargs):
+def plot_umap_adata_dict(adata_dict, **kwargs):
     """
     Plots UMAP embeddings for each AnnData object in adata_dict, colored by a specified variable.
 
@@ -852,12 +852,8 @@ def plot_umap_adata_dict(adata_dict, color_by, **kwargs):
     """
     def plot_umap(adata, adt_key=None, **kwargs):
         print(f"Plotting UMAP for key: {adt_key}")
-        color_by = kwargs.get('color_by')
-        if color_by is None:
-            raise ValueError("The 'color_by' parameter must be provided.")
         if 'X_umap' in adata.obsm:
-            title = [f"{color}" for color in color_by]
-            sc.pl.umap(adata, color=color_by, title=title)
+            sc.pl.umap(adata, **kwargs)
         else:
             print(f"UMAP not computed for adata with key {adt_key}. Please compute UMAP before plotting.")
     adata_dict_fapply(adata_dict, plot_umap, use_multithreading=False, **kwargs)
