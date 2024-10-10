@@ -109,7 +109,6 @@
 <li class="toctree-l2"><a class="reference internal" href="#anndict.dict.ai_annotate_by_comparison"><code class="docutils literal notranslate"><span class="pre">ai_annotate_by_comparison()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#anndict.dict.ai_annotate"><code class="docutils literal notranslate"><span class="pre">ai_annotate()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#anndict.dict.ai_unify_labels"><code class="docutils literal notranslate"><span class="pre">ai_unify_labels()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#anndict.dict.normalize_label"><code class="docutils literal notranslate"><span class="pre">normalize_label()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#anndict.dict.ensure_label_consistency_adata_dict"><code class="docutils literal notranslate"><span class="pre">ensure_label_consistency_adata_dict()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#anndict.dict.ensure_label_consistency_adata"><code class="docutils literal notranslate"><span class="pre">ensure_label_consistency_adata()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#anndict.dict.ensure_label_consistency_main"><code class="docutils literal notranslate"><span class="pre">ensure_label_consistency_main()</span></code></a></li>
@@ -123,6 +122,8 @@
 <li class="toctree-l2"><a class="reference internal" href="#anndict.strata.stable_label_adata_strata"><code class="docutils literal notranslate"><span class="pre">stable_label_adata_strata()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#anndict.strata.plot_confusion_matrix_across_strata"><code class="docutils literal notranslate"><span class="pre">plot_confusion_matrix_across_strata()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#anndict.utils.make_names"><code class="docutils literal notranslate"><span class="pre">make_names()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#anndict.utils.normalize_string"><code class="docutils literal notranslate"><span class="pre">normalize_string()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#anndict.utils.normalize_label"><code class="docutils literal notranslate"><span class="pre">normalize_label()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#anndict.utils.add_label_to_adata"><code class="docutils literal notranslate"><span class="pre">add_label_to_adata()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#anndict.utils.add_col_to_adata_obs"><code class="docutils literal notranslate"><span class="pre">add_col_to_adata_obs()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#anndict.utils.add_col_to_adata_var"><code class="docutils literal notranslate"><span class="pre">add_col_to_adata_var()</span></code></a></li>
@@ -246,19 +247,16 @@ Inherits attributes from the built-in dict class.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="anndict.dict.adata_dict_fapply">
-<span class="sig-prename descclassname"><span class="pre">anndict.dict.</span></span><span class="sig-name descname"><span class="pre">adata_dict_fapply</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_processes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_workers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_retries</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs_dicts</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/dict.html#adata_dict_fapply"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.dict.adata_dict_fapply" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">anndict.dict.</span></span><span class="sig-name descname"><span class="pre">adata_dict_fapply</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_multithreading</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_workers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_retries</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs_dicts</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/dict.html#adata_dict_fapply"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.dict.adata_dict_fapply" title="Link to this definition"></a></dt>
 <dd><p>Applies a given function to each AnnData object in the adata_dict, with error handling,
-retry mechanism, and the option to use either threading or multiprocessing.</p>
+retry mechanism, and the option to use either threading or sequential execution.</p>
 <p>Parameters:
 - adata_dict: Dictionary of AnnData objects with keys as identifiers.
 - func: Function to apply to each AnnData object in the dictionary.
-- use_processes: (Currently not implemented) If True, use ProcessPoolExecutor; if False, use ThreadPoolExecutor.
-- num_workers: Number of worker processes or threads to use (default: number of CPUs available).
+- use_multithreading: If True, use ThreadPoolExecutor; if False, execute sequentially.
+- num_workers: Number of worker threads to use (default: number of CPUs available).
 - max_retries: Maximum number of retries for a failed task.
-- kwargs_dicts: Additional keyword arguments to pass to the function, where each argument can be:
-1. A dictionary with keys matching or including all keys from adata_dict
-2. A dictionary to be used for all AnnData objects
-3. A single value to be used for all AnnData objects</p>
+- kwargs_dicts: Additional keyword arguments to pass to the function.</p>
 <p>Returns:
 - None: The function modifies the AnnData objects in place.</p>
 </dd></dl>
@@ -270,20 +268,17 @@ retry mechanism, and the option to use either threading or multiprocessing.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="anndict.dict.adata_dict_fapply_return">
-<span class="sig-prename descclassname"><span class="pre">anndict.dict.</span></span><span class="sig-name descname"><span class="pre">adata_dict_fapply_return</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_processes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_workers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_retries</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs_dicts</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/dict.html#adata_dict_fapply_return"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.dict.adata_dict_fapply_return" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">anndict.dict.</span></span><span class="sig-name descname"><span class="pre">adata_dict_fapply_return</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_multithreading</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_workers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_retries</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs_dicts</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/dict.html#adata_dict_fapply_return"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.dict.adata_dict_fapply_return" title="Link to this definition"></a></dt>
 <dd><p>Applies a given function to each AnnData object in the adata_dict, with error handling,
-retry mechanism, and the option to use either threading or multiprocessing. Returns
+retry mechanism, and the option to use either threading or sequential execution. Returns
 a dictionary with the results of the function applied to each AnnData object.</p>
 <p>Parameters:
 - adata_dict: Dictionary of AnnData objects with keys as identifiers.
 - func: Function to apply to each AnnData object in the dictionary.
-- use_processes: (Currently not implemented) If True, use ProcessPoolExecutor; if False, use ThreadPoolExecutor.
-- num_workers: Number of worker processes or threads to use (default: number of CPUs available).
+- use_multithreading: If True, use ThreadPoolExecutor; if False, execute sequentially.
+- num_workers: Number of worker threads to use (default: number of CPUs available).
 - max_retries: Maximum number of retries for a failed task.
-- kwargs_dicts: Additional keyword arguments to pass to the function, where each argument can be:
-1. A dictionary with keys matching or including all keys from adata_dict
-2. A dictionary to be used for all AnnData objects
-3. A single value to be used for all AnnData objects</p>
+- kwargs_dicts: Additional keyword arguments to pass to the function.</p>
 <p>Returns:
 - dict: A dictionary with the same keys as adata_dict, containing the results of the function applied to each AnnData object.</p>
 </dd></dl>
@@ -953,12 +948,6 @@ dict: A mapping dictionary where the keys are the original labels and the values
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="anndict.dict.normalize_label">
-<span class="sig-prename descclassname"><span class="pre">anndict.dict.</span></span><span class="sig-name descname"><span class="pre">normalize_label</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/dict.html#normalize_label"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.dict.normalize_label" title="Link to this definition"></a></dt>
-<dd><p>Function to normalize labels by stripping whitespace, converting to lowercase, etc.</p>
-</dd></dl>
-
-<dl class="py function">
 <dt class="sig sig-object py" id="anndict.dict.ensure_label_consistency_adata_dict">
 <span class="sig-prename descclassname"><span class="pre">anndict.dict.</span></span><span class="sig-name descname"><span class="pre">ensure_label_consistency_adata_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cols</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simplification_level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'unified,</span> <span class="pre">typo-fixed'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_col_prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'consistent'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/dict.html#ensure_label_consistency_adata_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.dict.ensure_label_consistency_adata_dict" title="Link to this definition"></a></dt>
 <dd><p>Apply label consistency across multiple AnnData objects in a dictionary.</p>
@@ -1101,6 +1090,18 @@ ValueError: If no strata meet the minimum cell requirement after filtering.</p>
 <dd class="field-odd"><p>list of str</p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="anndict.utils.normalize_string">
+<span class="sig-prename descclassname"><span class="pre">anndict.utils.</span></span><span class="sig-name descname"><span class="pre">normalize_string</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/utils.html#normalize_string"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.utils.normalize_string" title="Link to this definition"></a></dt>
+<dd><p>Removes non-alphanumeric characters and converts to lowercase.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="anndict.utils.normalize_label">
+<span class="sig-prename descclassname"><span class="pre">anndict.utils.</span></span><span class="sig-name descname"><span class="pre">normalize_label</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/utils.html#normalize_label"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.utils.normalize_label" title="Link to this definition"></a></dt>
+<dd><p>Calls normalize-string and handles NaN values.</p>
 </dd></dl>
 
 <dl class="py function">
@@ -1361,22 +1362,24 @@ dict: Mapping of original categories to simplified categories.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="anndict.ai.map_cell_type_labels_to_simplified_set">
-<span class="sig-prename descclassname"><span class="pre">anndict.ai.</span></span><span class="sig-name descname"><span class="pre">map_cell_type_labels_to_simplified_set</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">labels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simplification_level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/ai.html#map_cell_type_labels_to_simplified_set"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.ai.map_cell_type_labels_to_simplified_set" title="Link to this definition"></a></dt>
-<dd><p>Maps a list of labels to a smaller set of labels using the AI.
+<span class="sig-prename descclassname"><span class="pre">anndict.ai.</span></span><span class="sig-name descname"><span class="pre">map_cell_type_labels_to_simplified_set</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">labels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simplification_level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/ai.html#map_cell_type_labels_to_simplified_set"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.ai.map_cell_type_labels_to_simplified_set" title="Link to this definition"></a></dt>
+<dd><p>Maps a list of labels to a smaller set of labels using the AI, processing in batches.
 Args:
 labels (list of str): The list of labels to be mapped.
 simplification_level (str): A qualitative description of how much you want the labels to be simplified. Or a direction about how to simplify the labels. Could be anything, like ‘extremely’, ‘barely’, ‘compartment-level’, ‘remove-typos’
+batch_size (int): The number of labels to process in each batch.
 Returns:
 dict: A dictionary mapping the original labels to the smaller set of labels.</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="anndict.ai.map_gene_labels_to_simplified_set">
-<span class="sig-prename descclassname"><span class="pre">anndict.ai.</span></span><span class="sig-name descname"><span class="pre">map_gene_labels_to_simplified_set</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">labels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simplification_level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/ai.html#map_gene_labels_to_simplified_set"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.ai.map_gene_labels_to_simplified_set" title="Link to this definition"></a></dt>
-<dd><p>Maps a list of genes to a smaller set of labels using AI.
+<span class="sig-prename descclassname"><span class="pre">anndict.ai.</span></span><span class="sig-name descname"><span class="pre">map_gene_labels_to_simplified_set</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">labels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simplification_level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/ai.html#map_gene_labels_to_simplified_set"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.ai.map_gene_labels_to_simplified_set" title="Link to this definition"></a></dt>
+<dd><p>Maps a list of genes to a smaller set of labels using AI, processing in batches.
 Args:
 labels (list of str): The list of labels to be mapped.
-simplification_level (str): A qualitative description of how much you want the labels to be simplified. Could be anything, like ‘extremely’, ‘barely’, or ‘compartment-level’
+simplification_level (str): A qualitative description of how much you want the labels to be simplified.
+batch_size (int): The number of labels to process in each batch.
 Returns:
 dict: A dictionary mapping the original labels to the smaller set of labels.</p>
 </dd></dl>
@@ -1644,7 +1647,7 @@ None</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="anndict.stablelabel.plot_confusion_matrix_from_adata">
-<span class="sig-prename descclassname"><span class="pre">anndict.stablelabel.</span></span><span class="sig-name descname"><span class="pre">plot_confusion_matrix_from_adata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">true_label_key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">predicted_label_key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Confusion</span> <span class="pre">Matrix'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row_color_keys</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">col_color_keys</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">diagonalize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/stablelabel.html#plot_confusion_matrix_from_adata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.stablelabel.plot_confusion_matrix_from_adata" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">anndict.stablelabel.</span></span><span class="sig-name descname"><span class="pre">plot_confusion_matrix_from_adata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">true_label_key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">predicted_label_key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Confusion</span> <span class="pre">Matrix'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row_color_keys</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">col_color_keys</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">diagonalize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">true_ticklabels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">predicted_ticklabels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/stablelabel.html#plot_confusion_matrix_from_adata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.stablelabel.plot_confusion_matrix_from_adata" title="Link to this definition"></a></dt>
 <dd><p>Wrapper function to plot a confusion matrix from an AnnData object, with optional row and column colors.</p>
 <p>Parameters:
 - adata: AnnData object containing the dataset.
@@ -1657,7 +1660,7 @@ None</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="anndict.stablelabel.plot_confusion_matrix">
-<span class="sig-prename descclassname"><span class="pre">anndict.stablelabel.</span></span><span class="sig-name descname"><span class="pre">plot_confusion_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">true_labels_encoded</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">predicted_labels_encoded</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label_encoder</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color_map</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Confusion</span> <span class="pre">Matrix'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row_color_keys</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">col_color_keys</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">true_label_color_dict</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">predicted_label_color_dict</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">true_labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">predicted_labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">diagonalize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/stablelabel.html#plot_confusion_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.stablelabel.plot_confusion_matrix" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">anndict.stablelabel.</span></span><span class="sig-name descname"><span class="pre">plot_confusion_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">true_labels_encoded</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">predicted_labels_encoded</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label_encoder</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color_map</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Confusion</span> <span class="pre">Matrix'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row_color_keys</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">col_color_keys</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">true_label_color_dict</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">predicted_label_color_dict</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">true_labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">predicted_labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">diagonalize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">true_ticklabels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">predicted_ticklabels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/stablelabel.html#plot_confusion_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.stablelabel.plot_confusion_matrix" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
@@ -1701,11 +1704,11 @@ adt_key : str, optional Optional identifier to append to the filename.</p>
 <dt class="sig sig-object py" id="anndict.stablelabel.kappa_adata">
 <span class="sig-prename descclassname"><span class="pre">anndict.stablelabel.</span></span><span class="sig-name descname"><span class="pre">kappa_adata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cols</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/stablelabel.html#kappa_adata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.stablelabel.kappa_adata" title="Link to this definition"></a></dt>
 <dd><p>Calculate pairwise Cohen’s Kappa, average pairwise Kappa, and Fleiss’ Kappa
-for categorical data in adata.obs[cols].</p>
-<p>Parameters:
+for categorical data in adata.obs[cols].
+Parameters:
 - adata: AnnData object.
-- cols: List of columns in adata.obs to use for calculating agreement.</p>
-<p>Returns:
+- cols: List of columns in adata.obs to use for calculating agreement.
+Returns:
 - Dictionary with keys ‘pairwise’, ‘average_pairwise’, and ‘fleiss’:
 - ‘pairwise’: A dictionary with pairwise Cohen’s Kappa values.
 - ‘average_pairwise’: A dictionary with the average pairwise Kappa for each rater.
@@ -1715,12 +1718,12 @@ for categorical data in adata.obs[cols].</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="anndict.stablelabel.krippendorff_alpha_adata">
 <span class="sig-prename descclassname"><span class="pre">anndict.stablelabel.</span></span><span class="sig-name descname"><span class="pre">krippendorff_alpha_adata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cols</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level_of_measurement</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'nominal'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/anndict/stablelabel.html#krippendorff_alpha_adata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.stablelabel.krippendorff_alpha_adata" title="Link to this definition"></a></dt>
-<dd><p>Calculate Krippendorff’s Alpha for categorical data in adata.obs[cols].</p>
-<p>Parameters:
+<dd><p>Calculate Krippendorff’s Alpha for categorical data in adata.obs[cols].
+Parameters:
 - adata: AnnData object.
 - cols: List of columns in adata.obs to use for calculating agreement.
-- level_of_measurement: The type of data (‘nominal’, ‘ordinal’, ‘interval’, ‘ratio’). Default is ‘nominal’ (for categorical data).</p>
-<p>Returns:
+- level_of_measurement: The type of data (‘nominal’, ‘ordinal’, ‘interval’, ‘ratio’). Default is ‘nominal’ (for categorical data).
+Returns:
 - Krippendorff’s Alpha for the specified columns in adata.obs.</p>
 </dd></dl>
 
