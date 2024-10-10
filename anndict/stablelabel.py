@@ -852,27 +852,31 @@ def kappa_adata(adata, cols):
 def krippendorff_alpha_adata(adata, cols, level_of_measurement='nominal'):
     """
     Calculate Krippendorff's Alpha for categorical data in adata.obs[cols].
-
     Parameters:
     - adata: AnnData object.
     - cols: List of columns in adata.obs to use for calculating agreement.
     - level_of_measurement: The type of data ('nominal', 'ordinal', 'interval', 'ratio'). Default is 'nominal' (for categorical data).
-
     Returns:
     - Krippendorff's Alpha for the specified columns in adata.obs.
     """
     # Extract data from adata.obs based on the specified columns
     data = adata.obs[cols].to_numpy()
 
-    # Initialize LabelEncoder for each column
+    # Initialize LabelEncoder
     le = LabelEncoder()
 
-    # Encode categorical data to numerical values, per column
-    encoded_data = np.array([le.fit_transform(data[:, i]) for i in range(data.shape[1])]).T
+    # Flatten the data, fit the encoder, and reshape back
+    flat_data = data.ravel()
+    encoded_flat = le.fit_transform(flat_data)
+    encoded_data = encoded_flat.reshape(data.shape)
+
+    # Transpose the data to match Krippendorff's alpha input format
+    # (units as columns, raters as rows)
+    encoded_data = encoded_data.T
 
     # Calculate Krippendorff's Alpha
     alpha = krippendorff.alpha(reliability_data=encoded_data, level_of_measurement=level_of_measurement)
-
+    
     return alpha
 
 
