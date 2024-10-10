@@ -9,7 +9,7 @@ To view the documentation, clone this repository, and then navigate to docs/buil
 Copy and paste the code below into a terminal window to download this package and install it in a conda env. It assumes conda is already installed.
 
 ```bash
-git clone https://github.com/ggit12/anndict
+git clone https://github.com/ggit12/anndictionary
 cd anndict
 conda create -n anndict
 conda activate anndict
@@ -18,7 +18,7 @@ pip install -e .
 
 
 # About
-`anndict` is a package that lets you process multiple `anndata` objects in parallel with a simplified interface (so that you can avoid writing a bunch of for loops). This is accomplished by a dictionary-based wrapping of `scanpy`.
+`anndictionary` is a package that lets you process multiple `anndata` objects in parallel with a simplified interface (so that you can avoid writing a bunch of for loops). This is accomplished by a dictionary-based wrapping of `scanpy`.
 
 ## AI to make things easier
 To make it easier to handle basics like cell type annotation for anndatas (one or many), and to make cell type labels agree across multiple anndatas, we provide AI-based processing to handle these tedious tasks. There are also AI-based functions to to biological process inference on gene lists.
@@ -40,7 +40,7 @@ The main function in this package is `adata_dict_fapply()` (and its cousin `adat
 
 You can have `func` take the argument `adt_key` (i.e., `func(adata, adt_key=None)`) if you want the dictionary key to be available within `func`.
 
-Many functions in `anndict` are built around `adata_dict_fapply()`, and the package provides prebuilt wrappers for several common Scanpy functions, as well as functions to build and concatenate `adata` dictionaries.
+Many functions in `anndictionary` are built around `adata_dict_fapply()`, and the package provides prebuilt wrappers for several common Scanpy functions, as well as functions to build and concatenate `adata` dictionaries.
 
 ### If you like objects (under development):
 This package also defines the class AdataDict(), which is a dictionary of anndatas. When a method is called on an AdataDict, it is applied independently to each adata in the dictionary. Currently in beta.
@@ -51,7 +51,7 @@ The syntax looks like this: `adata_dict.fapply(func, **kwargs)`, where `adata_di
 Read the tutorial below for basic demonstrations.
 
 # Tutorial
-This is the tutorial notebook for `anndict`. Follow the tutorial below to get started.
+This is the tutorial notebook for ``. Follow the tutorial below to get started.
 
 See `tutorial_notbooks` for other tutorials:
 
@@ -107,7 +107,7 @@ adata
 
 
 
-`anndict` has a helpful frequency summary function to do frequencies and joint frequencies
+`anndictionary` has a helpful frequency summary function to do frequencies and joint frequencies
 
 
 ```python
