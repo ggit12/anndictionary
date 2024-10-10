@@ -1,4 +1,4 @@
-# anndict
+# AnnDictionary
 A package for processing multiple `anndata` objects in parallel
 
 # Documentation
