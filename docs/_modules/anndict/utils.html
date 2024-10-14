@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>anndict.utils &mdash; anndict 0.2 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=10f1778b"></script>
+        <script src="../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            anndict
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">Modules Documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">anndict</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">anndict.utils</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for anndict.utils</h1><div class="highlight"><pre>
+<span></span><span class="c1">#functions that aren&#39;t part of the stablelabel pipeline and operate on a single anndata (unstratified)</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">sklearn.base</span> <span class="kn">import</span> <span class="n">clone</span>
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">accuracy_score</span>
+<span class="kn">from</span> <span class="nn">sklearn.utils.validation</span> <span class="kn">import</span> <span class="n">check_random_state</span>
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">LabelEncoder</span>
+<span class="kn">import</span> <span class="nn">scanpy</span> <span class="k">as</span> <span class="nn">sc</span>
+<span class="kn">import</span> <span class="nn">anndata</span> <span class="k">as</span> <span class="nn">ad</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">itertools</span>
+<span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">HTML</span><span class="p">,</span> <span class="n">display</span>
+
+<span class="kn">from</span> <span class="nn">sklearn.decomposition</span> <span class="kn">import</span> <span class="n">PCA</span>
+<span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="n">gaussian_kde</span>
+
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="kn">import</span> <span class="nn">matplotlib</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">confusion_matrix</span>
+
+<span class="kn">import</span> <span class="nn">subprocess</span>
+
+
+<div class="viewcode-block" id="make_names">
+<a class="viewcode-back" href="../../modules.html#anndict.utils.make_names">[docs]</a>
+<span class="k">def</span> <span class="nf">make_names</span><span class="p">(</span><span class="n">names</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convert a list of names into valid and unique Python identifiers.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        names (list of str): List of names to be transformed.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        list of str: Valid and unique Python identifiers.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Equivalent of R&#39;s make.names() function in Python</span>
+    <span class="n">valid_names</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">seen</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+        <span class="c1"># Replace invalid characters with underscores</span>
+        <span class="n">clean_name</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;[^0-9a-zA-Z_]&#39;</span><span class="p">,</span> <span class="s1">&#39;_&#39;</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">clean_name</span> <span class="ow">in</span> <span class="n">seen</span><span class="p">:</span>
+            <span class="n">seen</span><span class="p">[</span><span class="n">clean_name</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">clean_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">clean_name</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">seen</span><span class="p">[</span><span class="n">clean_name</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">seen</span><span class="p">[</span><span class="n">clean_name</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">valid_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">clean_name</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">valid_names</span></div>
+
+
+
+<div class="viewcode-block" id="normalize_string">
+<a class="viewcode-back" href="../../modules.html#anndict.utils.normalize_string">[docs]</a>
+<span class="k">def</span> <span class="nf">normalize_string</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Removes non-alphanumeric characters and converts to lowercase.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;[^\w\s]&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span></div>
+
+
+<div class="viewcode-block" id="normalize_label">
+<a class="viewcode-back" href="../../modules.html#anndict.utils.normalize_label">[docs]</a>
+<span class="k">def</span> <span class="nf">normalize_label</span><span class="p">(</span><span class="n">label</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calls normalize-string and handles NaN values.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">pd</span><span class="o">.</span><span class="n">isna</span><span class="p">(</span><span class="n">label</span><span class="p">):</span>  <span class="c1"># Handle NaN values</span>
+        <span class="k">return</span> <span class="s1">&#39;missing&#39;</span>
+    <span class="k">return</span> <span class="n">normalize_string</span><span class="p">(</span><span class="n">label</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span></div>
+
+
+<div class="viewcode-block" id="add_label_to_adata">
+<a class="viewcode-back" href="../../modules.html#anndict.utils.add_label_to_adata">[docs]</a>
+<span class="k">def</span> <span class="nf">add_label_to_adata</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">indices</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">new_label_key</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Adds a label to the AnnData object in a specified column for given indices.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">    - adata: AnnData object to be updated.</span>
+<span class="sd">    - indices: Array of indices where labels will be assigned.</span>
+<span class="sd">    - labels: Array of labels corresponding to the indices.</span>
+<span class="sd">    - new_label_key: Name of the column in adata.obs where the labels will be stored.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">add_col_to_adata_obs</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">indices</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">new_label_key</span><span class="p">)</span></div>
+
+    
+
+<div class="viewcode-block" id="add_col_to_adata_obs">
+<a class="viewcode-back" href="../../modules.html#anndict.utils.add_col_to_adata_obs">[docs]</a>
+<span class="k">def</span> <span class="nf">add_col_to_adata_obs</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">indices</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">new_col_name</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Adds a label to the AnnData object in a specified column for given indices.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">    - adata: AnnData object to be updated.</span>
+<span class="sd">    - indices: Array of indices where labels will be assigned.</span>
+<span class="sd">    - values: Array of labels corresponding to the indices.</span>
+<span class="sd">    - new_col_name: Name of the column in adata.obs where the labels will be stored.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">integer</span><span class="p">)):</span>
+        <span class="n">dtype</span> <span class="o">=</span> <span class="nb">int</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">floating</span><span class="p">)):</span>
+        <span class="n">dtype</span> <span class="o">=</span> <span class="nb">float</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">dtype</span> <span class="o">=</span> <span class="nb">str</span>
+
+    <span class="n">adata</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="n">new_col_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">adata</span><span class="o">.</span><span class="n">obs</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
+    <span class="n">adata</span><span class="o">.</span><span class="n">obs</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">indices</span><span class="p">,</span> <span class="n">new_col_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">values</span></div>
+
+
+
+<div class="viewcode-block" id="add_col_to_adata_var">
+<a class="viewcode-back" href="../../modules.html#anndict.utils.add_col_to_adata_var">[docs]</a>
+<span class="k">def</span> <span class="nf">add_col_to_adata_var</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">indices</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">new_col_name</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Adds a label to the AnnData object in a specified column for given indices in adata.var.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">    - adata: AnnData object to be updated.</span>
+<span class="sd">    - indices: Array of indices where labels will be assigned.</span>
+<span class="sd">    - values: Array of labels corresponding to the indices.</span>
+<span class="sd">    - new_label_key: Name of the column in adata.var where the labels will be stored.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">integer</span><span class="p">)):</span>
+        <span class="n">dtype</span> <span class="o">=</span> <span class="nb">int</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">floating</span><span class="p">)):</span>
+        <span class="n">dtype</span> <span class="o">=</span> <span class="nb">float</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">dtype</span> <span class="o">=</span> <span class="nb">str</span>
+
+    <span class="n">adata</span><span class="o">.</span><span class="n">var</span><span class="p">[</span><span class="n">new_col_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">adata</span><span class="o">.</span><span class="n">var</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
+    <span class="n">adata</span><span class="o">.</span><span class="n">var</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">indices</span><span class="p">,</span> <span class="n">new_col_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">values</span></div>
+
+
+
+<div class="viewcode-block" id="convert_obs_col_to_category">
+<a class="viewcode-back" href="../../modules.html#anndict.utils.convert_obs_col_to_category">[docs]</a>
+<span class="k">def</span> <span class="nf">convert_obs_col_to_category</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">col_name</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convert a column in AnnData.obs to category dtype.</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters:</span>
+<span class="sd">    adata (AnnData): The AnnData object.</span>
+<span class="sd">    col_name (str): The name of the column in adata.obs to convert.</span>
+<span class="sd">    </span>
+<span class="sd">    Returns:</span>
+<span class="sd">    None: The function modifies the adata object in-place.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">col_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">adata</span><span class="o">.</span><span class="n">obs</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Column &#39;</span><span class="si">{</span><span class="n">col_name</span><span class="si">}</span><span class="s2">&#39; not found in adata.obs&quot;</span><span class="p">)</span>
+    
+    <span class="n">adata</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="n">col_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">adata</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="n">col_name</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;category&#39;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="convert_obs_col_to_string">
+<a class="viewcode-back" href="../../modules.html#anndict.utils.convert_obs_col_to_string">[docs]</a>
+<span class="k">def</span> <span class="nf">convert_obs_col_to_string</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">col_name</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convert a column in AnnData.obs to string dtype.</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters:</span>
+<span class="sd">    adata (AnnData): The AnnData object.</span>
+<span class="sd">    col_name (str): The name of the column in adata.obs to convert.</span>
+<span class="sd">    </span>
+<span class="sd">    Returns:</span>
+<span class="sd">    None: The function modifies the adata object in-place.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">col_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">adata</span><span class="o">.</span><span class="n">obs</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Column &#39;</span><span class="si">{</span><span class="n">col_name</span><span class="si">}</span><span class="s2">&#39; not found in adata.obs&quot;</span><span class="p">)</span>
+    
+    <span class="n">adata</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="n">col_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">adata</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="n">col_name</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="convert_obs_index_to_str">
+<a class="viewcode-back" href="../../modules.html#anndict.utils.convert_obs_index_to_str">[docs]</a>
+<span class="k">def</span> <span class="nf">convert_obs_index_to_str</span><span class="p">(</span><span class="n">adata</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Converts the index of .obs to a string</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">adata</span><span class="o">.</span><span class="n">obs</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">adata</span><span class="o">.</span><span class="n">obs</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="get_adata_columns">
+<a class="viewcode-back" href="../../modules.html#anndict.utils.get_adata_columns">[docs]</a>
+<span class="k">def</span> <span class="nf">get_adata_columns</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">col_startswith</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">col_endswith</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">col_contains</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
+                      <span class="n">not_col_startswith</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">not_col_endswith</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">not_col_contains</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Extract columns from an AnnData object&#39;s observation dataframe (`adata.obs`) based on specified filtering criteria.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">    adata : AnnData The AnnData object containing the observation dataframe (adata.obs) from which columns are selected.</span>
+<span class="sd">    col_{startswith, endswith, contains} : list of str, optional</span>
+<span class="sd">    Lists of substrings to positively filter columns. </span>
+<span class="sd">    - col_startswith: Select columns that start with any of these strings.</span>
+<span class="sd">    - col_endswith: Select columns that end with any of these strings.</span>
+<span class="sd">    - col_contains: Select columns that contain any of these strings.</span>
+<span class="sd">    not_col_{startswith, endswith, contains} : list of str, optional</span>
+<span class="sd">    Lists of substrings to negatively filter columns from the previously selected ones. </span>
+<span class="sd">    - not_col_startswith: Exclude columns that start with any of these strings.</span>
+<span class="sd">    - not_col_endswith: Exclude columns that end with any of these strings.</span>
+<span class="sd">    - not_col_contains: Exclude columns that contain any of these strings.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">    list of str A list of unique column names from adata.obs that match the specified criteria.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">columns</span> <span class="o">=</span> <span class="n">adata</span><span class="o">.</span><span class="n">obs</span><span class="o">.</span><span class="n">columns</span>
+    <span class="n">matched_columns</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="c1">#Get local variables and enforce that the filtering parameters are lists</span>
+    <span class="n">filter_params</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;col_startswith&#39;</span><span class="p">,</span> <span class="s1">&#39;col_endswith&#39;</span><span class="p">,</span> <span class="s1">&#39;col_contains&#39;</span><span class="p">,</span> 
+                     <span class="s1">&#39;not_col_startswith&#39;</span><span class="p">,</span> <span class="s1">&#39;not_col_endswith&#39;</span><span class="p">,</span> <span class="s1">&#39;not_col_contains&#39;</span><span class="p">]</span>
+
+    <span class="k">for</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">filter_params</span><span class="p">:</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="nb">locals</span><span class="p">()[</span><span class="n">param</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="nb">locals</span><span class="p">()[</span><span class="n">param</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">val</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">col_startswith</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">start</span> <span class="ow">in</span> <span class="n">col_startswith</span><span class="p">:</span>
+            <span class="n">matched_columns</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">col</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">columns</span> <span class="k">if</span> <span class="n">col</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">start</span><span class="p">)])</span>
+
+    <span class="k">if</span> <span class="n">col_endswith</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">end</span> <span class="ow">in</span> <span class="n">col_endswith</span><span class="p">:</span>
+            <span class="n">matched_columns</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">col</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">columns</span> <span class="k">if</span> <span class="n">col</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="n">end</span><span class="p">)])</span>
+
+    <span class="k">if</span> <span class="n">col_contains</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">contain</span> <span class="ow">in</span> <span class="n">col_contains</span><span class="p">:</span>
+            <span class="n">matched_columns</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">col</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">columns</span> <span class="k">if</span> <span class="n">contain</span> <span class="ow">in</span> <span class="n">col</span><span class="p">])</span>
+
+    <span class="k">if</span> <span class="n">not_col_startswith</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">start</span> <span class="ow">in</span> <span class="n">not_col_startswith</span><span class="p">:</span>
+            <span class="n">matched_columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">col</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">matched_columns</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">col</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">start</span><span class="p">)]</span>
+
+    <span class="k">if</span> <span class="n">not_col_endswith</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">end</span> <span class="ow">in</span> <span class="n">not_col_endswith</span><span class="p">:</span>
+            <span class="n">matched_columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">col</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">matched_columns</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">col</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="n">end</span><span class="p">)]</span>
+
+    <span class="k">if</span> <span class="n">not_col_contains</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">contain</span> <span class="ow">in</span> <span class="n">not_col_contains</span><span class="p">:</span>
+            <span class="n">matched_columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">col</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">matched_columns</span> <span class="k">if</span> <span class="n">contain</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">col</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">matched_columns</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="create_color_map">
+<a class="viewcode-back" href="../../modules.html#anndict.utils.create_color_map">[docs]</a>
+<span class="k">def</span> <span class="nf">create_color_map</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">keys</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Creates a unified color map for given keys from an AnnData object, differentiating</span>
+<span class="sd">    between continuous and categorical data.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">    - adata: AnnData object.</span>
+<span class="sd">    - keys: list of str, keys for which the color map is required.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">    - dict: A color map linking unique values or ranges from the specified keys to colors.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">color_map</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">pd</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">is_numeric_dtype</span><span class="p">(</span><span class="n">adata</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="n">key</span><span class="p">]):</span>
+            <span class="c1"># Create a continuous colormap</span>
+            <span class="n">min_val</span><span class="p">,</span> <span class="n">max_val</span> <span class="o">=</span> <span class="n">adata</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">adata</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+            <span class="n">norm</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">Normalize</span><span class="p">(</span><span class="n">min_val</span><span class="p">,</span> <span class="n">max_val</span><span class="p">)</span>
+            <span class="n">scalar_map</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">cm</span><span class="o">.</span><span class="n">ScalarMappable</span><span class="p">(</span><span class="n">norm</span><span class="o">=</span><span class="n">norm</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;viridis&#39;</span><span class="p">)</span>
+            <span class="c1"># Store the scalar map directly</span>
+            <span class="n">color_map</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">scalar_map</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Handle as categorical</span>
+            <span class="n">unique_values</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">adata</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+            <span class="n">color_palette</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">color_palette</span><span class="p">(</span><span class="s2">&quot;husl&quot;</span><span class="p">,</span> <span class="n">n_colors</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">unique_values</span><span class="p">))</span>
+            <span class="n">color_palette_hex</span> <span class="o">=</span> <span class="p">[</span><span class="n">matplotlib</span><span class="o">.</span><span class="n">colors</span><span class="o">.</span><span class="n">rgb2hex</span><span class="p">(</span><span class="n">color</span><span class="p">)</span> <span class="k">for</span> <span class="n">color</span> <span class="ow">in</span> <span class="n">color_palette</span><span class="p">]</span>
+            <span class="n">color_map</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">unique_values</span><span class="p">,</span> <span class="n">color_palette_hex</span><span class="p">))</span>
+    
+    <span class="k">return</span> <span class="n">color_map</span></div>
+
+
+<div class="viewcode-block" id="UCE_adata">
+<a class="viewcode-back" href="../../modules.html#anndict.utils.UCE_adata">[docs]</a>
+<span class="k">def</span> <span class="nf">UCE_adata</span><span class="p">(</span><span class="n">adata_paths</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Runs the eval_single_anndata.py script for each specified anndata path. This function is included largely for illustrative purposes and will be restrictivley slow with a gpu.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">    adata_paths (list of str): A list of paths to the .h5ad files to be processed.</span>
+
+<span class="sd">    This function constructs the command to run the eval_single_anndata.py script </span>
+<span class="sd">    with specified arguments and then executes the command using subprocess.run.</span>
+<span class="sd">    </span>
+<span class="sd">    The function assumes that a uce-compatible conda environment is already activated </span>
+<span class="sd">    and the working directory is correctly set to UCE (i.e. as in https://github.com/snap-stanford/UCE)</span>
+
+
+<span class="sd">    Example usage:</span>
+<span class="sd">    UCE_adata([&quot;../dat/liver.h5ad&quot;, &quot;../dat/kidney.h5ad&quot;])</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">adata_path</span> <span class="ow">in</span> <span class="n">adata_paths</span><span class="p">:</span>
+        <span class="c1"># Command to run the python script with the specified arguments</span>
+        <span class="n">command</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s1">&#39;accelerate&#39;</span><span class="p">,</span> <span class="s1">&#39;launch&#39;</span><span class="p">,</span> <span class="s1">&#39;eval_single_anndata.py&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;--adata_path&#39;</span><span class="p">,</span> <span class="n">adata_path</span><span class="p">,</span>
+            <span class="s1">&#39;--dir&#39;</span><span class="p">,</span> <span class="s1">&#39;./uce_wd/&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;--species&#39;</span><span class="p">,</span> <span class="s1">&#39;human&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;--model_loc&#39;</span><span class="p">,</span> <span class="s1">&#39;./model_files/33l_8ep_1024t_1280.torch&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;--filter&#39;</span><span class="p">,</span> <span class="s1">&#39;True&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;--batch_size&#39;</span><span class="p">,</span> <span class="s1">&#39;25&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;--nlayers&#39;</span><span class="p">,</span> <span class="s1">&#39;33&#39;</span>
+        <span class="p">]</span>
+
+        <span class="c1"># Run the command</span>
+        <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">command</span><span class="p">)</span></div>
+
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, ggit12.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
