@@ -5,6 +5,18 @@ A package for processing multiple `anndata` objects in parallel with LLMs
 
 To view the documentation, clone this repository, and then navigate to docs/build/index.html and view in a browser.
 
+
+# Citation
+
+If you use this package, please cite:
+
+> #### Benchmarking Cell Type Annotation by Large Language Models with AnnDictionary  
+> **George Crowley, Tabula Sapiens Consortium, Stephen R. Quake**  
+> *bioRxiv* 2024.10.10.617605  
+> [doi: https://doi.org/10.1101/2024.10.10.617605](https://doi.org/10.1101/2024.10.10.617605)
+
+
+
 # Install
 Copy and paste the code below into a terminal window to download this package and install it in a conda env. It assumes conda is already installed.
 
@@ -18,7 +30,7 @@ pip install -e .
 
 
 # About
-`AnnDictionary` is a package that lets you process multiple `anndata` objects in parallel with a simplified interface (so that you can avoid writing a bunch of for loops). This is accomplished by a dictionary-based wrapping of `scanpy`.
+`AnnDictionary` is a package that lets you process multiple `anndata` objects in parallel with a simplified interface (so that you can avoid writing a bunch of for loops). This is accomplished by a dictionary-based wrapping of `scanpy`. We used the package to benchmark cell type annotaiton by 15 LLMs and maintain leaderboard at: https://singlecellgpt.com/celltype-annotation-leaderboard/.
 
 ## AI to make things easier
 To make it easier to handle basics like cell type annotation for anndatas (one or many), and to make cell type labels agree across multiple anndatas, we provide AI-based processing to handle these tedious tasks. There are also AI-based functions to to biological process inference on gene lists.
