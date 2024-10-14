@@ -1,5 +1,5 @@
 # AnnDictionary
-A package for processing multiple `anndata` objects in parallel
+A package for processing multiple `anndata` objects in parallel with LLMs
 
 # Documentation
 
@@ -10,7 +10,7 @@ Copy and paste the code below into a terminal window to download this package an
 
 ```bash
 git clone https://github.com/ggit12/anndictionary
-cd anndict
+cd anndictionary
 conda create -n anndict
 conda activate anndict
 pip install -e .
@@ -18,7 +18,7 @@ pip install -e .
 
 
 # About
-`anndictionary` is a package that lets you process multiple `anndata` objects in parallel with a simplified interface (so that you can avoid writing a bunch of for loops). This is accomplished by a dictionary-based wrapping of `scanpy`.
+`AnnDictionary` is a package that lets you process multiple `anndata` objects in parallel with a simplified interface (so that you can avoid writing a bunch of for loops). This is accomplished by a dictionary-based wrapping of `scanpy`.
 
 ## AI to make things easier
 To make it easier to handle basics like cell type annotation for anndatas (one or many), and to make cell type labels agree across multiple anndatas, we provide AI-based processing to handle these tedious tasks. There are also AI-based functions to to biological process inference on gene lists.
@@ -27,7 +27,7 @@ These functions include `ai_annotate_cell_type`, `ai_annotate_biological_process
 
 
 
-During installation, you will be prompted to enter an OpenAI API key to allow the AI backend to operate (this will modify your .bashrc, you can also skip this step and set the OPENAI_API_KEY environemnt variable yourself). Directions on how to get an OpenAI API key can be found here: https://platform.openai.com/docs/quickstart/account-setup. You'll need to buy at least $5 of credits to start (so that you can use GPT-4+).
+This package supports many external LLM providers (including OpenAI, Anthropic, Google, and Bedrock). To use these, you'll need an API key. Directions on how to get an OpenAI API key can be found here: https://platform.openai.com/docs/quickstart/account-setup, and for Anthropic, here: https://docs.anthropic.com/en/api/getting-started.
 
 ### If you like functions:
 The main function in this package is `adata_dict_fapply()` (and its cousin `adata_dict_fapply_return()`, which does the same thing but also returns the result as a dictionary). 
@@ -40,7 +40,9 @@ The main function in this package is `adata_dict_fapply()` (and its cousin `adat
 
 You can have `func` take the argument `adt_key` (i.e., `func(adata, adt_key=None)`) if you want the dictionary key to be available within `func`.
 
-Many functions in `anndictionary` are built around `adata_dict_fapply()`, and the package provides prebuilt wrappers for several common Scanpy functions, as well as functions to build and concatenate `adata` dictionaries.
+The value for any **kwarg can be either: 1) a single value to be used for all anndata in adata_dict, or 2) a dictionary with the same keys as adata, and a separate value for each anndata in adata_dict.
+
+Many functions in `anndict` are built around `adata_dict_fapply()`, and the package provides prebuilt wrappers for several common Scanpy functions, as well as functions to build and concatenate `adata` dictionaries.
 
 ### If you like objects (under development):
 This package also defines the class AdataDict(), which is a dictionary of anndatas. When a method is called on an AdataDict, it is applied independently to each adata in the dictionary. Currently in beta.
@@ -51,180 +53,95 @@ The syntax looks like this: `adata_dict.fapply(func, **kwargs)`, where `adata_di
 Read the tutorial below for basic demonstrations.
 
 # Tutorial
-This is the tutorial notebook for ``. Follow the tutorial below to get started.
+This is the tutorial notebook for `AnnDictionary`. Follow the tutorial below to get started.
 
 See `tutorial_notbooks` for other tutorials:
 
-- Label transfer with UCE
+- Basic Tutorial (learn the basic mechanics of this package)
+- Label transfer with the Universal Cell Embedding (UCE)
 - Automated spatial transcriptomic annotation with UCE
 
 
-
 ```python
-#import the package
 import anndict as adt
-```
-
-
-```python
+import scanpy as sc
+import time
 import warnings
 warnings.filterwarnings('ignore')
 ```
 
+## Set up the LLM backend.
+This package supports most LLMs including those offered by OpenAI, Anthropic, Google Gen AI, and Amazon Bedrock (if there's one you want that we don't support yet, let us know). Any of these can be configured or swapped with the single function call below to `adt.configure_llm_backend`. This function takes 3 required arguments, `provider`, `model`, and `api_key`, and then any provider-specific configurations as additional keyword arguments. See the documentation for examples of how to use this function with other providers.
+
 
 ```python
-#load an anndata
-
-#for this tutorial, we'll use Tabula Sapiens from cellxgene census
-#but you could use any anndata you want
-import cellxgene_census
-
-#this command gets liver and kidney from tabula sapiens 
-census = cellxgene_census.open_soma(census_version="2023-12-15")
-adata = cellxgene_census.get_anndata(
-    census,
-    organism = "homo_sapiens",
-    measurement_name = "RNA",
-    obs_value_filter = "(dataset_id == '53d208b0-2cfd-4366-9866-c3c6114081bc') & ((tissue_general == 'liver') | (tissue_general == 'kidney') | (tissue_general == 'spleen'))",
-    obs_embeddings = ["uce"]
-)
-
-
+adt.configure_llm_backend(provider='anthropic',
+                          model='claude-3-5-sonnet-20240620',
+                          api_key='your-anthropic-api-key',
+                          requests_per_minute=500
+                          )
 ```
 
 
 ```python
-adata
-```
-
-
-
-
-    AnnData object with n_obs × n_vars = 48652 × 60664
-        obs: 'soma_joinid', 'dataset_id', 'assay', 'assay_ontology_term_id', 'cell_type', 'cell_type_ontology_term_id', 'development_stage', 'development_stage_ontology_term_id', 'disease', 'disease_ontology_term_id', 'donor_id', 'is_primary_data', 'self_reported_ethnicity', 'self_reported_ethnicity_ontology_term_id', 'sex', 'sex_ontology_term_id', 'suspension_type', 'tissue', 'tissue_ontology_term_id', 'tissue_general', 'tissue_general_ontology_term_id', 'raw_sum', 'nnz', 'raw_mean_nnz', 'raw_variance_nnz', 'n_measured_vars'
-        var: 'soma_joinid', 'feature_id', 'feature_name', 'feature_length', 'nnz', 'n_measured_obs'
-        obsm: 'uce'
-
-
-
-`anndictionary` has a helpful frequency summary function to do frequencies and joint frequencies
-
-
-```python
-adt.display_html_summary(adt.summarize_metadata(adata, columns = ['cell_type*tissue']))
-
-#Run the line below to see frequencies of single variables
-# adt.display_html_summary(adt.summarize_metadata(adata, columns = ['donor_id', 'tissue','cell_type']))
-```
-
-
-<div style="display: flex; flex-wrap: wrap;"><div style="flex: 1; padding: 10px;"><h3>cell_type x tissue</h3><table border="1"><tr><th></th><th>kidney</th><th>liver</th><th>spleen</th></tr><tr><td>B cell</td><td>341</td><td>0</td><td>0</td></tr><tr><td>CD141-positive myeloid dendritic cell</td><td>0</td><td>0</td><td>51</td></tr><tr><td>CD1c-positive myeloid dendritic cell</td><td>0</td><td>0</td><td>51</td></tr><tr><td>CD4-positive helper T cell</td><td>181</td><td>0</td><td>0</td></tr><tr><td>CD4-positive, alpha-beta memory T cell</td><td>0</td><td>0</td><td>1771</td></tr><tr><td>CD8-positive, alpha-beta T cell</td><td>241</td><td>0</td><td>43</td></tr><tr><td>CD8-positive, alpha-beta memory T cell</td><td>0</td><td>0</td><td>4301</td></tr><tr><td>T cell</td><td>0</td><td>146</td><td>0</td></tr><tr><td>classical monocyte</td><td>0</td><td>0</td><td>4443</td></tr><tr><td>endothelial cell</td><td>95</td><td>267</td><td>596</td></tr><tr><td>endothelial cell of hepatic sinusoid</td><td>0</td><td>421</td><td>0</td></tr><tr><td>erythrocyte</td><td>0</td><td>108</td><td>170</td></tr><tr><td>fibroblast</td><td>0</td><td>76</td><td>0</td></tr><tr><td>hematopoietic stem cell</td><td>0</td><td>0</td><td>73</td></tr><tr><td>hepatocyte</td><td>0</td><td>1558</td><td>0</td></tr><tr><td>innate lymphoid cell</td><td>0</td><td>0</td><td>117</td></tr><tr><td>intermediate monocyte</td><td>0</td><td>0</td><td>131</td></tr><tr><td>intrahepatic cholangiocyte</td><td>0</td><td>42</td><td>0</td></tr><tr><td>kidney epithelial cell</td><td>8331</td><td>0</td><td>0</td></tr><tr><td>liver dendritic cell</td><td>0</td><td>34</td><td>0</td></tr><tr><td>macrophage</td><td>321</td><td>1381</td><td>1335</td></tr><tr><td>mature NK T cell</td><td>131</td><td>245</td><td>2439</td></tr><tr><td>memory B cell</td><td>0</td><td>0</td><td>6460</td></tr><tr><td>monocyte</td><td>0</td><td>612</td><td>0</td></tr><tr><td>naive B cell</td><td>0</td><td>0</td><td>1044</td></tr><tr><td>naive thymus-derived CD4-positive, alpha-beta T cell</td><td>0</td><td>0</td><td>1261</td></tr><tr><td>naive thymus-derived CD8-positive, alpha-beta T cell</td><td>0</td><td>0</td><td>610</td></tr><tr><td>neutrophil</td><td>0</td><td>83</td><td>4539</td></tr><tr><td>plasma cell</td><td>0</td><td>34</td><td>3171</td></tr><tr><td>plasmacytoid dendritic cell</td><td>0</td><td>0</td><td>43</td></tr><tr><td>platelet</td><td>0</td><td>0</td><td>29</td></tr><tr><td>regulatory T cell</td><td>0</td><td>0</td><td>288</td></tr><tr><td>type I NK T cell</td><td>0</td><td>0</td><td>1038</td></tr></table></div></div>
-
-
-The first step is to build the dictionary of anndata.  
-For this tutorial, we'll build a dictionary of tissue-specific objects, but you could do variables or combinations of variables.
-
-
-```python
-#This command will give an adata_dict where each value is an anndata containing cells from a single tissue
-#Take only liver and kidney
-adata_dict = adt.build_adata_dict(adata=adata,strata_keys=['tissue'], desired_strata=['liver','kidney'])
+#read data
+adata_path = 'path-to-your-adata.h5ad'
+adata = sc.read_h5ad(adata_path)
 ```
 
 
 ```python
-adata_dict
-```
-
-
-
-
-    {'liver': View of AnnData object with n_obs × n_vars = 5007 × 60664
-         obs: 'soma_joinid', 'dataset_id', 'assay', 'assay_ontology_term_id', 'cell_type', 'cell_type_ontology_term_id', 'development_stage', 'development_stage_ontology_term_id', 'disease', 'disease_ontology_term_id', 'donor_id', 'is_primary_data', 'self_reported_ethnicity', 'self_reported_ethnicity_ontology_term_id', 'sex', 'sex_ontology_term_id', 'suspension_type', 'tissue', 'tissue_ontology_term_id', 'tissue_general', 'tissue_general_ontology_term_id', 'raw_sum', 'nnz', 'raw_mean_nnz', 'raw_variance_nnz', 'n_measured_vars'
-         var: 'soma_joinid', 'feature_id', 'feature_name', 'feature_length', 'nnz', 'n_measured_obs'
-         obsm: 'uce',
-     'kidney': View of AnnData object with n_obs × n_vars = 9641 × 60664
-         obs: 'soma_joinid', 'dataset_id', 'assay', 'assay_ontology_term_id', 'cell_type', 'cell_type_ontology_term_id', 'development_stage', 'development_stage_ontology_term_id', 'disease', 'disease_ontology_term_id', 'donor_id', 'is_primary_data', 'self_reported_ethnicity', 'self_reported_ethnicity_ontology_term_id', 'sex', 'sex_ontology_term_id', 'suspension_type', 'tissue', 'tissue_ontology_term_id', 'tissue_general', 'tissue_general_ontology_term_id', 'raw_sum', 'nnz', 'raw_mean_nnz', 'raw_variance_nnz', 'n_measured_vars'
-         var: 'soma_joinid', 'feature_id', 'feature_name', 'feature_length', 'nnz', 'n_measured_obs'
-         obsm: 'uce'}
-
-
-
-Building adata_dicts is flexible. We could also get only macrophages and endothelial cells from the desired tissues like this:
-
-
-```python
-strata_keys = ['tissue', 'cell_type'] #keys in .obs of each anndata
-desired_strata = {'tissue': ['liver', 'kidney'],
-                  'cell_type': ['macrophage', 'endothelial cell']
-                  }
-adata_dict_only_mac_and_endo = adt.build_adata_dict(adata=adata, strata_keys=strata_keys, desired_strata=desired_strata)
+#set X to be raw counts
+adata.X = adata.layers['raw_counts'].copy()
 ```
 
 
 ```python
-adata_dict_only_mac_and_endo
+#get only protein coding genes
+
+#load/define your list of protein-coding genes here, otherwise, annotationw will be based on all genes in object
+protein_coding = None
+
+if protein_coding:
+    adata.var['protein_coding'] = [(i in protein_coding) for i in adata.var_names]
+    # Subset to keep only protein-coding genes
+    adata = adata[:, adata.var['protein_coding']].copy()
 ```
 
-
-
-
-    {'liver_macrophage': View of AnnData object with n_obs × n_vars = 1381 × 60664
-         obs: 'soma_joinid', 'dataset_id', 'assay', 'assay_ontology_term_id', 'cell_type', 'cell_type_ontology_term_id', 'development_stage', 'development_stage_ontology_term_id', 'disease', 'disease_ontology_term_id', 'donor_id', 'is_primary_data', 'self_reported_ethnicity', 'self_reported_ethnicity_ontology_term_id', 'sex', 'sex_ontology_term_id', 'suspension_type', 'tissue', 'tissue_ontology_term_id', 'tissue_general', 'tissue_general_ontology_term_id', 'raw_sum', 'nnz', 'raw_mean_nnz', 'raw_variance_nnz', 'n_measured_vars', 'tissue_cell_type'
-         var: 'soma_joinid', 'feature_id', 'feature_name', 'feature_length', 'nnz', 'n_measured_obs'
-         obsm: 'uce',
-     'liver_endothelial cell': View of AnnData object with n_obs × n_vars = 267 × 60664
-         obs: 'soma_joinid', 'dataset_id', 'assay', 'assay_ontology_term_id', 'cell_type', 'cell_type_ontology_term_id', 'development_stage', 'development_stage_ontology_term_id', 'disease', 'disease_ontology_term_id', 'donor_id', 'is_primary_data', 'self_reported_ethnicity', 'self_reported_ethnicity_ontology_term_id', 'sex', 'sex_ontology_term_id', 'suspension_type', 'tissue', 'tissue_ontology_term_id', 'tissue_general', 'tissue_general_ontology_term_id', 'raw_sum', 'nnz', 'raw_mean_nnz', 'raw_variance_nnz', 'n_measured_vars', 'tissue_cell_type'
-         var: 'soma_joinid', 'feature_id', 'feature_name', 'feature_length', 'nnz', 'n_measured_obs'
-         obsm: 'uce',
-     'kidney_macrophage': View of AnnData object with n_obs × n_vars = 321 × 60664
-         obs: 'soma_joinid', 'dataset_id', 'assay', 'assay_ontology_term_id', 'cell_type', 'cell_type_ontology_term_id', 'development_stage', 'development_stage_ontology_term_id', 'disease', 'disease_ontology_term_id', 'donor_id', 'is_primary_data', 'self_reported_ethnicity', 'self_reported_ethnicity_ontology_term_id', 'sex', 'sex_ontology_term_id', 'suspension_type', 'tissue', 'tissue_ontology_term_id', 'tissue_general', 'tissue_general_ontology_term_id', 'raw_sum', 'nnz', 'raw_mean_nnz', 'raw_variance_nnz', 'n_measured_vars', 'tissue_cell_type'
-         var: 'soma_joinid', 'feature_id', 'feature_name', 'feature_length', 'nnz', 'n_measured_obs'
-         obsm: 'uce',
-     'kidney_endothelial cell': View of AnnData object with n_obs × n_vars = 95 × 60664
-         obs: 'soma_joinid', 'dataset_id', 'assay', 'assay_ontology_term_id', 'cell_type', 'cell_type_ontology_term_id', 'development_stage', 'development_stage_ontology_term_id', 'disease', 'disease_ontology_term_id', 'donor_id', 'is_primary_data', 'self_reported_ethnicity', 'self_reported_ethnicity_ontology_term_id', 'sex', 'sex_ontology_term_id', 'suspension_type', 'tissue', 'tissue_ontology_term_id', 'tissue_general', 'tissue_general_ontology_term_id', 'raw_sum', 'nnz', 'raw_mean_nnz', 'raw_variance_nnz', 'n_measured_vars', 'tissue_cell_type'
-         var: 'soma_joinid', 'feature_id', 'feature_name', 'feature_length', 'nnz', 'n_measured_obs'
-         obsm: 'uce'}
-
-
-
-And we can summarize their metadata using adata_dict wrappers for the previously mentioned summary functions  
-Note that each anndata in this dictionary only has 1 tissue and 1 cell type, as it should
+## Build the dictionary of anndatas.
+The function `adt.build_adata_dict` will create separate anndatas based on the column names you provide. The following code creates a dictionary where each entry is the anndata for an individual tissue. You can also select only certain tissues by setting the argument `desired_strata`. See the Basic Tutorial notebook and function documentation for more examples and information on how to use this function.
 
 
 ```python
-#Not run for brevity; uncomment and run the line below to see contents of adata_dict_only_mac_and_endo
-# adt.display_html_summary_adata_dict(adt.summarize_metadata_adata_dict(adata_dict_only_mac_and_endo, columns = ["tissue", "cell_type", "donor_id"]))
-```
-
-For the rest of this tutorial, we'll use adata_dict that has multiple celltypes per tissue
-
-
-```python
-#Run the line below to see contents of adata_dict
-# adt.display_html_summary_adata_dict(adt.summarize_metadata_adata_dict(adata_dict, columns = ["cell_type"]))
-```
-
-Now, let's do some standard scanpy preprocessing
-Each anndata in the dictionary will be processed independently
-
-Note: since many of these functions are scanpy wrappers, they take and pass any function arguments to their underlying scanpy functions.
-resample_adata_dict uses sc.pp.subsample under the hood and so takes n_obs or fraction (among others)
-
-
-```python
-#Subset each celltype to 1000 cells and drop celltypes with fewer than 50 cells
-adata_dict = adt.resample_adata_dict(adata_dict, strata_keys=['cell_type'], min_num_cells=50, n_obs=1000)
+#build adata_dict
+adata_dict = adt.build_adata_dict(adata, ['tissue'])
 ```
 
 
 ```python
-#Confirm that the subsampling and dropping has been performed (commented out for brevity)
-# adt.display_html_summary_adata_dict(adt.summarize_metadata_adata_dict(adata_dict, columns = ["cell_type"]))
+#remove a standard list of uninformative genes
+abundant_rnas = [
+    "MALAT1",
+    "NEAT1",
+    "XIST",
+    "KCNQ1OT1",
+    "RPPH1",
+    "RN7SL1",
+    "RMRP",
+    "SNHG1",
+    "MIAT",
+    "H19"
+]
+
+adt.remove_genes_adata_dict(adata_dict, abundant_rnas)
 ```
+
+This section is just the standard Scanpy preprocessing pipeline, except here, we do it on each tissue independently and in parallel (by taking advantage of multithreading).
 
 
 ```python
+#Run leiden clustering on each adata independently
+#adata.X is raw counts, so run standard preprocessing
 # Normalize each AnnData in the dictionary
 adt.normalize_adata_dict(adata_dict)
 
@@ -232,7 +149,7 @@ adt.normalize_adata_dict(adata_dict)
 adt.log_transform_adata_dict(adata_dict)
 
 # Optionally, you might subset the data to only high-variance genes
-adt.set_high_variance_genes(adata_dict, n_top_genes=2000, subset=False)
+adt.set_high_variance_genes_adata_dict(adata_dict, n_top_genes=2000, subset=False)
 
 # Scale each AnnData in the dictionary
 adt.scale_adata_dict(adata_dict)
@@ -240,79 +157,69 @@ adt.scale_adata_dict(adata_dict)
 # Perform PCA on each AnnData in the dictionary
 adt.pca_adata_dict(adata_dict, n_comps=50, mask_var='highly_variable')
 
-# Calculate and plot UMAP based on pca
-adt.calculate_umap_adata_dict(adata_dict, use_rep='X_pca')
-adt.plot_umap_adata_dict(adata_dict, color_by = ['cell_type', 'donor_id'])
+#Calculate the neighborhood graph
+adt.neighbors_adata_dict(adata_dict)
 
-```
-
-    Plotting UMAP for key: liver
-
-
-
-    
-![png](Basic_Tutorial_files/Basic_Tutorial_24_1.png)
-    
-
-
-    Plotting UMAP for key: kidney
-
-
-
-    
-![png](Basic_Tutorial_files/Basic_Tutorial_24_3.png)
-    
-
-
-
-```python
-# Write each adata in adata_dict separately
-adt.write_h5ad_adata_dict(adata_dict, "~/adatas", file_prefix="adata_")
+#Calculate the UMAP
+adt.calculate_umap_adata_dict(adata_dict)
 ```
 
 
 ```python
-#Concatenate the adata_dict back to a single anndata
+#Determine appropriate cluster resolutions using AI. This function only works with LLMs that accept image inputs
+#This will leave the final column as 'leiden' in the .obs of each anndata
+# appropriate_resolution_dict = adt.ai_determine_leiden_resolution_adata_dict(adata_dict, initial_resolution=0.5)
+```
+
+
+```python
+#recluster at 0.5 for this example
+#get leiden clusters
+adt.leiden_adata_dict(adata_dict, resolution=0.5)
+
+# could also do 
+# adt.leiden_adata_dict(adata_dict, resolution=appropriate_resolution_dict)
+```
+
+
+```python
+#Run differential expression analysis independently on each anndata in adata_dict
+adt.rank_genes_groups_adata_dict(adata_dict, groupby='leiden')
+```
+
+#### Now, run the LLM cell type annotation functions. Here's the rationale for this series of steps:
+- First, Use an LLM to label each leiden cluster based on the top differentially expressed genes using `ai_annotate_cell_type_adata_dict`.
+- Because each cluster is labelled independently, there might be some redundant labels with slight differences, for example ('Macropage' and 'macrophage.'). So, the next step is to use an LLM to merge these redundant category labels with `simplify_obs_column_adata_dict`.
+- Finally, the dictionary of anndatas is merged into a single anndata. At this point, since each anndata has been processed independently, there might again be redundancies, which we remove (with an LLM) using `ensure_label_consistency_adata`. Note that this function can take a list of columns across which to unify labels (here we pass only a single column).
+
+
+```python
+#get the model name directly from the LLM config (just for naming the column in .obs)
+model = adt.get_llm_config()['model']
+
+#use an LLM to annotate celltypes based on the 'leiden' column, pass tissue information from 'tissue' column. The new label column will be as passed to label_column.
+label_results = adt.ai_annotate_cell_type_adata_dict(adata_dict, groupby='leiden', n_top_genes=10, label_column=f'{model}_ai_cell_type', tissue_of_origin_col='tissue')
+
+#These labels seem to have some redundancy, let's merge them with AI
+ai_label_column = f'{model}_simplified_ai_cell_type'
+simplified_mappings = adt.simplify_obs_column_adata_dict(adata_dict, f'{model}_ai_cell_type', ai_label_column, simplification_level='redundancy-removed')
+```
+
+
+```python
+#Merge the adata_dict
 adata = adt.concatenate_adata_dict(adata_dict)
 ```
 
 
 ```python
-#View summary table for concatenated adata
-# adt.display_html_summary(adt.summarize_metadata(adata, columns = ['tissue','cell_type','cell_type*tissue']))
+#unify the labels from the different adata in the adata_dict (i.e. use an LLM to merge categories like 'Macrophage' and 'macrophages.')
+label_map_with_manual = adt.ensure_label_consistency_adata(adata, ai_label_column, simplification_level='unified', new_col_prefix='unified')
 ```
 
 
 ```python
-#Note, you could also run scanpy functions directly on the adata_dict like this:
-import scanpy as sc
-adata_dict = adt.build_adata_dict(adata=adata,strata_keys=['tissue'], desired_strata=['liver','kidney'])
-adata_dict.fapply(sc.pp.subsample, fraction=0.1)
-
+#write the adata
+path_to_write_adata = 'your-path-here.h5ad'
+adata.write(path_to_write_adata)
 ```
-
-
-
-
-    {'liver': None, 'kidney': None}
-
-
-
-
-```python
-adata_dict
-```
-
-
-
-
-    {'liver': AnnData object with n_obs × n_vars = 500 × 60664
-         obs: 'soma_joinid', 'dataset_id', 'assay', 'assay_ontology_term_id', 'cell_type', 'cell_type_ontology_term_id', 'development_stage', 'development_stage_ontology_term_id', 'disease', 'disease_ontology_term_id', 'donor_id', 'is_primary_data', 'self_reported_ethnicity', 'self_reported_ethnicity_ontology_term_id', 'sex', 'sex_ontology_term_id', 'suspension_type', 'tissue', 'tissue_ontology_term_id', 'tissue_general', 'tissue_general_ontology_term_id', 'raw_sum', 'nnz', 'raw_mean_nnz', 'raw_variance_nnz', 'n_measured_vars'
-         var: 'soma_joinid', 'feature_id', 'feature_name', 'feature_length', 'nnz', 'n_measured_obs'
-         obsm: 'uce',
-     'kidney': AnnData object with n_obs × n_vars = 964 × 60664
-         obs: 'soma_joinid', 'dataset_id', 'assay', 'assay_ontology_term_id', 'cell_type', 'cell_type_ontology_term_id', 'development_stage', 'development_stage_ontology_term_id', 'disease', 'disease_ontology_term_id', 'donor_id', 'is_primary_data', 'self_reported_ethnicity', 'self_reported_ethnicity_ontology_term_id', 'sex', 'sex_ontology_term_id', 'suspension_type', 'tissue', 'tissue_ontology_term_id', 'tissue_general', 'tissue_general_ontology_term_id', 'raw_sum', 'nnz', 'raw_mean_nnz', 'raw_variance_nnz', 'n_measured_vars'
-         var: 'soma_joinid', 'feature_id', 'feature_name', 'feature_length', 'nnz', 'n_measured_obs'
-         obsm: 'uce'}
-
-
