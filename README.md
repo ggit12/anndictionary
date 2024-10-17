@@ -23,7 +23,7 @@ Copy and paste the code below into a terminal window to download this package an
 ```bash
 git clone https://github.com/ggit12/anndictionary
 cd anndictionary
-conda create -n anndict
+conda create -n anndict python=3.12
 conda activate anndict
 pip install -e .
 ```
