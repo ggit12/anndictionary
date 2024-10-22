@@ -473,7 +473,7 @@ def build_adata_dict_main(adata, strata_keys, desired_strata, print_missing_stra
     categories = adata.obs[strata_key].cat.categories
     
     # Group indices by category for efficient access
-    groups = adata.obs.groupby(strata_key).indices
+    groups = adata.obs.groupby(strata_key, observed=False).indices
     
     # Initialize the dictionary to store subsets
     subsets_dict = {}
