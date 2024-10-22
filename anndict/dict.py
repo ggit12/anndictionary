@@ -424,30 +424,70 @@ def build_adata_dict(adata, strata_keys, desired_strata=None):
         raise ValueError("desired_strata must be either a list or a dictionary of lists")
 
 
+# def build_adata_dict_main(adata, strata_keys, desired_strata, print_missing_strata=True):
+#     """
+#     Main function to build a dictionary of AnnData objects based on desired strata values.
+
+#     Parameters:
+#     adata (AnnData): Annotated data matrix.
+#     strata_keys (list of str): List of column names in `adata.obs` to use for stratification.
+#     desired_strata (list of str): List of desired strata values.
+
+#     Returns:
+#     dict: Dictionary where keys are strata values and values are corresponding AnnData subsets.
+#     """
+#     # Check and create stratifying variable in adata
+#     strata_key = check_and_create_strata(adata, strata_keys)
+#     # Initialize the dictionary to store subsets
+#     subsets_dict = {}
+#     # Filter adata for each desired stratum and add to the dictionary
+#     for stratum in desired_strata:
+#         if stratum in adata.obs[strata_key].cat.categories:
+#             subset = adata[adata.obs[strata_key] == stratum].copy()
+#             subsets_dict[stratum] = subset
+#         else:
+#             if print_missing_strata:
+#                 print(f"Warning: '{stratum}' is not a valid category in '{strata_key}'.")
+#     return AdataDict(subsets_dict)
+
 def build_adata_dict_main(adata, strata_keys, desired_strata, print_missing_strata=True):
     """
-    Main function to build a dictionary of AnnData objects based on desired strata values.
-
+    Optimized function to build a dictionary of AnnData objects based on desired strata values.
+    
     Parameters:
     adata (AnnData): Annotated data matrix.
     strata_keys (list of str): List of column names in `adata.obs` to use for stratification.
     desired_strata (list of str): List of desired strata values.
-
+    
     Returns:
     dict: Dictionary where keys are strata values and values are corresponding AnnData subsets.
     """
     # Check and create stratifying variable in adata
     strata_key = check_and_create_strata(adata, strata_keys)
+    
+    # Ensure the strata column is categorical
+    if not pd.api.types.is_categorical_dtype(adata.obs[strata_key]):
+        adata.obs[strata_key] = adata.obs[strata_key].astype('category')
+    
+    # Get all categories, including those without observations
+    categories = adata.obs[strata_key].cat.categories
+    
+    # Group indices by category for efficient access
+    groups = adata.obs.groupby(strata_key).indices
+    
     # Initialize the dictionary to store subsets
     subsets_dict = {}
-    # Filter adata for each desired stratum and add to the dictionary
+    
+    # Iterate over desired strata and extract subsets
     for stratum in desired_strata:
-        if stratum in adata.obs[strata_key].cat.categories:
-            subset = adata[adata.obs[strata_key] == stratum]
-            subsets_dict[stratum] = subset
+        if stratum in categories:
+            # Get indices if the stratum has observations; else, empty list
+            indices = groups.get(stratum, [])
+            subsets_dict[stratum] = adata[indices].copy()
         else:
             if print_missing_strata:
                 print(f"Warning: '{stratum}' is not a valid category in '{strata_key}'.")
+    
     return AdataDict(subsets_dict)
 
 
