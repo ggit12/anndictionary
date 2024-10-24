@@ -1,3 +1,11 @@
+import os
+import platform
+
+# Set Numba threading layer to 'tbb' on macOS if not set
+if os.getenv("NUMBA_THREADING_LAYER") is None:
+    if platform.system() == "Darwin":
+        os.environ["NUMBA_THREADING_LAYER"] = "tbb"
+
 from . import metadata_summary
 from . import utils
 from . import ai

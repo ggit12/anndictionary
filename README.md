@@ -64,6 +64,20 @@ The syntax looks like this: `adata_dict.fapply(func, **kwargs)`, where `adata_di
 
 Read the tutorial below for basic demonstrations.
 
+
+## Compatibility
+
+**macOS Compatibility:**
+
+For users on macOS (especially M1/M2 systems), we configure the Numba threading layer to `tbb` to prevent concurrency issues caused by the default `workqueue` threading layer. This is automatically applied to ensure stable performance during multi-threading and parallel execution.
+
+If you experience any threading-related issues, you can manually set the environment variable `NUMBA_THREADING_LAYER=tbb` before running the package. However, this should not be necessary, as the package manages it automatically.
+
+**How to Identify a Multithreading Issue:**
+
+This issue typically manifests as a Jupyter kernel crash (or a Python crash with Numba-related errors, if running directly in Python). If you encounter these symptoms, they are likely related to the threading configuration.
+
+
 # Tutorial
 This is the tutorial notebook for `AnnDictionary`. Follow the tutorial below to get started.
 

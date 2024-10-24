@@ -790,7 +790,7 @@ def pca_adata_dict(adata_dict, **kwargs):
     Returns:
     - None: The function modifies the input AnnData objects in place.
     """
-    adata_dict_fapply(adata_dict, sc.pp.pca, use_multithreading=False, **kwargs)
+    adata_dict_fapply(adata_dict, sc.pp.pca, **kwargs)
 
 
 def neighbors_adata_dict(adata_dict, **kwargs):
