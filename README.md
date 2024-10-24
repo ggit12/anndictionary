@@ -25,6 +25,7 @@ git clone https://github.com/ggit12/anndictionary
 cd anndictionary
 conda create -n anndict python=3.12
 conda activate anndict
+conda install -c conda-forge tbb numba
 pip install -e .
 ```
 
@@ -69,13 +70,24 @@ Read the tutorial below for basic demonstrations.
 
 **macOS Compatibility:**
 
-For users on macOS (especially M1/M2 systems), we configure the Numba threading layer to `tbb` to prevent concurrency issues caused by the default `workqueue` threading layer. This is automatically applied to ensure stable performance during multi-threading and parallel execution.
+We configure the Numba threading layer to `tbb` to prevent concurrency issues caused by the default `workqueue` threading layer. This is automatically applied to ensure stable performance during multi-threading and parallel execution, and is done to ensure compatibility for users on macOS (especially Apple silicon).
 
-If you experience any threading-related issues, you can manually set the environment variable `NUMBA_THREADING_LAYER=tbb` before running the package. However, this should not be necessary, as the package manages it automatically.
+If you encounter TBB threading layer errors, first run:
+```bash
+pip uninstall numba tbb intel-tbb
+conda remove tbb numba
+```
+
+then reinstall `numba` and `tbb` with
+
+```bash
+conda install -c conda-forge tbb numba #need to conda install these, pip won't work
+```
+
 
 **How to Identify a Multithreading Issue:**
 
-This issue typically manifests as a Jupyter kernel crash (or a Python crash with Numba-related errors, if running directly in Python). If you encounter these symptoms, they are likely related to the threading configuration.
+This issue typically manifests as a Jupyter kernel crash (or a Python crash with `numba` or `tbb` related errors, if running directly in Python). If you encounter these symptoms, they are likely related to the threading configuration.
 
 
 # Tutorial

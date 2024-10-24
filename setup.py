@@ -1,5 +1,33 @@
 from setuptools import setup, find_packages
 
+import platform
+import sys
+
+if platform.system() == "Darwin":
+    #MacOS-specific install requirements to make sure multithreading is possible
+    try:
+        import numba
+        numba.config.THREADING_LAYER = 'tbb'
+        # Try to actually initialize the threading layer
+        @numba.jit
+        def test_func():
+            return 1
+        test_func()
+    except Exception:
+        sys.exit("""
+Error: TBB threading layer could not be initialized.
+
+On macOS, please run these commands in your conda environment:
+    conda remove tbb numba
+    conda install -c conda-forge tbb numba #need to conda install, pip won't work
+
+Then try installing anndictionary again.
+
+Note: If you installed tbb or numba with pip previously, also run:
+    pip uninstall tbb numba
+before the conda install commands above.
+""")
+
 setup(
     name='anndict',
     version='0.1',
