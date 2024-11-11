@@ -3,7 +3,7 @@ A package for processing multiple `anndata` objects in parallel with LLMs
 
 # Documentation
 
-To view the documentation, clone this repository, and then navigate to docs/build/index.html and view in a browser.
+Complete documentation covering all functions and modules is available at https://ggit12.github.io/anndictionary. We are actively working to enhance its appearance and improve the overall user experience.
 
 
 # Citation
