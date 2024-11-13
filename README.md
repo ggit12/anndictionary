@@ -68,7 +68,9 @@ Read the tutorial below for basic demonstrations.
 
 ## Compatibility
 
-**macOS Compatibility:**
+This package has been tested on linux (v3.10, v4.18) and macOS (v13.5, v14.7), and should work on most Unix-like operating systems. Although we haven’t formally tested it on Windows, we’re optimistic about compatibility and encourage you to reach out with any feedback or issues.
+
+**macOS Compatibility Note:**
 
 We configure the Numba threading layer to `tbb` to prevent concurrency issues caused by the default `workqueue` threading layer. This is automatically applied to ensure stable performance during multi-threading and parallel execution, and is done to ensure compatibility for users on macOS (especially Apple silicon).
 
