@@ -18,7 +18,7 @@ If you use this package, please cite:
 
 
 # Install
-Copy and paste the code below into a terminal window to download this package and install it in a conda env. It assumes conda is already installed.
+Copy and paste the code below into a terminal window to download this package and install it in a conda env. It assumes conda is already installed. This should only take a few minutes total.
 
 ```bash
 git clone https://github.com/ggit12/anndictionary
