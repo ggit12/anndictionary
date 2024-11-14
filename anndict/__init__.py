@@ -78,7 +78,8 @@ from .stablelabel import (
     plot_sankey, 
     save_sankey,
     plot_grouped_average,
-    plot_model_agreement,  
+    plot_model_agreement,
+    plot_model_agreement_categorical,  
     harmony_label_transfer,
     kappa_adata,
     krippendorff_alpha_adata
@@ -302,6 +303,7 @@ __all__ = [
     'convert_obs_col_to_category',
     'convert_obs_col_to_string',
     'plot_model_agreement',
+    'plot_model_agreement_categorical',
     'convert_obs_index_to_str', 
     'bedrock_init',
     'azureml_init',
