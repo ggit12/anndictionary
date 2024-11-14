@@ -25,7 +25,6 @@ git clone https://github.com/ggit12/anndictionary
 cd anndictionary
 conda create -n anndict python=3.12
 conda activate anndict
-conda install -c conda-forge tbb numba
 pip install -e .
 ```
 
@@ -65,7 +64,6 @@ The syntax looks like this: `adata_dict.fapply(func, **kwargs)`, where `adata_di
 
 Read the tutorial below for basic demonstrations.
 
-
 ## Compatibility
 
 This package has been tested on linux (v3.10, v4.18) and macOS (v13.5, v14.7), and should work on most Unix-like operating systems. Although we haven’t formally tested it on Windows, we’re optimistic about compatibility and encourage you to reach out with any feedback or issues.
@@ -91,9 +89,8 @@ conda install -c conda-forge tbb numba #need to conda install these, pip won't w
 
 This issue typically manifests as a Jupyter kernel crash (or a Python crash with `numba` or `tbb` related errors, if running directly in Python). If you encounter these symptoms, they are likely related to the threading configuration.
 
-
 # Tutorial
-This is the tutorial notebook for `AnnDictionary`. Follow the tutorial below to get started.
+This is the tutorial notebook for `AnnDictionary`. Follow the tutorial below to get started. The total run time is under 1 minute on a desktop computer.
 
 See `tutorial_notbooks` for other tutorials:
 
@@ -117,10 +114,36 @@ This package supports most LLMs including those offered by OpenAI, Anthropic, Go
 ```python
 adt.configure_llm_backend(provider='anthropic',
                           model='claude-3-5-sonnet-20240620',
-                          api_key='your-anthropic-api-key',
+                          api_key='my-anthropic-api-key',
                           requests_per_minute=500
                           )
 ```
+
+Download a sample dataset from the cellxgene census. To run this download, you'll need the `cellxgene_census` package which can be installed via
+```bash
+pip install cellxgene_census
+```
+
+
+```python
+#load an anndata
+
+#for this tutorial, we'll use Tabula Sapiens from cellxgene census
+#but you could use any anndata you want
+import cellxgene_census
+
+#this command gets liver and kidney from tabula sapiens 
+census = cellxgene_census.open_soma(census_version="2023-12-15")
+adata = cellxgene_census.get_anndata(
+    census,
+    organism = "homo_sapiens",
+    measurement_name = "RNA",
+    obs_value_filter = "(dataset_id == '53d208b0-2cfd-4366-9866-c3c6114081bc') & ((tissue_general == 'liver') | (tissue_general == 'kidney'))"
+)
+
+```
+
+Alternativley, use the block of code below to read your own adata.
 
 
 ```python
@@ -131,15 +154,49 @@ adata = sc.read_h5ad(adata_path)
 
 
 ```python
+adata
+```
+
+
+
+
+    AnnData object with n_obs × n_vars = 14648 × 60664
+        obs: 'soma_joinid', 'dataset_id', 'assay', 'assay_ontology_term_id', 'cell_type', 'cell_type_ontology_term_id', 'development_stage', 'development_stage_ontology_term_id', 'disease', 'disease_ontology_term_id', 'donor_id', 'is_primary_data', 'self_reported_ethnicity', 'self_reported_ethnicity_ontology_term_id', 'sex', 'sex_ontology_term_id', 'suspension_type', 'tissue', 'tissue_ontology_term_id', 'tissue_general', 'tissue_general_ontology_term_id', 'raw_sum', 'nnz', 'raw_mean_nnz', 'raw_variance_nnz', 'n_measured_vars'
+        var: 'soma_joinid', 'feature_id', 'feature_name', 'feature_length', 'nnz', 'n_measured_obs'
+
+
+
+
+```python
+#note, .X contains raw counts
+adata.X.data[1:20]
+```
+
+
+
+
+    array([ 1.,  1.,  1.,  1.,  1.,  1.,  2.,  3.,  1.,  1.,  1.,  1.,  2.,
+            1.,  1., 74.,  1.,  8.,  4.], dtype=float32)
+
+
+
+
+```python
 #set X to be raw counts
-adata.X = adata.layers['raw_counts'].copy()
+# adata.X = adata.layers['raw_counts'].copy()
+```
+
+
+```python
+#make sure that adata.var.index has gene names and not integers (or integers cast as string)
+adata.var.index = adata.var.feature_name #the default index from cellxgene censuse is integer cast as string
 ```
 
 
 ```python
 #get only protein coding genes
 
-#load/define your list of protein-coding genes here, otherwise, annotationw will be based on all genes in object
+#load/define your list of protein-coding genes here, otherwise, annotation will be based on all genes in object (optionally filtered to only highly variable).
 protein_coding = None
 
 if protein_coding:
@@ -154,6 +211,7 @@ The function `adt.build_adata_dict` will create separate anndatas based on the c
 
 ```python
 #build adata_dict
+adt.convert_obs_col_to_category(adata, 'tissue') #stratifying column must be categorical to run build_adata_dict
 adata_dict = adt.build_adata_dict(adata, ['tissue'])
 ```
 
@@ -175,6 +233,10 @@ abundant_rnas = [
 
 adt.remove_genes_adata_dict(adata_dict, abundant_rnas)
 ```
+
+    Removed 8 genes from liver. 60656 genes remaining.
+    Removed 8 genes from kidney. 60656 genes remaining.
+
 
 This section is just the standard Scanpy preprocessing pipeline, except here, we do it on each tissue independently and in parallel (by taking advantage of multithreading).
 
@@ -205,6 +267,26 @@ adt.calculate_umap_adata_dict(adata_dict)
 ```
 
 
+
+
+    {'kidney': AnnData object with n_obs × n_vars = 9641 × 60656
+         obs: 'soma_joinid', 'dataset_id', 'assay', 'assay_ontology_term_id', 'cell_type', 'cell_type_ontology_term_id', 'development_stage', 'development_stage_ontology_term_id', 'disease', 'disease_ontology_term_id', 'donor_id', 'is_primary_data', 'self_reported_ethnicity', 'self_reported_ethnicity_ontology_term_id', 'sex', 'sex_ontology_term_id', 'suspension_type', 'tissue', 'tissue_ontology_term_id', 'tissue_general', 'tissue_general_ontology_term_id', 'raw_sum', 'nnz', 'raw_mean_nnz', 'raw_variance_nnz', 'n_measured_vars'
+         var: 'soma_joinid', 'feature_id', 'feature_name', 'feature_length', 'nnz', 'n_measured_obs', 'highly_variable', 'means', 'dispersions', 'dispersions_norm', 'mean', 'std'
+         uns: 'log1p', 'hvg', 'pca', 'neighbors', 'umap'
+         obsm: 'X_pca', 'X_umap'
+         varm: 'PCs'
+         obsp: 'distances', 'connectivities',
+     'liver': AnnData object with n_obs × n_vars = 5007 × 60656
+         obs: 'soma_joinid', 'dataset_id', 'assay', 'assay_ontology_term_id', 'cell_type', 'cell_type_ontology_term_id', 'development_stage', 'development_stage_ontology_term_id', 'disease', 'disease_ontology_term_id', 'donor_id', 'is_primary_data', 'self_reported_ethnicity', 'self_reported_ethnicity_ontology_term_id', 'sex', 'sex_ontology_term_id', 'suspension_type', 'tissue', 'tissue_ontology_term_id', 'tissue_general', 'tissue_general_ontology_term_id', 'raw_sum', 'nnz', 'raw_mean_nnz', 'raw_variance_nnz', 'n_measured_vars'
+         var: 'soma_joinid', 'feature_id', 'feature_name', 'feature_length', 'nnz', 'n_measured_obs', 'highly_variable', 'means', 'dispersions', 'dispersions_norm', 'mean', 'std'
+         uns: 'log1p', 'hvg', 'pca', 'neighbors', 'umap'
+         obsm: 'X_pca', 'X_umap'
+         varm: 'PCs'
+         obsp: 'distances', 'connectivities'}
+
+
+
+
 ```python
 #Determine appropriate cluster resolutions using AI. This function only works with LLMs that accept image inputs
 #This will leave the final column as 'leiden' in the .obs of each anndata
@@ -213,9 +295,9 @@ adt.calculate_umap_adata_dict(adata_dict)
 
 
 ```python
-#recluster at 0.5 for this example
+#recluster at 0.4 for this example
 #get leiden clusters
-adt.leiden_adata_dict(adata_dict, resolution=0.5)
+adt.leiden_adata_dict(adata_dict, resolution=0.4)
 
 # could also do 
 # adt.leiden_adata_dict(adata_dict, resolution=appropriate_resolution_dict)
@@ -247,15 +329,353 @@ simplified_mappings = adt.simplify_obs_column_adata_dict(adata_dict, f'{model}_a
 
 
 ```python
+#View the results on a UMAP
+adt.plot_umap_adata_dict(adata_dict, color=['cell_type', ai_label_column])
+```
+
+    Plotting UMAP for key: kidney
+
+
+
+    
+![png](tutorial_notebooks/cell_type_annotation_with_an_LLM_files/cell_type_annotation_with_an_LLM_30_1.png)
+    
+
+
+    Plotting UMAP for key: liver
+
+
+
+    
+![png](tutorial_notebooks/cell_type_annotation_with_an_LLM_files/cell_type_annotation_with_an_LLM_30_3.png)
+    
+
+
+
+```python
+#Confirm an annotation using a marker gene score
+endothelial_cell_markers = ["PECAM1", "VWF", "ENG", "CDH5", "FLT1"]
+sc.tl.score_genes(adata_dict['liver'], gene_list=endothelial_cell_markers, score_name='Endothelial_Score')
+
+# Plot UMAP (Kupffer Score)
+sc.pl.umap(adata_dict['liver'], color='Endothelial_Score', title='Endothelial Module Score', vmax='p99', return_fig=False)
+```
+
+
+    
+![png](tutorial_notebooks/cell_type_annotation_with_an_LLM_files/cell_type_annotation_with_an_LLM_31_0.png)
+    
+
+
+
+```python
 #Merge the adata_dict
 adata = adt.concatenate_adata_dict(adata_dict)
 ```
 
 
 ```python
-#unify the labels from the different adata in the adata_dict (i.e. use an LLM to merge categories like 'Macrophage' and 'macrophages.')
-label_map_with_manual = adt.ensure_label_consistency_adata(adata, ai_label_column, simplification_level='unified', new_col_prefix='unified')
+adata
 ```
+
+
+
+
+    AnnData object with n_obs × n_vars = 14648 × 60656
+        obs: 'soma_joinid', 'dataset_id', 'assay', 'assay_ontology_term_id', 'cell_type', 'cell_type_ontology_term_id', 'development_stage', 'development_stage_ontology_term_id', 'disease', 'disease_ontology_term_id', 'donor_id', 'is_primary_data', 'self_reported_ethnicity', 'self_reported_ethnicity_ontology_term_id', 'sex', 'sex_ontology_term_id', 'suspension_type', 'tissue', 'tissue_ontology_term_id', 'tissue_general', 'tissue_general_ontology_term_id', 'raw_sum', 'nnz', 'raw_mean_nnz', 'raw_variance_nnz', 'n_measured_vars', 'leiden', 'claude-3-5-sonnet-20240620_ai_cell_type', 'claude-3-5-sonnet-20240620_simplified_ai_cell_type'
+        obsm: 'X_pca', 'X_umap'
+
+
+
+
+```python
+#unify the labels from the different adata in the adata_dict (i.e. use an LLM to merge categories like 'Macrophage' and 'macrophages.')
+#this allows calculation of kappa
+manual_cell_type_col = 'cell_type'
+label_map_with_manual = adt.ensure_label_consistency_adata(adata, [ai_label_column, manual_cell_type_col], simplification_level='unified', new_col_prefix='unified')
+```
+
+
+```python
+label_map_with_manual
+```
+
+
+
+
+    {'hepatocytes': 'Hepatocyte',
+     'b lymphocytes': 'B Cell',
+     'erythroid precursor cells': 'Erythroid Cell',
+     'kidney epithelial cell': 'Epithelial Cell',
+     'plasma cells': 'Plasma Cell',
+     'endothelial cell': 'Endothelial Cell',
+     'kupffer cells': 'Kupffer Cell',
+     'hepatocyte': 'Hepatocyte',
+     'immune cells': 'Immune Cell',
+     'macrophage': 'Macrophage',
+     'endothelial cell of hepatic sinusoid': 'Endothelial Cell',
+     'plasma cell': 'Plasma Cell',
+     'intrahepatic cholangiocyte': 'Cholangiocyte',
+     'monocyte': 'Monocyte',
+     'cholangiocytes': 'Cholangiocyte',
+     'hepatic stellate cells': 'Hepatic Stellate Cell',
+     'b cell': 'B Cell',
+     'liver dendritic cell': 'Dendritic Cell',
+     'erythrocyte': 'Erythrocyte',
+     'neutrophil': 'Neutrophil',
+     'mature nk t cell': 'NK T Cell',
+     'proximal tubule epithelial cells': 'Epithelial Cell',
+     'endothelial cells': 'Endothelial Cell',
+     'cd4positive helper t cell': 'T Cell',
+     't cell': 'T Cell',
+     'fibroblast': 'Fibroblast',
+     'macrophages': 'Macrophage',
+     'tnk cells': 'NK T Cell',
+     'cd8positive alphabeta t cell': 'T Cell'}
+
+
+
+
+```python
+#get unified cols
+unified_cell_types = adt.get_adata_columns(adata, col_contains=['unified'])
+unified_cell_types
+```
+
+
+
+
+    ['unified_claude-3-5-sonnet-20240620_simplified_ai_cell_type',
+     'unified_cell_type']
+
+
+
+
+```python
+#assess accuracy compared to manual (for benchmarking)
+label_agreement_binary = adt.ai_compare_cell_type_labels_pairwise(adata, [unified_cell_types[0]], [unified_cell_types[1]], new_col_prefix='binary_agreement', comparison_level='binary')
+label_agreement_categorical = adt.ai_compare_cell_type_labels_pairwise(adata, [unified_cell_types[0]], [unified_cell_types[1]], new_col_prefix='categorical_agreement', comparison_level='categorical')
+```
+
+
+```python
+label_agreement_binary
+```
+
+
+
+
+    {('unified_claude-3-5-sonnet-20240620_simplified_ai_cell_type',
+      'unified_cell_type'):                      col1              col2 raw_agreement  agreement
+     0         Epithelial Cell   Epithelial Cell           yes          1
+     1                  B Cell            B Cell           yes          1
+     2               NK T Cell            T Cell           yes          1
+     3         Epithelial Cell  Endothelial Cell            no          0
+     4              Macrophage        Macrophage           yes          1
+     5               NK T Cell         NK T Cell           yes          1
+     6         Epithelial Cell        Macrophage            no          0
+     7         Epithelial Cell            T Cell            no          0
+     8                  B Cell        Macrophage            no          0
+     9              Macrophage   Epithelial Cell            no          0
+     10        Epithelial Cell            B Cell            no          0
+     11              NK T Cell            B Cell            no          0
+     12                 B Cell            T Cell            no          0
+     13              NK T Cell        Macrophage            no          0
+     14           Kupffer Cell        Macrophage           yes          1
+     15           Kupffer Cell          Monocyte            no          0
+     16       Endothelial Cell  Endothelial Cell           yes          1
+     17           Kupffer Cell    Dendritic Cell            no          0
+     18            Immune Cell         NK T Cell           yes          1
+     19  Hepatic Stellate Cell        Fibroblast           yes          1
+     20             Hepatocyte        Hepatocyte           yes          1
+     21            Immune Cell          Monocyte           yes          1
+     22       Endothelial Cell        Macrophage            no          0
+     23          Cholangiocyte     Cholangiocyte           yes          1
+     24             Hepatocyte        Macrophage            no          0
+     25            Immune Cell            T Cell           yes          1
+     26  Hepatic Stellate Cell        Neutrophil            no          0
+     27          Cholangiocyte        Macrophage            no          0
+     28            Plasma Cell       Plasma Cell           yes          1
+     29           Kupffer Cell         NK T Cell            no          0
+     30            Immune Cell        Macrophage           yes          1
+     31             Hepatocyte          Monocyte            no          0
+     32          Cholangiocyte  Endothelial Cell            no          0
+     33            Immune Cell  Endothelial Cell            no          0
+     34          Cholangiocyte          Monocyte            no          0
+     35       Endothelial Cell    Dendritic Cell            no          0
+     36           Kupffer Cell        Neutrophil            no          0
+     37            Immune Cell        Neutrophil           yes          1
+     38             Hepatocyte        Neutrophil            no          0
+     39           Kupffer Cell            T Cell            no          0
+     40         Erythroid Cell       Erythrocyte           yes          1
+     41           Kupffer Cell  Endothelial Cell            no          0
+     42            Plasma Cell        Hepatocyte            no          0
+     43            Plasma Cell          Monocyte            no          0
+     44             Hepatocyte            T Cell            no          0
+     45            Immune Cell       Erythrocyte            no          0
+     46       Endothelial Cell            T Cell            no          0
+     47             Hepatocyte  Endothelial Cell            no          0
+     48             Hepatocyte         NK T Cell            no          0}
+
+
+
+
+```python
+label_agreement_categorical
+```
+
+
+
+
+    {('unified_claude-3-5-sonnet-20240620_simplified_ai_cell_type',
+      'unified_cell_type'):                      col1              col2  raw_agreement  agreement
+     0         Epithelial Cell   Epithelial Cell  perfect match          2
+     1                  B Cell            B Cell  perfect match          2
+     2               NK T Cell            T Cell  partial match          1
+     3         Epithelial Cell  Endothelial Cell       no match          0
+     4              Macrophage        Macrophage  perfect match          2
+     5               NK T Cell         NK T Cell  perfect match          2
+     6         Epithelial Cell        Macrophage       no match          0
+     7         Epithelial Cell            T Cell       no match          0
+     8                  B Cell        Macrophage       no match          0
+     9              Macrophage   Epithelial Cell       no match          0
+     10        Epithelial Cell            B Cell       no match          0
+     11              NK T Cell            B Cell       no match          0
+     12                 B Cell            T Cell       no match          0
+     13              NK T Cell        Macrophage       no match          0
+     14           Kupffer Cell        Macrophage  partial match          1
+     15           Kupffer Cell          Monocyte  partial match          1
+     16       Endothelial Cell  Endothelial Cell  perfect match          2
+     17           Kupffer Cell    Dendritic Cell       no match          0
+     18            Immune Cell         NK T Cell  partial match          1
+     19  Hepatic Stellate Cell        Fibroblast  partial match          1
+     20             Hepatocyte        Hepatocyte  perfect match          2
+     21            Immune Cell          Monocyte  partial match          1
+     22       Endothelial Cell        Macrophage       no match          0
+     23          Cholangiocyte     Cholangiocyte  perfect match          2
+     24             Hepatocyte        Macrophage       no match          0
+     25            Immune Cell            T Cell  partial match          1
+     26  Hepatic Stellate Cell        Neutrophil       no match          0
+     27          Cholangiocyte        Macrophage       no match          0
+     28            Plasma Cell       Plasma Cell  perfect match          2
+     29           Kupffer Cell         NK T Cell       no match          0
+     30            Immune Cell        Macrophage  partial match          1
+     31             Hepatocyte          Monocyte       no match          0
+     32          Cholangiocyte  Endothelial Cell       no match          0
+     33            Immune Cell  Endothelial Cell       no match          0
+     34          Cholangiocyte          Monocyte       no match          0
+     35       Endothelial Cell    Dendritic Cell       no match          0
+     36           Kupffer Cell        Neutrophil       no match          0
+     37            Immune Cell        Neutrophil  partial match          1
+     38             Hepatocyte        Neutrophil       no match          0
+     39           Kupffer Cell            T Cell       no match          0
+     40         Erythroid Cell       Erythrocyte  partial match          1
+     41           Kupffer Cell  Endothelial Cell       no match          0
+     42            Plasma Cell        Hepatocyte       no match          0
+     43            Plasma Cell          Monocyte       no match          0
+     44             Hepatocyte            T Cell       no match          0
+     45            Immune Cell       Erythrocyte  partial match          1
+     46       Endothelial Cell            T Cell       no match          0
+     47             Hepatocyte  Endothelial Cell       no match          0
+     48             Hepatocyte         NK T Cell       no match          0}
+
+
+
+
+```python
+#get the agreement columns
+binary_agreement_cols = adt.get_adata_columns(adata, col_contains = ['binary_agreement'])
+categorical_agreement_cols = adt.get_adata_columns(adata, col_contains = ['categorical_agreement'])
+```
+
+
+```python
+#change scale of categorical label agreement cols from 0 to 1 (raw has values 0, 1, and 2)
+adata.obs[categorical_agreement_cols] = adata.obs[categorical_agreement_cols]/2
+```
+
+
+```python
+#plot the agreement at the binary level
+agreement_plot_overall_binary = adt.plot_model_agreement(adata, group_by=manual_cell_type_col, sub_group_by='tissue', model_cols=binary_agreement_cols, granularity=0)
+
+#clean plot up for display
+import matplotlib.pyplot as plt
+def set_xticks_rotation_and_resize(fig_ax_tuple):
+    fig, ax = fig_ax_tuple
+    fig.set_size_inches((4, 11))
+    fig.tight_layout()  # Adjust layout to fit the new size
+    
+    # Rotate x-axis tick labels
+    for label in ax.get_xticklabels():
+        label.set_rotation(90)
+    
+    # Check if legend exists and update labels if necessary
+    legend = ax.get_legend()
+    if legend:
+        # Define label mapping
+        label_mapping = {'0.0': 'No', '0.5': 'Partial', '1.0': 'Perfect'}
+        
+        # Iterate over legend texts and update if in mapping
+        for text in legend.get_texts():
+            original_label = text.get_text()
+            new_label = label_mapping.get(original_label, original_label)
+            text.set_text(new_label)
+set_xticks_rotation_and_resize(agreement_plot_overall_binary)
+```
+
+
+    
+![png](tutorial_notebooks/cell_type_annotation_with_an_LLM_files/cell_type_annotation_with_an_LLM_42_0.png)
+    
+
+
+
+```python
+#plot the agreement at the binary level
+agreement_plot_overall_categorical = adt.plot_model_agreement_categorical(adata, group_by=manual_cell_type_col, sub_group_by='tissue', model_cols=categorical_agreement_cols, granularity=0)
+
+#clean plot up for display
+set_xticks_rotation_and_resize(agreement_plot_overall_categorical)
+```
+
+
+    
+![png](tutorial_notebooks/cell_type_annotation_with_an_LLM_files/cell_type_annotation_with_an_LLM_43_0.png)
+    
+
+
+
+```python
+#calculate kappa
+kappa = adt.kappa_adata(adata, unified_cell_types)
+kappa
+```
+
+
+
+
+    {'pairwise': {('unified_claude-3-5-sonnet-20240620_simplified_ai_cell_type',
+       'unified_cell_type'): 0.6337789381249733,
+      ('unified_cell_type',
+       'unified_claude-3-5-sonnet-20240620_simplified_ai_cell_type'): 0.6337789381249733},
+     'average_pairwise': {'unified_claude-3-5-sonnet-20240620_simplified_ai_cell_type': 0.6337789381249733,
+      'unified_cell_type': 0.6337789381249733},
+     'fleiss': 0.6282839565968413}
+
+
+
+
+```python
+#Visualize agreement at the tissue-celltype level
+agreement_plot_overall_binary = adt.plot_model_agreement(adata, group_by=manual_cell_type_col, sub_group_by='tissue', model_cols=binary_agreement_cols, granularity=2)
+```
+
+
+    
+![png](tutorial_notebooks/cell_type_annotation_with_an_LLM_files/cell_type_annotation_with_an_LLM_45_0.png)
+    
+
 
 
 ```python
