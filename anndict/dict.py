@@ -65,34 +65,159 @@ from .ai import (
 class AdataDict(dict):
     """
     AdataDict is a dictionary-like container where values are AnnData objects.
-    
-    This class provides two main functionalities:
-    1. It behaves like an AnnData object by passing each method through to each AnnData in the dictionary. For example, adata_dict.obs.group_by("column") will apply the group_by method on the obs attribute of each AnnData object in the dictionary.
-    2. It has a method fapply(func, kwargs) that applies a given function func with arguments kwargs to each AnnData object in the dictionary.
-    
-    Methods:
-    __getattr__(attr) Dynamically creates methods that apply the corresponding method of AnnData objects in the dictionary.
-        
-    fapply(func, kwargs) Applies the provided function func with additional arguments kwargs to each AnnData object in the dictionary.
-    
-    Attributes:
-    Inherits attributes from the built-in dict class.
 
+    This class provides two main functionalities:
+    1. It behaves like an AnnData object by passing each method through to each AnnData in the dictionary.
+    2. It has a method fapply(func, kwargs) that applies a given function func with arguments kwargs to each AnnData object in the dictionary.
     """
+
+    def __init__(self, data=None, hierarchy=None):
+        """
+        Initialize the AdataDict with data and hierarchy.
+
+        :param data: Dictionary with keys as tuples of indices.
+        :param hierarchy: Tuple or list indicating the order of indices.
+        """
+        if data is None:
+            data = {}
+        super().__init__(data)  # Initialize the dict with data
+        if hierarchy is not None:
+            self._hierarchy = tuple(hierarchy)  # Tuple indicating the index hierarchy
+        else:
+            self._hierarchy = ()
+
+    def flatten(self, parent_key=()):
+        flat_data = {}
+        for key, value in self.items():
+            full_key = parent_key + key
+            if isinstance(value, AdataDict):
+                flat_data.update(value.flatten(parent_key=full_key))
+            else:
+                flat_data[full_key] = value
+        return flat_data
+
+    def flatten_nesting_list(self, nesting_list):
+        """
+        Flatten a nested list into a single list.
+
+        :param nesting_list: Nested list of hierarchy levels.
+        :return: Flattened list of hierarchy elements.
+        """
+        hierarchy = []
+        for item in nesting_list:
+            if isinstance(item, list):
+                hierarchy.extend(self.flatten_nesting_list(item))
+            else:
+                hierarchy.append(item)
+        return hierarchy
+
+    def get_levels(self, nesting_list, levels=None, depth=0):
+        """
+        Get the levels of hierarchy based on the nesting structure.
+
+        :param nesting_list: Nested list indicating the new hierarchy structure.
+        :param levels: List to store the levels.
+        :param depth: Current depth in recursion.
+        :return: List of levels with hierarchy elements.
+        """
+        if levels is None:
+            levels = []
+        if len(levels) <= depth:
+            levels.append([])
+        for item in nesting_list:
+            if isinstance(item, list):
+                self.get_levels(item, levels, depth + 1)
+            else:
+                levels[depth].append(item)
+        return levels
+
+    def set_hierarchy(self, nesting_list):
+        """
+        Rearrange the hierarchy of AdataDict based on the provided nesting structure.
+
+        :param nesting_list: Nested list indicating the new hierarchy structure.
+        """
+        # Flatten the nested data
+        flat_data = self.flatten()
+        self.clear()
+        self.update(flat_data)
+        self._hierarchy = tuple(self.flatten_nesting_list(self._hierarchy))
+
+        new_hierarchy = self.flatten_nesting_list(nesting_list)
+        levels = self.get_levels(nesting_list)
+        old_hierarchy = self._hierarchy
+
+        # Function to recursively create nested AdataDicts
+        def create_nested_adata_dict(current_level, key_indices, value, level_idx):
+            if level_idx == len(levels):
+                return value  # Base case: return the value (AnnData object)
+            level = levels[level_idx]
+            level_length = len(level)
+            level_key = tuple(key_indices[:level_length])
+            remaining_key_indices = key_indices[level_length:]
+            if level_key not in current_level:
+                # Remaining hierarchy for nested AdataDict
+                remaining_hierarchy = new_hierarchy[level_idx * level_length:]
+                current_level[level_key] = AdataDict(hierarchy=remaining_hierarchy)
+            # Recurse into the next level
+            nested_dict = current_level[level_key]
+            nested_value = create_nested_adata_dict(nested_dict, remaining_key_indices, value, level_idx + 1)
+            if level_idx == len(levels) - 1:
+                # At the last level, set the value
+                current_level[level_key] = nested_value
+            return current_level
+
+        # Start building the new nested AdataDict
+        new_data = AdataDict(hierarchy=new_hierarchy)
+        for key, value in self.items():
+            # Map old indices to their values
+            index_map = dict(zip(old_hierarchy, key))
+            # Arrange indices according to the new hierarchy
+            new_key_indices = [index_map[h] for h in new_hierarchy]
+            # Recursively build the nested structure
+            create_nested_adata_dict(new_data, new_key_indices, value, 0)
+
+        # Update the hierarchy and data
+        self._hierarchy = tuple(new_hierarchy)
+        # Replace the existing data in self with new_data
+        self.clear()
+        self.update(new_data)
+
+    def __getitem__(self, key):
+        # Simplify access by converting non-tuple keys to tuple
+        if not isinstance(key, tuple):
+            key = (key,)
+        return super().__getitem__(key)
+
+    def __setitem__(self, key, value):
+        # Simplify setting by converting non-tuple keys to tuple
+        if not isinstance(key, tuple):
+            key = (key,)
+        super().__setitem__(key, value)
+
     def __getattr__(self, attr):
         def method(*args, **kwargs):
             results = {}
             for key, adata in self.items():
-                func = getattr(adata, attr)
-                results[key] = func(*args, **kwargs)
+                if isinstance(adata, AdataDict):
+                    # Recurse into nested AdataDict
+                    results[key] = getattr(adata, attr)(*args, **kwargs)
+                else:
+                    func = getattr(adata, attr)
+                    results[key] = func(*args, **kwargs)
             return results
         return method
-    
+
     def fapply(self, func, **kwargs):
         results = {}
         for key, adata in self.items():
-            results[key] = func(adata, **kwargs)
+            if isinstance(adata, AdataDict):
+                # Recurse into nested AdataDict
+                results[key] = adata.fapply(func, **kwargs)
+            else:
+                results[key] = func(adata, **kwargs)
         return results
+
 
 
 def apply_func(adt_key, adata, func, accepts_key, max_retries, **func_args):
@@ -182,7 +307,7 @@ def apply_func_return(adt_key, adata, func, accepts_key, max_retries, **func_arg
                 return f"Error: {e}"  # Optionally, return None or raise an error
 
 
-def adata_dict_fapply_return(adata_dict, func, use_multithreading=True, num_workers=None, max_retries=0, **kwargs_dicts):
+def adata_dict_fapply_return(adata_dict, func, use_multithreading=True, num_workers=None, max_retries=0, return_as_adata_dict=False, **kwargs_dicts):
     """
     Applies a given function to each AnnData object in the adata_dict, with error handling,
     retry mechanism, and the option to use either threading or sequential execution. Returns
@@ -202,6 +327,11 @@ def adata_dict_fapply_return(adata_dict, func, use_multithreading=True, num_work
     sig = inspect.signature(func)
     accepts_key = 'adt_key' in sig.parameters
     results = {}
+
+    if return_as_adata_dict:
+        # if not isinstance(adata_dict, AdataDict):
+        #     raise ValueError("You cannot return as class AdataDict if input is not already of class AdataDict")
+        hierarchy = adata_dict._hierarchy if hasattr(adata_dict, '_hierarchy') else ()
 
     def get_arg_value(arg_value, adt_key):
         if isinstance(arg_value, dict):
@@ -241,6 +371,9 @@ def adata_dict_fapply_return(adata_dict, func, use_multithreading=True, num_work
             except Exception as e:
                 print(f"Unhandled error processing {adt_key}: {e}")
                 results[adt_key] = None  # Optionally, return None or handle differently
+
+    if return_as_adata_dict:
+        results = AdataDict(results, hierarchy)
 
     return results
 
@@ -388,6 +521,7 @@ def read_adata_dict(paths, keys=None):
 
     return adata_dict
 
+
 def build_adata_dict(adata, strata_keys, desired_strata=None):
     """
     Build a dictionary of AnnData objects split by desired strata values.
@@ -395,9 +529,10 @@ def build_adata_dict(adata, strata_keys, desired_strata=None):
     Parameters:
     adata (AnnData): Annotated data matrix.
     strata_keys (list of str): List of column names in `adata.obs` to use for stratification.
-    desired_strata (list or dict, optional): List of desired strata values or a dictionary where keys are strata keys and values are lists of desired strata values. If None (Default), all combinations of categories in adata.obs[strata_keys] will be used.
+    desired_strata (list or dict, optional): List of desired strata tuples or a dictionary where keys are strata keys and values are lists of desired strata values. If None (Default), all combinations of categories in adata.obs[strata_keys] will be used.
+
     Returns:
-    dict: Dictionary where keys are strata values and values are corresponding AnnData subsets.
+    dict: Dictionary where keys are strata tuples and values are corresponding AnnData subsets.
 
     Raises:
     ValueError: If `desired_strata` is neither a list nor a dictionary of lists.
@@ -405,90 +540,65 @@ def build_adata_dict(adata, strata_keys, desired_strata=None):
     if desired_strata is None:
         # Generate all combinations of categories in adata.obs[strata_keys]
         all_categories = [adata.obs[key].cat.categories.tolist() for key in strata_keys]
-        all_combinations = itertools.product(*all_categories)
-        desired_strata = ['_'.join(map(str, comb)) for comb in all_combinations]
+        all_combinations = list(itertools.product(*all_categories))
+        desired_strata = all_combinations
         return build_adata_dict_main(adata, strata_keys, desired_strata, print_missing_strata=False)
-    
+
     elif isinstance(desired_strata, list):
-        # Directly use the list of strata
+        # Ensure that desired_strata is a list of tuples
+        if all(isinstance(item, str) for item in desired_strata):
+            raise ValueError("desired_strata should be a list of tuples, not strings.")
         return build_adata_dict_main(adata, strata_keys, desired_strata)
-    
+
     elif isinstance(desired_strata, dict):
         # Generate all combinations of desired strata values across strata_keys
         all_combinations = itertools.product(*(desired_strata[key] for key in strata_keys))
-        # Convert tuples of combinations to a format suitable for strata_keys
-        combined_strata_list = ['_'.join(map(str, comb)) for comb in all_combinations]
-        return build_adata_dict_main(adata, strata_keys, combined_strata_list)
-    
+        desired_strata = list(all_combinations)
+        return build_adata_dict_main(adata, strata_keys, desired_strata)
+
     else:
-        raise ValueError("desired_strata must be either a list or a dictionary of lists")
+        raise ValueError("desired_strata must be either a list of tuples or a dictionary of lists")
 
-
-# def build_adata_dict_main(adata, strata_keys, desired_strata, print_missing_strata=True):
-#     """
-#     Main function to build a dictionary of AnnData objects based on desired strata values.
-
-#     Parameters:
-#     adata (AnnData): Annotated data matrix.
-#     strata_keys (list of str): List of column names in `adata.obs` to use for stratification.
-#     desired_strata (list of str): List of desired strata values.
-
-#     Returns:
-#     dict: Dictionary where keys are strata values and values are corresponding AnnData subsets.
-#     """
-#     # Check and create stratifying variable in adata
-#     strata_key = check_and_create_strata(adata, strata_keys)
-#     # Initialize the dictionary to store subsets
-#     subsets_dict = {}
-#     # Filter adata for each desired stratum and add to the dictionary
-#     for stratum in desired_strata:
-#         if stratum in adata.obs[strata_key].cat.categories:
-#             subset = adata[adata.obs[strata_key] == stratum].copy()
-#             subsets_dict[stratum] = subset
-#         else:
-#             if print_missing_strata:
-#                 print(f"Warning: '{stratum}' is not a valid category in '{strata_key}'.")
-#     return AdataDict(subsets_dict)
 
 def build_adata_dict_main(adata, strata_keys, desired_strata, print_missing_strata=True):
     """
     Optimized function to build a dictionary of AnnData objects based on desired strata values.
-    
+
     Parameters:
     adata (AnnData): Annotated data matrix.
     strata_keys (list of str): List of column names in `adata.obs` to use for stratification.
-    desired_strata (list of str): List of desired strata values.
-    
+    desired_strata (list of tuples): List of desired strata tuples.
+
     Returns:
-    dict: Dictionary where keys are strata values and values are corresponding AnnData subsets.
+    dict: Dictionary where keys are strata tuples and values are corresponding AnnData subsets.
     """
-    # Check and create stratifying variable in adata
-    strata_key = check_and_create_strata(adata, strata_keys)
-    
-    # Ensure the strata column is categorical
-    if not pd.api.types.is_categorical_dtype(adata.obs[strata_key]):
-        adata.obs[strata_key] = adata.obs[strata_key].astype('category')
-    
-    # Get all categories, including those without observations
-    categories = adata.obs[strata_key].cat.categories
-    
-    # Group indices by category for efficient access
-    groups = adata.obs.groupby(strata_key, observed=False).indices
-    
+    # Ensure that the strata columns are categorical
+    for key in strata_keys:
+        if not pd.api.types.is_categorical_dtype(adata.obs[key]):
+            adata.obs[key] = adata.obs[key].astype('category')
+
+    # Group indices by combinations of strata_keys for efficient access
+    groups = adata.obs.groupby(strata_keys, observed=False).indices
+
+    # Adjust group keys to always be tuples
+    if len(strata_keys) == 1:
+        groups = { (k,): v for k,v in groups.items() }
+
     # Initialize the dictionary to store subsets
-    subsets_dict = {}
-    
-    # Iterate over desired strata and extract subsets
+    adata_dict = {}
+
+    # Iterate over desired strata (tuples) and extract subsets
     for stratum in desired_strata:
-        if stratum in categories:
-            # Get indices if the stratum has observations; else, empty list
-            indices = groups.get(stratum, [])
-            subsets_dict[stratum] = adata[indices].copy()
+        if stratum in groups:
+            indices = groups[stratum]
+            adata_dict[stratum] = adata[indices].copy()
         else:
             if print_missing_strata:
-                print(f"Warning: '{stratum}' is not a valid category in '{strata_key}'.")
-    
-    return AdataDict(subsets_dict)
+                print(f"Warning: {stratum} is not a valid combination in {strata_keys}.")
+
+    # Create AdataDict and set hierarchy to strata_keys
+    adata_dict = AdataDict(adata_dict, tuple(strata_keys))
+    return adata_dict
 
 
 def subsplit_adata_dict(adata_dict, strata_keys, desired_strata):
