@@ -151,7 +151,8 @@ from .dict import (
     plot_grouped_average_adata_dict,
     ensure_label_consistency_adata_dict,
     ensure_label_consistency_adata,
-    ensure_label_consistency_main
+    ensure_label_consistency_main,
+    annotate_gene_groups_with_ai_biological_process
 )
 
 from .strata import (
@@ -320,5 +321,6 @@ __all__ = [
     'ensure_label_consistency_adata',
     'ensure_label_consistency_main',
     'process_llm_category_mapping',
-    'parse_dict_with_unescaped_strings'
+    'parse_dict_with_unescaped_strings',
+    'annotate_gene_groups_with_ai_biological_process'
 ]
