@@ -55,12 +55,17 @@ from .ai import (
     map_gene_labels_to_simplified_set, 
     ai_biological_process, 
     ai_cell_type,
+    ai_gene_list,
     ai_compare_cell_types_binary,
     ai_compare_cell_types_categorical,
     encode_plot_for_openai, 
     ai_resolution_interpretation,
     determine_sign_of_resolution_change,
-    process_llm_category_mapping
+    process_llm_category_mapping,
+    filter_gene_list,
+    cell_type_marker_gene_score,
+    module_score_barplot,
+    module_score_umap
 )
 
 from .stablelabel import (
@@ -252,6 +257,7 @@ __all__ = [
     'map_gene_labels_to_simplified_set', 
     'ai_biological_process', 
     'ai_cell_type',
+    'ai_gene_list',
     'simplify_obs_column', 
     'simplify_obs_column_adata_dict', 
     'simplify_var_index', 
@@ -322,5 +328,9 @@ __all__ = [
     'ensure_label_consistency_main',
     'process_llm_category_mapping',
     'parse_dict_with_unescaped_strings',
-    'annotate_gene_groups_with_ai_biological_process'
+    'annotate_gene_groups_with_ai_biological_process',
+    'filter_gene_list',
+    'cell_type_marker_gene_score',
+    'module_score_barplot',
+    'module_score_umap'
 ]
