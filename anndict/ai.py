@@ -1342,7 +1342,7 @@ def cell_type_marker_gene_score(adata, cell_type_col=None, cell_types=None, **kw
         sc.tl.score_genes(adata, gene_list=gene_list, score_name=score_name, **kwargs)
 
 
-def module_score_barplot(adata, group_cols, score_cols, adt_key=None):
+def module_score_barplot(adata, group_cols, score_cols, adt_key=None, figsize=(10,8)):
     """
     Create a bar plot of mean module scores grouped by specified columns.
 
@@ -1375,15 +1375,18 @@ def module_score_barplot(adata, group_cols, score_cols, adt_key=None):
     mean_scores = module_scores.groupby(group_cols, observed=False).mean()
 
     # Create figure and axes
-    fig, ax = plt.subplots(figsize=(10, 8))
+    fig, ax = plt.subplots(figsize=figsize)
 
     # Plot the mean module scores as a grouped bar plot
     mean_scores.plot(kind='bar', ax=ax)
 
-    # Set labels and title
+    # Set labels, title, and legend location
     ax.set_ylabel('Mean Module Score')
+    ax.legend(title=None, loc=6, bbox_to_anchor=(1,0.5))
+
     plt.xticks(rotation=90)
     plt.tight_layout()
+    
 
     return fig, ax
 
