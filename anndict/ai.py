@@ -1341,7 +1341,7 @@ def cell_type_marker_gene_score(adata, cell_type_col=None, cell_types=None, spec
         else:
             # Assign NaN to adata.obs[score_name] for all observations
             adata.obs[score_name] = np.nan
-            print(f"No valid genes for {cell_type} in {adt_key}. Assigning score value as NaN")
+            print(f"No valid genes for {cell_type} in {adt_key if adt_key else ''}. Assigning score value as NaN")
 
 
 def module_score_barplot(adata, group_cols, score_cols, adt_key=None, figsize=(10,8)):
