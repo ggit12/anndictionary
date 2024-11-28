@@ -1285,7 +1285,7 @@ def filter_gene_list(adata, gene_list):
     return updated_gene_list
 
 
-def cell_type_marker_gene_score(adata, cell_type_col=None, cell_types=None, **kwargs):
+def cell_type_marker_gene_score(adata, cell_type_col=None, cell_types=None, species='Human', list_length=None, score_name='_score', **kwargs):
     """
     Compute marker gene scores for specified cell types. Must provide either a list of cell types, or a column that contains cell_type labels.
     
@@ -1293,11 +1293,10 @@ def cell_type_marker_gene_score(adata, cell_type_col=None, cell_types=None, **kw
         adata (AnnData): Annotated data matrix.
         cell_type_col (str, optional): Column name in adata.obs containing cell type annotations.
         cell_types (list of str, optional): List of cell types for which to compute the marker gene scores.
-        **kwargs: Optional parameters:
-            - species (str): Species for gene list generation. Defaults to 'Human'.
-            - list_length (str, optional): Qualitative length of the marker gene list.
-            - score_name (str): Suffix for the computed score names. Defaults to '_score'.
-            - Other keyword args passed to sc.tl.score_genes().
+        species (str, optional): Species for gene list generation. Defaults to 'Human'.
+        list_length (str, optional): Qualitative length of the marker gene list (i.e. "longer" if you are having trouble getting valid genes present in your dataset.)
+        score_name (str, optional): Suffix for the computed score names. Defaults to '_score'.
+        **kwargs: Optional keyword args passed to sc.tl.score_genes().
     
     Modifies:
         adata.var: Adds boolean columns indicating genes used in the scores.
@@ -1305,11 +1304,8 @@ def cell_type_marker_gene_score(adata, cell_type_col=None, cell_types=None, **kw
     
     """
     
-    # Extract optional parameters with defaults
-    species = kwargs.pop('species', 'Human')
-    list_length = kwargs.pop('list_length', None)
-    score_name_suffix = kwargs.pop('score_name', '_score')
-    
+    score_name_suffix = score_name
+
     # Check for conflicting parameters
     if cell_types is not None and cell_type_col is not None:
         raise ValueError("Provide either 'cell_type_col' or 'cell_types', not both.")
