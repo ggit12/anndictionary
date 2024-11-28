@@ -1285,7 +1285,7 @@ def filter_gene_list(adata, gene_list):
     return updated_gene_list
 
 
-def cell_type_marker_gene_score(adata, cell_type_col=None, cell_types=None, species='Human', list_length=None, score_name='_score', **kwargs):
+def cell_type_marker_gene_score(adata, cell_type_col=None, cell_types=None, species='Human', list_length=None, score_name='_score', adt_key=None, **kwargs):
     """
     Compute marker gene scores for specified cell types. Must provide either a list of cell types, or a column that contains cell_type labels.
     
@@ -1303,7 +1303,7 @@ def cell_type_marker_gene_score(adata, cell_type_col=None, cell_types=None, spec
         adata.obs: Adds new columns with the computed scores for each observation.
     
     """
-    
+
     score_name_suffix = score_name
 
     # Check for conflicting parameters
@@ -1333,9 +1333,15 @@ def cell_type_marker_gene_score(adata, cell_type_col=None, cell_types=None, spec
         
         # Mark genes included in this score in adata.var
         adata.var[score_name] = adata.var.index.isin(gene_list)
-        
-        # Compute the gene score and store it in adata.obs[score_name]
-        sc.tl.score_genes(adata, gene_list=gene_list, score_name=score_name, **kwargs)
+
+        #calculate score if any valid genes, otherwise print warning and assign score value as NaN.
+        if gene_list:
+            # Compute the gene score and store it in adata.obs[score_name]
+            sc.tl.score_genes(adata, gene_list=gene_list, score_name=score_name, **kwargs)
+        else:
+            # Assign NaN to adata.obs[score_name] for all observations
+            adata.obs[score_name] = np.nan
+            print(f"No valid genes for {cell_type} in {adt_key}. Assigning score value as NaN")
 
 
 def module_score_barplot(adata, group_cols, score_cols, adt_key=None, figsize=(10,8)):
