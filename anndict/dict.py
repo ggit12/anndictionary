@@ -541,6 +541,86 @@ def write_adata_dict(adata_dict, directory, file_prefix=""):
         # Save the AnnData object
         sc.write(file_path, adata)
 
+import os
+import json
+
+def read(directory_list):
+    """
+    Takes a list of strings, which can be directories or file paths.
+    For each directory, if a .hierarchy file is found in the directory, it processes that directory with read_adata_dict.
+    Otherwise, processes the highest-level directory with read_h5ad_to_adata_dict.
+    The directories that contain .hierarchy files and the subdirectories of a directory that contains .hierarchy files are not processed with read_h5ad_to_adata_dict.
+
+    Parameters:
+    - directory_list: List of strings, paths to directories or .h5ad files.
+
+    Returns:
+    - A combined dictionary of AnnData objects.
+    """
+    adata_dict = {}
+
+    # Set to keep track of directories that have been processed with read_adata_dict
+    hierarchy_dirs = set()
+
+    # List to collect .h5ad files to process
+    h5ad_files = []
+
+    # Function to find all directories containing adata_dict.hierarchy files
+    def find_hierarchy_dirs(dir_path):
+        for root, dirs, files in os.walk(dir_path):
+            if 'adata_dict.hierarchy' in files:
+                hierarchy_dirs.add(root)
+                # Do not traverse subdirectories of directories with hierarchy files
+                dirs[:] = []
+            else:
+                # Continue traversing subdirectories
+                pass
+
+    # First, process the input paths to find hierarchy directories and collect .h5ad files
+    for path in directory_list:
+        if os.path.isfile(path):
+            if path.endswith('.h5ad'):
+                h5ad_files.append(path)
+        elif os.path.isdir(path):
+            # Find hierarchy directories
+            find_hierarchy_dirs(path)
+        else:
+            raise ValueError(f"Path {path} is neither a file nor a directory.")
+
+    # Process directories with hierarchy files using read_adata_dict
+    for h_dir in hierarchy_dirs:
+        adata_dict.update(read_adata_dict(h_dir))
+
+    # Build a set of directories to exclude (hierarchy_dirs and their subdirectories)
+    exclude_dirs = set()
+    for h_dir in hierarchy_dirs:
+        for root, dirs, files in os.walk(h_dir):
+            exclude_dirs.add(root)
+
+    # Function to collect .h5ad files not under exclude_dirs
+    def collect_h5ad_files(dir_path):
+        for root, dirs, files in os.walk(dir_path):
+            # Skip directories under exclude_dirs
+            if any(os.path.commonpath([root, excl_dir]) == excl_dir for excl_dir in exclude_dirs):
+                dirs[:] = []
+                continue
+            for file in files:
+                if file.endswith('.h5ad'):
+                    h5ad_files.append(os.path.join(root, file))
+
+    # Collect .h5ad files from directories not containing hierarchy files
+    for path in directory_list:
+        if os.path.isdir(path):
+            collect_h5ad_files(path)
+
+    # Process the collected .h5ad files using read_h5ad_to_adata_dict
+    if h5ad_files:
+        adata_dict.update(read_h5ad_to_adata_dict(h5ad_files))
+
+    return adata_dict
+
+# Note: The implementations of read_adata_dict and read_h5ad_to_adata_dict are assumed to be as provided earlier.
+
 
 def read_adata_dict(directory):
     """
@@ -628,7 +708,7 @@ def read_adata_dict(directory):
 #         sc.write(file_path, adata)
 
 
-# def read_adata_dict(paths, keys=None):
+# def read_h5ad_to_adata_dict(paths, keys=None):
 #     """
 #     Reads .h5ad files from a list of paths and returns them in a dictionary.
 #     For each element in the provided list of paths, if the element is a directory,
