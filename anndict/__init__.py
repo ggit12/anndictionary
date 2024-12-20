@@ -2,10 +2,12 @@ import os
 import platform
 import numba  # Import numba to interact with its threading layer
 
-# Set Numba threading layer to 'tbb'
-if os.getenv("NUMBA_THREADING_LAYER") is None:
-    os.environ["NUMBA_THREADING_LAYER"] = "tbb"
-    numba.config.THREADING_LAYER = 'tbb'  # Explicitly set the threading layer using config
+# Check if the operating system is macOS
+if platform.system() == 'Darwin':
+    # Set Numba threading layer to 'tbb'
+    if os.getenv("NUMBA_THREADING_LAYER") is None:
+        os.environ["NUMBA_THREADING_LAYER"] = "tbb"
+        numba.config.THREADING_LAYER = 'tbb'  # Explicitly set the threading layer using config
 
 from . import metadata_summary
 from . import utils
