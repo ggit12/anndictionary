@@ -709,18 +709,26 @@ def read_h5ad_to_adata_dict(paths, keys=None):
     Reads .h5ad files from a list of paths and returns them in a dictionary.
     For each element in the provided list of paths, if the element is a directory,
     it reads all .h5ad files in that directory. If the element is an .h5ad file,
-    it reads the file directly. The results are returned as a dictionary with
-    keys as the base name of each file (minus the extension).
+    it reads the file directly. 
+    
+    For auto-generated keys, if there are duplicate filenames, the function will 
+    include parent directory names from right to left until keys are unique.
+    For example, 'dat/heart/fibroblast.h5ad' would generate the key ('heart', 'fibroblast')
+    if disambiguation is needed.
 
     Parameters:
     paths (list): A list of paths to directories or .h5ad files.
-    keys (list, optional): A list of strings to use as keys for the adata_dict. If provided, must be equal in length to the number of .h5ad files read.
+    keys (list, optional): A list of strings to use as keys for the adata_dict. 
+                          If provided, must be equal in length to the number of .h5ad files read.
 
     Returns:
-    dict: A dictionary with keys as specified or generated, and values as AnnData objects.
+    dict: A dictionary with tuple keys and AnnData objects as values.
     """
+    import os
+    import anndata as ad
+    from collections import Counter
+
     adata_dict = {}
-    count = 1
     file_paths = []
 
     # First, collect all file paths
@@ -733,19 +741,46 @@ def read_h5ad_to_adata_dict(paths, keys=None):
             file_paths.append(path)
 
     # Check if provided keys match the number of files
-    if keys is not None and len(keys) != len(file_paths):
-        raise ValueError(f"Number of provided keys ({len(keys)}) does not match the number of .h5ad files ({len(file_paths)})")
-
-    # Now process the files
-    for i, file_path in enumerate(file_paths):
-        if keys is not None:
-            key = keys[i]
-        else:
-            # key = attempt_ai_integration(generate_file_key, lambda: f"ad{count}", file_path)
-            key = os.path.splitext(os.path.basename(file_path))[0]
+    if keys is not None:
+        if len(keys) != len(file_paths):
+            raise ValueError(f"Number of provided keys ({len(keys)}) does not match the number of .h5ad files ({len(file_paths)})")
+        # Check for uniqueness in provided keys
+        key_counts = Counter(keys)
+        duplicates = [k for k, v in key_counts.items() if v > 1]
+        if duplicates:
+            raise ValueError(f"Duplicate keys found: {duplicates}")
+        # Convert provided keys to tuples
+        tuple_keys = [tuple(k) if isinstance(k, (list, tuple)) else (k,) for k in keys]
+    else:
+        # Generate keys from paths
+        base_names = [os.path.splitext(os.path.basename(fp))[0] for fp in file_paths]
         
-        adata_dict[key] = ad.read_h5ad(file_path)
-        count += 1
+        # Start with just the base names
+        tuple_keys = [(name,) for name in base_names]
+        
+        # Keep extending paths to the left until all keys are unique
+        while len(set(tuple_keys)) != len(tuple_keys):
+            new_tuple_keys = []
+            for i, file_path in enumerate(file_paths):
+                path_parts = os.path.normpath(file_path).split(os.sep)
+                # Find the current key's elements in the path
+                current_key = tuple_keys[i]
+                current_idx = len(path_parts) - 1 - len(current_key)  # -1 for zero-based index
+                # Add one more path element to the left if possible
+                if current_idx > 0:
+                    new_key = (path_parts[current_idx - 1],) + current_key
+                else:
+                    new_key = current_key
+                new_tuple_keys.append(new_key)
+            tuple_keys = new_tuple_keys
+            
+            # Safety check - if we've used all path components and still have duplicates
+            if all(len(key) == len(os.path.normpath(fp).split(os.sep)) for key, fp in zip(tuple_keys, file_paths)):
+                raise ValueError("Unable to create unique keys even using full paths")
+
+    # Process the files with the finalized tuple keys
+    for i, file_path in enumerate(file_paths):
+        adata_dict[tuple_keys[i]] = ad.read_h5ad(file_path)
 
     return adata_dict
 
