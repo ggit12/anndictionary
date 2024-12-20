@@ -660,7 +660,7 @@ def attempt_ai_integration(ai_func, fallback_func, *args, **kwargs):
 
 def generate_file_key(file_path):
     """
-    Generates a concise, descriptive name for a file based on its file path using the configured AI model.
+    Generates a concise, descriptive name for a file based on its file path using the configured AI model. Deprecated.
 
     Args:
         file_path (str): The path to the file for which to generate a name.
