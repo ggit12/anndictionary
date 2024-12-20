@@ -1270,7 +1270,7 @@ def filter_gene_list(adata, gene_list):
     import re
     for gene in gene_list:
         # Create a regex pattern to match the gene name and its possible unique suffixes, case-insensitive
-        pattern = re.compile('^' + re.escape(gene) + '(-\d+)?$', re.IGNORECASE)
+        pattern = re.compile(r'^' + re.escape(gene) + r'(-\d+)?$', re.IGNORECASE)
         
         # Find all matching genes in adata.var.index
         matching_genes = [g for g in adata.var.index if pattern.match(g)]
