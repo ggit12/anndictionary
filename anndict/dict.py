@@ -881,22 +881,32 @@ def subsplit_adata_dict(adata_dict, strata_keys, desired_strata):
     return adata_dict_fapply_return(adata_dict, build_adata_dict, strata_keys=strata_keys, desired_strata=desired_strata)
 
 
-def concatenate_adata_dict(adata_dict, **kwargs):
+def concatenate_adata_dict(adata_dict, new_col_name=None, **kwargs):
     """
     Concatenates all AnnData objects in adata_dict into a single AnnData object.
     If only a single AnnData object is present, returns it as is.
 
     Parameters:
     - adata_dict (dict): Dictionary of AnnData objects with keys as identifiers.
+    - new_col_name (str): If provided, the name of the new column that will store the adata_dict key in .obs of the concatenated adata. Defaults to None.
     - kwargs: Additional keyword arguments for concatenation.
 
     Returns:
-    - AnnData: A single AnnData object or the original AnnData object if only one is provided.
+    - AnnData: A single AnnData object or the original AnnData object if only one is provided. The .obs will contain a new column specifying the key of the adata of origin.
     """
     kwargs.setdefault('join', 'outer')
     kwargs.setdefault('index_unique', None)  # Ensure original indices are kept
 
     adatas = list(adata_dict.values())
+
+    #add the key to the obs to keep track after merging
+    def add_key_to_obs_adata_dict(adata_dict, new_col_name=new_col_name):
+        def add_key_to_obs_adata(adata, new_col_name=new_col_name, adt_key=None):
+            adata.obs[new_col_name] = [adt_key] * adata.n_obs
+        adata_dict_fapply(adata_dict, add_key_to_obs_adata)
+
+    if new_col_name:
+        add_key_to_obs_adata_dict(adata_dict)
     
     if len(adatas) == 1:
         return adatas[0]  # Return the single AnnData object as is
