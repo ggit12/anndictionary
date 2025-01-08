@@ -57,12 +57,17 @@ from .ai import (
     map_gene_labels_to_simplified_set, 
     ai_biological_process, 
     ai_cell_type,
+    ai_gene_list,
     ai_compare_cell_types_binary,
     ai_compare_cell_types_categorical,
     encode_plot_for_openai, 
     ai_resolution_interpretation,
     determine_sign_of_resolution_change,
-    process_llm_category_mapping
+    process_llm_category_mapping,
+    filter_gene_list,
+    cell_type_marker_gene_score,
+    module_score_barplot,
+    module_score_umap
 )
 
 from .stablelabel import (
@@ -92,7 +97,9 @@ from .dict import (
     adata_dict_fapply, 
     adata_dict_fapply_return,
     check_and_create_strata,
+    read,
     read_adata_dict,
+    read_h5ad_to_adata_dict,
     build_adata_dict, 
     subsplit_adata_dict,  
     concatenate_adata_dict, 
@@ -114,7 +121,7 @@ from .dict import (
     leiden_sub_cluster_adata_dict,
     calculate_umap_adata_dict, 
     plot_umap_adata_dict, 
-    write_h5ad_adata_dict, 
+    write_adata_dict, 
     stable_label_adata_dict, 
     predict_labels_adata_dict, 
     update_adata_labels_with_stable_label_results_dict, 
@@ -153,7 +160,8 @@ from .dict import (
     plot_grouped_average_adata_dict,
     ensure_label_consistency_adata_dict,
     ensure_label_consistency_adata,
-    ensure_label_consistency_main
+    ensure_label_consistency_main,
+    annotate_gene_groups_with_ai_biological_process
 )
 
 from .strata import (
@@ -192,7 +200,9 @@ __all__ = [
     'plot_confusion_matrix_from_adata', 
     'plot_confusion_matrix', 
     'check_and_create_strata', 
-    'read_adata_dict', 
+    'read', 
+    'read_adata_dict',
+    'read_h5ad_to_adata_dict',
     'build_adata_dict', 
     'subsplit_adata_dict', 
     'concatenate_adata_dict',
@@ -211,7 +221,7 @@ __all__ = [
     'leiden_adata_dict', 
     'calculate_umap_adata_dict', 
     'plot_umap_adata_dict', 
-    'write_h5ad_adata_dict', 
+    'write_adata_dict', 
     'stable_label_adata_dict', 
     'predict_labels_adata_dict', 
     'update_adata_labels_with_stable_label_results_dict', 
@@ -253,6 +263,7 @@ __all__ = [
     'map_gene_labels_to_simplified_set', 
     'ai_biological_process', 
     'ai_cell_type',
+    'ai_gene_list',
     'simplify_obs_column', 
     'simplify_obs_column_adata_dict', 
     'simplify_var_index', 
@@ -322,5 +333,10 @@ __all__ = [
     'ensure_label_consistency_adata',
     'ensure_label_consistency_main',
     'process_llm_category_mapping',
-    'parse_dict_with_unescaped_strings'
+    'parse_dict_with_unescaped_strings',
+    'annotate_gene_groups_with_ai_biological_process',
+    'filter_gene_list',
+    'cell_type_marker_gene_score',
+    'module_score_barplot',
+    'module_score_umap'
 ]

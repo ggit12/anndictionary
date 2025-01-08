@@ -7,6 +7,7 @@ from sklearn.preprocessing import LabelEncoder
 import scanpy as sc
 import anndata as ad
 import os
+import json
 import re
 import pandas as pd
 import random
@@ -22,6 +23,8 @@ import matplotlib
 import matplotlib.pyplot as plt
 from sklearn.metrics import confusion_matrix
 import harmonypy as hm
+
+import textwrap
 
 import inspect
 from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor, as_completed
@@ -61,38 +64,177 @@ from .ai import (
     determine_sign_of_resolution_change
 )
 
+def to_nested_tuple(nested_list):
+    """
+    Recursively convert a nested list into a nested tuple.
+    """
+    if isinstance(nested_list, list):
+        return tuple(to_nested_tuple(item) for item in nested_list)
+    return nested_list
+
 
 class AdataDict(dict):
     """
     AdataDict is a dictionary-like container where values are AnnData objects.
-    
-    This class provides two main functionalities:
-    1. It behaves like an AnnData object by passing each method through to each AnnData in the dictionary. For example, adata_dict.obs.group_by("column") will apply the group_by method on the obs attribute of each AnnData object in the dictionary.
-    2. It has a method fapply(func, kwargs) that applies a given function func with arguments kwargs to each AnnData object in the dictionary.
-    
-    Methods:
-    __getattr__(attr) Dynamically creates methods that apply the corresponding method of AnnData objects in the dictionary.
-        
-    fapply(func, kwargs) Applies the provided function func with additional arguments kwargs to each AnnData object in the dictionary.
-    
-    Attributes:
-    Inherits attributes from the built-in dict class.
 
+    This class provides two main functionalities:
+    1. It behaves like an AnnData object by passing each method through to each AnnData in the dictionary.
+    2. It has a method fapply(func, kwargs) that applies a given function func with arguments kwargs to each AnnData object in the dictionary.
     """
+
+    def __init__(self, data=None, hierarchy=None):
+        """
+        Initialize the AdataDict with data and hierarchy.
+
+        :param data: Dictionary with keys as tuples of indices.
+        :param hierarchy: Tuple or list indicating the order of indices.
+        """
+        if data is None:
+            data = {}
+        super().__init__(data)  # Initialize the dict with data
+        if hierarchy is not None:
+            self._hierarchy = tuple(hierarchy)  # Tuple indicating the index hierarchy
+        else:
+            self._hierarchy = ()
+
+    def flatten(self, parent_key=()):
+        flat_data = {}
+        for key, value in self.items():
+            full_key = parent_key + key
+            if isinstance(value, AdataDict):
+                flat_data.update(value.flatten(parent_key=full_key))
+            else:
+                flat_data[full_key] = value
+        return flat_data
+
+    def flatten_nesting_list(self, nesting_list):
+        """
+        Flatten a nested list or tuple into a single list.
+
+        :param nesting_list: Nested list or tuple of hierarchy levels.
+        :return: Flattened list of hierarchy elements.
+        """
+        hierarchy = []
+        for item in nesting_list:
+            if isinstance(item, (list, tuple)):
+                hierarchy.extend(self.flatten_nesting_list(item))
+            else:
+                hierarchy.append(item)
+        return hierarchy
+
+    def get_levels(self, nesting_list, levels=None, depth=0):
+        """
+        Get the levels of hierarchy based on the nesting structure.
+
+        :param nesting_list: Nested list indicating the new hierarchy structure.
+        :param levels: List to store the levels.
+        :param depth: Current depth in recursion.
+        :return: List of levels with hierarchy elements.
+        """
+        if levels is None:
+            levels = []
+        if len(levels) <= depth:
+            levels.append([])
+        for item in nesting_list:
+            if isinstance(item, list):
+                self.get_levels(item, levels, depth + 1)
+            else:
+                levels[depth].append(item)
+        return levels
+
+    def set_hierarchy(self, nesting_list):
+        """
+        Rearrange the hierarchy of AdataDict based on the provided nesting structure.
+
+        :param nesting_list: Nested list indicating the new hierarchy structure.
+        """
+
+        # Flatten the nested data
+        flat_data = self.flatten()
+        self.clear()
+        self.update(flat_data)
+        
+        # Flatten and extract the current hierarchy
+        self._hierarchy = tuple(self.flatten_nesting_list(self._hierarchy))
+        
+        # Flatten the new hierarchy
+        new_hierarchy = self.flatten_nesting_list(nesting_list)
+        
+        # Get the levels of the nesting structure
+        levels = self.get_levels(nesting_list)
+        old_hierarchy = self._hierarchy
+
+        # Function to recursively create nested AdataDicts
+        def create_nested_adata_dict(current_level, key_indices, value, level_idx):
+            if level_idx == len(levels):
+                return value  # Base case: return the value (AnnData object)
+            level = levels[level_idx]
+            level_length = len(level)
+            level_key = tuple(key_indices[:level_length])
+            remaining_key_indices = key_indices[level_length:]
+            if level_key not in current_level:
+                # Remaining hierarchy for nested AdataDict
+                remaining_hierarchy = levels[level_idx + 1 :] if level_idx + 1 < len(levels) else []
+                current_level[level_key] = AdataDict(hierarchy=remaining_hierarchy)
+            # Recurse into the next level
+            nested_dict = current_level[level_key]
+            nested_value = create_nested_adata_dict(nested_dict, remaining_key_indices, value, level_idx + 1)
+            if level_idx == len(levels) - 1:
+                # At the last level, set the value
+                current_level[level_key] = nested_value
+            return current_level
+
+        # Start building the new nested AdataDict
+        new_data = AdataDict(hierarchy=new_hierarchy)
+        for key, value in flat_data.items():
+            # Map old indices to their values
+            index_map = dict(zip(old_hierarchy, key))
+            # Arrange indices according to the new hierarchy
+            new_key_indices = [index_map[h] for h in new_hierarchy]
+            # Recursively build the nested structure
+            create_nested_adata_dict(new_data, new_key_indices, value, 0)
+
+        # Update the hierarchy and data
+        self._hierarchy = to_nested_tuple(nesting_list)  # Update with the nested structure
+        # Replace the existing data in self with new_data
+        self.clear()
+        self.update(new_data)
+
+    def __getitem__(self, key):
+        # Simplify access by converting non-tuple keys to tuple
+        if not isinstance(key, tuple):
+            key = (key,)
+        return super().__getitem__(key)
+
+    def __setitem__(self, key, value):
+        # Simplify setting by converting non-tuple keys to tuple
+        if not isinstance(key, tuple):
+            key = (key,)
+        super().__setitem__(key, value)
+
     def __getattr__(self, attr):
         def method(*args, **kwargs):
             results = {}
             for key, adata in self.items():
-                func = getattr(adata, attr)
-                results[key] = func(*args, **kwargs)
+                if isinstance(adata, AdataDict):
+                    # Recurse into nested AdataDict
+                    results[key] = getattr(adata, attr)(*args, **kwargs)
+                else:
+                    func = getattr(adata, attr)
+                    results[key] = func(*args, **kwargs)
             return results
         return method
-    
+
     def fapply(self, func, **kwargs):
         results = {}
         for key, adata in self.items():
-            results[key] = func(adata, **kwargs)
+            if isinstance(adata, AdataDict):
+                # Recurse into nested AdataDict
+                results[key] = adata.fapply(func, **kwargs)
+            else:
+                results[key] = func(adata, **kwargs)
         return results
+
 
 
 def apply_func(adt_key, adata, func, accepts_key, max_retries, **func_args):
@@ -182,7 +324,7 @@ def apply_func_return(adt_key, adata, func, accepts_key, max_retries, **func_arg
                 return f"Error: {e}"  # Optionally, return None or raise an error
 
 
-def adata_dict_fapply_return(adata_dict, func, use_multithreading=True, num_workers=None, max_retries=0, **kwargs_dicts):
+def adata_dict_fapply_return(adata_dict, func, use_multithreading=True, num_workers=None, max_retries=0, return_as_adata_dict=False, **kwargs_dicts):
     """
     Applies a given function to each AnnData object in the adata_dict, with error handling,
     retry mechanism, and the option to use either threading or sequential execution. Returns
@@ -202,6 +344,11 @@ def adata_dict_fapply_return(adata_dict, func, use_multithreading=True, num_work
     sig = inspect.signature(func)
     accepts_key = 'adt_key' in sig.parameters
     results = {}
+
+    if return_as_adata_dict:
+        # if not isinstance(adata_dict, AdataDict):
+        #     raise ValueError("You cannot return as class AdataDict if input is not already of class AdataDict")
+        hierarchy = adata_dict._hierarchy if hasattr(adata_dict, '_hierarchy') else ()
 
     def get_arg_value(arg_value, adt_key):
         if isinstance(arg_value, dict):
@@ -241,6 +388,9 @@ def adata_dict_fapply_return(adata_dict, func, use_multithreading=True, num_work
             except Exception as e:
                 print(f"Unhandled error processing {adt_key}: {e}")
                 results[adt_key] = None  # Optionally, return None or handle differently
+
+    if return_as_adata_dict:
+        results = AdataDict(results, hierarchy)
 
     return results
 
@@ -343,24 +493,242 @@ def check_and_create_strata(adata, strata_keys):
     return strata_key
 
 
-def read_adata_dict(paths, keys=None):
+def write_adata_dict(adata_dict, directory, file_prefix=""):
+    """
+    Saves each AnnData object from an AdataDict into separate .h5ad files,
+    creating a directory structure that reflects the hierarchy of the AdataDict,
+    using key values as directory names. The hierarchy is saved in a file
+    'adata_dict.hierarchy' in the top-level directory.
+
+    Parameters:
+    - adata_dict: An instance of AdataDict.
+    - directory: String, base directory where .h5ad files will be saved.
+    - file_prefix: String, optional prefix for the filenames.
+
+    The directory structure uses key values as directory names, and the full key tuple
+    as the filename of the h5ad file.
+
+    Example:
+    If the hierarchy is ('species', 'tissue', 'cell_type') and keys are ('human', 'brain', 'neuron'),
+    the files will be saved in 'directory/human/brain/neuron/' with filenames like 'human_brain_neuron.h5ad'.
+
+    Additionally, a file named 'adata_dict.hierarchy' is saved in the top-level directory,
+    containing the hierarchy information.
+    """
+
+    # Create the base directory, throwing error if it exists already (to avoid overwriting)
+    os.makedirs(directory, exist_ok=False)
+
+    # Save the hierarchy to a file in the top-level directory
+    hierarchy_file_path = os.path.join(directory, 'adata_dict.hierarchy')
+    with open(hierarchy_file_path, 'w') as f:
+        # Save the hierarchy using JSON for easy reconstruction
+        json.dump(adata_dict._hierarchy, f)
+
+    # Flatten the AdataDict to get all AnnData objects with their keys
+    flat_dict = adata_dict.flatten()
+
+    # Iterate over the flattened dictionary and save each AnnData object
+    for key, adata in flat_dict.items():
+        # Build the path according to the key values (without hierarchy names)
+        path_parts = [directory] + [str(k) for k in key]
+        # Create the directory path
+        dir_path = os.path.join(*path_parts)
+        os.makedirs(dir_path, exist_ok=True)
+        # Construct the filename using the full key tuple
+        filename = f"{file_prefix}{'_'.join(map(str, key))}.h5ad"
+        file_path = os.path.join(dir_path, filename)
+        # Save the AnnData object
+        sc.write(file_path, adata)
+
+def read(directory_list, keys=None):
+    """
+    Takes a list of strings, which can be directories or file paths.
+    For each directory, if a .hierarchy file is found in the directory, it processes that directory with read_adata_dict.
+    Otherwise, processes the highest-level directory with read_h5ad_to_adata_dict.
+    The directories that contain .hierarchy files and the subdirectories of a directory that contains .hierarchy files are not processed with read_h5ad_to_adata_dict.
+
+    Parameters:
+    - directory_list: List of strings, paths to directories or .h5ad files.
+    - keys: a list of strings that will be the keys for the dictionary
+
+    Returns:
+    - A combined dictionary of AnnData objects.
+    """
+    adata_dict = {}
+
+    # Set to keep track of directories that have been processed with read_adata_dict
+    hierarchy_dirs = set()
+
+    # List to collect .h5ad files to process
+    h5ad_files = []
+
+    # Function to find all directories containing adata_dict.hierarchy files
+    def find_hierarchy_dirs(dir_path):
+        for root, dirs, files in os.walk(dir_path):
+            if 'adata_dict.hierarchy' in files:
+                hierarchy_dirs.add(root)
+                # Do not traverse subdirectories of directories with hierarchy files
+                dirs[:] = []
+            else:
+                # Continue traversing subdirectories
+                pass
+
+    # First, process the input paths to find hierarchy directories and collect .h5ad files
+    for path in directory_list:
+        if os.path.isfile(path):
+            if path.endswith('.h5ad'):
+                h5ad_files.append(path)
+        elif os.path.isdir(path):
+            # Find hierarchy directories
+            find_hierarchy_dirs(path)
+        else:
+            raise ValueError(f"Path {path} is neither a file nor a directory.")
+
+    # Process directories with hierarchy files using read_adata_dict
+    for h_dir in hierarchy_dirs:
+        adata_dict.update(read_adata_dict(h_dir))
+
+    # Build a set of directories to exclude (hierarchy_dirs and their subdirectories)
+    exclude_dirs = set()
+    for h_dir in hierarchy_dirs:
+        for root, dirs, files in os.walk(h_dir):
+            exclude_dirs.add(root)
+
+    # Function to collect .h5ad files not under exclude_dirs
+    def collect_h5ad_files(dir_path):
+        for root, dirs, files in os.walk(dir_path):
+            # Skip directories under exclude_dirs
+            if any(os.path.commonpath([root, excl_dir]) == excl_dir for excl_dir in exclude_dirs):
+                dirs[:] = []
+                continue
+            for file in files:
+                if file.endswith('.h5ad'):
+                    h5ad_files.append(os.path.join(root, file))
+
+    # Collect .h5ad files from directories not containing hierarchy files
+    for path in directory_list:
+        if os.path.isdir(path):
+            collect_h5ad_files(path)
+
+    # Process the collected .h5ad files using read_h5ad_to_adata_dict
+    if h5ad_files:
+        adata_dict.update(read_h5ad_to_adata_dict(h5ad_files,keys=keys))
+
+    return adata_dict
+
+
+def read_adata_dict(directory):
+    """
+    Reads the AdataDict from the specified directory, reconstructing
+    the hierarchy and loading all AnnData objects. Returns an instance
+    of AdataDict with the hierarchy attribute set.
+
+    Parameters:
+    - directory: String, base directory where the .h5ad files and hierarchy file are located.
+
+    Returns:
+    - An instance of AdataDict reconstructed from the saved files.
+    """
+
+    # Read the hierarchy from the file
+    hierarchy_file_path = os.path.join(directory, 'adata_dict.hierarchy')
+    with open(hierarchy_file_path, 'r') as f:
+        hierarchy = to_nested_tuple(json.load(f)) #tuples will be converted to lists on write, so need to convert back to tuple on load
+
+    # Initialize an empty AdataDict with the hierarchy
+    adata_dict = AdataDict(hierarchy=hierarchy)
+
+    # Function to recursively rebuild the nested AdataDict
+    def add_to_adata_dict(current_dict, key_tuple, adata):
+        """
+        Recursively adds the AnnData object to the appropriate place in the nested AdataDict.
+
+        Parameters:
+        - current_dict: The current level of AdataDict.
+        - key_tuple: Tuple of key elements indicating the path.
+        - adata: The AnnData object to add.
+        """
+        if len(key_tuple) == 1:
+            current_dict[key_tuple[0]] = adata
+        else:
+            key = key_tuple[0]
+            if key not in current_dict:
+                current_dict[key] = AdataDict(hierarchy=hierarchy[1:])
+            add_to_adata_dict(current_dict[key], key_tuple[1:], adata)
+
+    # Walk through the directory structure
+    for root, dirs, files in os.walk(directory):
+        # Skip the top-level directory where the hierarchy file is located
+        relative_path = os.path.relpath(root, directory)
+        if relative_path == '.':
+            continue
+        for file in files:
+            if file.endswith('.h5ad'):
+                # Reconstruct the key from the directory path
+                path_parts = relative_path.split(os.sep)
+                key_elements = path_parts
+                # Remove empty strings (if any)
+                key_elements = [k for k in key_elements if k]
+                key = tuple(key_elements)
+                # Read the AnnData object
+                file_path = os.path.join(root, file)
+                adata = sc.read(file_path)
+                # Add to the AdataDict
+                add_to_adata_dict(adata_dict, key, adata)
+
+    return adata_dict
+
+
+
+# def write_h5ad_adata_dict(adata_dict, directory, file_prefix=""):
+#     """
+#     Saves each AnnData object from adata_dict into separate .h5ad files.
+
+#     Parameters:
+#     - adata_dict: Dictionary of AnnData objects, with keys as identifiers.
+#     - directory: String, directory path where .h5ad files will be saved.
+#     - file_prefix: String, optional prefix for the filenames.
+
+#     Example:
+#     - If ``file_prefix`` is ``experiment1_``, files will be named ``experiment1_group1.h5ad`` for a key ``group1``.
+#     """
+#     # Ensure the directory exists, create if it doesn't
+#     os.makedirs(directory, exist_ok=True)
+
+#     # Iterate over the dictionary and save each AnnData object
+#     for key, adata in adata_dict.items():
+#         # Construct the file path
+#         file_path = os.path.join(directory, f"{file_prefix}{key}.h5ad")
+#         # Save the AnnData object
+#         sc.write(file_path, adata)
+
+
+def read_h5ad_to_adata_dict(paths, keys=None):
     """
     Reads .h5ad files from a list of paths and returns them in a dictionary.
     For each element in the provided list of paths, if the element is a directory,
     it reads all .h5ad files in that directory. If the element is an .h5ad file,
-    it reads the file directly. The results are returned as a dictionary with
-    keys generated by generate_file_key() or fallback to "ad1", "ad2", ... if
-    generate_file_key() fails, or uses provided keys if given.
+    it reads the file directly. 
+    
+    For auto-generated keys, if there are duplicate filenames, the function will 
+    include parent directory names from right to left until keys are unique.
+    For example, 'dat/heart/fibroblast.h5ad' would generate the key ('heart', 'fibroblast')
+    if disambiguation is needed.
 
     Parameters:
     paths (list): A list of paths to directories or .h5ad files.
-    keys (list, optional): A list of strings to use as keys for the adata_dict. If provided, must be equal in length to the number of .h5ad files read.
+    keys (list, optional): A list of strings to use as keys for the adata_dict. 
+                          If provided, must be equal in length to the number of .h5ad files read.
 
     Returns:
-    dict: A dictionary with keys as specified or generated, and values as AnnData objects.
+    dict: A dictionary with tuple keys and AnnData objects as values.
     """
+    import os
+    import anndata as ad
+    from collections import Counter
+
     adata_dict = {}
-    count = 1
     file_paths = []
 
     # First, collect all file paths
@@ -373,20 +741,49 @@ def read_adata_dict(paths, keys=None):
             file_paths.append(path)
 
     # Check if provided keys match the number of files
-    if keys is not None and len(keys) != len(file_paths):
-        raise ValueError(f"Number of provided keys ({len(keys)}) does not match the number of .h5ad files ({len(file_paths)})")
-
-    # Now process the files
-    for i, file_path in enumerate(file_paths):
-        if keys is not None:
-            key = keys[i]
-        else:
-            key = attempt_ai_integration(generate_file_key, lambda: f"ad{count}", file_path)
+    if keys is not None:
+        if len(keys) != len(file_paths):
+            raise ValueError(f"Number of provided keys ({len(keys)}) does not match the number of .h5ad files ({len(file_paths)})")
+        # Check for uniqueness in provided keys
+        key_counts = Counter(keys)
+        duplicates = [k for k, v in key_counts.items() if v > 1]
+        if duplicates:
+            raise ValueError(f"Duplicate keys found: {duplicates}")
+        # Convert provided keys to tuples
+        tuple_keys = [tuple(k) if isinstance(k, (list, tuple)) else (k,) for k in keys]
+    else:
+        # Generate keys from paths
+        base_names = [os.path.splitext(os.path.basename(fp))[0] for fp in file_paths]
         
-        adata_dict[key] = ad.read_h5ad(file_path)
-        count += 1
+        # Start with just the base names
+        tuple_keys = [(name,) for name in base_names]
+        
+        # Keep extending paths to the left until all keys are unique
+        while len(set(tuple_keys)) != len(tuple_keys):
+            new_tuple_keys = []
+            for i, file_path in enumerate(file_paths):
+                path_parts = os.path.normpath(file_path).split(os.sep)
+                # Find the current key's elements in the path
+                current_key = tuple_keys[i]
+                current_idx = len(path_parts) - 1 - len(current_key)  # -1 for zero-based index
+                # Add one more path element to the left if possible
+                if current_idx > 0:
+                    new_key = (path_parts[current_idx - 1],) + current_key
+                else:
+                    new_key = current_key
+                new_tuple_keys.append(new_key)
+            tuple_keys = new_tuple_keys
+            
+            # Safety check - if we've used all path components and still have duplicates
+            if all(len(key) == len(os.path.normpath(fp).split(os.sep)) for key, fp in zip(tuple_keys, file_paths)):
+                raise ValueError("Unable to create unique keys even using full paths")
+
+    # Process the files with the finalized tuple keys
+    for i, file_path in enumerate(file_paths):
+        adata_dict[tuple_keys[i]] = ad.read_h5ad(file_path)
 
     return adata_dict
+
 
 def build_adata_dict(adata, strata_keys, desired_strata=None):
     """
@@ -395,9 +792,10 @@ def build_adata_dict(adata, strata_keys, desired_strata=None):
     Parameters:
     adata (AnnData): Annotated data matrix.
     strata_keys (list of str): List of column names in `adata.obs` to use for stratification.
-    desired_strata (list or dict, optional): List of desired strata values or a dictionary where keys are strata keys and values are lists of desired strata values. If None (Default), all combinations of categories in adata.obs[strata_keys] will be used.
+    desired_strata (list or dict, optional): List of desired strata tuples or a dictionary where keys are strata keys and values are lists of desired strata values. If None (Default), all combinations of categories in adata.obs[strata_keys] will be used.
+
     Returns:
-    dict: Dictionary where keys are strata values and values are corresponding AnnData subsets.
+    dict: Dictionary where keys are strata tuples and values are corresponding AnnData subsets.
 
     Raises:
     ValueError: If `desired_strata` is neither a list nor a dictionary of lists.
@@ -405,90 +803,65 @@ def build_adata_dict(adata, strata_keys, desired_strata=None):
     if desired_strata is None:
         # Generate all combinations of categories in adata.obs[strata_keys]
         all_categories = [adata.obs[key].cat.categories.tolist() for key in strata_keys]
-        all_combinations = itertools.product(*all_categories)
-        desired_strata = ['_'.join(map(str, comb)) for comb in all_combinations]
+        all_combinations = list(itertools.product(*all_categories))
+        desired_strata = all_combinations
         return build_adata_dict_main(adata, strata_keys, desired_strata, print_missing_strata=False)
-    
+
     elif isinstance(desired_strata, list):
-        # Directly use the list of strata
+        # Ensure that desired_strata is a list of tuples
+        if all(isinstance(item, str) for item in desired_strata):
+            raise ValueError("desired_strata should be a list of tuples, not strings.")
         return build_adata_dict_main(adata, strata_keys, desired_strata)
-    
+
     elif isinstance(desired_strata, dict):
         # Generate all combinations of desired strata values across strata_keys
         all_combinations = itertools.product(*(desired_strata[key] for key in strata_keys))
-        # Convert tuples of combinations to a format suitable for strata_keys
-        combined_strata_list = ['_'.join(map(str, comb)) for comb in all_combinations]
-        return build_adata_dict_main(adata, strata_keys, combined_strata_list)
-    
+        desired_strata = list(all_combinations)
+        return build_adata_dict_main(adata, strata_keys, desired_strata)
+
     else:
-        raise ValueError("desired_strata must be either a list or a dictionary of lists")
+        raise ValueError("desired_strata must be either a list of tuples or a dictionary of lists")
 
-
-# def build_adata_dict_main(adata, strata_keys, desired_strata, print_missing_strata=True):
-#     """
-#     Main function to build a dictionary of AnnData objects based on desired strata values.
-
-#     Parameters:
-#     adata (AnnData): Annotated data matrix.
-#     strata_keys (list of str): List of column names in `adata.obs` to use for stratification.
-#     desired_strata (list of str): List of desired strata values.
-
-#     Returns:
-#     dict: Dictionary where keys are strata values and values are corresponding AnnData subsets.
-#     """
-#     # Check and create stratifying variable in adata
-#     strata_key = check_and_create_strata(adata, strata_keys)
-#     # Initialize the dictionary to store subsets
-#     subsets_dict = {}
-#     # Filter adata for each desired stratum and add to the dictionary
-#     for stratum in desired_strata:
-#         if stratum in adata.obs[strata_key].cat.categories:
-#             subset = adata[adata.obs[strata_key] == stratum].copy()
-#             subsets_dict[stratum] = subset
-#         else:
-#             if print_missing_strata:
-#                 print(f"Warning: '{stratum}' is not a valid category in '{strata_key}'.")
-#     return AdataDict(subsets_dict)
 
 def build_adata_dict_main(adata, strata_keys, desired_strata, print_missing_strata=True):
     """
     Optimized function to build a dictionary of AnnData objects based on desired strata values.
-    
+
     Parameters:
     adata (AnnData): Annotated data matrix.
     strata_keys (list of str): List of column names in `adata.obs` to use for stratification.
-    desired_strata (list of str): List of desired strata values.
-    
+    desired_strata (list of tuples): List of desired strata tuples.
+
     Returns:
-    dict: Dictionary where keys are strata values and values are corresponding AnnData subsets.
+    dict: Dictionary where keys are strata tuples and values are corresponding AnnData subsets.
     """
-    # Check and create stratifying variable in adata
-    strata_key = check_and_create_strata(adata, strata_keys)
-    
-    # Ensure the strata column is categorical
-    if not pd.api.types.is_categorical_dtype(adata.obs[strata_key]):
-        adata.obs[strata_key] = adata.obs[strata_key].astype('category')
-    
-    # Get all categories, including those without observations
-    categories = adata.obs[strata_key].cat.categories
-    
-    # Group indices by category for efficient access
-    groups = adata.obs.groupby(strata_key, observed=False).indices
-    
+    # Ensure that the strata columns are categorical
+    for key in strata_keys:
+        if not pd.api.types.is_categorical_dtype(adata.obs[key]):
+            adata.obs[key] = adata.obs[key].astype('category')
+
+    # Group indices by combinations of strata_keys for efficient access
+    groups = adata.obs.groupby(strata_keys, observed=False).indices
+
+    # Adjust group keys to always be tuples
+    if len(strata_keys) == 1:
+        groups = { (k,): v for k,v in groups.items() }
+
     # Initialize the dictionary to store subsets
-    subsets_dict = {}
-    
-    # Iterate over desired strata and extract subsets
+    adata_dict = {}
+
+    # Iterate over desired strata (tuples) and extract subsets
     for stratum in desired_strata:
-        if stratum in categories:
-            # Get indices if the stratum has observations; else, empty list
-            indices = groups.get(stratum, [])
-            subsets_dict[stratum] = adata[indices].copy()
+        if stratum in groups:
+            indices = groups[stratum]
+            adata_dict[stratum] = adata[indices].copy()
         else:
             if print_missing_strata:
-                print(f"Warning: '{stratum}' is not a valid category in '{strata_key}'.")
-    
-    return AdataDict(subsets_dict)
+                print(f"Warning: {stratum} is not a valid combination in {strata_keys}.")
+
+    # Create AdataDict and set hierarchy to strata_keys
+    adata_dict = AdataDict(adata_dict, tuple(strata_keys))
+    return adata_dict
 
 
 def subsplit_adata_dict(adata_dict, strata_keys, desired_strata):
@@ -508,22 +881,32 @@ def subsplit_adata_dict(adata_dict, strata_keys, desired_strata):
     return adata_dict_fapply_return(adata_dict, build_adata_dict, strata_keys=strata_keys, desired_strata=desired_strata)
 
 
-def concatenate_adata_dict(adata_dict, **kwargs):
+def concatenate_adata_dict(adata_dict, new_col_name=None, **kwargs):
     """
     Concatenates all AnnData objects in adata_dict into a single AnnData object.
     If only a single AnnData object is present, returns it as is.
 
     Parameters:
     - adata_dict (dict): Dictionary of AnnData objects with keys as identifiers.
+    - new_col_name (str): If provided, the name of the new column that will store the adata_dict key in .obs of the concatenated adata. Defaults to None.
     - kwargs: Additional keyword arguments for concatenation.
 
     Returns:
-    - AnnData: A single AnnData object or the original AnnData object if only one is provided.
+    - AnnData: A single AnnData object or the original AnnData object if only one is provided. The .obs will contain a new column specifying the key of the adata of origin.
     """
     kwargs.setdefault('join', 'outer')
     kwargs.setdefault('index_unique', None)  # Ensure original indices are kept
 
     adatas = list(adata_dict.values())
+
+    #add the key to the obs to keep track after merging
+    def add_key_to_obs_adata_dict(adata_dict, new_col_name=new_col_name):
+        def add_key_to_obs_adata(adata, new_col_name=new_col_name, adt_key=None):
+            adata.obs[new_col_name] = [adt_key] * adata.n_obs
+        adata_dict_fapply(adata_dict, add_key_to_obs_adata)
+
+    if new_col_name:
+        add_key_to_obs_adata_dict(adata_dict)
     
     if len(adatas) == 1:
         return adatas[0]  # Return the single AnnData object as is
@@ -898,28 +1281,6 @@ def plot_umap_adata_dict(adata_dict, **kwargs):
             print(f"UMAP not computed for adata with key {adt_key}. Please compute UMAP before plotting.")
     adata_dict_fapply(adata_dict, plot_umap, use_multithreading=False, **kwargs)
 
-
-def write_h5ad_adata_dict(adata_dict, directory, file_prefix=""):
-    """
-    Saves each AnnData object from adata_dict into separate .h5ad files.
-
-    Parameters:
-    - adata_dict: Dictionary of AnnData objects, with keys as identifiers.
-    - directory: String, directory path where .h5ad files will be saved.
-    - file_prefix: String, optional prefix for the filenames.
-
-    Example:
-    - If ``file_prefix`` is ``experiment1_``, files will be named ``experiment1_group1.h5ad`` for a key ``group1``.
-    """
-    # Ensure the directory exists, create if it doesn't
-    os.makedirs(directory, exist_ok=True)
-
-    # Iterate over the dictionary and save each AnnData object
-    for key, adata in adata_dict.items():
-        # Construct the file path
-        file_path = os.path.join(directory, f"{file_prefix}{key}.h5ad")
-        # Save the AnnData object
-        sc.write(file_path, adata)
 
 
 def stable_label_adata_dict(adata_dict, feature_key, label_key, classifier_class, max_iterations=100, stability_threshold=0.05, moving_average_length=3, random_state=None, **kwargs):
@@ -1846,3 +2207,91 @@ def plot_grouped_average_adata_dict(adata_dict, label_value):
     plots the grouped average of a value for each group of a label. label_value must be a dictionary of dictionaries. For example, if adata_dict has two anndata with keys 'ad1' and 'ad2', then setting label_value = {'ad1':{'cell_type':'pct_counts_mt'}, 'ad2':{'cell_type':'pct_counts_mt'}} would plot the average of pct_counts_mt for each cell type in the anndata on separate plots for each anndata in adata_dict.
     """
     adata_dict_fapply(adata_dict, plot_grouped_average, label_value=label_value)
+
+
+def annotate_gene_groups_with_ai_biological_process(plot_obj, df, groupby, adt_key=None):
+    """
+    Annotate gene groups on a heatmap with their biological process labels.
+
+    This function adds annotations below the x-axis of a heatmap generated by
+    `sc.pl.rank_genes_groups_heatmap`, labeling gene groups with their associated
+    biological process descriptions from `adt.ai_annotate_biological_process`.
+
+    Parameters
+    ----------
+    plot_obj : dict
+        Output from `sc.pl.rank_genes_groups_heatmap`, containing matplotlib axes,
+        specifically with the key 'heatmap_ax' representing the heatmap axis.
+    df : pandas.DataFrame
+        Output from `adt.ai_annotate_biological_process`, containing gene group information
+        with the following columns:
+            - 'groupby': Identifier for each gene group.
+            - 'top_10_genes': List of gene names in the group.
+            - 'ai_biological_process': Biological process label for the group.
+    adt_key : str, optional
+        An optional key to be printed. Default is None.
+
+    Returns
+    -------
+    None
+    """
+
+    if adt_key:
+        print(adt_key)
+
+    heatmap_ax = plot_obj['heatmap_ax']
+
+    # Get the genes and their positions from the x-axis
+    xticks = heatmap_ax.get_xticks()
+    xlabels = [tick.get_text() for tick in heatmap_ax.get_xticklabels()]
+    gene_positions = {gene: xtick for gene, xtick in zip(xlabels, xticks)}
+
+    group_positions = {}
+    for idx, row in df.iterrows():
+        group = row[groupby]
+        genes_in_group = row['top_10_genes']
+        # Filter genes that are actually in the plot
+        positions = [gene_positions[gene] for gene in genes_in_group if gene in gene_positions]
+        if positions:
+            start_pos = min(positions)
+            end_pos = max(positions)
+            center_pos = (start_pos + end_pos) / 2.0
+            group_positions[group] = {'start': start_pos, 'end': end_pos, 'center': center_pos}
+
+    # Adjust the figure to make space for annotations
+    fig = heatmap_ax.figure
+    bottom_margin = 0.18  # Adjust this value if more space is needed
+    fig.subplots_adjust(bottom=bottom_margin)
+
+    # Annotate each group with the ai_biological_process label
+    for group, pos_dict in group_positions.items():
+        process_label = df.loc[df[groupby] == group, 'ai_biological_process'].values[0]
+        # Wrap the text to fit within the group width
+        # Convert group width from data to display coordinates
+        inv = heatmap_ax.transData.inverted()
+        start_display = heatmap_ax.transData.transform((pos_dict['start'], 0))
+        end_display = heatmap_ax.transData.transform((pos_dict['end'], 0))
+        group_display_width = end_display[0] - start_display[0]
+        # Convert display width to figure coordinates
+        start_fig = fig.transFigure.inverted().transform(start_display)
+        end_fig = fig.transFigure.inverted().transform(end_display)
+        group_fig_width = end_fig[0] - start_fig[0]
+        # Estimate character width in figure coordinates
+        char_width = 0.006  # Adjust this value based on font size and figure size
+        max_chars = int((group_fig_width - 0.15) / char_width)  # Subtract padding
+        max_chars = max(max_chars, 0.5)
+        wrapped_label = textwrap.fill(process_label, width=max_chars)
+        
+        # Get the center position in figure coordinates
+        center_display = heatmap_ax.transData.transform((pos_dict['center'], 0))
+        center_fig = fig.transFigure.inverted().transform(center_display)
+
+        # Place the text below the x-axis labels
+        y_pos = 0.02  # Position in figure coordinates, adjust as needed
+        fig.text(center_fig[0], y_pos, wrapped_label, ha='center', va='top', fontsize=10, fontweight='bold')
+
+    # Redraw the plot to show the annotations
+    fig.canvas.draw()
+
+    plt.figure(plot_obj['gene_groups_ax'].figure)  # Select the figure associated with the heatmap axis
+    plt.show()
