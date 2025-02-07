@@ -27,7 +27,7 @@ dependencies = [
     "scipy==1.14.1",
     "seaborn==0.13.2",
     "matplotlib==3.9.2",
-#    "squidpy==1.6.2", #was 1.6.0
+    # "squidpy==1.6.2", #was 1.6.0
     "harmonypy==0.0.10",
     "langchain==0.2.14",
     "langchain-community==0.2.12",

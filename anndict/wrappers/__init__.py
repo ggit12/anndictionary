@@ -21,14 +21,14 @@ from .scanpy_ import (
 
 )
 
-from .squidpy_ import(
-    compute_spatial_neighbors_adata_dict,
-    perform_colocalization_adata_dict,
-    plot_colocalization_adata_dict,
-    compute_interaction_matrix_adata_dict,
-    plot_interaction_matrix_adata_dict,
+# from .squidpy_ import(
+#     compute_spatial_neighbors_adata_dict,
+#     perform_colocalization_adata_dict,
+#     plot_colocalization_adata_dict,
+#     compute_interaction_matrix_adata_dict,
+#     plot_interaction_matrix_adata_dict,
 
-)
+# )
 
 
 
@@ -76,11 +76,11 @@ __all__ = [
     "plot_umap_adata_dict",
 
     # squidpy_
-    "compute_spatial_neighbors_adata_dict",
-    "perform_colocalization_adata_dict",
-    "plot_colocalization_adata_dict",
-    "compute_interaction_matrix_adata_dict",
-    "plot_interaction_matrix_adata_dict",
+    # "compute_spatial_neighbors_adata_dict",
+    # "perform_colocalization_adata_dict",
+    # "plot_colocalization_adata_dict",
+    # "compute_interaction_matrix_adata_dict",
+    # "plot_interaction_matrix_adata_dict",
 
     # anndictionary_
     "remove_genes_adata_dict",
