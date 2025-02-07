@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "anndict"
-version = "0.3.1.2"
+version = "0.3.1.3"
 description = "Conveniently process a dictionary of anndatas (adata_dict)"
 authors = [
     {name = "ggit12"}
@@ -45,14 +45,17 @@ dependencies = [
 packages = [
     "anndict",
     "anndict.adata_dict",
+    "anndict.wrappers",
+    "anndict.llm",
+    "anndict.plot",
+    "anndict.automated_label_management",
+    "anndict.automated_label_management.clean_single_column",
+    "anndict.utils",
     "anndict.annotate",
     "anndict.annotate.cells",
-    "anndict.annotate.cells.benchmarking",
     "anndict.annotate.cells.de_novo",
+#    "anndict.annotate.cells.error_correction",
+    "anndict.annotate.cells.benchmarking",
     "anndict.annotate.cells.label_transfer",
-    "anndict.annotate.genes",
-    "anndict.automated_label_management",
-    "anndict.llm",
-    "anndict.visualize",
-    "anndict.wrappers"
+    "anndict.annotate.genes"
 ]
