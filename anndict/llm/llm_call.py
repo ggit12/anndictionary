@@ -1,8 +1,8 @@
 # llm_call
 """
-A module for managing interactions with Large Language Models (LLMs) across providers.
-Provides configuration, initialization, and retry mechanisms for making LLM calls
-through a unified interface that works with OpenAI, Google, Anthropic and others.
+Manage interactions with LLMs across providers.
+Provides configuration, initialization, and response processing/retry/fallback mechanisms for making LLM calls
+through a unified interface that works with OpenAI, Anthropic, Amazon Bedrock, Google, and others.
 """
 from functools import wraps
 

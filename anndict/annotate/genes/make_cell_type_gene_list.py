@@ -1,23 +1,33 @@
-#annotate genes
+#make_cell_type_gene_list.py
 """
-This module handles annotation of groups of genes.
+Use LLMs create gene lists for a given cell type (with species awareness). 
+This automates manual curation of these lists. 
 """
 
 from anndict.utils import enforce_semantic_list
 from anndict.llm import call_llm, retry_call_llm, extract_list_from_ai_string
 
 
-def ai_gene_list(cell_type, species, list_length=None):
+def ai_make_cell_type_gene_list(
+    cell_type: str,
+    species: str,
+    list_length: str = None
+    ) -> list[str]:
     """
-    Returns a list of specific marker genes for the input cell_type.
+    Returns a list of specific marker genes for the input ``cell_type``.
 
-    Args:
-        cell_type (str): The cell type to get marker genes for.
-        species (str): The species to consider.
-        list_length (str, optional): if not None, provides a {list_length} list of genes (i.e. very long, short, much shorter, etc.)
+    Parameters
+    ------------
+    cell_type
+        The cell type to get marker genes for.
+    species
+        The species to consider.
+    list_length
+        Qualitative length of the marker gene list. Can be anything like ``'short'`` or ``'long'``. Try ``'long'`` if you are having trouble getting valid genes that are present in your dataset.
 
-    Returns:
-        list: A list of marker genes.
+    Returns
+    --------
+    A list of marker genes.
     """
     # Enforce that cell_type is a semantic string
     enforce_semantic_list([cell_type])

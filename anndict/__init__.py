@@ -24,16 +24,23 @@ from .adata_dict import (
     adata_dict_fapply,
     adata_dict_fapply_return,
 
-    #read_write_build.py
-    read_adata_dict,
-    write_adata_dict,
-    read_adata_dict_from_h5ad,
-    read,
+    # build.py
     build_adata_dict,
     add_stratification,
-    concatenate_adata_dict,
-    check_and_create_stratifier,
 
+    # write.py
+    write_adata_dict,
+
+    #read.py
+    read_adata_dict,
+    read_adata_dict_from_h5ad,
+    read,
+
+    # concatenate.py
+    concatenate_adata_dict,
+
+    # utils.py
+    check_and_create_stratifier,
 )
 
 from .llm import (
@@ -57,7 +64,7 @@ from .annotate import (
 
     # Genes
     #--------
-    ai_gene_list,
+    ai_make_cell_type_gene_list,
 
     # Cells
     #--------
@@ -65,6 +72,7 @@ from .annotate import (
     ai_annotate, ai_annotate_by_comparison,
     ai_cell_type, ai_annotate_cell_type,
     ai_cell_types_by_comparison,
+    ai_annotate_cell_type_by_comparison,
     ai_annotate_cell_sub_type,
     ai_annotate_biological_process,
     cell_type_marker_gene_score,
@@ -82,33 +90,44 @@ from .annotate import (
 )
 
 from .plot import (
-    #cells.py
+    #module_score_plots.py
     module_score_barplot,
     module_score_umap,
 
-    #genes.py
+    #annotate_genes_on_heatmap.py
     annotate_gene_groups_with_ai_biological_process,
 
-    #benchmarking.py
-    plot_training_history,
-    plot_changes,
-    plot_confusion_matrix_from_adata,
-    plot_confusion_matrix,
-    plot_sankey,
-    save_sankey,
+    #agreement_bar_plots
     plot_grouped_average,
     plot_model_agreement,
     plot_model_agreement_categorical,
 
+    #sankey_plots.py
+    plot_sankey,
+    save_sankey,
+
+    #confusion_matrix_plots.py
+    plot_confusion_matrix_from_adata,
+    plot_confusion_matrix,
+
+    #stabilizing_classifier_plots.py
+    plot_training_history,
+    plot_changes,
+
 )
+
 
 from .automated_label_management import (
 
-    #clean_single_column.py
+    #clean single column
+    #--------------------
+    # in_adata_obs.py
     simplify_obs_column,
-    simplify_var_index,
     create_label_hierarchy,
     map_cell_type_labels_to_simplified_set,
+
+    # in_adata_var.py
+    simplify_var_index,
     map_gene_labels_to_simplified_set,
 
     #unify_columns_within_adata.py
@@ -133,16 +152,23 @@ __all__ = [
     "adata_dict_fapply",
     "adata_dict_fapply_return",
 
-    #read_write_build.py
-    "read_adata_dict",
-    "write_adata_dict",
-    "read_adata_dict_from_h5ad",
-    "read",
+    # build.py
     "build_adata_dict",
     "add_stratification",
-    "concatenate_adata_dict",
-    "check_and_create_stratifier",
 
+    # write.py
+    "write_adata_dict",
+
+    #read.py
+    "read_adata_dict",
+    "read_adata_dict_from_h5ad",
+    "read",
+
+    # concatenate.py
+    "concatenate_adata_dict",
+
+    # utils.py
+    "check_and_create_stratifier",
 
     # LLM
     # --------
@@ -163,12 +189,15 @@ __all__ = [
 
     # Annotate
     # -----------
+
+    # Cells
     # De Novo
     "ai_annotate",
     "ai_annotate_by_comparison",
     "ai_cell_type",
     "ai_annotate_cell_type",
     "ai_cell_types_by_comparison",
+    "ai_annotate_cell_type_by_comparison",
     "ai_annotate_cell_sub_type",
     "ai_annotate_biological_process",
     "cell_type_marker_gene_score",
@@ -185,34 +214,47 @@ __all__ = [
     "krippendorff_alpha_adata",
     "ai_compare_cell_type_labels_pairwise",
 
+    # Genes
+    # Make Marker Gene Lists
+    "ai_make_cell_type_gene_list",
 
     # Plot
     # -------
-    # from cells.py
+    # from module_score_plots.py
     "module_score_barplot",
     "module_score_umap",
 
-    # from genes.py
+    # from annotate_genes_on_heatmap.py
     "annotate_gene_groups_with_ai_biological_process",
 
-    # from benchmarking.py
-    "plot_training_history",
-    "plot_changes",
-    "plot_confusion_matrix_from_adata",
-    "plot_confusion_matrix",
-    "plot_sankey",
-    "save_sankey",
+    # from agreement_bar_plots.py
     "plot_grouped_average",
     "plot_model_agreement",
     "plot_model_agreement_categorical",
 
+    # from sankey_plots.py
+    "plot_sankey",
+    "save_sankey",
+
+    # from confusion_matrix_plots.py
+    "plot_confusion_matrix_from_adata",
+    "plot_confusion_matrix",
+
+    # from stabilizing_classifier_plots.py
+    "plot_training_history",
+    "plot_changes",
+
     # Automated Label Management
     # ----------------------------
-    # from clean_single_column.py
+
+    #clean single column
+    # from in_adata_obs.py
     "simplify_obs_column",
-    "simplify_var_index",
     "create_label_hierarchy",
     "map_cell_type_labels_to_simplified_set",
+
+    # from in_adata_var.py
+    "simplify_var_index",
     "map_gene_labels_to_simplified_set",
 
     # from unify_columns_within_adata.py

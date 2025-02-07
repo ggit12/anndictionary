@@ -7,25 +7,58 @@ import warnings
 import pandas as pd
 import scanpy as sc
 
-from anndict.wrappers.anndata_ import convert_obs_col_to_category
+from pandas import DataFrame
+from anndata import AnnData
 
-def ai_annotate(func, adata, groupby, n_top_genes, label_column, tissue_of_origin_col=None, **kwargs):
+from anndict.utils.anndata_ import convert_obs_col_to_category
+
+def ai_annotate(
+    func: callable,
+    adata: AnnData,
+    groupby: str,
+    n_top_genes: int,
+    new_label_column: str,
+    tissue_of_origin_col: str = None,
+    **kwargs,
+) -> DataFrame:
     """
     Annotate clusters based on the top marker genes for each cluster.
 
     This uses marker genes for each cluster and applies func to determine the label for each cluster based on the top n
     marker genes. The results are added to the AnnData object and returned as a DataFrame.
 
-    If rank_genes_groups hasn't been run on the adata, this function will automatically run sc.tl.rank_genes_groups
+    If rank_genes_groups hasn't been run on the adata, this function will automatically run ``sc.tl.rank_genes_groups``
 
-    Parameters:
-    adata : AnnData
-    groupby : str Column in adata.obs to group by for differential expression analysis.
-    n_top_genes : int The number of top marker genes to consider for each cluster.
-    label_column : str The name of the new column in adata.obs where the annotations will be stored.
+    Parameters
+    ------------
+    func
+        A function that takes ``gene_list`` **:** :class:`list` **[** :class:`str` **]** and returns ``annotation`` **:** :class:`str`.
 
-    Returns:
-    pd.DataFrame A DataFrame with a column for the top marker genes for each cluster.
+    adata
+        An :class:`AnnData` object.
+
+    groupby
+        Column in ``adata.obs`` to group by for differential expression analysis.
+
+    n_top_genes
+        The number of top marker genes to consider for each cluster.
+
+    new_label_column
+        The name of the new column in ``adata.obs`` where the annotations will be stored.
+
+    tissue_of_origin_col
+        Name of a column in ``adata.obs`` that contains the tissue of orgin. Used to provide context to the LLM.
+
+    **kwargs
+        additional kwargs passed to ``func``
+
+    Returns
+    ---------
+    A ``pd.DataFrame`` with a column for the top marker genes for each cluster.
+
+    Notes
+    -------
+    This function also modifies the input ``adata`` in place, adding annotations to ``adata.obs[new_label_col]``
     """
     # Ensure the groupby column is categorical
     if not pd.api.types.is_categorical_dtype(adata.obs[groupby]):
@@ -70,52 +103,87 @@ def ai_annotate(func, adata, groupby, n_top_genes, label_column, tissue_of_origi
     # Initialize a list to store the results
     results = []
 
-
     # Loop through each cluster and get the top n marker genes, then get cell type based on these marker genes
     for cluster in clusters:
         # Add tissue to kwargs if tissue_of_origin_col is provided
         if tissue_of_origin_col:
             kwargs['tissue'] = cluster_to_tissue[cluster]
 
-        #Get top n genes
+        # Get top n genes
         top_genes = rank_genes_groups['names'][cluster][:n_top_genes]
 
-        #Get annotation via func
+        # Get annotation via func
         annotation = func(top_genes, **kwargs)
         cell_type_annotations[cluster] = annotation
 
         results.append({
             groupby: cluster,
-            label_column: annotation,
+            new_label_column: annotation,
             f"top_{n_top_genes}_genes": list(top_genes)
         })
 
     # Create a new column in .obs for cell type annotations
-    adata.obs[label_column] = adata.obs[groupby].map(cell_type_annotations)
+    adata.obs[new_label_column] = adata.obs[groupby].map(cell_type_annotations)
 
-    #Convert annotation to categorical dtype
-    convert_obs_col_to_category(adata, label_column)
+    # Convert annotation to categorical dtype
+    convert_obs_col_to_category(adata, new_label_column)
 
     return pd.DataFrame(results)
 
 
-def ai_annotate_by_comparison(func, adata, groupby, n_top_genes, label_column, cell_type_of_origin_col=None, tissue_of_origin_col=None, **kwargs):
+def ai_annotate_by_comparison(
+    func :callable,
+    adata: AnnData,
+    groupby: str,
+    n_top_genes: int,
+    new_label_column: str,
+    cell_type_of_origin_col: str = None,
+    tissue_of_origin_col: str = None,
+    **kwargs,
+) -> DataFrame:
     """
-    Annotate clusters based on the top marker genes for each cluster.
+    Annotate clusters based on the top marker genes for each cluster, in the context of the other clusters' marker genes.
 
     This uses marker genes for each cluster and applies func to determine the label for each cluster based on the top n
     marker genes. The results are added to the AnnData object and returned as a DataFrame.
 
-    If rank_genes_groups hasn't been run on the adata, this function will automatically run sc.tl.rank_genes_groups
+    If rank_genes_groups hasn't been run on the adata, this function will automatically run ``sc.tl.rank_genes_groups``
 
-    Parameters:
-    adata : AnnData
-    groupby : str Column in adata.obs to group by for differential expression analysis.
-    n_top_genes : int The number of top marker genes to consider for each cluster.
-    label_column : str The name of the new column in adata.obs where the annotations will be stored.
+    Parameters
+    -------------
+    func
+        A function that takes ``gene_lists`` **:** :class:`list` **[** :class:`list` **[** :class:`str` **] ]** and
 
-    Returns:
-    pd.DataFrame A DataFrame with a column for the top marker genes for each cluster.
+        returns ``annotations`` **:** :class:`list` **[** :class:`str` **]**, one for each :class:`list` of genes in ``gene_lists``.
+
+    adata
+        An :class:`AnnData` object.
+
+    groupby
+        Column in ``adata.obs`` to group by for differential expression analysis.
+
+    n_top_genes
+        The number of top marker genes to consider for each cluster.
+
+    new_label_column
+        The name of the new column in ``adata.obs`` where the annotations will be stored.
+
+    cell_type_of_origin_col
+        Name of a column in ``adata.obs`` that contains the cell type of orgin. Used for context to the LLM.
+
+    tissue_of_origin_col
+        Name of a column in ``adata.obs`` that contains the tissue of orgin. Used to provide context to the LLM.
+
+    **kwargs
+        additional kwargs passed to ``func``
+
+    Returns
+    --------
+    A ``pd.DataFrame`` with a column for the top marker genes for each cluster.
+
+    Notes
+    -------
+    This function also modifies the input ``adata`` in place, adding annotations to ``adata.obs[new_label_col]``
     """
     # Check if rank_genes_groups has already been run
     if 'rank_genes_groups' not in adata.uns or adata.uns['rank_genes_groups']['params']['groupby'] != groupby:
@@ -141,7 +209,6 @@ def ai_annotate_by_comparison(func, adata, groupby, n_top_genes, label_column, c
     if cell_type_of_origin_col and cell_type_of_origin_col not in adata.obs.columns:
         warnings.warn(f"Cell type of origin column '{cell_type_of_origin_col}' not found in adata.obs, will not consider cell type of origin for annotation.", UserWarning)
         cell_type_of_origin_col = None
-    
 
     # Get mappings of clusters to tissues and cell types
     cluster_to_tissue = {}
@@ -150,7 +217,7 @@ def ai_annotate_by_comparison(func, adata, groupby, n_top_genes, label_column, c
     if tissue_of_origin_col or cell_type_of_origin_col:
         for cluster in clusters:
             mask = adata.obs[groupby] == cluster
-            
+
             # Map the cluster to tissues if tissue_of_origin_col is provided
             if tissue_of_origin_col:
                 cluster_to_tissue[cluster] = adata.obs.loc[mask, tissue_of_origin_col].unique().tolist()
@@ -158,7 +225,6 @@ def ai_annotate_by_comparison(func, adata, groupby, n_top_genes, label_column, c
             # Map the cluster to cell types if cell_type_of_origin_col is provided
             if cell_type_of_origin_col:
                 cluster_to_cell_type[cluster] = adata.obs.loc[mask, cell_type_of_origin_col].unique().tolist()
-
 
     # Create a list of lists for top genes
     top_genes = [list(rank_genes_groups['names'][cluster][:n_top_genes]) for cluster in clusters]
@@ -181,15 +247,14 @@ def ai_annotate_by_comparison(func, adata, groupby, n_top_genes, label_column, c
         cell_type_annotations[cluster] = annotation
         results.append({
             groupby: cluster,
-            label_column: annotation,
+            new_label_column: annotation,
             f"top_{n_top_genes}_genes": top_genes[clusters.index(cluster)]
         })
 
-
     # Create a new column in .obs for cell type annotations
-    adata.obs[label_column] = adata.obs[groupby].map(cell_type_annotations)
+    adata.obs[new_label_column] = adata.obs[groupby].map(cell_type_annotations)
 
-    #Convert annotation to categorical dtype
-    convert_obs_col_to_category(adata, label_column)
+    # Convert annotation to categorical dtype
+    convert_obs_col_to_category(adata, new_label_column)
 
     return pd.DataFrame(results)

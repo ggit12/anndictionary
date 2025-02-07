@@ -17,9 +17,12 @@ from .annotate_cell_type import (
 #cell type annotation methods--by gene list (in the context of other gene lists)
 from .annotate_cell_type_by_comparison import (
     ai_cell_types_by_comparison,
+    ai_annotate_cell_type_by_comparison,
+
 )
 
 from .annotate_cell_subtype import (
+    ai_annotate_cell_type_by_comparison_adata_dict,
     ai_annotate_cell_sub_type,
 )
 
@@ -49,8 +52,11 @@ __all__ = [
 
     # annotate_cell_type_by_comparison.py
     "ai_cell_types_by_comparison",
+    "ai_annotate_cell_type_by_comparison",
+    
 
     # annotate_cell_subtype.py
+    "ai_annotate_cell_type_by_comparison_adata_dict",
     "ai_annotate_cell_sub_type",
 
     # annotate_biological_process.py

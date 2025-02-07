@@ -1,87 +1,71 @@
 """
-This module contains adata_dict wrappers for `squidpy`.
+This module contains adata_dict wrappers for ``squidpy``.
 """
+from functools import wraps
+
 import squidpy as sq
 
-def compute_spatial_neighbors_adata_dict(adata_dict):
-    """
-    Computes spatial neighborhood graphs for each AnnData object in adata_dict.
+from anndict.adata_dict import AdataDict, adata_dict_fapply, adata_dict_fapply_return
 
-    Parameters:
-    adata_dict (dict): A dictionary with keys as strata and values as AnnData objects.
+@wraps(sq.gr.spatial_neighbors)
+def compute_spatial_neighbors_adata_dict(
+    adata_dict: AdataDict,
+    **kwargs
+    ) -> None:
     """
-    for stratum, adata in adata_dict.items():
-        if 'spatial' in adata.obsm:
-            # sq.gr.spatial_neighbors(adata, n_neighs=10)
-            sq.gr.spatial_neighbors(adata)
+    Wrapper for :func:`sq.gr.spatial_neighbors`.
+    """
+    adata_dict_fapply(adata_dict, sq.gr.spatial_neighbors, **kwargs)
+
+@wraps(sq.gr.co_occurrence)
+def perform_colocalization_adata_dict(
+    adata_dict: AdataDict,
+    cluster_key: str = "cell_type",
+    **kwargs
+) -> None:
+    """
+    Wrapper for :func:`sq.gr.co_occurrence`.
+    """
+    adata_dict_fapply(adata_dict, sq.gr.co_occurrence, cluster_key=cluster_key, **kwargs)
+
+@wraps(sq.pl.co_occurrence)
+def plot_colocalization_adata_dict(
+    adata_dict: AdataDict,
+    cluster_key: str = "cell_type",
+    source_cell_type: str | None = None,
+    figsize: tuple[float, float] = (10, 5),
+    **kwargs
+) -> None:
+    """
+    Wrapper for :func:`sq.pl.co_occurrence`.
+    """
+    def plot_coloc(adata, **kwargs):
+        if source_cell_type:
+            # Get matches for the source cell type in the cluster key
+            matches = [ct for ct in adata.obs[cluster_key].unique() if source_cell_type in ct]
+            sq.pl.co_occurrence(adata, cluster_key=cluster_key, clusters=matches, figsize=figsize, **kwargs)
         else:
-            print(f"Spatial coordinates not available for '{stratum}'. Please add spatial data before computing neighbors.")
+            sq.pl.co_occurrence(adata, cluster_key=cluster_key, figsize=figsize, **kwargs)
+    adata_dict_fapply(adata_dict, plot_coloc, use_multithreading=False, **kwargs)
 
-
-def perform_colocalization_adata_dict(adata_dict, cluster_key="cell_type"):
+@wraps(sq.gr.interaction_matrix)
+def compute_interaction_matrix_adata_dict(
+    adata_dict,
+    cluster_key="cell_type",
+    **kwargs
+) -> dict:
     """
-    Performs colocalization analysis for each AnnData object in adata_dict.
-
-    Parameters:
-    adata_dict (dict): A dictionary with keys as strata and values as AnnData objects.
-    cluster_key (str): The key in adata.obs containing the cell type or cluster information.
+    Wrapper for :func:`sq.gr.interaction_matrix`.
     """
-    for stratum, adata in adata_dict.items():
-        if 'spatial' in adata.obsm:
-            sq.gr.co_occurrence(adata, cluster_key=cluster_key)
-        else:
-            print(f"Spatial coordinates not available for '{stratum}'. Please add spatial data before performing colocalization analysis.")
+    return adata_dict_fapply_return(adata_dict, sq.gr.interaction_matrix, cluster_key=cluster_key, **kwargs)
 
-
-def plot_colocalization_adata_dict(adata_dict, cluster_key="cell_type", source_cell_type=None, figsize = (10,5)):
+@wraps(sq.pl.interaction_matrix)
+def plot_interaction_matrix_adata_dict(
+    adata_dict,
+    cluster_key="cell_type",
+    **kwargs
+) -> None:
     """
-    Plots colocalization results for each AnnData object in adata_dict, optionally focusing on a specific source cell type.
-
-    Parameters:
-    adata_dict (dict): A dictionary with keys as strata and values as AnnData objects.
-    cluster_key (str): The key in adata.obs containing the cell type or cluster information.
-    source_cell_type (str, optional): The specific source cell type to focus on in the colocalization plot.
+    Wrapper for :func:`sq.pl.interaction_matrix`.
     """
-    for stratum, adata in adata_dict.items():
-        if 'spatial' in adata.obsm:
-            if source_cell_type:
-                # Get matches for the source cell type in the cluster key
-                matches = [ct for ct in adata.obs[cluster_key].unique() if source_cell_type in ct]
-                sq.pl.co_occurrence(adata, cluster_key=cluster_key, clusters=matches, figsize=figsize)
-            else:
-                sq.pl.co_occurrence(adata, cluster_key=cluster_key, figsize=figsize)
-        else:
-            print(f"Spatial coordinates not available for '{stratum}'. Please add spatial data before plotting colocalization results.")
-
-
-def compute_interaction_matrix_adata_dict(adata_dict, cluster_key="cell_type"):
-    """
-    Computes interaction matrices for each AnnData object in adata_dict.
-
-    Parameters:
-    adata_dict (dict): A dictionary with keys as strata and values as AnnData objects.
-    cluster_key (str): The key in adata.obs containing the cell type or cluster information.
-    """
-    interaction_matrices = {}
-    for stratum, adata in adata_dict.items():
-        if 'spatial' in adata.obsm:
-            interaction_matrix = sq.gr.interaction_matrix(adata, cluster_key=cluster_key, normalized=True)
-            interaction_matrices[stratum] = interaction_matrix
-        else:
-            print(f"Spatial coordinates not available for '{stratum}'. Please add spatial data before computing interaction matrix.")
-    return interaction_matrices
-
-def plot_interaction_matrix_adata_dict(adata_dict, cluster_key="cell_type"):
-    """
-    Plots interaction matrices for each AnnData object in adata_dict.
-
-    Parameters:
-    adata_dict (dict): A dictionary with keys as strata and values as AnnData objects.
-    cluster_key (str): The key in adata.obs containing the cell type or cluster information.
-    """
-    for stratum, adata in adata_dict.items():
-        print(stratum)
-        if 'spatial' in adata.obsm:
-            sq.pl.interaction_matrix(adata, cluster_key=cluster_key)
-        else:
-            print(f"Spatial coordinates not available for '{stratum}'. Please add spatial data before plotting interaction matrix.")
+    adata_dict_fapply(adata_dict, sq.pl.interaction_matrix, cluster_key=cluster_key, use_multithreading=False, **kwargs)

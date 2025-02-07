@@ -7,15 +7,23 @@ This module contains the core functions of AnnDictionary. This includes:
 
 """
 
-from .adata_dict import (  # type: ignore
-    AdataDict,
+from .adata_dict_utils import (  # type: ignore
     to_nested_tuple,
     to_nested_list,
+    set_var_index_func,
+    set_obs_index_func
+
 )
 
 from .adata_dict_fapply import (  # type: ignore
     adata_dict_fapply,
     adata_dict_fapply_return,
+
+)
+
+from .adata_dict import (  # type: ignore
+    AdataDict,
+
 )
 
 from .read import (  # type: ignore
@@ -27,12 +35,14 @@ from .read import (  # type: ignore
 
     #a catch all to read h5ads and AdataDicts all in one go
     read,
+
 )
 
 
 from .write import (  # type: ignore
     #write AdataDict class
     write_adata_dict,
+
 )
 
 

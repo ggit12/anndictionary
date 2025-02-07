@@ -1,35 +1,38 @@
 """
 LLM Configuration Module
+=========================
 
-This module handles the configuration and initialization of different LLM providers through 
+This module handles the configuration and use of LLMs from different providers through 
 a unified interface. It manages provider configurations, initialization strategies, and 
 rate limiting for each supported LLM provider.
 
 The module supports dynamic configuration of various LLM backends including:
-- OpenAI
-- Anthropic
-- AWS Bedrock
-- Google AI
-- Azure OpenAI
-- Azure ML endpoints
-- Cohere
-- HuggingFace
-- Vertex AI
-- Ollama
-
-Each provider can be configured with custom initialization parameters, rate limits,
-and provider-specific settings. The module handles environment variable management,
-provider-specific initializations, and maintains consistent interfaces across providers.
+    - OpenAI
+    - Anthropic
+    - AWS Bedrock
+    - Google AI
+    - Azure OpenAI
+    - Azure ML endpoints
+    - Cohere
+    - HuggingFace
+    - Vertex AI
+    - Ollama
 
 Key Components:
-- Provider configuration using dataclasses
-- Abstract base classes for provider initialization
-- Rate limiting configuration
-- Environment variable management
-- Provider-specific initialization strategies
+    - Provider configuration using dataclasses
+        - Provider-specific initialization strategies
+        - Abstract base classes for provider initialization
+    - LLM calling with
+        - retry logic
+        - rate limiting
+        - customizable response processing and failure handling
 
-The module is used internally by the anndict package and shouldn't be imported directly
+
+The module is used internally by ``AnnDictionary`` shouldn't generally be imported directly
 by end users. Instead, use the main package interface:
+
+.. code-block:: python
+
     import anndict as adt
     adt.configure_llm_backend(...)
 """

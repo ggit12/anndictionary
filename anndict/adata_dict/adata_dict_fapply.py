@@ -1,10 +1,17 @@
 """
 This module contains the adata_dict_fapply family of functions, the core functions of Anndictionary.
 """
+from __future__ import annotations #allows type hinting without circular dependency
 
 import inspect
+
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from .adata_dict import AdataDict
+
+from typing import TYPE_CHECKING
+from typing import Any
+
+if TYPE_CHECKING:
+    from .adata_dict import AdataDict
 
 
 def apply_func(adt_key, adata, func, accepts_key, max_retries, **func_args):
@@ -33,19 +40,23 @@ def adata_dict_fapply(
     use_multithreading: bool = True,
     num_workers: int | None = None,
     max_retries: int = 0,
-    **kwargs_dicts: dict,
+    **kwargs_dicts: Any,
 ) -> None:
     """
-    Applies a given function to each AnnData object in the ``adata_dict``, with error handling,
-    a retry mechanism, and the option to use either multithreading or sequential execution.
+    Applies ``func`` to each :class:`AnnData` in ``adata_dict``, with error handling,
+    a retry mechanism, and the option to use either multithreaded or sequential execution. 
+
+    ``kwargs`` can be :class:`Any`. if a ``kwarg`` is a :class:`dict` with keys that match ``adata_dict``, 
+    then values are broadcast to the ``func`` call on the corresponding key-value of ``adata_dict``. Otherwise, 
+    the kwarg is directly broadcast to all calls of ``func``.
 
     Parameters
     ------------
     adata_dict
-        An object of class :class:`AdataDict`.  
+        An :class:`AdataDict`.  
 
     func
-        Function to apply to each AnnData object in the dictionary.
+        Function to apply to each :class:`AnnData` object in ``adata_dict``.
 
     use_multithreading
         If True, use ``ThreadPoolExecutor``; if False, execute sequentially. Default is True.
@@ -54,16 +65,14 @@ def adata_dict_fapply(
         Number of worker threads to use. If :obj:`None`, defaults to the number of CPUs available.
 
     max_retries
-        Maximum number of retries for a failed task. Default is 3.
+        Maximum number of retries for a failed task. Default is 0.
 
     kwargs_dicts
-        Additional keyword arguments to pass to the function.
+        Additional keyword arguments to pass to the function. If the dtype of a kwarg is :class:`dict`, then the keys are checked 
 
     Returns
     -------
-    None
-        ``adata_dict_fapply`` applies ``func`` to each item in ``adata_dict``,
-        potentially modifying the AnnData objects in place.
+    ``adata_dict_fapply`` applies ``func`` to each item in ``adata_dict``, potentially modifying the AnnData objects in place.
     """
 
     sig = inspect.signature(func)
@@ -152,24 +161,37 @@ def adata_dict_fapply_return(
     **kwargs_dicts: dict,
 ) -> dict | AdataDict:
     """
-    Applies a given function to each AnnData object in the adata_dict, with error handling,
-    retry mechanism, and the option to use either threading or sequential execution. Returns
-    a dictionary with the results of the function applied to each AnnData object.
+    Same as ``fapply``, additionally returning the results of ``func``.
+
+    Applies ``func`` to each :class:`AnnData` in ``adata_dict``, with error handling,
+    retry mechanism, and the option to use either threading or sequential execution. 
+    ``kwargs`` can be :class:`Any`. if a ``kwarg`` is a :class:`dict` with keys that match ``adata_dict``, 
+    then values are broadcast to the ``func`` call on the corresponding key-value of ``adata_dict``. Otherwise, 
+    the kwarg is directly broadcast to all calls of ``func``.
 
     Parameters
     -------------
     adata_dict
-        Dictionary of AnnData objects with keys as identifiers.
+        An :class:`AdataDict`.  
+
     func
-        Function to apply to each AnnData object in the dictionary.
+        Function to apply to each :class:`AnnData` object in ``adata_dict``.
+
     use_multithreading
-        If True, use ThreadPoolExecutor; if False, execute sequentially.
+        If True, use ``ThreadPoolExecutor``; if False, execute sequentially. Default is True.
+
     num_workers
-        Number of worker threads to use (default: number of CPUs available).
+        Number of worker threads to use. If :obj:`None`, defaults to the number of CPUs available.
+
     max_retries
-        Maximum number of retries for a failed task.
+        Maximum number of retries for a failed task. Default is 0.
+
+    return_as_adata_dict
+        Whether to return the results as a :class:`dict` (if ``False``) or :class:`AdataDict` (if ``True``).
+
     kwargs_dicts
         Additional keyword arguments to pass to the function.
+
 
     Returns
     ----------
@@ -242,6 +264,8 @@ def adata_dict_fapply_return(
                 results[adt_key] = None  # Optionally, return None or handle differently
 
     if return_as_adata_dict:
+        #Need local import to avoid circular dependency
+        from .adata_dict import AdataDict # pylint: disable=import-outside-toplevel
         results = AdataDict(results, hierarchy)
 
     return results

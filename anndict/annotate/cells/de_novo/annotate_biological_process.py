@@ -2,20 +2,27 @@
 This module annotates groups of cells with a biological process, based on the group's enriched genes
 """
 
+from pandas import DataFrame
+from anndata import AnnData
+
 from anndict.utils import enforce_semantic_list
 from anndict.llm import call_llm
 from anndict.annotate.cells.de_novo.base import ai_annotate
 
 
-def ai_biological_process(gene_list):
+def ai_biological_process(gene_list: list[str]
+) -> dict:
     """
     Describes the most prominent biological process represented by a list of genes using an LLM.
 
-    Args:
-        gene_list (list of str): The list of genes to be described.
+    Parameters
+    -------------
+    gene_list
+        The list of genes to be described.
 
-    Returns:
-        dict: A dictionary containing the description of the biological process.
+    Returns
+    ---------
+        A :class:`dictionary` containing the description of the biological process.
     """
     #enforce that labels are semantic
     enforce_semantic_list(gene_list)
@@ -43,7 +50,12 @@ def ai_biological_process(gene_list):
     return annotation
 
 
-def ai_annotate_biological_process(adata, groupby, n_top_genes, label_column='ai_biological_process'):
+def ai_annotate_biological_process(
+    adata: AnnData,
+    groupby: str,
+    n_top_genes: int,
+    new_label_column: str = 'ai_biological_process'
+) -> DataFrame:
     """
     Annotate biological processes based on the top n marker genes for each cluster.
 
@@ -51,15 +63,26 @@ def ai_annotate_biological_process(adata, groupby, n_top_genes, label_column='ai
     and applies a user-defined function to determine the biological processes for each cluster based on the top 
     marker genes. The results are added to the AnnData object and returned as a DataFrame.
 
-    Parameters:
-    adata : AnnData
-    groupby : str Column in adata.obs to group by for differential expression analysis.
-    n_top_genes : int The number of top marker genes to consider for each cluster.
-    label_column : str, optional (default: 'ai_cell_type') The name of the new column in adata.obs where the cell type annotations will be stored.
+    Parameters
+    ------------
+    adata
+        An :class:`AnnData` object.
 
-    Returns:
-    pd.DataFrame A DataFrame with a column for the top marker genes for each cluster.
+    groupby
+        Column in ``adata.obs`` to group by for differential expression analysis.
+
+    n_top_genes
+        The number of top marker genes to consider.
+
+    label_column
+        The name of the new column in ``adata.obs`` where the cell type annotations will be stored.
+
+    Returns
+    --------
+    A ``pd.DataFrame`` with a column for the top marker genes for each cluster.
+
+    Notes
+    -------
+    This function also modifies the input ``adata`` in place, adding annotations to ``adata.obs[new_label_col]``
     """
-    return ai_annotate(func=ai_biological_process, adata=adata, groupby=groupby, n_top_genes=n_top_genes, label_column=label_column)
-
-
+    return ai_annotate(func=ai_biological_process, adata=adata, groupby=groupby, n_top_genes=n_top_genes, new_label_column=new_label_column)

@@ -2,22 +2,11 @@
 This module contains the ``AdataDict`` class, which is basically a nested dictionary of anndata, with a 
 few extra features to help restructure the nesting hierarchy and iterate over it.
 """
-def to_nested_tuple(nested_list):
-    """
-    Recursively convert a nested list into a nested tuple.
-    """
-    if isinstance(nested_list, list):
-        return tuple(to_nested_tuple(item) for item in nested_list)
-    return nested_list
 
+from functools import wraps
 
-def to_nested_list(nested_tuple):
-    """
-    Recursively convert a nested tuple into a nested list.
-    """
-    if isinstance(nested_tuple, tuple):
-        return list(to_nested_list(item) for item in nested_tuple)
-    return nested_tuple
+from .adata_dict_utils import to_nested_tuple, set_var_index_func, set_obs_index_func
+from .adata_dict_fapply import adata_dict_fapply, adata_dict_fapply_return
 
 
 class AdataDict(dict):
@@ -28,7 +17,7 @@ class AdataDict(dict):
 
     1. It has the ``set_hierarchy`` method to restructure the nesting hierarchy, and the ``hierarchy`` attribute to keep track.
     2. It behaves like an ``AnnData`` object by passing methods through to each ``AnnData`` in the dictionary.
-    3. It has a method ``fapply(func, kwargs)`` that applies a given function ``func`` with arguments ``kwargs`` to each ``AnnData`` object in the dictionary.
+    3. It has methods ``fapply(func, kwargs)`` and ``fapply_return(func, kwargs)`` that apply a given function ``func`` with arguments ``kwargs`` to each ``AnnData`` object in the :class:`AdataDict`.
 
     Parameters
     -----------
@@ -37,7 +26,13 @@ class AdataDict(dict):
 
     hierarchy
         Tuple or list indicating the order of indices in the keys of ``data``.
+
     """
+    # See Also
+    # --------
+
+    # :func:`adata_dict_fapply` : The function underneath ``fapply`` that can be used separatley.
+    # :func:`adata_dict_fapply_return` : The function underneath ``fapply_return`` that can be used separatley.
 
     def __init__(
     self,
@@ -75,7 +70,17 @@ class AdataDict(dict):
 
         This attribute is accessed as: ``adata_dict.hierarchy``.
 
-        :return: The current hierarchy of the ``AdataDict`` as a tuple.
+        Returns
+        --------
+        The current hierarchy of the ``AdataDict`` as a tuple.
+
+        Examples
+        ---------
+
+        .. code-block:: python
+
+            adata_dict.hierarchy
+            > ('donor', ('tissue'))
         """
         return self._hierarchy
 
@@ -244,12 +249,33 @@ class AdataDict(dict):
             return results
         return method
 
-    def fapply(self, func, **kwargs):
-        results = {}
-        for key, adata in self.items():
-            if isinstance(adata, AdataDict):
-                # Recurse into nested AdataDict
-                results[key] = adata.fapply(func, **kwargs)
-            else:
-                results[key] = func(adata, **kwargs)
-        return results
+    @wraps(adata_dict_fapply)
+    def fapply(self, func, *, use_multithreading=True, num_workers=None, max_retries=0, **kwargs_dicts):
+        return adata_dict_fapply(
+            self,
+            func,
+            use_multithreading=use_multithreading,
+            num_workers=num_workers,
+            max_retries=max_retries,
+            **kwargs_dicts,
+        )
+
+    @wraps(adata_dict_fapply_return)
+    def fapply_return(self, func, *, use_multithreading=True, num_workers=None, max_retries=0, return_as_adata_dict=False, **kwargs_dicts):
+        return adata_dict_fapply_return(
+            self,
+            func,
+            use_multithreading=use_multithreading,
+            num_workers=num_workers,
+            max_retries=max_retries,
+            return_as_adata_dict=return_as_adata_dict,
+            **kwargs_dicts,
+        )
+
+    @wraps(set_var_index_func)
+    def set_var_index(self, cols: str | list[str]):
+        return set_var_index_func(self, cols)
+
+    @wraps(set_obs_index_func)
+    def set_obs_index(self, cols: str | list[str]):
+        return set_obs_index_func(self, cols)

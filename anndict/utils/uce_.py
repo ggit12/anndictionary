@@ -1,23 +1,38 @@
 """
 This module contains wrappers for UCE (the universal cell embedding).
+Note: this is mainly included for instructional purposes because it will be slow without a gpu.
 """
 import subprocess
 
-def UCE_adata(adata_paths):
+def uce_adata(
+    adata_paths: list[str]
+) -> None:
     """
-    Runs the eval_single_anndata.py script for each specified anndata path. This function is included largely for illustrative purposes and will be restrictivley slow with a gpu.
+    Runs the eval_single_anndata.py script for each specified anndata path. 
+    This function is included largely for illustrative purposes and will be 
+    restrictivley slow without a gpu.
 
-    Parameters:
-    adata_paths (list of str): A list of paths to the .h5ad files to be processed.
+    Parameters
+    ----------
+    adata_paths
+        A list of paths to the ``.h5ad`` files to be processed.
 
-    This function constructs the command to run the eval_single_anndata.py script 
-    with specified arguments and then executes the command using subprocess.run.
+    This function constructs the command to run the ``eval_single_anndata.py`` script 
+    with specified arguments and then executes the command using :func:`subprocess.run`.
     
     The function assumes that a uce-compatible conda environment is already activated 
     and the working directory is correctly set to UCE (i.e. as in https://github.com/snap-stanford/UCE)
 
+    Returns
+    -------
+    None
 
-    Example usage:
+    Notes
+    -----
+    Writes the output to the ``./uce_wd/`` directory.
+
+    Examples
+    --------
     UCE_adata(["../dat/liver.h5ad", "../dat/kidney.h5ad"])
     """
     for adata_path in adata_paths:

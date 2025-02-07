@@ -1,19 +1,17 @@
-# functions that aren't part of the stablelabel pipeline and operate on a single anndata (unstratified)
+"""
+AnnDictionary utility functions.
+"""
 import os
 import re
 
-import numpy as np
 import pandas as pd
 import seaborn as sns
 
 import matplotlib
 import matplotlib.pyplot as plt
 
-from sklearn.decomposition import PCA
-from scipy.stats import gaussian_kde
-
 from IPython.display import HTML, display
-
+from anndata import AnnData
 
 def enforce_semantic_list(lst):
     """This function runs a number of checks to make sure that the input is a semantic list, and not i.e. integers cast as strings."""
@@ -46,7 +44,6 @@ def enforce_semantic_list(lst):
 
     return True
 
-
 def make_names(names):
     """
     Convert a list of names into valid and unique Python identifiers.
@@ -71,11 +68,9 @@ def make_names(names):
         valid_names.append(clean_name)
     return valid_names
 
-
 def normalize_string(s):
     """Removes non-alphanumeric characters and converts to lowercase."""
     return re.sub(r"[^\w\s]", "", s.lower())
-
 
 def normalize_label(label):
     """
@@ -84,7 +79,6 @@ def normalize_label(label):
     if pd.isna(label):  # Handle NaN values
         return "missing"
     return normalize_string(label.strip())
-
 
 def create_color_map(adata, keys):
     """
@@ -118,7 +112,6 @@ def create_color_map(adata, keys):
 
     return color_map
 
-
 def get_slurm_cores():
     """
     Returns the total number of CPU cores allocated to a Slurm job based on environment variables.
@@ -134,81 +127,75 @@ def get_slurm_cores():
 
     return total_cores
 
-
-def pca_density_filter(data, n_components=3, threshold=0.10):
+def summarize_metadata(
+    adata: AnnData,
+    cols: str | list[str]
+) -> dict:
     """
-    Calculate density contours for PCA-reduced data, return the density of all input data,
-    and identify the unique variables that were included in the PCA.
+    Generate a summary for specified metadata column(s) in ``adata``.
+    
+    Parameters
+    -----------
+    adata
+        The anndata object containing the data.
 
-    Parameters:
-    - data: array-like, shape (n_samples, n_features)
-    - n_components: int, number of components for PCA to reduce the data to.
+    columns
+        List of columns in ``adata.obs``. Use '*' to specify joint frequencies of multiple columns.
+    
+    Returns
+    --------
+    A :class:`dict` with keys as column descriptions and values as a :class:`DataFrame` of counts.
 
-    Returns:
-    - pca_data: PCA-reduced data (None if all variables are constant).
-    - density: Density values of all the points (None if all variables are constant).
-    - unique_variables: List of unique variables that were included in the PCA (empty list if all variables are constant).
+    Notes
+    -----
+    Use '*' to specify joint frequencies of multiple columns.
+
+    Examples
+    ---------
+
+    Case 1: calculate frequency of donor and tissue columns
+    .. code-block:: python
+
+        import anndict as adt
+        adt.wrappers.summarize_metadata(adata, ['donor', 'tissue'])
+
+    Case 2: calculate joint frequency of donor x tissue
+    .. code-block:: python
+
+        import anndict as adt
+        adt.wrappers.summarize_metadata(adata, ['donor*tissue'])
+
+    See Also
+    ---------
+    :func:`get_adata_columns` : To use string matching to retrieve specific column names from ``adata``.
+    :func:`display_html_summary` : To print the results of :func:`summarize_metadata` as an html table.
+    :func:`summarize_metadata_adata_dict` and :func:`display_html_summary_adata_dict` : For :func:`adata_dict_fapply_return` wrappers.
     """
+    results = {}
 
-    # Check for constant variables (these will not be used by PCA)
-    non_constant_columns = np.var(data, axis=0) > 0
+    for col in cols:
+        if '*' in col:
+            # Handle joint frequencies
+            sub_cols = col.split('*')
+            combined_data = adata.obs[sub_cols]
 
-    # Skip the block if no non-constant variables are found
-    if not np.any(non_constant_columns):
-        return None, None, []
+            # Convert categorical columns to string and replace NaN with a placeholder
+            for sub_col in sub_cols:
+                if pd.api.types.is_categorical_dtype(combined_data[sub_col]):
+                    combined_data[sub_col] = combined_data[sub_col].astype(str)
 
-    # Adjust n_components if necessary
-    n_features = np.sum(non_constant_columns)
-    n_samples = data.shape[0]
-    n_components = min(n_components, n_features, n_samples)
+            # Replace NaN with a placeholder to include them in groupby
+            combined_data = combined_data.fillna('NaN')
 
-    unique_variables = np.arange(data.shape[1])[non_constant_columns]
-
-    # Perform PCA reduction only on non-constant variables
-    pca = PCA(n_components=n_components)
-    pca_data = pca.fit_transform(data[:, non_constant_columns])
-
-    # Calculate the point density for all points
-    kde = gaussian_kde(pca_data.T)
-    density = kde(pca_data.T)
-
-    # Determine the density threshold
-    cutoff = np.percentile(density, threshold * 100)
-
-    return density, cutoff, unique_variables.tolist()
-
-
-def pca_density_wrapper(X, labels):
-    """
-    Apply calculate_density_contours_with_unique_variables to subsets of X indicated by labels.
-    Returns a vector indicating whether each row in X is above the threshold for its respective label group.
-
-    Parameters:
-    - X: array-like, shape (n_samples, n_features)
-    - labels: array-like, shape (n_samples,), labels indicating the subset to which each row belongs
-
-    Returns:
-    - index_vector: array-like, boolean vector of length n_samples indicating rows above the threshold
-    """
-    unique_labels = np.unique(labels)
-    index_vector = np.zeros(len(X), dtype=bool)
-
-    for label in unique_labels:
-        subset = X[labels == label]
-        if subset.shape[0] < 10:
-            # If fewer than 10 cells, include all cells by assigning density = 1 and cutoff = 0
-            density, cutoff = np.ones(subset.shape[0]), 0
+            joint_freq = combined_data.groupby(sub_cols).size().unstack(fill_value=0)
+            joint_freq = combined_data.groupby(sub_cols, observed=True).size().unstack(fill_value=0)
+            results[col.replace('*', ' x ')] = joint_freq
         else:
-            density, cutoff, _ = pca_density_filter(
-                subset, n_components=3, threshold=0.10
-            )
+            # Calculate frequency for a single column
+            freq = adata.obs[col].value_counts(dropna=False).to_frame('count')
+            results[col] = freq
 
-        # Mark rows above the threshold for this label
-        high_density_indices = density > cutoff
-        global_indices = np.where(labels == label)[0][high_density_indices]
-        index_vector[global_indices] = True
-
-    return index_vector
+    return results
 
 
 def display_html_summary(summary_dict):

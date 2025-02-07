@@ -7,22 +7,40 @@ import scanpy as sc
 
 import matplotlib.pyplot as plt
 
+from matplotlib.figure import Figure
+from matplotlib.axes import Axes
+from anndata import AnnData
 
-def module_score_barplot(adata, group_cols, score_cols, adt_key=None, figsize=(10,8)):
+
+def module_score_barplot(adata: AnnData,
+    group_cols: str | list[str],
+    score_cols: str | list[str],
+    figsize: tuple[int,int] = (10,8),
+    adt_key: tuple[str,...] | None = None,
+    ) -> tuple[Figure, Axes]:
     """
     Create a bar plot of mean module scores grouped by specified columns.
 
-    Parameters:
-    adata : AnnData
-        The AnnData object containing the data.
-    group_cols : str or list of str
-        The column(s) in adata.obs to group by.
-    score_cols : str or list of str
-        The column(s) in adata.obs that contain the module scores.
+    Parameters
+    ------------
+    adata
+        The :class:`AnnData` object containing the data.
 
-    Returns:
-    fig, ax : matplotlib Figure and Axes
-        The figure and axes objects of the plot.
+    group_cols
+        The column(s) in adata.obs to group by.
+
+    score_cols
+        The column(s) in adata.obs that contain the module scores.
+    
+    figsize
+        The figure size (width, height)
+
+    adt_key
+        Used by :func:`adata_dict_fapply` and :func:`adata_dict_fapply_return` when passing this function.
+
+    Returns
+    --------
+    The :class:`Figure` and :class:`Axes` objects of the plot.
     """
     #print adt_key if provided
     if adt_key:
@@ -56,18 +74,31 @@ def module_score_barplot(adata, group_cols, score_cols, adt_key=None, figsize=(1
     return fig, ax
 
 
-def module_score_umap(adata, score_cols, adt_key=None, **kwargs):
+def module_score_umap(adata: AnnData,
+    score_cols: list[str],
+    adt_key: tuple[str,...] | None = None,
+    **kwargs
+) -> Figure:
     """
     Generates UMAP plots for specified module scores in a single figure.
 
-    Parameters:
-        adata (AnnData): Annotated data matrix containing UMAP coordinates and module scores.
-        score_cols (list of str): List of column names in `adata` containing module scores to plot.
-        **kwargs: Additional keyword arguments passed to `sc.pl.umap`, including 'vmax' for color scaling 
-                  (default is 'p99').
+    Parameters
+    -----------
+    adata
+        Annotated data matrix containing UMAP coordinates and module scores.
 
-    Returns:
-        matplotlib.figure.Figure: Figure containing the UMAP plots.
+    score_cols
+        List of column names in `adata` containing module scores to plot.
+    
+    adt_key
+        Used by :func:`adata_dict_fapply` and :func:`adata_dict_fapply_return` when passing this function.
+
+    **kwargs
+        Additional keyword arguments passed to `sc.pl.umap`, including ``'vmax'`` for color scaling (default is ``'p99'``).
+
+    Returns
+    --------
+    :class:`Figure` containing the UMAP plots.
     """
     # Print adt_key if provided
     if adt_key:

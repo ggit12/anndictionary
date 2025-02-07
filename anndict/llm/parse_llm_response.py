@@ -3,7 +3,7 @@
 This module handles parsing of LLM responses.
 """
 from difflib import get_close_matches
-from anndict.utils import normalize_string
+from anndict.utils.anndictionary_ import normalize_string
 
 def extract_dictionary_from_ai_string(ai_string):
     """

@@ -4,20 +4,40 @@ This module contains adata_dict wrappers for `scanpy`.
 
 import scanpy as sc
 
-from anndict.adata_dict import adata_dict_fapply, adata_dict_fapply_return
-from anndict.adata_dict import build_adata_dict, concatenate_adata_dict, check_and_create_stratifier
+from anndata import AnnData
+
+from anndict.adata_dict import (
+    AdataDict,
+    adata_dict_fapply,
+    adata_dict_fapply_return,
+    build_adata_dict,
+    concatenate_adata_dict,
+    check_and_create_stratifier,
+)
 
 
-def subsample_adata_dict(adata_dict, **kwargs):
+def subsample_adata_dict(
+    adata_dict: AdataDict,
+    **kwargs
+) -> None:
     """
-    Subsamples each AnnData object in the dictionary using Scanpy's subsample function.
+    Subsamples each :class:`AnnData` in ``adata_dict`` using :func:`sc.pp.subsample`.
     
-    Parameters:
-    - adata_dict (dict): Dictionary of AnnData objects with keys as identifiers.
-    - kwargs: Additional keyword arguments to pass to the subsample function.
+    Parameters
+    -----------
+    adata_dict
+        An :class:`AdataDict`.
 
-    Returns:
-    - None: The function modifies the input AnnData objects in place.
+    kwargs
+        Additional keyword arguments to pass to :func:`sc.pp.subsample`
+
+    Returns
+    --------
+    None
+
+    Notes
+    -----
+    The function modifies ``adata_dict`` in-place.
     """
     n_obs = kwargs.get('n_obs', None)
     fraction = kwargs.get('fraction', None)
@@ -33,21 +53,38 @@ def subsample_adata_dict(adata_dict, **kwargs):
     adata_dict_fapply(adata_dict, subsample_adata, **kwargs)
 
 
-def resample_adata(adata, strata_keys, min_num_cells, n_largest_groups=None, **kwargs):
+def resample_adata(
+    adata: AnnData,
+    strata_keys: list[str],
+    min_num_cells: int,
+    n_largest_groups: int | None = None,
+    **kwargs
+) -> AnnData:
     """
-    Resample an AnnData object based on specified strata keys and drop strata with fewer than the minimum number of cells.
+    Resample ``adata`` based on specified strata keys and drop strata with fewer than the minimum number of cells.
 
-    Parameters:
-    adata (AnnData): Annotated data matrix.
-    strata_keys (list of str): List of column names in adata.obs to use for stratification.
-    min_num_cells (int): Minimum number of cells required to retain a stratum.
-    kwargs: Additional keyword arguments to pass to the subsample function.
+    Parameters
+    -----------
+    adata
+        An :class:`AnnData`.
 
-    Returns:
-    AnnData: Concatenated AnnData object after resampling and filtering.
+    strata_keys
+        List of column names in adata.obs to use for stratification.
 
-    Raises:
-    ValueError: If any of the specified strata_keys do not exist in adata.obs.
+    min_num_cells
+        Minimum number of cells required to retain a stratum.
+
+    kwargs
+        Additional keyword arguments to pass to the subsample function.
+
+    Returns
+    --------
+    Concatenated :class:`AnnData` object after resampling and filtering.
+
+    Raises
+    --------
+    ValueError
+        If any of the specified ``strata_keys`` do not exist in ``adata.obs``.
     """
     # Step 1: Create the strata key
     strata_key = check_and_create_stratifier(adata, strata_keys)
@@ -75,144 +112,271 @@ def resample_adata(adata, strata_keys, min_num_cells, n_largest_groups=None, **k
     return concatenate_adata_dict(filtered_dict, index_unique=None)
 
 
-def resample_adata_dict(adata_dict, strata_keys, n_largest_groups=None, min_num_cells=0, **kwargs):
+def resample_adata_dict(
+    adata_dict: AdataDict,
+    strata_keys: list[str],
+    n_largest_groups: int | None = None,
+    min_num_cells: int = 0,
+    **kwargs
+) -> AdataDict:
     """
-    Resample each AnnData object in a dictionary based on specified strata keys and drop strata with fewer than the minimum number of cells.
+    Resample each :class:`AnnData` in ``adata_dict`` based on specified strata keys and drop strata with fewer than the minimum number of cells.
 
-    Parameters:
-    adata_dict (dict): Dictionary where keys are strata values and values are AnnData objects.
-    strata_keys (list of str): List of column names in adata.obs to use for stratification.
-    min_num_cells (int, optional): Minimum number of cells required to retain a stratum. Default is 0.
-    kwargs: Additional keyword arguments to pass to the resample function.
+    Parameters
+    -----------
+    adata_dict
+        An :class:`AdataDict`.
 
-    Returns:
-    dict: Dictionary of resampled AnnData objects after filtering.
+    strata_keys
+        List of column names in `.obs` to use for stratification. Must be present in each adata in ``adata_dict``.
+
+    min_num_cells
+        Minimum number of cells required to retain a stratum.
+
+    kwargs
+        Additional keyword arguments to pass to :func:`~anndict.wrappers.resample_adata`.
+
+    Returns
+    --------
+    :class:`AdataDict` of resampled :class:`AnnData` after filtering.
     """
     return adata_dict_fapply_return(adata_dict, resample_adata, strata_keys=strata_keys, n_largest_groups=n_largest_groups, min_num_cells=min_num_cells, **kwargs)
 
 
-def normalize_adata_dict(adata_dict, **kwargs):
+def normalize_adata_dict(
+    adata_dict: AdataDict,
+    **kwargs
+) -> None:
     """
-    Normalizes each AnnData object in the dictionary using Scanpy's normalize_total.
+    Normalizes each :class:`AnnData` in ``adata_dict`` using :func:`sc.pp.normalize_total`.
 
-    Parameters:
-    - adata_dict (dict): Dictionary of AnnData objects with keys as identifiers.
-    - kwargs: Additional keyword arguments to pass to the normalize_total function.
+    Parameters
+    -----------
+    adata_dict
+        An :class:`AdataDict`.
 
-    Returns:
-    - None: The function modifies the input AnnData objects in place.
+    kwargs
+        Additional keyword arguments to pass to :func:`sc.pp.normalize_total`
+
+    Returns
+    --------
+    None
+
+    Notes
+    -----
+    The function modifies ``adata_dict`` in-place.
     """
     adata_dict_fapply(adata_dict, sc.pp.normalize_total, **kwargs)
 
 
-def log_transform_adata_dict(adata_dict, **kwargs):
+def log_transform_adata_dict(
+    adata_dict: AdataDict,
+    **kwargs
+) -> None:
     """
-    Log-transforms each AnnData object in the dictionary using Scanpy's log1p.
+    Log-transforms each :class:`AnnData` in ``adata_dict`` using :func:`sc.pp.log1p`.
 
-    Parameters:
-    - adata_dict (dict): Dictionary of AnnData objects with keys as identifiers.
-    - kwargs: Additional keyword arguments to pass to the log1p function.
+    Parameters
+    -----------
+    adata_dict
+        An :class:`AdataDict`.
 
-    Returns:
-    - None: The function modifies the input AnnData objects in place.
+    kwargs
+        Additional keyword arguments to pass to :func:`sc.pp.log1p`
+
+    Returns
+    --------
+    None
+
+    Notes
+    -----
+    The function modifies ``adata_dict`` in-place.
     """
     adata_dict_fapply(adata_dict, sc.pp.log1p, **kwargs)
 
 
-def set_high_variance_genes_adata_dict(adata_dict, **kwargs):
+def set_high_variance_genes_adata_dict(
+    adata_dict: AdataDict,
+    **kwargs
+) -> None:
     """
-    Identifies high-variance genes in each AnnData object in the dictionary.
+    Identifies highly variable genes in each :class:`AnnData` in ``adata_dict`` using :func:`sc.pp.highly_variable_genes`.
 
-    Parameters:
-    - adata_dict (dict): Dictionary of AnnData objects with keys as identifiers.
-    - kwargs: Additional keyword arguments to pass to the highly_variable_genes function.
+    Parameters
+    -----------
+    adata_dict
+        An :class:`AdataDict`.
 
-    Returns:
-    - None: The function modifies the input AnnData objects in place.
+    kwargs
+        Additional keyword arguments to pass to :func:`sc.pp.highly_variable_genes`
+
+    Returns
+    --------
+    None
+
+    Notes
+    ------
+    The function modifies ``adata_dict`` in-place.
     """
     adata_dict_fapply(adata_dict, sc.pp.highly_variable_genes, **kwargs)
 
-def rank_genes_groups_adata_dict(adata_dict, **kwargs):
+def rank_genes_groups_adata_dict(
+    adata_dict: AdataDict,
+    **kwargs
+) -> None:
     """
-    Identifies differentially expressed genes in each AnnData object in the dictionary.
+    Identifies differentially expressed genes in each :class:`AnnData` in ``adata_dict`` using :func:`sc.tl.rank_genes_groups`.
 
-    Parameters:
-    - adata_dict (dict): Dictionary of AnnData objects with keys as identifiers.
-    - kwargs: Additional keyword arguments to pass to the rank_genes_groups function.
+    Parameters
+    -----------
+    adata_dict
+        An :class:`AdataDict`.
 
-    Returns:
-    - None: The function modifies the input AnnData objects in place.
+    kwargs
+        Additional keyword arguments to pass to :func:`sc.tl.rank_genes_groups`
+
+    Returns
+    --------
+    None
+
+    Notes
+    ------
+    The function modifies ``adata_dict`` in-place.
     """
     adata_dict_fapply(adata_dict, sc.tl.rank_genes_groups, **kwargs)
 
 
-def scale_adata_dict(adata_dict, **kwargs):
+def scale_adata_dict(
+    adata_dict: AdataDict,
+    **kwargs
+) -> None:
     """
-    Scales each AnnData object in the dictionary using Scanpy's scale function.
+    Scales each :class:`AnnData` object in ``adata_dict`` using :func:`sc.pp.scale`.
 
-    Parameters:
-    - adata_dict (dict): Dictionary of AnnData objects with keys as identifiers.
-    - kwargs: Additional keyword arguments to pass to the scale function.
+    Parameters
+    -----------
+    adata_dict
+        An :class:`AdataDict`.
 
-    Returns:
-    - None: The function modifies the input AnnData objects in place.
+    kwargs
+        Additional keyword arguments to pass to :func:`sc.pp.scale`
+
+    Returns
+    --------
+    None
+
+    Notes
+    -----
+    The function modifies ``adata_dict`` in-place.
     """
     adata_dict_fapply(adata_dict, sc.pp.scale, **kwargs)
 
 
-def pca_adata_dict(adata_dict, **kwargs):
+def pca_adata_dict(
+    adata_dict: AdataDict,
+    **kwargs
+) -> None:
     """
-    Performs PCA on each AnnData object in the dictionary using Scanpy's pca function.
+    Performs PCA on each :class:`AnnData` object in ``adata_dict`` using :func:`sc.pp.pca`.
 
-    Parameters:
-    - adata_dict (dict): Dictionary of AnnData objects with keys as identifiers.
-    - kwargs: Additional keyword arguments to pass to the pca function.
+    Parameters
+    -----------
+    adata_dict
+        An :class:`AdataDict`.
 
-    Returns:
-    - None: The function modifies the input AnnData objects in place.
+    kwargs
+        Additional keyword arguments to pass to :func:`sc.pp.pca`.
+
+    Returns
+    --------
+    None
+
+    Notes
+    -----
+    The function modifies ``adata_dict`` in-place.
     """
     adata_dict_fapply(adata_dict, sc.pp.pca, **kwargs)
 
 
-def neighbors_adata_dict(adata_dict, **kwargs):
+def neighbors_adata_dict(
+    adata_dict: AdataDict,
+    **kwargs
+) -> None:
     """
-    Calculates neighborhood graph for each AnnData object in the dictionary using Scanpy's neighbors function.
+    Calculates neighborhood graph for each :class:`AnnData` object in ``adata_dict`` using :func:`sc.pp.neighbors`.
 
-    Parameters:
-    - adata_dict (dict): Dictionary of AnnData objects with keys as identifiers.
-    - kwargs: Additional keyword arguments to pass to the sc.pp.neighbors function.
+    Parameters
+    -----------
+    adata_dict
+        An :class:`AdataDict`.
 
-    Returns:
-    - None: The function modifies the input AnnData objects in place.
+    kwargs
+        Additional keyword arguments to pass to :func:`sc.pp.neighbors`.
+
+    Returns
+    --------
+    None
+
+    Notes
+    -----
+    The function modifies ``adata_dict`` in-place.
     """
     adata_dict_fapply(adata_dict, sc.pp.neighbors, **kwargs)
 
 
-def leiden_adata_dict(adata_dict, **kwargs):
+def leiden_adata_dict(
+    adata_dict: AdataDict,
+    **kwargs
+) -> None:
     """
-    Performs Leiden clustering for each AnnData object in the dictionary using Scanpy's leiden function.
+    Performs Leiden clustering for each AnnData object in ``adata_dict`` using Scanpy's leiden function.
 
-    Parameters:
-    - adata_dict (dict): Dictionary of AnnData objects with keys as identifiers.
-    - kwargs: Additional keyword arguments to pass to the sc.tl.leiden function.
+    Parameters
+    -----------
+    adata_dict
+        An :class:`AdataDict`.
 
-    Returns:
-    - None: The function modifies the input AnnData objects in place.
+    kwargs
+        Additional keyword arguments to pass to :func:`sc.tl.leiden`.
+
+    Returns
+    --------
+    None
+
+    Notes
+    -----
+    The function modifies ``adata_dict`` in-place.
     """
     adata_dict_fapply(adata_dict, sc.tl.leiden, **kwargs)
 
-def leiden_sub_cluster(adata, groupby, **kwargs):
+def leiden_sub_cluster(
+    adata: AnnData,
+    groupby: str,
+    **kwargs
+) -> AnnData:
     """
     Perform Leiden clustering on subgroups of cells.
-    This function applies Leiden clustering to subgroups of cells defined by the groupby parameter.
 
-    Parameters:
-    adata : AnnData Annotated data matrix.
-    groupby : str Column name in adata.obs for grouping cells before subclustering.
-    kwargs : dict Additional keyword arguments to pass to the leiden_adata_dict function.
+    This function applies Leiden clustering to subgroups of cells defined by the ``groupby`` parameter.
 
-    Returns:
-    None, The function modifies the input AnnData object in-place.
+    Parameters
+    -----------
+    adata
+        An :class:`AnnData`.
+
+    groupby
+        Column name in ``adata.obs`` for grouping cells before subclustering.
+
+    kwargs
+        Additional keyword arguments to pass to :func:`leiden_adata_dict`.
+
+    Returns
+    --------
+    None
+
+    Notes
+    -----
+    The function modifies the input ``AnnData`` object in-place.
     """
     adata_dict = build_adata_dict(adata, strata_keys=[groupby])
     leiden_adata_dict(adata_dict, **kwargs)
@@ -220,47 +384,77 @@ def leiden_sub_cluster(adata, groupby, **kwargs):
     return adata
 
 
-def leiden_sub_cluster_adata_dict(adata_dict, groupby, **kwargs):
+def leiden_sub_cluster_adata_dict(
+    adata_dict: AdataDict,
+    groupby: str,
+    **kwargs
+) -> AdataDict:
     """
-    This function applies the leiden_sub_cluster function to each AnnData object
-    in the provided dictionary.
-    
-    Parameters:
-    adata_dict : dict Dictionary of AnnData objects.
-    groupby : str Column name in adata.obs for grouping cells before subclustering.
-    kwargs : dict Additional keyword arguments to pass to the leiden_sub_cluster function.
+    Applies the :func:`leiden_sub_cluster` function to each :class:`AnnData` object in ``adata_dict``.
 
-    Returns:
-    None The function modifies the input AnnData objects in-place.
+    Parameters
+    -----------
+    adata_dict
+        An :class:`AdataDict`.
+
+    groupby
+        Column name in ``adata.obs`` for grouping cells before subclustering.
+
+    kwargs
+        Additional keyword arguments to pass to :func:`leiden_sub_cluster`.
+
+    Returns
+    --------
+    :class:`AdataDict` of resampled AnnData objects after filtering.
     """
     return adata_dict_fapply_return(adata_dict, leiden_sub_cluster, groupby=groupby, **kwargs)
 
 
-def calculate_umap_adata_dict(adata_dict, **kwargs):
+def calculate_umap_adata_dict(
+    adata_dict: AdataDict,
+    **kwargs
+) -> AdataDict:
     """
-    Calculates UMAP embeddings for each subset in the adata_dict.
+    Calculates UMAP embeddings for each :class:`AnnData` in ``adata_dict`` using :func:`sc.tl.umap`.
 
-    Parameters:
-    - adata_dict (dict): A dictionary with keys as strata and values as AnnData objects.
-    - kwargs: Additional keyword arguments, including 'use_rep' which specifies the key in .obsm where the representation matrix is stored.
+    Parameters
+    -----------
+    adata_dict
+        An :class:`AdataDict`.
 
-    Returns:
-    - dict: A dictionary with the same keys as adata_dict, but values now include UMAP coordinates.
+    kwargs
+        Additional keyword arguments to pass to :func:`sc.tl.umap`.
+
+    Returns
+    --------
+    :class:`AdataDict` with UMAP coordinates added to each :class:`AnnData`.
     """
     adata_dict_fapply(adata_dict, sc.tl.umap, **kwargs)
     return adata_dict
 
 
-def plot_umap_adata_dict(adata_dict, **kwargs):
+def plot_umap_adata_dict(
+    adata_dict: AdataDict,
+    **kwargs
+) -> None:
     """
-    Plots UMAP embeddings for each AnnData object in adata_dict, colored by a specified variable.
+    Plots UMAP embeddings for each :class:`AnnData` in ``adata_dict``, colored by a specified variable.
 
-    Parameters:
-    - adata_dict (dict): A dictionary with keys as strata and values as AnnData objects.
-    - kwargs: Additional keyword arguments, including 'color_by' which specifies a variable by which to color the UMAP plots, typically a column in .obs.
+    Parameters
+    -----------
+    adata_dict
+        An :class:`AdataDict`.
 
-    Returns:
-    - None: The function creates plots for the AnnData objects.
+    kwargs
+        Additional keyword arguments, including 'color_by' which specifies a variable by which to color the UMAP plots, typically a column in ``.obs``.
+
+    Returns
+    --------
+    None
+
+    Notes
+    -----
+    The function creates plots for the each :class:`AnnData`.
     """
     def plot_umap(adata, adt_key=None, **kwargs):
         print(f"Plotting UMAP for key: {adt_key}")

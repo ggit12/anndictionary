@@ -2,21 +2,42 @@
 This module contains functions that operate across multiple adata, to make a sure that each adata has a .obs column with a set of categories that is shared between all the adata.
 """
 
-from anndict.automated_label_management.clean_single_column import map_cell_type_labels_to_simplified_set
+from anndict.adata_dict import AdataDict
+from anndict.automated_label_management.clean_single_column.in_adata_obs import map_cell_type_labels_to_simplified_set
 
-def ai_unify_labels(adata_dict, label_columns, new_label_column, simplification_level='unified, typo-fixed'):
+
+def ai_unify_labels(
+    adata_dict: AdataDict,
+    label_columns: dict[tuple[str, ...], str],
+    new_label_column: str,
+    simplification_level: str = "unified, typo-fixed",
+) -> dict:
     """
     Unifies cell type labels across multiple AnnData objects by mapping them to a simplified, unified set of labels.
 
-    Parameters:
-    adata_dict (dict): Dictionary where keys are identifiers and values are AnnData objects.
-    label_columns (dict): Dictionary where keys should be the same as the keys of adata_dict and values are the column names in .obs containing the original labels.
-    new_label_column (str): Name of the new column to be created in .obs for storing the harmonized labels.
+    Parameters
+    ------------
+    adata_dict
+        An :class:`AdataDict`.
 
-    Returns:
-    dict: A mapping dictionary where the keys are the original labels and the values are the unified labels.
+    label_columns
+        :class:`dict` where keys should be the same as the keys of ``adata_dict`` and values are the column names in the corresponding ``adata.obs`` containing the original labels.
+
+    new_label_column
+        Name of the new column to be created in each ``adata.obs`` for storing the unified labels.
+    
+    simplification_level
+        Instructions on how to unify the labels.
+
+    Returns
+    ---------
+    A mapping :class:`dict` where the keys are the original labels and the values are the unified labels.
+
+    Notes
+    -------
+    Modifies each ``adata`` in ``adata_dict`` in-place by adding ``adata.obs[new_label_column]`` with the unified label mapping.
     """
-    #todo: use adata_dict_fapply instead of loops
+    # todo: use adata_dict_fapply instead of loops
     def get_unique_labels_from_obs_column(adata, label_column):
         return adata.obs[label_column].unique().tolist()
 

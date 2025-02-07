@@ -1,32 +1,15 @@
-#squidpy adata_dict functions
+"""
+Spatial data processing functions.
+"""
+
 import numpy as np
-from sklearn.base import clone
-from sklearn.metrics import accuracy_score
-from sklearn.utils.validation import check_random_state
-from sklearn.preprocessing import LabelEncoder
 import scanpy as sc
 import anndata as ad
-import os
-import re
 import pandas as pd
-import random
-import itertools
-from IPython.display import HTML, display
 
-from sklearn.decomposition import PCA
-from scipy.stats import gaussian_kde
-
-import seaborn as sns
-import matplotlib
-import matplotlib.pyplot as plt
-from sklearn.metrics import confusion_matrix
-
-import squidpy as sq
-
-from scipy.sparse import lil_matrix, csr_matrix
 from scipy.sparse import dok_matrix
 
-from .dict import adata_dict_fapply
+from anndict.adata_dict import adata_dict_fapply
 
 
 def read_data(file_path, platform=None):

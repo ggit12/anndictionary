@@ -7,7 +7,8 @@ import itertools
 import pandas as pd
 from anndata import AnnData
 
-from .adata_dict import AdataDict, to_nested_list
+from .adata_dict import AdataDict
+from .adata_dict_utils import to_nested_list
 from .adata_dict_fapply import adata_dict_fapply_return
 
 

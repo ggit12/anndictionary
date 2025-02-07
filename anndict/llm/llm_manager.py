@@ -161,6 +161,9 @@ class LLMManager:
         model = os.getenv("LLM_MODEL")
         providers = LLMProviders.get_providers()
 
+        if provider is None:
+            raise ValueError("No LLM backend found. Please configure LLM backend before attempting to use LLM features. See `adt.configure_llm_backend()`")
+
         if provider not in providers:
             raise ValueError(f"Unsupported provider: {provider}")
 
@@ -247,10 +250,10 @@ class LLMManager:
         Notes
         ------
         The function performs the following steps:
-        1. Gets LLM configuration and initializes the provider
-        2. Converts messages to appropriate ``LangChain`` message types
-        3. Calls the LLM with the processed messages
-        4. Writes the response to a file specified by ``RESPONSE_PATH`` env variable
+            1. Gets LLM configuration and initializes the provider
+            2. Converts messages to appropriate ``LangChain`` message types
+            3. Calls the LLM with the processed messages
+            4. Writes the response to a file specified by ``RESPONSE_PATH`` env variable
         
         The response is written to ``'./response.txt'`` by default if ``RESPONSE_PATH`` is not set.
 
@@ -307,7 +310,7 @@ class LLMManager:
        failure_handler_kwargs: Optional[Dict[str, Any]] = None,
    ) -> Any:
         """
-        A retry wrapper for call_llm that handles response processing and failures.
+        A retry wrapper for call_llm that allows custom response processing and failure handling.
 
         Parameters
         -----------

@@ -58,6 +58,10 @@ def read_adata_dict(
             ("Donor1", "Tissue2"): adata_d1_t2,
             ("Donor2", "Tissue1"): adata_d2_t1,
         }
+
+    See Also
+    ---------
+    :func:`~write_adata_dict` : To write an :class:`AdataDict`
     """
 
     # Read the hierarchy from the file

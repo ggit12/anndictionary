@@ -1,20 +1,6 @@
 """
-This module contains adata_dict_fapply* wrappers for packages.
+This module contains :func:`adata_dict_fapply` and :func:`adata_dict_fapply_return` wrappers for common packages and functions.
 """
-from .anndata_ import (
-    set_var_index,
-    set_obs_index,
-    remove_genes,
-    remove_genes_adata_dict,
-    add_label_to_adata,
-    add_col_to_adata_obs,
-    add_col_to_adata_var,
-    convert_obs_col_to_category,
-    convert_obs_col_to_string,
-    convert_obs_index_to_str,
-    get_adata_columns,
-
-)
 
 from .scanpy_ import (
     subsample_adata_dict,
@@ -35,37 +21,42 @@ from .scanpy_ import (
 
 )
 
-# from .squidpy_ import(
-#     compute_spatial_neighbors_adata_dict,
-#     perform_colocalization_adata_dict,
-#     plot_colocalization_adata_dict,
-#     compute_interaction_matrix_adata_dict,
-#     plot_interaction_matrix_adata_dict,
-
-# )
-
-from .uce_ import (
-    UCE_adata,
+from .squidpy_ import(
+    compute_spatial_neighbors_adata_dict,
+    perform_colocalization_adata_dict,
+    plot_colocalization_adata_dict,
+    compute_interaction_matrix_adata_dict,
+    plot_interaction_matrix_adata_dict,
 
 )
 
-# from .anndictionary_ import (
 
-# )
+
+from .anndictionary_ import (
+    remove_genes_adata_dict,
+    ai_annotate_biological_process_adata_dict,
+    simplify_var_index_adata_dict,
+    ensure_label_consistency_adata_dict,
+    simplify_obs_column_adata_dict,
+    create_label_hierarchy_adata_dict,
+    ai_annotate_cell_type_adata_dict,
+    ai_compare_cell_type_labels_pairwise_adata_dict,
+    ai_annotate_cell_sub_type_adata_dict,
+    ai_determine_leiden_resolution_adata_dict,
+    harmony_label_transfer_adata_dict,
+    plot_sankey_adata_dict,
+    save_sankey_adata_dict,
+    plot_grouped_average_adata_dict,
+    plot_changes_adata_dict,
+    plot_confusion_matrix_adata_dict,
+    summarize_metadata_adata_dict,
+    display_html_summary_adata_dict,
+    pca_density_adata_dict,
+
+)
+
 
 __all__ = [
-    # anndata_
-    "set_var_index",
-    "set_obs_index",
-    "remove_genes",
-    "remove_genes_adata_dict",
-    "add_label_to_adata",
-    "add_col_to_adata_obs",
-    "add_col_to_adata_var",
-    "convert_obs_col_to_category",
-    "convert_obs_col_to_string",
-    "convert_obs_index_to_str",
-    "get_adata_columns",
 
     # scanpy_
     "subsample_adata_dict",
@@ -85,12 +76,30 @@ __all__ = [
     "plot_umap_adata_dict",
 
     # squidpy_
-    # "compute_spatial_neighbors_adata_dict",
-    # "perform_colocalization_adata_dict",
-    # "plot_colocalization_adata_dict",
-    # "compute_interaction_matrix_adata_dict",
-    # "plot_interaction_matrix_adata_dict",
+    "compute_spatial_neighbors_adata_dict",
+    "perform_colocalization_adata_dict",
+    "plot_colocalization_adata_dict",
+    "compute_interaction_matrix_adata_dict",
+    "plot_interaction_matrix_adata_dict",
 
-    # uce_
-    "UCE_adata",
+    # anndictionary_
+    "remove_genes_adata_dict",
+    "ai_annotate_biological_process_adata_dict",
+    "simplify_var_index_adata_dict",
+    "ensure_label_consistency_adata_dict",
+    "simplify_obs_column_adata_dict",
+    "create_label_hierarchy_adata_dict",
+    "ai_annotate_cell_type_adata_dict",
+    "ai_compare_cell_type_labels_pairwise_adata_dict",
+    "ai_annotate_cell_sub_type_adata_dict",
+    "ai_determine_leiden_resolution_adata_dict",
+    "harmony_label_transfer_adata_dict",
+    "plot_sankey_adata_dict",
+    "save_sankey_adata_dict",
+    "plot_grouped_average_adata_dict",
+    "plot_changes_adata_dict",
+    "plot_confusion_matrix_adata_dict",
+    "summarize_metadata_adata_dict",
+    "display_html_summary_adata_dict",
+    "pca_density_adata_dict",
 ]

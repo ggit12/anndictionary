@@ -6,28 +6,65 @@ import pandas as pd
 
 from sklearn.preprocessing import LabelEncoder
 from sklearn.utils.validation import check_random_state
+from anndata import AnnData
 
-from anndict.utils import pca_density_wrapper
-from anndict.wrappers import add_label_to_adata
+from anndict.adata_dict import AdataDict
+from anndict.utils.pca_density_filter import pca_density_subsets
+from anndict.utils.anndata_ import add_col_to_adata_obs
 
-def stable_label(X, y, classifier, max_iterations=100, stability_threshold=0.05, moving_average_length=3, random_state=None):
+def stable_label(
+    X: np.ndarray,
+    y: np.ndarray,
+    classifier: object,
+    *,
+    max_iterations: int = 100,
+    stability_threshold: float = 0.05,
+    moving_average_length: int = 3,
+    random_state: int | None = None
+) -> tuple[object, list[float], int, np.ndarray]:
+
     """
     Trains a classifier using a semi-supervised approach where labels are probabilistically reassigned based on classifier predictions.
 
-    Parameters:
-    - X: ndarray, feature matrix.
-    - y: ndarray, initial labels for all data.
-    - classifier: a classifier instance that implements fit and predict_proba methods.
-    - max_iterations: int, maximum number of iterations for updating labels.
-    - stability_threshold: float, threshold for the fraction of labels changing to consider the labeling stable.
-    - moving_average_length: int, number of past iterations to consider for moving average.
-    - random_state: int or None, seed for random number generator for reproducibility.
+    Parameters
+    -----------
+    X
+        feature matrix.
 
-    Returns:
-    - classifier: trained classifier.
-    - history: list, percentage of labels that changed at each iteration.
-    - iterations: int, number of iterations run.
-    - final_labels: ndarray, the labels after the last iteration.
+    y
+        initial labels for all data.
+
+    classifier
+        a classifier instance that implements fit and predict_proba methods.
+
+    max_iterations
+        maximum number of iterations for updating labels.
+
+    stability_threshold 
+        threshold for the fraction of labels changing to consider the labeling stable.
+
+    moving_average_length
+        number of past iterations to consider for moving average.
+
+    random_state
+        seed for random number generator for reproducibility.
+
+    Returns
+    --------
+    classifier
+        trained classifier.
+
+    history
+        percentage of labels that changed at each iteration.
+
+    iterations
+        number of iterations run.
+
+    final_labels
+        the labels after the last iteration.
+
+    @todo
+    - switch pca_density_subsets to use pca_density_filter_main or pca_density_filter_adata
     """
     rng = check_random_state(random_state)
     history = []
@@ -36,7 +73,7 @@ def stable_label(X, y, classifier, max_iterations=100, stability_threshold=0.05,
     for iteration in range(max_iterations):
 
         #Call the wrapper function to get the index vector
-        dense_on_pca = pca_density_wrapper(X, current_labels)
+        dense_on_pca = pca_density_subsets(X, current_labels)
 
         #Get which labels are non_empty
         has_label = current_labels != -1
@@ -105,22 +142,40 @@ def stable_label(X, y, classifier, max_iterations=100, stability_threshold=0.05,
 
     return classifier, history, iteration + 1, current_labels
 
-def stable_label_adata(adata, feature_key, label_key, classifier, max_iterations=100, stability_threshold=0.05, moving_average_length=3, random_state=None):
+def stable_label_adata(
+    adata: AnnData,
+    feature_key: str,
+    label_key: str,
+    classifier: object,
+    **kwargs
+) -> tuple[object, list[float], int, np.ndarray, object]:
     """
-    A wrapper for train_classifier_with_probabilistic_labels that handles categorical labels.
+    A wrapper for :func:`stable_label` that handles categorical labels.
 
-    Parameters:
-    - adata: AnnData object containing the dataset.
-    - feature_key: str, key to access the features in adata.obsm.
-    - label_key: str, key to access the labels in adata.obs.
-    - classifier: classifier instance that implements fit and predict_proba methods.
-    - max_iterations, stability_threshold, moving_average_length, random_state: passed directly to train_classifier_with_probabilistic_labels.
+    Parameters
+    -----------
+    adata
+        AnnData object containing the dataset.
 
-    Returns:
+    feature_key
+        str, key to access the features in adata.obsm.
+
+    label_key
+        str, key to access the labels in adata.obs.
+
+    classifier
+        classifier instance that implements fit and predict_proba methods.
+
+    **kwargs
+        keyword args passed directly to :func:`stable_label`.
+
+    Returns
+    -----------
+    A tuple containing:
     - classifier: trained classifier.
-    - history: list, percentage of labels that changed at each iteration.
-    - iterations: int, number of iterations run.
-    - final_labels: ndarray, text-based final labels after the last iteration.
+    - history: percentage of labels that changed at each iteration.
+    - iterations: number of iterations run.
+    - final_labels: text-based final labels after the last iteration.
     - label_encoder: the label encoder used during training (can be used to convert predictions to semantic labels)
     """
     # Initialize Label Encoder
@@ -145,9 +200,7 @@ def stable_label_adata(adata, feature_key, label_key, classifier, max_iterations
         encoded_labels[encoded_labels == nan_label_index] = -1
 
     # Train the classifier using the modified training function that handles probabilistic labels
-    trained_classifier, history, iterations, final_numeric_labels = stable_label(
-        X, encoded_labels, classifier, max_iterations, stability_threshold, moving_average_length, random_state
-    )
+    trained_classifier, history, iterations, final_numeric_labels = stable_label(X, encoded_labels, classifier, **kwargs)
 
     # Decode the numeric labels back to original text labels
     final_labels = label_encoder.inverse_transform(final_numeric_labels)
@@ -155,22 +208,46 @@ def stable_label_adata(adata, feature_key, label_key, classifier, max_iterations
     return trained_classifier, history, iterations, final_labels, label_encoder
 
 
-def stable_label_adata_dict(adata_dict, feature_key, label_key, classifier_class, max_iterations=100, stability_threshold=0.05, moving_average_length=3, random_state=None, **kwargs):
+def stable_label_adata_dict(
+    adata_dict: AdataDict,
+    feature_key: str,
+    label_key: str,
+    classifier_class: object,
+    **kwargs
+) -> dict[tuple[str,...], dict]:
     """
     Trains a classifier for each AnnData object in adata_dict.
 
-    Parameters:
-    adata_dict (dict): Dictionary with keys as identifiers and values as AnnData objects.
-    feature_key (str): Key to access the features in adata.obsm.
-    label_key (str): Key to access the labels in adata.obs.
-    classifier: Classifier instance that implements fit and predict_proba methods.
-    max_iterations, stability_threshold, moving_average_length, random_state: Additional parameters for training.
-    kwargs: Additional keyword arguments to pass to the classifier constructor.
+    Parameters
+    -----------
+    adata_dict
+        Dictionary with keys as identifiers and values as AnnData objects.
 
-    Returns:
-    results: Dict, keys are the identifiers from adata_dict and values are dictionaries containing the outputs from stable_label_adata.
+    feature_key
+        Key to access the features in ``adata.obsm``.
+
+    label_key
+        Key to access the labels in ``adata.obs``.
+
+    classifier_class
+        Classifier instance that implements fit and predict_proba methods.
+
+
+    **kwargs
+        Additional keyword arguments to pass to the classifier constructor and :func:`stable_label_adata`.
+
+    Returns
+    --------
+    A :class:`dict` where keys keys of ``adata_dict`` and values are ``dictionaries`` containing the outputs from :func:`stable_label_adata`.
     """
     stable_label_results = {}
+
+    max_iterations = kwargs.pop('max_iterations', 100)
+    stability_threshold = kwargs.pop('stability_threshold', 0.05)
+    moving_average_length = kwargs.pop('moving_average_length', 3)
+    random_state = kwargs.pop('random_state', None)
+
+
     for stratum, adata in adata_dict.items():
         print(f"Training classifier for {stratum}")
 
@@ -180,7 +257,7 @@ def stable_label_adata_dict(adata_dict, feature_key, label_key, classifier_class
 
         indices = np.array(adata.obs.index)
         trained_classifier, history, iterations, final_labels, label_encoder = stable_label_adata(
-            adata, feature_key, label_key, classifier, max_iterations, stability_threshold, moving_average_length, random_state
+            adata, feature_key, label_key, classifier, max_iterations=max_iterations, stability_threshold=stability_threshold, moving_average_length=moving_average_length, random_state=random_state
         )
 
         stable_label_results[stratum] = {
@@ -195,37 +272,66 @@ def stable_label_adata_dict(adata_dict, feature_key, label_key, classifier_class
     return stable_label_results
 
 
-
-def update_adata_labels_with_results(adata, results, new_label_key='stable_cell_type'):
+def update_adata_labels_with_results(
+    adata: AnnData,
+    results: dict,
+    new_label_key: str = 'stable_cell_type'
+) -> None:
     """
-    Collects indices and labels from results and adds them to the AnnData object using add_label_to_adata function.
+    Collects indices and labels from results and adds them to the AnnData object using add_col_to_adata_obs function.
 
-    Parameters:
-    - adata: AnnData object to be updated.
-    - results: Dictionary containing results, including indices and final_labels.
-    - new_label_key: Name of the new column in adata.obs where the labels will be stored.
+    Parameters
+    -----------
+    adata
+        AnnData object to be updated.
+
+    results
+        Dictionary containing results, including indices and final_labels.
+
+    new_label_key
+        Name of the new column in adata.obs where the labels will be stored.
+    
+    Returns
+    --------
+    None
+
+    Notes
+    ---------
+    This function modifies the input ``adata`` in-place
     """
     # Collect all indices and labels from the results
     all_indices = np.concatenate([info['indices'] for stratum, info in results.items()])
     all_labels = np.concatenate([info['final_labels'] for stratum, info in results.items()])
 
     # Call the function to add labels to adata
-    add_label_to_adata(adata, all_indices, all_labels, new_label_key)
+    add_col_to_adata_obs(adata, all_indices, all_labels, new_label_key)
 
 
 
-def predict_labels_adata_dict(adata_dict, stable_label_results, feature_key):
+def predict_labels_adata_dict(
+    adata_dict: AdataDict,
+    stable_label_results: dict,
+    feature_key: str
+) -> dict:
     """
-    Predicts labels for each AnnData object in adata_dict using the corresponding classifier from stable_label_results,
-    and converts numeric predictions back to text labels.
+    Predict labels for each :class:`AnnData` in ``adata_dict`` using the corresponding classifier from ``stable_label_results``,
+    and convert numeric predictions back to text labels.
 
-    Parameters:
-    adata_dict (dict): Dictionary with keys as identifiers and values as AnnData objects.
-    stable_label_results (dict): Dictionary with keys as identifiers and values as dictionaries containing the trained classifier and other outputs from stable_label_adata.
-    feature_key (str): Key to access the features in adata.obsm.
+    Parameters
+    ------------
+    adata_dict
+        An :class:`AdataDict`.
 
-    Returns:
-    predictions_dict (dict): Dictionary with keys as identifiers from adata_dict and values as predicted text labels.
+    stable_label_results
+        Dictionary with keys as identifiers and values as dictionaries containing output from ``stable_label_adata``.
+
+    feature_key
+        Key to access the features in ``adata.obsm``.
+
+    Returns
+    ------------
+    predictions_dict
+        Dictionary with keys as identifiers from ``adata_dict`` and values as predicted text labels.
     """
     predictions_dict = {}
 
@@ -262,42 +368,91 @@ def predict_labels_adata_dict(adata_dict, stable_label_results, feature_key):
     return predictions_dict
 
 
-def update_adata_labels_with_stable_label_results_dict(adata_dict, stable_label_results_dict, new_label_key='stable_cell_type'):
+def update_adata_labels_with_stable_label_results_dict(
+    adata_dict: AdataDict,
+    stable_label_results_dict: dict,
+    new_label_key: str = 'stable_cell_type'
+):
     """
     Updates each AnnData object in adata_dict with new labels from stable_label_results_dict.
 
-    Parameters:
-    - adata_dict: Dictionary of AnnData objects to be updated.
-    - stable_label_results_dict: Dictionary of dictionaries containing results, including indices and final_labels for each AnnData key.
-    - new_label_key: Name of the new column in adata.obs where the labels will be stored.
+    Parameters
+    -----------
+    adata_dict
+        An :class:`AdataDict`.
+
+    stable_label_results_dict
+        Dictionary of dictionaries containing results, including indices and final_labels for each AnnData key.
+
+    new_label_key
+        Name of the new column in adata.obs where the labels will be stored.
     """
     update_adata_dict_with_label_dict(adata_dict, stable_label_results_dict, new_label_key=new_label_key, label_key='final_labels')
 
 
-def update_adata_labels_with_predictions_dict(adata_dict, predictions_dict, new_label_key='predicted_cell_type'):
+def update_adata_labels_with_predictions_dict(
+    adata_dict: AdataDict,
+    predictions_dict: dict,
+    new_label_key: str = 'predicted_cell_type'
+    ) -> None:
     """
-    Updates each AnnData object in adata_dict with new labels from predictions_dict.
+    Updates each :class:`AnnData` in ``adata_dict`` with new labels from ``predictions_dict``.
 
-    Parameters:
-    - adata_dict: Dictionary of AnnData objects to be updated.
-    - predictions_dict: Dictionary of predicted labels for each AnnData key.
-    - new_label_key: Name of the new column in adata.obs where the labels will be stored.
+    Parameters
+    -----------
+    adata_dict
+        An :class:`AdataDict`.
+
+    predictions_dict
+        Dictionary of predicted labels for each ``AnnData`` key.
+
+    new_label_key
+        Name of the new column in adata.obs where the labels will be stored.
+
+    Returns
+    --------
+    None
+
+    Notes
+    ---------
+    This function modifies the input ``adata_dict`` in-place.
     """
     update_adata_dict_with_label_dict(adata_dict, predictions_dict, new_label_key=new_label_key, label_key='predicted_labels')
 
 
-def update_adata_dict_with_label_dict(adata_dict, results_dict, new_label_key=None, label_key=None):
+def update_adata_dict_with_label_dict(
+    adata_dict: AdataDict,
+    results_dict: dict,
+    new_label_key: str | None = None,
+    label_key: str | None = None
+) -> None:
     """
     Wrapper function to update each AnnData object in adata_dict with new labels from results_dict.
     Accepts either 'final_labels' or 'predicted_labels' as the label key.
     results_dict can be either 1) stable_label_results: the object returned by stable_label_adata_dict()
     or 2) predictions_dict: the object returned by predict_labels_adata_dict
 
-    Parameters:
-    - adata_dict: Dictionary of AnnData objects to be updated.
-    - results_dict: Dictionary containing results, including indices and labels for each AnnData key.
-    - new_label_key: Name of the new column in adata.obs where the labels will be stored.
-    - label_key: Key to access the labels in results_dict (either 'final_labels' or 'predicted_labels').
+    Parameters
+    -----------
+    adata_dict
+        Dictionary of AnnData objects to be updated.
+
+    results_dict
+        Dictionary containing results, including indices and labels for each AnnData key.
+
+    new_label_key
+        Name of the new column in adata.obs where the labels will be stored.
+
+    label_key
+        Key to access the labels in results_dict (either 'final_labels' or 'predicted_labels').
+
+    Returns
+    --------
+    None
+
+    Notes
+    ---------
+    This function modifies the input ``adata_dict`` in-place.
     """
     for key, adata in adata_dict.items():
         if key in results_dict:
@@ -305,4 +460,4 @@ def update_adata_dict_with_label_dict(adata_dict, results_dict, new_label_key=No
             indices = subset_results['indices']
             labels = subset_results[label_key]
 
-            add_label_to_adata(adata, indices, labels, new_label_key)
+            add_col_to_adata_obs(adata, indices, labels, new_label_key)
