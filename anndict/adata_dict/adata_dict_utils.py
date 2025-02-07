@@ -1,8 +1,13 @@
 """
 utils for :class:`AdataDict`
 """
+from __future__ import annotations #allows type hinting without circular dependency
+from typing import TYPE_CHECKING
 
 from .adata_dict_fapply import adata_dict_fapply_return
+
+if TYPE_CHECKING:
+    from .adata_dict import AdataDict
 
 
 def to_nested_tuple(nested_list):
@@ -24,9 +29,9 @@ def to_nested_list(nested_tuple):
 
 
 def set_var_index_func(
-    adata_dict: "AdataDict",
+    adata_dict: AdataDict,
     column: str | list[str]
-) -> "AdataDict":
+) -> AdataDict:
     """
     Set the index of ``adata.var`` to the specified column for each :class:`AnnData` in ``adata_dict``.
 
@@ -49,9 +54,9 @@ def set_var_index_func(
 
 
 def set_obs_index_func(
-    adata_dict: "AdataDict",
+    adata_dict: AdataDict,
     column: str | list[str]
-) -> "AdataDict":
+) -> AdataDict:
     """
     Set the index of adata.obs to the specified column for each AnnData object in adata_dict.
 

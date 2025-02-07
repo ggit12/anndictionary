@@ -24,35 +24,34 @@ def plot_sankey(
 
     Parameters
     ------------
-        adata
-            An :class:`AnnData` object.
+    adata
+        An :class:`AnnData` object.
 
-        cols
-            The list of column names in ``adata.obs`` from which to construct the Sankey diagram.
+    cols
+        The list of column names in ``adata.obs`` from which to construct the Sankey diagram.
 
-        params
-            A :class:`dict` of optional parameters to customize the Sankey diagram appearance. Supported keys include:
+    params
+        A :class:`dict` of optional parameters to customize the Sankey diagram appearance. Supported keys include:
 
-            - ``'cmap'``: :class:`str, colormap for node colors (default: ``'Colorblind'``).
-            - ``'label_position'``: :class:`str`, position of node labels (``'outer'`` or ``'center'``, default: ``'outer'``).
-            - ``'edge_line_width'``: :class:`int`, width of the edges (default: ``0``).
-            - ``'edge_color'``: :class:`str`, attribute for edge coloring (default: ``'value'``, or ``'grey'`` for uniform color).
-            - ``'show_values'``: :class:`bool`, whether to display flow values (default: ``False``).
-            - ``'node_padding'``: :class:`int`, padding between nodes (default: ``12``).
-            - ``'node_alpha'``: :class:`float`, transparency of nodes (default: ``1.0``).
-            - ``'node_width'``: :class:`int`, width of nodes (default: ``30``).
-            - ``'node_sort'``: :class:`bool`, whether to sort nodes (default: ``True``).
-            - ``'frame_height'``: :class:`int`, height of the diagram frame (default: ``1000``).
-            - ``'frame_width'``: :class:`int`, width of the diagram frame (default: ``2000``).
-            - ``'bgcolor'``: :class:`str`, background color of the diagram (default: ``'white'``).
-            - ``'apply_ranges'``: :class:`bool`, whether to apply range adjustments to the plot (default: ``True``).
-            - ``'align_thr'``: :class:`float`, alignment threshold for colors (default: ``-0.1``).
-            - ``'label_font_size'``: :class:`str`, font size for labels (default: ``'12pt'``).
+        - ``'cmap'``: :class:`str`, colormap for node colors (default: ``'Colorblind'``).
+        - ``'label_position'``: :class:`str`, position of node labels (``'outer'`` or ``'center'``, default: ``'outer'``).
+        - ``'edge_line_width'``: :class:`int`, width of the edges (default: ``0``).
+        - ``'edge_color'``: :class:`str`, attribute for edge coloring (default: ``'value'``, or ``'grey'`` for uniform color).
+        - ``'show_values'``: :class:`bool`, whether to display flow values (default: ``False``).
+        - ``'node_padding'``: :class:`int`, padding between nodes (default: ``12``).
+        - ``'node_alpha'``: :class:`float`, transparency of nodes (default: ``1.0``).
+        - ``'node_width'``: :class:`int`, width of nodes (default: ``30``).
+        - ``'node_sort'``: :class:`bool`, whether to sort nodes (default: ``True``).
+        - ``'frame_height'``: :class:`int`, height of the diagram frame (default: ``1000``).
+        - ``'frame_width'``: :class:`int`, width of the diagram frame (default: ``2000``).
+        - ``'bgcolor'``: :class:`str`, background color of the diagram (default: ``'white'``).
+        - ``'apply_ranges'``: :class:`bool`, whether to apply range adjustments to the plot (default: ``True``).
+        - ``'align_thr'``: :class:`float`, alignment threshold for colors (default: ``-0.1``).
+        - ``'label_font_size'``: :class:`str`, font size for labels (default: ``'12pt'``).
 
     Returns
     --------
-        hv.Sankey
-            A Holoviews Sankey diagram object.
+    A Holoviews Sankey diagram object.
 
     Example
     --------
@@ -171,8 +170,7 @@ def save_sankey(
 
     Notes
     ------
-    Saves sankey plot as ``svg`` at the location specified by filename
-    
+    Saves sankey plot as ``svg`` at the location specified by filename.
     """
     import holoviews as hv
     from bokeh.io.webdriver import webdriver_control

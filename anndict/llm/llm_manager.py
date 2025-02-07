@@ -6,7 +6,7 @@ Handles provider configuration, initialization, and message passing using enviro
 """
 import os
 import importlib
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Optional
 from langchain.schema import HumanMessage, AIMessage, SystemMessage
 from .llm_providers import LLMProviders  # type: ignore
 
@@ -24,12 +24,12 @@ class LLMManager:
 
         Parameters
         -----------
-            provider
-                The LLM provider name. Run :func:`LLMProviders.get_providers` to view list of supported providers.
-            model
-                The LLM model name.
-            **kwargs
-                Additional configuration parameters passed to :func:`LLMManager.configure_llm_backend`
+        provider
+            The LLM provider name. Run :func:`LLMProviders.get_providers` to view list of supported providers.
+        model
+            The LLM model name.
+        **kwargs
+            Additional configuration parameters passed to :func:`LLMManager.configure_llm_backend`
 
         Examples
         -----------
@@ -108,7 +108,7 @@ class LLMManager:
             os.environ[f"LLM_{key.upper()}"] = str(value)
 
     @staticmethod
-    def get_llm_config() -> Dict[str, Any]:
+    def get_llm_config() -> dict[str, Any]:
         """
         Retrieves the LLM configuration from environment variables.
 
@@ -119,7 +119,7 @@ class LLMManager:
 
         Returns
         --------
-            A dictionary containing LLM configuration with the following keys:
+        A dictionary containing LLM configuration with the following keys:
 
             provider : :class:`str`
                 The LLM provider name from ``LLM_PROVIDER`` env var
@@ -184,8 +184,8 @@ class LLMManager:
 
     @staticmethod
     def get_llm(
-        instance: Optional[Any], config: Optional[Dict[str, Any]], **kwargs
-    ) -> Tuple[Any, Dict[str, Any]]:
+        instance: Optional[Any], config: Optional[dict[str, Any]], **kwargs
+    ) -> tuple[Any, dict[str, Any]]:
         """Dynamically retrieves the appropriate LLM based on the configuration."""
         current_config = LLMManager.get_llm_config()
 
@@ -222,7 +222,7 @@ class LLMManager:
             ) from e
 
     @staticmethod
-    def call_llm(messages: List[Dict[str, str]],
+    def call_llm(messages: list[dict[str, str]],
         **kwargs
     ) -> str:
         """
@@ -245,21 +245,22 @@ class LLMManager:
 
         Returns
         --------
-            The stripped content of the LLM's response.
+        The stripped content of the LLM's response.
 
         Notes
         ------
         The function performs the following steps:
-            1. Gets LLM configuration and initializes the provider
-            2. Converts messages to appropriate ``LangChain`` message types
-            3. Calls the LLM with the processed messages
-            4. Writes the response to a file specified by ``RESPONSE_PATH`` env variable
-        
+
+        1. Gets LLM configuration and initializes the provider
+        2. Converts messages to appropriate ``LangChain`` message types
+        3. Calls the LLM with the processed messages
+        4. Writes the response to a file specified by ``RESPONSE_PATH`` env variable
+
         The response is written to ``'./response.txt'`` by default if ``RESPONSE_PATH`` is not set.
 
         See Also
         --------
-        LLMManager : Class handling LLM configuration and use.
+        :class:`LLMManager` : Class handling LLM configuration and use.
         :func:`LLMProviders.get_providers` : To see supported providers.
         """
         config = LLMManager.get_llm_config()
@@ -301,14 +302,15 @@ class LLMManager:
 
     @staticmethod
     def retry_call_llm(
-       messages: List[Dict[str, str]],
-       process_response,
-       failure_handler,
-       max_attempts: int = 5,
-       call_llm_kwargs: Optional[Dict[str, Any]] = None,
-       process_response_kwargs: Optional[Dict[str, Any]] = None,
-       failure_handler_kwargs: Optional[Dict[str, Any]] = None,
-   ) -> Any:
+        messages: list[dict[str, str]],
+        process_response: callable,
+        failure_handler: callable,
+        *,
+        max_attempts: int = 5,
+        call_llm_kwargs: dict[str, Any] | None = None,
+        process_response_kwargs: dict[str, Any] | None = None,
+        failure_handler_kwargs: dict[str, Any] | None = None,
+    ) -> Any:
         """
         A retry wrapper for call_llm that allows custom response processing and failure handling.
 
@@ -316,25 +318,33 @@ class LLMManager:
         -----------
         messages
             List of message dictionaries, where each dictionary contains:
+
             - 'role' : :class:`str`
-                The role of the message sender (``'system'``, ``'user'``, or ``'assistant'``)
+              The role of the message sender (``'system'``, ``'user'``, or ``'assistant'``)
+
             - 'content' : :class:`str`
-                The content of the message
+              The content of the message
+
         process_response
             Function to process the LLM response. Should accept response string as first argument.
             If processing fails, triggers retry logic.
+
         failure_handler
             Function called after all retry attempts are exhausted.
             Should handle the complete failure case.
+
         max_attempts
             Maximum number of retry attempts (default: ``5``)
+
         call_llm_kwargs
             Keyword arguments passed to :func:`call_llm` (default: ``None``)
             If contains ``'temperature'``, it's adjusted on retries:
             - Attempts 1-2: temperature = 0
             - Attempts 3+: temperature = (attempt - 2) * 0.025
+
         process_response_kwargs
             Keyword arguments passed to process_response function (default: ``None``)
+
         failure_handler_kwargs
             Keyword arguments passed to failure_handler function (default: ``None``)
 

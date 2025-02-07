@@ -8,3 +8,8 @@ generated/
 # macOS specific files
 .DS_Store
 
+# twine/Pypi files
+dist/
+
+# docs source files
+docs_source/

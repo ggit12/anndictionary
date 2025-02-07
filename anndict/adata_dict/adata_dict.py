@@ -251,6 +251,7 @@ class AdataDict(dict):
 
     @wraps(adata_dict_fapply)
     def fapply(self, func, *, use_multithreading=True, num_workers=None, max_retries=0, **kwargs_dicts):
+        """Wrapper for adata_dict_fapply."""
         return adata_dict_fapply(
             self,
             func,
@@ -262,6 +263,7 @@ class AdataDict(dict):
 
     @wraps(adata_dict_fapply_return)
     def fapply_return(self, func, *, use_multithreading=True, num_workers=None, max_retries=0, return_as_adata_dict=False, **kwargs_dicts):
+        """Wrapper for adata_dict_fapply_return."""
         return adata_dict_fapply_return(
             self,
             func,
@@ -274,8 +276,10 @@ class AdataDict(dict):
 
     @wraps(set_var_index_func)
     def set_var_index(self, cols: str | list[str]):
+        """Wrapper for set_var_index_func."""
         return set_var_index_func(self, cols)
 
     @wraps(set_obs_index_func)
     def set_obs_index(self, cols: str | list[str]):
+        """Wrapper for set_obs_index_func."""
         return set_obs_index_func(self, cols)

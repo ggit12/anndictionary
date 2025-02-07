@@ -11,7 +11,7 @@ def annotate_gene_groups_with_ai_biological_process(
     df: DataFrame,
     groupby: str,
     adt_key: tuple[str,...] | None = None
-    ) -> None:
+) -> None:
     """
     Annotate gene groups on a heatmap with their biological process labels.
 
@@ -46,7 +46,6 @@ def annotate_gene_groups_with_ai_biological_process(
     ----------
     :func:`sc.pl.rank_genes_groups_heatmap` : To generate the ``plot_obj``.
     :func:`adt.ai_annotate_biological_process` : To annotate the gene sets.
-
     """
 
     if adt_key:
