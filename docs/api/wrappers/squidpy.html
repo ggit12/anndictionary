@@ -11,12 +11,12 @@
 <meta property="og:type" content="website" />
 <meta property="og:url" content="api/wrappers/squidpy.html" />
 <meta property="og:site_name" content="AnnDictionary" />
-<meta property="og:description" content="This module contains adata_dict wrappers for squidpy." />
+<meta property="og:description" content="We’ve had to temporarily remove squidpy wrapper support due to dask compatibility ( scverse/squidpy#937)." />
 <meta property="og:image:width" content="1146" />
 <meta property="og:image:height" content="600" />
-<meta property="og:image" content="/None" />
-<meta property="og:image:alt" content="This module contains adata_dict wrappers for squidpy." />
-<meta name="description" content="This module contains adata_dict wrappers for squidpy." />
+<meta property="og:image" content="/_images/social_previews/summary_api_wrappers_squidpy_01129427.png" />
+<meta property="og:image:alt" content="We’ve had to temporarily remove squidpy wrapper support due to dask compatibility ( scverse/squidpy#937)." />
+<meta name="description" content="We’ve had to temporarily remove squidpy wrapper support due to dask compatibility ( scverse/squidpy#937)." />
 <meta name="twitter:card" content="summary_large_image" />
 
     <title>Squidpy &#8212; AnnDictionary Documentation</title>
@@ -65,7 +65,7 @@
     <link rel="canonical" href="https://ggit12.github.io/anndictionary/api/wrappers/squidpy.html" />
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="anndict.wrappers.compute_spatial_neighbors_adata_dict" href="generated/anndict.wrappers.compute_spatial_neighbors_adata_dict.html" />
+    <link rel="next" title="Contribute" href="../../contribute/index.html" />
     <link rel="prev" title="anndict.wrappers.plot_umap_adata_dict" href="generated/anndict.wrappers.plot_umap_adata_dict.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -338,14 +338,7 @@
 <li class="toctree-l4"><a class="reference internal" href="generated/anndict.wrappers.plot_umap_adata_dict.html">anndict.wrappers.plot_umap_adata_dict</a></li>
 </ul>
 </details></li>
-<li class="toctree-l3 current active has-children"><a class="current reference internal" href="#">Squidpy</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l4"><a class="reference internal" href="generated/anndict.wrappers.compute_spatial_neighbors_adata_dict.html">anndict.wrappers.compute_spatial_neighbors_adata_dict</a></li>
-<li class="toctree-l4"><a class="reference internal" href="generated/anndict.wrappers.perform_colocalization_adata_dict.html">anndict.wrappers.perform_colocalization_adata_dict</a></li>
-<li class="toctree-l4"><a class="reference internal" href="generated/anndict.wrappers.plot_colocalization_adata_dict.html">anndict.wrappers.plot_colocalization_adata_dict</a></li>
-<li class="toctree-l4"><a class="reference internal" href="generated/anndict.wrappers.compute_interaction_matrix_adata_dict.html">anndict.wrappers.compute_interaction_matrix_adata_dict</a></li>
-<li class="toctree-l4"><a class="reference internal" href="generated/anndict.wrappers.plot_interaction_matrix_adata_dict.html">anndict.wrappers.plot_interaction_matrix_adata_dict</a></li>
-</ul>
-</details></li>
+<li class="toctree-l3 current active"><a class="current reference internal" href="#">Squidpy</a></li>
 </ul>
 </details></li>
 </ul>
@@ -515,27 +508,7 @@
                   
   <section id="squidpy">
 <h1>Squidpy<a class="headerlink" href="#squidpy" title="Link to this heading">#</a></h1>
-<p>This module contains adata_dict wrappers for <code class="docutils literal notranslate"><span class="pre">squidpy</span></code>.</p>
-<div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/anndict.wrappers.compute_spatial_neighbors_adata_dict.html#anndict.wrappers.compute_spatial_neighbors_adata_dict" title="anndict.wrappers.compute_spatial_neighbors_adata_dict"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compute_spatial_neighbors_adata_dict</span></code></a>(adata)</p></td>
-<td><p>Create a graph from spatial coordinates.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/anndict.wrappers.perform_colocalization_adata_dict.html#anndict.wrappers.perform_colocalization_adata_dict" title="anndict.wrappers.perform_colocalization_adata_dict"><code class="xref py py-obj docutils literal notranslate"><span class="pre">perform_colocalization_adata_dict</span></code></a>(adata, ...)</p></td>
-<td><p>Compute co-occurrence probability of clusters.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/anndict.wrappers.plot_colocalization_adata_dict.html#anndict.wrappers.plot_colocalization_adata_dict" title="anndict.wrappers.plot_colocalization_adata_dict"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_colocalization_adata_dict</span></code></a>(adata, ...[, ...])</p></td>
-<td><p>Plot co-occurrence probability ratio for each cluster.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/anndict.wrappers.compute_interaction_matrix_adata_dict.html#anndict.wrappers.compute_interaction_matrix_adata_dict" title="anndict.wrappers.compute_interaction_matrix_adata_dict"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compute_interaction_matrix_adata_dict</span></code></a>(adata, ...)</p></td>
-<td><p>Compute interaction matrix for clusters.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/anndict.wrappers.plot_interaction_matrix_adata_dict.html#anndict.wrappers.plot_interaction_matrix_adata_dict" title="anndict.wrappers.plot_interaction_matrix_adata_dict"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_interaction_matrix_adata_dict</span></code></a>(adata, ...)</p></td>
-<td><p>Plot cluster interaction matrix.</p></td>
-</tr>
-</tbody>
-</table>
-</div>
+<p>We’ve had to temporarily remove <code class="docutils literal notranslate"><span class="pre">squidpy</span></code> wrapper support due to dask compatibility (<a class="github reference external" href="https://github.com/scverse/squidpy/issues/937">scverse/squidpy#937</a>).</p>
 </section>
 
 
