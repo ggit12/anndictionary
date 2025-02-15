@@ -42,7 +42,11 @@ def ai_compare_cell_types_binary(
 
     # Prepare the messages for the Chat Completions API
     messages = [
-        {"role": "system", "content": "You are a terse molecular biologist who determines if two labels refer to the same cell type. Respond only with 'yes' or 'no'. Examples: 1) CD8-positive T cell 2) T cell -> yes; 1) epithelial cell 2) intrahepatic cholangiocyte -> yes; 1) Macrophage 2) Endothelial Cell -> no; 1) B cell 2) Plasma Cell -> yes"},
+        {"role": "system", "content": "You are a terse molecular biologist who \
+            determines if two labels refer to the same cell type. Respond only \
+            with 'yes' or 'no'. Examples: 1) CD8-positive T cell 2) T cell -> yes; \
+            1) epithelial cell 2) intrahepatic cholangiocyte -> yes; \
+            1) Macrophage 2) Endothelial Cell -> no; 1) B cell 2) Plasma Cell -> yes"},
         {"role": "user", "content": gpt_prompt}
     ]
 
@@ -84,7 +88,14 @@ def ai_compare_cell_types_categorical(
 
     # Prepare the messages for the Chat Completions API
     messages = [
-        {"role": "system", "content": "You are a terse molecular biologist who assesses the degree to which two labels refer to the same cell type. Respond only with 'perfect match', 'partial match', or 'no match'. Examples: 1) CD8-positive T cell 2) T cell -> partial match; 1) epithelial cell 2) intrahepatic cholangiocyte -> partial match; 1) Macrophage 2) Endothelial Cell -> no match; 1) macrophage 2) Macrophage. -> perfect match; 1) B cell 2) Plasma Cell -> partial match"},
+        {"role": "system", "content": "You are a terse molecular biologist who \
+            assesses the degree to which two labels refer to the same cell type. \
+            Respond only with 'perfect match', 'partial match', or 'no match'. \
+            Examples: 1) CD8-positive T cell 2) T cell -> partial match; \
+            1) epithelial cell 2) intrahepatic cholangiocyte -> partial match; \
+            1) Macrophage 2) Endothelial Cell -> no match; \
+            1) macrophage 2) Macrophage. -> perfect match; \
+            1) B cell 2) Plasma Cell -> partial match"},
         {"role": "user", "content": gpt_prompt}
     ]
 
@@ -105,8 +116,9 @@ def ai_compare_cell_type_labels_pairwise(
     comparison_level: str = 'binary'
 ) -> dict[tuple[str,str], DataFrame]:
     """
-    Compare cell type labels by finding unique combinations between labels in ``cols1`` and ``cols2``,
-    applying the comparison, and mapping the results back to ``adata.obs``.
+    Compare cell type labels by finding unique combinations between 
+    labels in ``cols1`` and ``cols2``, applying the comparison, and 
+    mapping the results back to ``adata.obs``.
 
     Parameters
     -----------
@@ -123,11 +135,16 @@ def ai_compare_cell_type_labels_pairwise(
         The base name for the new comparison result columns.
 
     comparison_level:
-        Determines which comparison function to use. Can be either ``'binary'`` or ``'categorical'``. If ``'binary'``, cell type labels are assessed for matching. If ``'categorical'``, the quality of the label match is assessed as one of three levels: ``'perfect'``, ``'partial'``, or ``'not-matching'``.
+        Determines which comparison function to use. Can be either 
+        ``'binary'`` or ``'categorical'``. If ``'binary'``, cell type 
+        labels are assessed for matching. If ``'categorical'``, the 
+        quality of the label match is assessed as one of three 
+        levels: ``'perfect'``, ``'partial'``, or ``'not-matching'``.
 
     Returns
     --------
-    Dictionary with keys as tuples of (col1, col2) and values as DataFrames with the comparison results.
+    Dictionary with keys as tuples of (col1, col2) 
+    and values as DataFrames with the comparison results.
     """
 
     # Call create_label_df to generate the label combinations DataFrame

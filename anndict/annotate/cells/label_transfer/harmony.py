@@ -6,49 +6,70 @@ import anndata as ad
 import scanpy as sc
 import harmonypy as hm
 
-def harmony_label_transfer(adata_to_label, master_data, master_subset_column, label_column):
-    """
-    Perform Harmony integration and transfer labels from master_data to adata_to_label.
+from anndata import AnnData
 
-    This function subsets master_data based on a provided column to get the cells
-    that match in the same column of adata_to_label. It then performs Harmony
+def harmony_label_transfer(
+    origin_adata: AnnData,
+    destination_adata: AnnData,
+    origin_subset_column: str,
+    label_column: str
+) -> None:
+    """
+    Perform Harmony integration and transfer labels from ``origin_adata`` to ``destination_adata``.
+
+    This function subsets ``origin_adata`` based on a provided column to get the cells
+    that match in the same column of ``destination_adata``. It then performs Harmony
     integration on the combined dataset and transfers the specified label column
-    from master_data to adata_to_label.
+    from origin_adata to ``destination_adata``.
 
-    Parameters:
-    adata_to_label : anndata.AnnData The AnnData object to which labels will be transferred.
-    master_data : anndata.AnnData The master AnnData object containing the reference data and labels.
-    master_subset_column : str The column name in .obs used for subsetting master_data to match adata_to_label.
-    label_column : str The column name in .obs of master_data containing the labels to be transferred.
+    Parameters
+    ----------
+    origin_adata
+        The origin AnnData object containing the reference data and labels.
 
-    Returns:
-    anndata.AnnData The adata_to_label object with a new column 'harmony_labels' in .obs containing the transferred labels.
+    destination_adata
+        The AnnData object to which labels will be transferred.
+
+    origin_subset_column
+        The column name in ``origin_adata.obs`` used for subsetting ``origin_adata`` to match ``destination_adata``.
+
+    label_column
+        The column name in ``origin_adata.obs`` containing the labels to be transferred.
+
+    Returns
+    -------
+    None
+
+    Notes
+    -----
+    Modifies ``destination_adata`` in-place, adding a new column 'harmony_labels' in ``adata_to_label.obs`` containing the transferred labels.
     """
 
-    # Subset master_data based on the provided column to get matching cells
-    matching_cells = master_data.obs[master_data.obs[master_subset_column].isin(adata_to_label.obs[master_subset_column])]
-    master_subset = master_data[matching_cells.index]
+    # Subset origin_adata based on the provided column to get matching cells
+    matching_cells = origin_adata.obs[origin_adata.obs[origin_subset_column].isin(destination_adata.obs[origin_subset_column])]
+    origin_subset = origin_adata[matching_cells.index]
 
-    # Combine adata_to_label and the subset of master_data
-    combined_data = ad.concat([adata_to_label, master_subset])
+    # Combine destination_adata and the subset of origin_adata
+    combined_data = ad.concat([destination_adata, origin_subset])
 
     # Perform Harmony integration
     sc.tl.pca(combined_data, svd_solver='arpack')
-    harmony_results = hm.run_harmony(combined_data.obsm['X_pca'], combined_data.obs, master_subset_column)
+    harmony_results = hm.run_harmony(combined_data.obsm['X_pca'], combined_data.obs, origin_subset_column)
     combined_data.obsm['X_harmony'] = harmony_results.Z_corr.T
 
     # Separate the integrated data back into the original datasets
-    adata_to_label_integrated = combined_data[:adata_to_label.n_obs]
-    master_integrated = combined_data[adata_to_label.n_obs:]
+    destination_adata_integrated = combined_data[:destination_adata.n_obs]
+    origin_integrated = combined_data[destination_adata.n_obs:]
 
-    # Transfer labels from master_data to adata_to_label using the integrated data
-    sc.pp.neighbors(master_integrated, use_rep='X_harmony')
-    sc.tl.umap(master_integrated)
-    sc.tl.leiden(master_integrated, resolution=0.5)
+    # Transfer labels from origin_adata to destination_adata using the integrated data
+    sc.pp.neighbors(origin_integrated, use_rep='X_harmony')
+    sc.tl.umap(origin_integrated)
+    sc.tl.leiden(origin_integrated, resolution=0.5)
 
-    # Transfer the specific label column from master_integrated to adata_to_label_integrated
-    master_labels = master_integrated.obs[label_column]
-    adata_to_label_integrated.obs[label_column] = master_labels.reindex(adata_to_label_integrated.obs.index).fillna(method='ffill')
+    # Transfer the specific label column from origin_integrated to destination_adata_integrated
+    origin_labels = origin_integrated.obs[label_column]
+    destination_adata_integrated = destination_adata_integrated.copy() # Make it not a view
+    destination_adata_integrated.obs[label_column] = origin_labels.reindex(destination_adata_integrated.obs.index).ffill()
 
-    # Return adata_to_label with the new labels
-    adata_to_label.obs['harmony_labels'] = adata_to_label_integrated.obs[label_column]
+    # Update destination_adata with the new labels
+    destination_adata.obs['harmony_labels'] = destination_adata_integrated.obs[label_column]

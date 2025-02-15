@@ -2,12 +2,18 @@
 Clean single columns in ``adata.var``
 """
 
+import ast
+
 import pandas as pd
 
 from anndata import AnnData
 
 from anndict.utils import enforce_semantic_list
-from anndict.llm import retry_call_llm, extract_dictionary_from_ai_string, process_llm_category_mapping
+from anndict.llm import (
+    retry_call_llm,
+    extract_dictionary_from_ai_string,
+    process_llm_category_mapping
+)
 
 def simplify_var_index(
     adata: AnnData,
@@ -17,9 +23,11 @@ def simplify_var_index(
     ) -> dict:
     """
 
-    Simplifies gene names in the index of the :class:`AnnData` object's var attribute based on a boolean column,
-    and stores the result in a new column using the :func:`map_gene_labels_to_simplified_set`. This function 
-    assumes that ``adata.var`` contains gene symbols (i.e. PER1, IL1A) and not numeric indices or accession numbers.
+    Simplifies gene names in the index of the :class:`AnnData` object's var 
+    attribute based on a boolean column, and stores the result in a new 
+    column using the :func:`map_gene_labels_to_simplified_set`. This function 
+    assumes that ``adata.var`` contains gene symbols (i.e. PER1, IL1A) 
+    and not numeric indices or accession numbers.
 
     Parameters
     ------------
@@ -33,7 +41,8 @@ def simplify_var_index(
         The name of the new column to store the simplified labels.
 
     simplification_level
-        A qualitative description of how much you want the labels to be simplified. Could be anything, like ``'extremely'``, ``'barely'``, or ``'pathway-level'``.
+        A qualitative description of how much you want the labels to be simplified. 
+        Could be anything, like ``'extremely'``, ``'barely'``, or ``'pathway-level'``.
 
     Returns
     --------
@@ -42,7 +51,8 @@ def simplify_var_index(
     Raises
     --------
     ValueError
-        If more than 1000 genes are selected for simplification or if the masking column (used to select genes) is not boolean.
+        If more than 1000 genes are selected for simplification or if the 
+        masking column (used to select genes) is not boolean.
 
     Notes
     -------
@@ -97,10 +107,12 @@ def simplify_var_index(
         raise ValueError("Cannot simplify more than 1000 genes at a time.")
 
     # Get the mapping of original labels to simplified labels using the provided function
-    label_mapping = map_gene_labels_to_simplified_set(selected_genes, simplification_level=simplification_level)
+    label_mapping = map_gene_labels_to_simplified_set(
+        selected_genes, simplification_level=simplification_level)
 
     # Apply the mapping to create the new column in the AnnData object
-    adata.var[new_column_name] = adata.var.index.to_series().map(label_mapping).fillna(adata.var.index.to_series())
+    adata.var[new_column_name] = adata.var.index.to_series()\
+        .map(label_mapping).fillna(adata.var.index.to_series())
 
     return label_mapping
 
@@ -169,8 +181,19 @@ def map_gene_labels_to_simplified_set(
 
     # Prepare the messages for the Chat Completions API
     messages = [
-        {"role": "system", "content": f"You are a python dictionary mapping generator that takes a list of genes and provides a mapping to a {simplification_level} simplified set as a dictionary. Example: HSP90AA1    HSPA1A    HSPA1B    CLOCK    ARNTL    PER1    IL1A    IL6 -> {{'HSP90AA1':'Heat Shock Proteins','HSPA1A':'Heat Shock Proteins','HSPA1B':'Heat Shock Proteins','CLOCK':'Circadian Rhythm','ARNTL':'Circadian Rhythm','PER1':'Circadian Rhythm','IL1A':'Interleukins','IL6':'Interleukins'}}"},
-        {"role": "user", "content": f"Here is the full list of gene labels to be simplified: {initial_labels_str}. Acknowledge that you've seen all labels. Do not provide the mapping yet."}
+        {"role": "system",
+        "content": f"You are a python dictionary mapping generator that takes \
+                a list of genes and provides a mapping to a {simplification_level} \
+                simplified set as a dictionary. \
+                Example: HSP90AA1    HSPA1A    HSPA1B    CLOCK    ARNTL    PER1    IL1A    IL6 -> \
+                {{'HSP90AA1':'Heat Shock Proteins','HSPA1A':'Heat Shock Proteins',\
+                'HSPA1B':'Heat Shock Proteins','CLOCK':'Circadian Rhythm',\
+                'ARNTL':'Circadian Rhythm','PER1':'Circadian Rhythm',\
+                'IL1A':'Interleukins','IL6':'Interleukins'}}"},
+        {"role": "user",
+        "content": f"Here is the full list of gene labels to be simplified: \
+                {initial_labels_str}. Acknowledge that you've seen all labels. \
+                Do not provide the mapping yet."}
     ]
 
     # Get initial acknowledgment
@@ -185,11 +208,13 @@ def map_gene_labels_to_simplified_set(
 
     def process_batch(batch_labels):
         batch_str = "    ".join(batch_labels)
-        messages.append({"role": "user", "content": f"Provide a mapping for this batch of gene labels. Generate only a dictionary: {batch_str} -> "})
+        messages.append({"role": "user", \
+                            "content": f"Provide a mapping for this batch of gene labels. \
+                            Generate only a dictionary: {batch_str} -> "})
 
         def process_response(response):
             cleaned_mapping = extract_dictionary_from_ai_string(response)
-            return eval(cleaned_mapping)
+            return ast.literal_eval(cleaned_mapping)
 
         def failure_handler(labels):
             print(f"Simplification failed for gene labels: {labels}")

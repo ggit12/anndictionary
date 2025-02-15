@@ -9,8 +9,6 @@ Scanpy
 .. autosummary::
    :toctree: generated
 
-   subsample_adata_dict
-   resample_adata
    resample_adata_dict
    normalize_adata_dict
    log_transform_adata_dict

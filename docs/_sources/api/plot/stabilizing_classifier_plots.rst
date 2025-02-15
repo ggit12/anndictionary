@@ -10,4 +10,4 @@ Stabilizing Classifier
    :toctree: generated
 
     plot_training_history
-    plot_changes
+    plot_label_changes

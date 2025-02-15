@@ -18,7 +18,8 @@ from .de_novo import (
 #transfer labels from an already labeled adata to an unlabaled adata
 from .label_transfer import (
     harmony_label_transfer,
-    stable_label, stable_label_adata
+    train_label_classifier,
+    transfer_labels_using_classifier,
 )
 
 #analyze annotation results
@@ -62,9 +63,9 @@ __all__ = [
     # harmony.py
     "harmony_label_transfer",
 
-    # stabilizing_classifier.py
-    "stable_label",
-    "stable_label_adata",
+    # sklearn_classifier.py
+    "train_label_classifier",
+    "transfer_labels_using_classifier",
 
     # Benchmarking
     #------------

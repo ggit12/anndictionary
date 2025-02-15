@@ -24,15 +24,22 @@ def ai_biological_process(gene_list: list[str]
     ---------
         A :class:`dictionary` containing the description of the biological process.
     """
+    if not gene_list:
+        raise ValueError("Empty gene list passed to ai_biological_process")
+
     #enforce that labels are semantic
     enforce_semantic_list(gene_list)
 
     # Prepare the prompt
     if len(gene_list) == 1:
-        base_prompt = f"In a few words and without restating any part of the question, describe the single most prominent biological process represented by the gene: {gene_list[0]}"
+        base_prompt = f"In a few words and without restating any part of \
+            the question, describe the single most prominent biological \
+            process represented by the gene: {gene_list[0]}"
     else:
         genes_str = "    ".join(gene_list[:-1])
-        base_prompt = f"In a few words and without restating any part of the question, describe the single most prominent biological process represented by the genes: {genes_str}, and {gene_list[-1]}"
+        base_prompt = f"In a few words and without restating any part of \
+            the question, describe the single most prominent biological \
+            process represented by the genes: {genes_str}, and {gene_list[-1]}"
 
     # Prepare the messages for the Chat Completions API
     messages = [
@@ -59,9 +66,10 @@ def ai_annotate_biological_process(
     """
     Annotate biological processes based on the top n marker genes for each cluster.
 
-    This function performs differential expression analysis to identify marker genes for each cluster
-    and applies a user-defined function to determine the biological processes for each cluster based on the top 
-    marker genes. The results are added to the AnnData object and returned as a DataFrame.
+    This function performs differential expression analysis to identify marker genes 
+    for each cluster and applies a user-defined function to determine the biological 
+    processes for each cluster based on the top marker genes. The results are added 
+    to the AnnData object and returned as a DataFrame.
 
     Parameters
     ------------
@@ -83,6 +91,7 @@ def ai_annotate_biological_process(
 
     Notes
     -------
-    This function also modifies the input ``adata`` in place, adding annotations to ``adata.obs[new_label_col]``
+    This function also modifies the input ``adata`` 
+    in place, adding annotations to ``adata.obs[new_label_col]``
     """
     return ai_annotate(func=ai_biological_process, adata=adata, groupby=groupby, n_top_genes=n_top_genes, new_label_column=new_label_column)

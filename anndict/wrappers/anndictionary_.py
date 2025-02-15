@@ -2,9 +2,11 @@
 This module contains adata_dict wrappers for functions in `anndict`.
 """
 
+from typing import Type, Literal
 from functools import wraps
 
 from pandas import DataFrame
+from sklearn.base import ClassifierMixin
 
 from anndict.adata_dict import (
     AdataDict,
@@ -19,12 +21,13 @@ from anndict.annotate import (
     ai_annotate_cell_sub_type,
     ai_determine_leiden_resolution,
     harmony_label_transfer,
+    transfer_labels_using_classifier,
 )
 from anndict.plot import (
     plot_sankey,
     save_sankey,
     plot_grouped_average,
-    plot_changes,
+    plot_label_changes,
     plot_confusion_matrix_from_adata
 )
 from anndict.utils.anndictionary_ import (
@@ -170,6 +173,32 @@ def ai_determine_leiden_resolution_adata_dict(
     """
     return adata_dict_fapply_return(adata_dict, ai_determine_leiden_resolution, max_retries=3, initial_resolution=initial_resolution)
 
+@wraps(transfer_labels_using_classifier)
+def transfer_labels_using_classifier_adata_dict(
+    origin_adata_dict: AdataDict,
+    destination_adata_dict: AdataDict,
+    origin_label_key: str,
+    feature_key: str | Literal["use_X"],
+    classifier_class: Type[ClassifierMixin],
+    new_column_name: str = 'predicted_label',
+    random_state: int | None = None,
+    **kwargs
+) -> AdataDict:
+    """
+    Wrapper for transfer_labels_using_classifier.
+    """
+    return adata_dict_fapply_return(
+        origin_adata_dict,
+        transfer_labels_using_classifier,
+        destination_adata=destination_adata_dict,
+        origin_label_key=origin_label_key,
+        feature_key=feature_key,
+        classifier_class=classifier_class,
+        new_column_name=new_column_name,
+        random_state=random_state,
+        **kwargs
+    )
+
 @wraps(harmony_label_transfer)
 def harmony_label_transfer_adata_dict(adata_dict,
     master_data,
@@ -201,12 +230,12 @@ def plot_grouped_average_adata_dict(adata_dict, label_value):
     """
     adata_dict_fapply(adata_dict, plot_grouped_average, label_value=label_value)
 
-@wraps(plot_changes)
-def plot_changes_adata_dict(adata_dict, true_label_key, predicted_label_key, percentage=True):
+@wraps(plot_label_changes)
+def plot_label_changes_adata_dict(adata_dict, true_label_key, predicted_label_key, percentage=True):
     """
-    Wrapper for plot_changes.
+    Wrapper for plot_label_changes.
     """
-    adata_dict_fapply(adata_dict, plot_changes, true_label_key=true_label_key, predicted_label_key=predicted_label_key, percentage=percentage, use_multithreading=False)
+    adata_dict_fapply(adata_dict, plot_label_changes, true_label_key=true_label_key, predicted_label_key=predicted_label_key, percentage=percentage, use_multithreading=False)
 
 @wraps(plot_confusion_matrix_from_adata)
 def plot_confusion_matrix_adata_dict(adata_dict, true_label_key, predicted_label_key,

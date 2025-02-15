@@ -2,6 +2,8 @@
 Clean single columns in ``adata.obs``
 """
 
+import ast
+
 from anndata import AnnData
 
 from anndict.utils import make_names, enforce_semantic_list, convert_obs_col_to_category
@@ -29,7 +31,9 @@ def simplify_obs_column(
         The name of the new column to store the simplified labels.
 
     simplification_level
-        A qualitative description of how much you want the labels to be simplified. Could be anything, like  ``'extremely'``, ``'barely'``, or ``'compartment-level'``.
+        A qualitative description of how much you want the labels to be 
+        simplified. Could be anything, like  ``'extremely'``, ``'barely'``, 
+        or ``'compartment-level'``.
 
     Returns
     --------
@@ -69,7 +73,8 @@ def simplify_obs_column(
     unique_labels = adata.obs[column].unique()
 
     # Get the mapping of original labels to simplified labels using the provided function
-    label_mapping = map_cell_type_labels_to_simplified_set(unique_labels, simplification_level=simplification_level)
+    label_mapping = map_cell_type_labels_to_simplified_set(
+        unique_labels, simplification_level=simplification_level)
 
     # Apply the mapping to create the new column in the AnnData object
     adata.obs[new_column_name] = adata.obs[column].map(label_mapping)
@@ -100,11 +105,14 @@ def create_label_hierarchy(
         Name of the column in ``adata.obs`` to be simplified.
 
     simplification_levels
-        List of simplification levels to apply. Each level should be a value that can be used by the simplify_obs_column function.
+        List of simplification levels to apply. Each level should be a 
+        value that can be used by the simplify_obs_column function.
 
     Returns
     --------
-    A :class:`dict` mapping new column names to their corresponding simplified label mappings. The keys are the names of the new columns created for each simplification level, and the values are the mappings returned by :func:`simplify_obs_column` for each level.
+    A :class:`dict` mapping new column names to their corresponding simplified label mappings. 
+    The keys are the names of the new columns created for each simplification level, and 
+    the values are the mappings returned by :func:`simplify_obs_column` for each level.
 
     Example
     ---------
@@ -135,7 +143,8 @@ def create_label_hierarchy(
     simplified_mapping = {}
     for level in simplification_levels:
         new_col_name = f"{base_col_name}_{make_names([level])[0]}"
-        simplified_mapping[new_col_name] = simplify_obs_column(adata, col, new_col_name, simplification_level=level)
+        simplified_mapping[new_col_name] = simplify_obs_column(
+            adata, col, new_col_name, simplification_level=level)
         col = new_col_name
     return simplified_mapping
 
@@ -155,7 +164,9 @@ def map_cell_type_labels_to_simplified_set(
         The list of labels to be mapped.
 
     simplification_level
-        A qualitative description of how much you want the labels to be simplified. Or a direction about how to simplify the labels. Could be anything, like ``'extremely'``, ``'barely'``, ``'compartment-level'``, ``'remove-typos'``
+        A qualitative description of how much you want the labels to be simplified. 
+        Or a direction about how to simplify the labels. Could be anything, like 
+        ``'extremely'``, ``'barely'``, ``'compartment-level'``, ``'remove-typos'``
 
     batch_size
         The number of labels to process in each batch.
@@ -198,8 +209,16 @@ def map_cell_type_labels_to_simplified_set(
 
     # Prepare the messages for the Chat Completions API
     messages = [
-        {"role": "system", "content": f"You are a python dictionary mapping generator that takes a list of categories and provides a mapping to a {simplification_level} simplified set as a dictionary. Generate only a dictionary. Example: Fibroblast.    Fibroblasts.    CD8-positive T Cells.    CD4-positive T Cells. -> {{'Fibroblast.':'Fibroblast','Fibroblasts.':'Fibroblast','CD8-positive T Cells.':'T Cell','CD4-positive T Cells.':'T Cell'}}"},
-        {"role": "user", "content": f"Here is the full list of labels to be simplified: {initial_labels_str}. Acknowledge that you've seen all labels. Do not provide the mapping yet."}
+        {"role": "system",
+         "content": f"You are a python dictionary mapping generator \
+                that takes a list of categories and provides a mapping to a \
+                {simplification_level} simplified set as a dictionary. Generate only a dictionary. \
+                Example: Fibroblast.    Fibroblasts.    CD8-positive T Cells.    CD4-positive T Cells. -> \
+                {{'Fibroblast.':'Fibroblast','Fibroblasts.':'Fibroblast',\
+                'CD8-positive T Cells.':'T Cell','CD4-positive T Cells.':'T Cell'}}"},
+        {"role": "user",
+         "content": f"Here is the full list of labels to be simplified: {initial_labels_str}. \
+                nowledge that you've seen all labels. Do not provide the mapping yet."}
     ]
 
     # Get initial acknowledgment
@@ -214,11 +233,13 @@ def map_cell_type_labels_to_simplified_set(
 
     def process_batch(batch_labels):
         batch_str = "    ".join(batch_labels)
-        messages.append({"role": "user", "content": f"Provide a mapping for this batch of labels. Generate only a dictionary: {batch_str} -> "})
+        messages.append({"role": "user",
+                         "content": f"Provide a mapping for this batch \
+                                of labels. Generate only a dictionary: {batch_str} -> "})
 
         def process_response(response):
             cleaned_mapping = extract_dictionary_from_ai_string(response)
-            return eval(cleaned_mapping)
+            return ast.literal_eval(cleaned_mapping)
 
         def failure_handler(labels):
             print(f"Simplification failed for labels: {labels}")

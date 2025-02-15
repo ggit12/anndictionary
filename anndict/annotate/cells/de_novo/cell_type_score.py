@@ -21,7 +21,8 @@ def cell_type_marker_gene_score(
     **kwargs,
 ) -> None:
     """
-    Compute marker gene scores for specified cell types. Must provide either a list of cell types, or a column that contains cell_type labels.
+    Compute marker gene scores for specified cell types. Must provide 
+    either a list of cell types, or a column that contains cell_type labels.
 
     Parameters
     ------------
@@ -38,14 +39,19 @@ def cell_type_marker_gene_score(
         Species for gene list generation. Defaults to ``'Human'``.
 
     list_length
-        Qualitative length of the marker gene list. Can be anything like ``'short'`` or ``'long'``. Try ``'long'`` if you are having trouble getting valid genes that are present in your dataset.
+        Qualitative length of the marker gene list. Can be anything like 
+        ``'short'`` or ``'long'``. Try ``'long'`` if you are having trouble 
+        getting valid genes that are present in your dataset.
 
     score_name
         Suffix for the computed score names. Defaults to '_score'.
 
     adt_key
-        Used by :func:`adata_dict_fapply` or :func:`adata_dict_fapply_return` when passing this function to them.
-    **kwargs: Optional keyword args passed to sc.tl.score_genes().
+        Used by :func:`adata_dict_fapply` or :func:`adata_dict_fapply_return` 
+        when passing this function to them.
+
+    **kwargs
+        Optional keyword args passed to :func:`sc.tl.score_genes`.
 
     Returns
     --------
@@ -54,7 +60,8 @@ def cell_type_marker_gene_score(
     Notes
     ------
         - ``adata.var`` is updated with boolean columns indicating genes used in the scores.
-        - ``adata.obs`` is updated with new columns containing the computed scores for each observation.
+        - ``adata.obs`` is updated with new columns containing the computed scores for each 
+            observation.
 
     See Also
     ---------

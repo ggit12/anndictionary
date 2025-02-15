@@ -33,9 +33,6 @@ from .read import (  # type: ignore
     #read h5ads directly into an AdataDict class
     read_adata_dict_from_h5ad,
 
-    #a catch all to read h5ads and AdataDicts all in one go
-    read,
-
 )
 
 
@@ -50,6 +47,10 @@ from .build import (  # type: ignore
     #build an AdataDict from an adata in memory
     build_adata_dict,
 
+)
+
+
+from .add_stratification import (  # type: ignore
     #add another stratification
     add_stratification,
 
@@ -79,7 +80,6 @@ __all__ = [
     "read_adata_dict",
     "write_adata_dict",
     "read_adata_dict_from_h5ad",
-    "read",
     "build_adata_dict",
     "add_stratification",
     "concatenate_adata_dict",

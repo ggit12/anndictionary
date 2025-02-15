@@ -52,7 +52,7 @@ from .parse_llm_response import (
 
 )
 
-from .llm_providers import LLMProviders
+from .provider_initializer_mapping import LLMProviders
 
 __all__ = [
 
@@ -67,6 +67,6 @@ __all__ = [
     "extract_list_from_ai_string",
     "process_llm_category_mapping",
 
-    #llm_providers.py
+    #provider_initializer_mapping.py
     "LLMProviders",
 ]

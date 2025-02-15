@@ -5,6 +5,8 @@ few extra features to help restructure the nesting hierarchy and iterate over it
 
 from functools import wraps
 
+from anndata import AnnData
+
 from .adata_dict_utils import to_nested_tuple, set_var_index_func, set_obs_index_func
 from .adata_dict_fapply import adata_dict_fapply, adata_dict_fapply_return
 
@@ -84,12 +86,12 @@ class AdataDict(dict):
         """
         return self._hierarchy
 
-    def flatten(self, parent_key=()):
+    def _flatten(self, parent_key=()):
         flat_data = {}
         for key, value in self.items():
             full_key = parent_key + key
             if isinstance(value, AdataDict):
-                flat_data.update(value.flatten(parent_key=full_key))
+                flat_data.update(value._flatten(parent_key=full_key)) # pylint: disable=protected-access
             else:
                 flat_data[full_key] = value
         return flat_data
@@ -141,7 +143,7 @@ class AdataDict(dict):
     nesting_list: list
     ):
         """
-        Rearrange the hierarchy of AdataDict based on the provided nesting structure.
+        Rearrange the hierarchy of :class:`AdataDict` based on the provided nesting structure.
 
         Parameters
         ------------
@@ -150,31 +152,54 @@ class AdataDict(dict):
 
         Examples
         ---------
-            Case 1: Flat hierarchy
-                >>> adata_dict.set_hierarchy(["Donor", "Tissue"])
-                >>> print(adata_dict)
-                {
-                    ("Donor1", "Tissue1"): adata1,
-                    ("Donor1", "Tissue2"): adata2,
-                    ("Donor2", "Tissue1"): adata3,
-                }
+        **Case 1: Flat hierarchy**
 
-            Case 2: Nested hierarchy
-                >>> adata_dict.set_hierarchy(["Donor", ["Tissue"]]) # Note the nested list here
-                >>> print(adata_dict)
-                {
-                    ("Donor1",): {
-                        ("Tissue1",): adata1,
-                        ("Tissue2",): adata2,
-                    },
-                    ("Donor2",): {
-                        ("Tissue1",): adata3,
-                    },
-                }
-            """
+        .. code-block:: python
+
+            adata_dict.set_hierarchy(["Donor", "Tissue"])
+            print(adata_dict)
+            > {
+            >     ("Donor1", "Tissue1"): adata1,
+            >     ("Donor1", "Tissue2"): adata2,
+            >     ("Donor2", "Tissue1"): adata3,
+            > }
+
+        **Case 2: Nested hierarchy**
+
+        .. code-block:: python
+
+            adata_dict.set_hierarchy(["Donor", ["Tissue"]])  # Note the nested list here
+            print(adata_dict)
+            > {
+            >     ("Donor1",): {
+            >         ("Tissue1",): adata1,
+            >         ("Tissue2",): adata2,
+            >     },
+            >     ("Donor2",): {
+            >         ("Tissue1",): adata3,
+            >     },
+            > }
+
+        **Case 3: Complex nested hierarchy**
+
+        .. code-block:: python
+
+            adata_dict.set_hierarchy(["Donor", ["Tissue", "Cell Type"]])  # Note the nested list here
+            print(adata_dict)
+            > {
+            >     ("Donor1",): {
+            >         ("Tissue1", "CellType1"): adata1,
+            >         ("Tissue1", "CellType2"): adata2,
+            >         ("Tissue2", "CellType3"): adata3,
+            >     },
+            >     ("Donor2",): {
+            >         ("Tissue1", "CellType1"): adata4,
+            >     },
+            > }
+        """
 
         # Flatten the nested data
-        flat_data = self.flatten()
+        flat_data = self._flatten()
         self.clear()
         self.update(flat_data)
 
@@ -224,6 +249,46 @@ class AdataDict(dict):
         self.clear()
         self.update(new_data)
 
+    def flatten(self):
+        """
+        Flatten the hierarchy of :class:`AdataDict`.
+
+        Examples
+        ---------
+
+        **Case 1: Nested hierarchy**
+
+        .. code-block:: python
+
+            #start with a nested hierarchy
+            adata_dict.hierarchy
+            > ('donor', ('tissue'))
+            print(adata_dict)
+            > {
+            >     ("Donor1",): {
+            >         ("Tissue1",): adata1,
+            >         ("Tissue2",): adata2,
+            >     },
+            >     ("Donor2",): {
+            >         ("Tissue1",): adata3,
+            >     },
+            > }
+
+            #flatten adata_dict
+            adata_dict.flatten()
+            addata_dict.hierarchy
+            > ('donor', 'tissue') #now the hierarchy is flat
+            print(adata_dict)
+            > {
+            >     ("Donor1", "Tissue1"): adata1,
+            >     ("Donor1", "Tissue2"): adata2,
+            >     ("Donor2", "Tissue1"): adata3,
+            > }
+        """
+        # Flatten the adata_dict
+        flat_hierarchy = self.flatten_nesting_list(self.hierarchy)
+        self.set_hierarchy(flat_hierarchy)
+
     def __getitem__(self, key):
         # Simplify access by converting non-tuple keys to tuple
         if not isinstance(key, tuple):
@@ -236,7 +301,44 @@ class AdataDict(dict):
             key = (key,)
         super().__setitem__(key, value)
 
+    # def __getattr__(self, attr):
+    #     def method(*args, **kwargs):
+    #         results = {}
+    #         for key, adata in self.items():
+    #             if isinstance(adata, AdataDict):
+    #                 # Recurse into nested AdataDict
+    #                 results[key] = getattr(adata, attr)(*args, **kwargs)
+    #             else:
+    #                 func = getattr(adata, attr)
+    #                 results[key] = func(*args, **kwargs)
+    #         return results
+    #     return method
+
     def __getattr__(self, attr):
+        # First check if this is a property of AnnData
+        if hasattr(AnnData, attr):
+            anndata_attr = getattr(AnnData, attr)
+            if isinstance(anndata_attr, property):
+                # Handle property access
+                return self._handle_property_access(attr)
+        
+        # If not a property, handle as a method
+        return self._handle_method_access(attr)
+    
+    def _handle_property_access(self, attr):
+        """Handle property access by returning a dictionary of property values."""
+        results = {}
+        for key, adata in self.items():
+            if isinstance(adata, AdataDict):
+                # Recurse into nested AdataDict
+                results[key] = getattr(adata, attr)
+            else:
+                # Get property value directly
+                results[key] = getattr(adata, attr)
+        return results
+    
+    def _handle_method_access(self, attr):
+        """Handle method access by returning a wrapper function."""
         def method(*args, **kwargs):
             results = {}
             for key, adata in self.items():

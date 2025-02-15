@@ -36,7 +36,8 @@ def module_score_barplot(adata: AnnData,
         The figure size (width, height)
 
     adt_key
-        Used by :func:`adata_dict_fapply` and :func:`adata_dict_fapply_return` when passing this function.
+        Used by :func:`adata_dict_fapply` and :func:`adata_dict_fapply_return` 
+        when passing this function.
 
     Returns
     --------
@@ -91,10 +92,12 @@ def module_score_umap(adata: AnnData,
         List of column names in `adata` containing module scores to plot.
     
     adt_key
-        Used by :func:`adata_dict_fapply` and :func:`adata_dict_fapply_return` when passing this function.
+        Used by :func:`adata_dict_fapply` and :func:`adata_dict_fapply_return` 
+        when passing this function.
 
     **kwargs
-        Additional keyword arguments passed to `sc.pl.umap`, including ``'vmax'`` for color scaling (default is ``'p99'``).
+        Additional keyword arguments passed to `sc.pl.umap`, including ``'vmax'`` 
+        for color scaling (default is ``'p99'``).
 
     Returns
     --------
@@ -116,7 +119,7 @@ def module_score_umap(adata: AnnData,
     # Ensure axes is a flat array of axes
     axes = np.atleast_1d(axes).ravel()
 
-    for i, (score_col, ax) in enumerate(zip(score_cols, axes)):
+    for _, (score_col, ax) in enumerate(zip(score_cols, axes)):
         # Process title
         title = ' '.join(word.capitalize() for word in score_col.replace('_', ' ').split())
         # Plot the UMAP

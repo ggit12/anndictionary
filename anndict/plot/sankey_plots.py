@@ -5,6 +5,7 @@ as well as other other customization parameters.
 """
 
 import os
+from typing import Literal
 from collections import defaultdict
 
 import numpy as np
@@ -18,7 +19,7 @@ def plot_sankey(
     adata: AnnData,
     cols: list[str],
     params: dict[str, str | int | float | bool ] | None = None
-) -> "holoviews.Sankey":
+) -> Literal["holoviews.Sankey"]:
     """
     Generate a Sankey diagram from the specified columns in ``adata.obs``.
 
@@ -60,10 +61,10 @@ def plot_sankey(
         sankey = plot_sankey(adata, cols=['cell_sub_type', 'cell_type', 'compartment'], params={'cmap': 'viridis', 'frame_width': 1200})
         hv.save(sankey, 'sankey_diagram.html')
     """
-    import holoviews as hv
+    import holoviews as hv # pylint: disable=import-outside-toplevel
     hv.extension('bokeh')
 
-    def f(plot, element):
+    def f(plot, element): # pylint: disable=unused-argument
         plot.handles['plot'].sizing_mode = 'scale_width'
         plot.handles['plot'].x_range.start = -1000
         plot.handles['plot'].x_range.end = 1500
@@ -124,7 +125,7 @@ def plot_sankey(
 
     colormap_max = max(sankey_data['value'])
     norm = plt.Normalize(vmin=0, vmax=colormap_max)
-    colors = plt.cm.get_cmap("plasma")(norm(np.linspace(0, colormap_max, 128)))
+    colors = plt.colormaps.get_cmap("plasma")(norm(np.linspace(0, colormap_max, 128)))
 
     replace_these = np.where(norm(np.linspace(0, colormap_max, 128)) <= align_thr)[0]
     if replace_these.size > 0:
@@ -148,7 +149,7 @@ def plot_sankey(
     return sankey
 
 def save_sankey(
-    plot: "holoviews.Sankey",
+    plot: Literal["holoviews.Sankey"],
     filename: str,
     adt_key: tuple[str,...] | None = None
 ) -> None:
@@ -172,9 +173,9 @@ def save_sankey(
     ------
     Saves sankey plot as ``svg`` at the location specified by filename.
     """
-    import holoviews as hv
-    from bokeh.io.webdriver import webdriver_control
-    from bokeh.io import export_svgs
+    import holoviews as hv # pylint: disable=import-outside-toplevel
+    from bokeh.io.webdriver import webdriver_control # pylint: disable=import-outside-toplevel
+    from bokeh.io import export_svgs # pylint: disable=import-outside-toplevel
 
     # Reset web driver because sometimes the max connections is hit when writing plots
     webdriver_control.reset()

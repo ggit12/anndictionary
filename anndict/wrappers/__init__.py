@@ -3,8 +3,6 @@ This module contains :func:`adata_dict_fapply` and :func:`adata_dict_fapply_retu
 """
 
 from .scanpy_ import (
-    subsample_adata_dict,
-    resample_adata,
     resample_adata_dict,
     normalize_adata_dict,
     log_transform_adata_dict,
@@ -18,6 +16,7 @@ from .scanpy_ import (
     leiden_sub_cluster_adata_dict,
     calculate_umap_adata_dict,
     plot_umap_adata_dict,
+    plot_spatial_adata_dict
 
 )
 
@@ -47,7 +46,7 @@ from .anndictionary_ import (
     plot_sankey_adata_dict,
     save_sankey_adata_dict,
     plot_grouped_average_adata_dict,
-    plot_changes_adata_dict,
+    plot_label_changes_adata_dict,
     plot_confusion_matrix_adata_dict,
     summarize_metadata_adata_dict,
     display_html_summary_adata_dict,
@@ -59,8 +58,6 @@ from .anndictionary_ import (
 __all__ = [
 
     # scanpy_
-    "subsample_adata_dict",
-    "resample_adata",
     "resample_adata_dict",
     "normalize_adata_dict",
     "log_transform_adata_dict",
@@ -74,6 +71,7 @@ __all__ = [
     "leiden_sub_cluster_adata_dict",
     "calculate_umap_adata_dict",
     "plot_umap_adata_dict",
+    "plot_spatial_adata_dict",
 
     # squidpy_
     # "compute_spatial_neighbors_adata_dict",
@@ -97,7 +95,7 @@ __all__ = [
     "plot_sankey_adata_dict",
     "save_sankey_adata_dict",
     "plot_grouped_average_adata_dict",
-    "plot_changes_adata_dict",
+    "plot_label_changes_adata_dict",
     "plot_confusion_matrix_adata_dict",
     "summarize_metadata_adata_dict",
     "display_html_summary_adata_dict",

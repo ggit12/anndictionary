@@ -13,7 +13,8 @@ def ai_unify_labels(
     simplification_level: str = "unified, typo-fixed",
 ) -> dict:
     """
-    Unifies cell type labels across multiple AnnData objects by mapping them to a simplified, unified set of labels.
+    Unifies cell type labels across multiple AnnData objects 
+    by mapping them to a simplified, unified set of labels.
 
     Parameters
     ------------
@@ -21,7 +22,9 @@ def ai_unify_labels(
         An :class:`AdataDict`.
 
     label_columns
-        :class:`dict` where keys should be the same as the keys of ``adata_dict`` and values are the column names in the corresponding ``adata.obs`` containing the original labels.
+        :class:`dict` where keys should be the same as the keys of ``adata_dict`` and 
+        values are the column names in the corresponding ``adata.obs`` containing the 
+        original labels.
 
     new_label_column
         Name of the new column to be created in each ``adata.obs`` for storing the unified labels.
@@ -31,17 +34,19 @@ def ai_unify_labels(
 
     Returns
     ---------
-    A mapping :class:`dict` where the keys are the original labels and the values are the unified labels.
+    A mapping :class:`dict` where the keys are the original labels and 
+    the values are the unified labels.
 
     Notes
     -------
-    Modifies each ``adata`` in ``adata_dict`` in-place by adding ``adata.obs[new_label_column]`` with the unified label mapping.
+    Modifies each ``adata`` in ``adata_dict`` in-place by 
+    adding ``adata.obs[new_label_column]`` with the unified label mapping.
     """
     # todo: use adata_dict_fapply instead of loops
     def get_unique_labels_from_obs_column(adata, label_column):
         return adata.obs[label_column].unique().tolist()
 
-    def apply_mapping_to_adata(adata, mapping_dict, original_column, new_column, adt_key=None):
+    def apply_mapping_to_adata(adata, mapping_dict, original_column, new_column, adt_key=None): # pylint: disable=unused-argument
         adata.obs[new_column] = adata.obs[original_column].map(mapping_dict)
 
     # Step 1: Aggregate all labels

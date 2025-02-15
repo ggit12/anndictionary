@@ -4,16 +4,32 @@ This module contains utility functions for label comparison.
 
 import pandas as pd
 
-def create_label_df(adata, cols1, cols2):
+from anndata import AnnData
+
+def create_label_df(
+    adata: AnnData,
+    cols1: list[str],
+    cols2: list[str]
+) -> pd.DataFrame:
     """
-    Create a DataFrame of unique label combinations from the specified columns in cols1 and cols2,
-    only including combinations that exist in adata.obs.
-    Parameters:
-    adata: AnnData object containing the data.
-    cols1: List of columns to compare against cols2.
-    cols2: List of columns to compare with cols1.
-    Returns:
-    pd.DataFrame: DataFrame containing unique combinations of the specified columns.
+    Creates a :class:`DataFrame` of unique label combinations from 
+    the specified columns in ``cols1`` and ``cols2``, only including 
+    combinations that exist in ``adata.obs[[*cols1, *cols2]]``.
+
+    Parameters
+    ----------
+    adata
+        An :class:`AnnData`.
+
+    cols1
+        List of columns to compare with cols2.
+
+    cols2
+        List of columns to compare with cols1.
+
+    Returns
+    -------
+    :class:`DataFrame` containing unique combinations of the specified columns.
     """
     # Combine all columns
     all_cols = cols1 + cols2

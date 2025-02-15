@@ -53,7 +53,7 @@ def plot_grouped_average(
     df = pd.DataFrame(grouped_means)
 
     # Plot the results
-    df.plot(kind='bar', figsize=(12, 8), color=plt.cm.get_cmap("Paired").colors)
+    df.plot(kind='bar', figsize=(12, 8), color=plt.colormaps["Paired"].colors)
     plt.xlabel('Groups')
     plt.ylabel('Average Scores')
     plt.title('Average Scores across Groups')
@@ -164,7 +164,7 @@ def plot_model_agreement(
         # Create the clustermapimport seaborn as sns
 
         # Use the 'viridis_r' colormap
-        cmap = plt.get_cmap('viridis_r')
+        cmap = plt.colormaps['viridis_r']
 
         # Set the color for NaN values (e.g., red)
         cmap.set_bad(color='black')

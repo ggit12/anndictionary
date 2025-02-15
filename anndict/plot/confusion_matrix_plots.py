@@ -31,10 +31,12 @@ def plot_confusion_matrix_from_adata(
     annot: bool | None = None
 ) -> ClusterGrid:
     """
-    Plots a confusion matrix from an :class:`AnnData` object, with optional row and column colors. 
+    Plots a confusion matrix from an :class:`AnnData` object, with optional row and column colors.
+
     Set ``diagonalize=True`` to automatically arrange the column and rows to make the confusion matrix appear as diagonal as possible.
+
     Wraps :func:`plot_confusion_matrix`.
-    
+
     Parameters
     ------------
     adata 
@@ -129,11 +131,11 @@ def plot_confusion_matrix(
 ) -> ClusterGrid:
     """
     Plot a confusion matrix using cluster mapping with optional color annotations.
-    
+
     This function computes a confusion matrix based on encoded true and predicted labels
     and optionally reorders the matrix to maximize diagonal alignment. It supports
     row and column coloring based on custom dictionaries and color maps.
-    
+
     Parameters
     ----------
     true_labels_encoded
@@ -194,19 +196,25 @@ def plot_confusion_matrix(
 
     Notes
     ------
-    - If the number of true or predicted labels exceeds 40, tick labels and annotations are disabled by default for better visibility.
+    - If the number of true or predicted labels exceeds 40, 
+        tick labels and annotations are disabled by default for better visibility.
     - The matrix is normalized by the number of samples in each true class.
-    - If `diagonalize` is True, reorder the columns and row to diagonalize the matrix to the extent possible.
+    - If `diagonalize` is True, reorder the columns and 
+        row to diagonalize the matrix to the extent possible.
 
     Examples
     ---------
-    >>> # Assume true_encoded, pred_encoded, and le are given, along with a color_map dict
-    >>> g = plot_confusion_matrix(
-    ...     true_labels_encoded=true_encoded,
-    ...     predicted_labels_encoded=pred_encoded,
-    ...     label_encoder=le,
-    ...     color_map={'some_color_key': {'some_label_value': '#ff0000'}}
-    ... )
+
+    .. code-block:: python
+
+        # Assume true_encoded, pred_encoded, and le are given, along with a color_map dict
+        g = plot_confusion_matrix(
+            true_labels_encoded=true_encoded,
+            predicted_labels_encoded=pred_encoded,
+            label_encoder=le,
+            color_map={'some_color_key': {'some_label_value': '#ff0000'}}
+        )
+
     """
 
     labels_true = np.unique(true_labels_encoded)

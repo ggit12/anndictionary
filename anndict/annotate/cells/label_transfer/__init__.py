@@ -7,11 +7,10 @@ from .harmony import (
     harmony_label_transfer,
 )
 
-#label transfer by training a classifier on labeled data, then running the classifier on unlabeled data
-from .stabilizing_classifier import (
-    #still need to rework stablelabel funcs
-    stable_label,
-    stable_label_adata,
+#label transfer using an sklearn classifier
+from .sklearn_classifier import (
+    train_label_classifier,
+    transfer_labels_using_classifier,
 )
 
 
@@ -19,7 +18,7 @@ __all__ = [
     # harmony.py
     "harmony_label_transfer",
 
-    # stabilizing_classifier.py
-    "stable_label",
-    "stable_label_adata",
+    # sklearn_classifier.py
+    "train_label_classifier",
+    "transfer_labels_using_classifier",
 ]

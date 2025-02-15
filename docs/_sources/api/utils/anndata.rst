@@ -29,6 +29,7 @@ Add metadata
 
    add_col_to_adata_obs
    add_col_to_adata_var
+   add_col_to_pd_df
 
 
 Convert column dtypes

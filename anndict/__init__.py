@@ -26,6 +26,8 @@ from .adata_dict import (
 
     # build.py
     build_adata_dict,
+
+    # add_stratification.py
     add_stratification,
 
     # write.py
@@ -34,7 +36,6 @@ from .adata_dict import (
     #read.py
     read_adata_dict,
     read_adata_dict_from_h5ad,
-    read,
 
     # concatenate.py
     concatenate_adata_dict,
@@ -55,7 +56,7 @@ from .llm import (
     extract_list_from_ai_string,
     process_llm_category_mapping,
 
-    #llm_providers.py
+    #provider_initializer_mapping.py
     LLMProviders,
 
 )
@@ -80,7 +81,8 @@ from .annotate import (
 
     # Label Transfer
     harmony_label_transfer,
-    stable_label, stable_label_adata,
+    train_label_classifier,
+    transfer_labels_using_classifier,
 
     # Benchmarking
     create_label_df,
@@ -112,7 +114,7 @@ from .plot import (
 
     #stabilizing_classifier_plots.py
     plot_training_history,
-    plot_changes,
+    plot_label_changes,
 
 )
 
@@ -139,6 +141,48 @@ from .automated_label_management import (
 
 )
 
+from .utils import (
+
+    # anndictionary_.py
+    enforce_semantic_list,
+    make_names,
+    normalize_string,
+    normalize_label,
+    create_color_map,
+    get_slurm_cores,
+    summarize_metadata,
+    display_html_summary,
+
+    # anndata_.py
+    remove_genes,
+    add_col_to_adata_obs,
+    add_col_to_adata_var,
+    add_col_to_pd_df,
+    convert_obs_col_to_category,
+    convert_obs_col_to_string,
+    convert_obs_index_to_str,
+    get_adata_columns,
+
+    # scanpy_.py
+    subsample_adata_dict,
+    resample_adata,
+
+    # pca_density_filter.py
+    pca_density_filter_main,
+    pca_density_filter_adata,
+
+    # stabilizing_classifier.py
+    stable_label,
+    stable_label_adata,
+
+    # read_spatial_data.py
+    add_blank_image_to_adata,
+    build_adata_from_transcript_positions,
+    build_adata_from_visium,
+
+
+)
+
 
 __all__ = [
     # Core
@@ -154,6 +198,8 @@ __all__ = [
 
     # build.py
     "build_adata_dict",
+
+    # add_stratification.py
     "add_stratification",
 
     # write.py
@@ -162,7 +208,6 @@ __all__ = [
     #read.py
     "read_adata_dict",
     "read_adata_dict_from_h5ad",
-    "read",
 
     # concatenate.py
     "concatenate_adata_dict",
@@ -183,13 +228,12 @@ __all__ = [
     "extract_list_from_ai_string",
     "process_llm_category_mapping",
 
-    #llm_providers.py
+    #provider_initializer_mapping.py
     "LLMProviders",
 
 
     # Annotate
     # -----------
-
     # Cells
     # De Novo
     "ai_annotate",
@@ -205,8 +249,8 @@ __all__ = [
 
     # Label Transfer
     "harmony_label_transfer",
-    "stable_label",
-    "stable_label_adata",
+    "train_label_classifier",
+    "transfer_labels_using_classifier",
 
     # Benchmarking
     "create_label_df",
@@ -242,7 +286,7 @@ __all__ = [
 
     # from stabilizing_classifier_plots.py
     "plot_training_history",
-    "plot_changes",
+    "plot_label_changes",
 
     # Automated Label Management
     # ----------------------------
@@ -263,6 +307,41 @@ __all__ = [
 
     # from unify_columns_between_adata.py
     "ai_unify_labels",
+
+    # Utils
+    # -------
+    # anndictionary_.py
+    "enforce_semantic_list",
+    "make_names",
+    "normalize_string",
+    "normalize_label",
+    "create_color_map",
+    "get_slurm_cores",
+    "summarize_metadata",
+    "display_html_summary",
+
+    # scanpy_.py
+    "subsample_adata_dict",
+    "resample_adata",
+
+    # anndata_.py
+    "remove_genes",
+    "add_col_to_adata_obs",
+    "add_col_to_adata_var",
+    "add_col_to_pd_df",
+    "convert_obs_col_to_category",
+    "convert_obs_col_to_string",
+    "convert_obs_index_to_str",
+    "get_adata_columns",
+
+    # pca_density_filter.py
+    "pca_density_filter_main",
+    "pca_density_filter_adata",
+
+    # read_spatial_data.py
+    "add_blank_image_to_adata",
+    "build_adata_from_transcript_positions",
+    "build_adata_from_visium",
 
 ]
 

@@ -27,8 +27,15 @@ def check_and_create_stratifier(
     Raises
     --------
     ValueError
+        If strata_keys is an empty list.
+
+    ValueError
         If one or more of the specified stratifying variables do not exist in adata.obs.
     """
+    #Check if strata_keys is an empty list
+    if not strata_keys:
+        raise ValueError("You specified strata_keys as an empty list. You must specify at least one stratifying variable")
+
     # Check if any of the strata_keys are not present in adata.obs
     if any(key not in adata.obs.columns for key in strata_keys):
         raise ValueError("one or more of your stratifying variables does not exist in adata.obs")

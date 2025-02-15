@@ -5,6 +5,20 @@ Transfer Labels
 .. automodule:: anndict.annotate.cells.label_transfer
    :noindex:
 
+Using an sklearn classifier
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. automodule:: anndict.annotate.cells.label_transfer.sklearn_classifier
+   :noindex:
+
+.. currentmodule:: anndict.annotate
+
+.. autosummary::
+   :toctree: generated
+
+   transfer_labels_using_classifier
+   train_label_classifier
+   
 Based on harmony integration
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -17,18 +31,3 @@ Based on harmony integration
    :toctree: generated
 
    harmony_label_transfer
-   
-
-Train a classifier on labeled data and use it to predict labels
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. automodule:: anndict.annotate.cells.label_transfer.stabilizing_classifier
-   :noindex:
-
-.. currentmodule:: anndict.annotate
-
-.. autosummary::
-   :toctree: generated
-
-   stable_label
-   stable_label_adata

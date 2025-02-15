@@ -24,7 +24,8 @@ from .cells import (
 
     # Label Transfer
     harmony_label_transfer,
-    stable_label, stable_label_adata,
+    train_label_classifier,
+    transfer_labels_using_classifier,
 
     # Benchmarking
     create_label_df,
@@ -55,8 +56,8 @@ __all__ = [
 
     # Label Transfer
     "harmony_label_transfer",
-    "stable_label",
-    "stable_label_adata",
+    "train_label_classifier",
+    "transfer_labels_using_classifier",
 
     # Benchmarking
     "create_label_df",

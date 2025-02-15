@@ -3,6 +3,7 @@
 Use LLMs create gene lists for a given cell type (with species awareness). 
 This automates manual curation of these lists. 
 """
+import ast
 
 from anndict.utils import enforce_semantic_list
 from anndict.llm import call_llm, retry_call_llm, extract_list_from_ai_string
@@ -20,10 +21,14 @@ def ai_make_cell_type_gene_list(
     ------------
     cell_type
         The cell type to get marker genes for.
+
     species
         The species to consider.
+
     list_length
-        Qualitative length of the marker gene list. Can be anything like ``'short'`` or ``'long'``. Try ``'long'`` if you are having trouble getting valid genes that are present in your dataset.
+        Qualitative length of the marker gene list. Can be anything like 
+        ``'short'`` or ``'long'``. Try ``'long'`` if you are having trouble 
+        getting valid genes that are present in your dataset.
 
     Returns
     --------
@@ -71,7 +76,7 @@ def ai_make_cell_type_gene_list(
 
     def process_response(response):
         gene_list = extract_list_from_ai_string(response)
-        return eval(gene_list)
+        return ast.literal_eval(gene_list)
 
     def failure_handler(cell_type):
         print(f"Failed to generate list for: {cell_type}")

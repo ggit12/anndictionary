@@ -1,5 +1,7 @@
 """
-This module contains functions that operate on a single ``adata`` to make multiple columns in the ``.obs`` have a shared set of categories.
+This module contains functions that operate on a single 
+``adata`` to make multiple columns in the ``.obs`` 
+have a shared set of categories.
 """
 
 #the following functions also unify labels but serve a different purpose than ai_unify_labels.
@@ -11,7 +13,9 @@ from pandas import DataFrame
 from anndata import AnnData
 
 from anndict.utils import normalize_label
-from anndict.automated_label_management.clean_single_column.in_adata_obs import map_cell_type_labels_to_simplified_set
+from anndict.automated_label_management.clean_single_column.in_adata_obs import (
+    map_cell_type_labels_to_simplified_set
+)
 
 def ensure_label_consistency_adata(
     adata: AnnData,
@@ -20,7 +24,8 @@ def ensure_label_consistency_adata(
     new_col_prefix: str = 'consistent'
     ) -> dict:
     """
-    Wrapper function to ensure label consistency across specified columns in an :class:`AnnData` object.
+    Wrapper function to ensure label consistency 
+    across specified columns in an :class:`AnnData` object.
 
     Parameters
     -----------
@@ -34,7 +39,8 @@ def ensure_label_consistency_adata(
         Qualitative direction about how to process the labels.
 
     new_col_prefix
-        Prefix to use when creating new columns in ``adata.obs``. Setting ``new_col_prefix = ""`` would overwrite the original columns.
+        Prefix to use when creating new columns in ``adata.obs``. 
+        Setting ``new_col_prefix = ""`` would overwrite the original columns.
 
     Returns
     --------
@@ -42,15 +48,19 @@ def ensure_label_consistency_adata(
 
     Notes
     -------
-    Updates ``adata`` in-place with a shared set of labels labels in ``adata.obs[new_col_prefix + cols]``.
+    Updates ``adata`` in-place with a shared set of labels 
+    labels in ``adata.obs[new_col_prefix + cols]``.
 
-    Useful when calculating inter-rater reliability. To calculate measures of inter-rater reliability, see below:
+    Useful when calculating inter-rater reliability. 
+    To calculate measures of inter-rater reliability, see below:
 
     See Also
     ----------
 
-    :func:`kappa_adata` : To calculate both Cohen's and Fleiss's Kappa, a measure of inter-rater reliability.
-    :func:`krippendorff_alpha_adata`: To calculate Krippendorff's Alpha, a measure of inter-rater reliability.
+    :func:`kappa_adata` : To calculate both Cohen's and 
+        Fleiss's Kappa, a measure of inter-rater reliability.
+    :func:`krippendorff_alpha_adata`: To calculate Krippendorff's 
+        Alpha, a measure of inter-rater reliability.
     """
     # Step 1: Extract the relevant columns from adata.obs into a DataFrame
     df = adata.obs[cols].copy()
@@ -76,7 +86,8 @@ def ensure_label_consistency_main(df: DataFrame,
     Parameters
     -----------
     df
-        a :class:`DataFrame` containing categorical columns across which to unify category labels (so that all columns share the same set of labels).
+        a :class:`DataFrame` containing categorical columns across 
+        which to unify category labels (so that all columns share the same set of labels).
 
     simplification_level
         Qualitative direction about how to process the labels.
@@ -87,21 +98,33 @@ def ensure_label_consistency_main(df: DataFrame,
     class:`dict` containing the full mapping of original labels to the new, shared set of labels
 
     """
-    # Step 1: Normalize all labels in the DataFrame
-    for column in df.columns:
-        df[column] = df[column].apply(normalize_label)
-
-    # Step 2: Create a unified set of unique labels across all columns
+    # Step 1: Create a unified set of unique labels across all columns (before normalization)
     unique_labels = set()
     for column in df.columns:
         unique_labels.update(df[column].unique())
 
-    # Step 3: Use the external function to map labels to a simplified set
-    unique_labels_list = list(unique_labels)
-    mapping_dict = map_cell_type_labels_to_simplified_set(unique_labels_list, simplification_level=simplification_level)
+    # Normalize the unique labels with normalize_label(unique_labels)
+    normalized_labels = {normalize_label(label) for label in unique_labels}
+
+    # Create a dict called normalization_mapping from original to normalized labels
+    normalization_mapping = {label: normalize_label(label) for label in unique_labels}
+
+    # Step 2: Normalize all labels in the DataFrame using the normalization_mapping
+    for column in df.columns:
+        df[column] = df[column].map(normalization_mapping)
+
+    # Step 3: Use the external function to map normalized labels to a simplified set
+    normalized_labels_list = list(normalized_labels)
+    mapping_dict = map_cell_type_labels_to_simplified_set(
+        normalized_labels_list, simplification_level=simplification_level)
 
     # Step 4: Apply the mapping dictionary to all columns
     for column in df.columns:
         df[column] = df[column].map(mapping_dict)
 
-    return df, mapping_dict
+    # Use normalization_mapping and mapping_dict to create one dict that goes from
+    # keys of normalization_mapping (original labels) to values of mapping_dict (simplified labels)
+    label_map = {original_label: mapping_dict[normalized_label]
+                     for original_label, normalized_label in normalization_mapping.items()}
+
+    return df, label_map

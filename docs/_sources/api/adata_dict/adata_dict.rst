@@ -17,6 +17,7 @@ Manipulate the hierarchy
    :toctree: generated
 
    AdataDict.set_hierarchy
+   AdataDict.flatten
 
 Iterate over :class:`AdataDict`
 --------------------------------

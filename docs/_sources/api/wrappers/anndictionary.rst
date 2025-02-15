@@ -23,7 +23,7 @@ AnnDictionary
    plot_sankey_adata_dict
    save_sankey_adata_dict
    plot_grouped_average_adata_dict
-   plot_changes_adata_dict
+   plot_label_changes_adata_dict
    plot_confusion_matrix_adata_dict
    summarize_metadata_adata_dict
    display_html_summary_adata_dict

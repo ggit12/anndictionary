@@ -15,7 +15,8 @@ def read_adata_dict(
     directory: str,
 ) -> AdataDict:
     """
-    Read an :class:`AdataDict` from a previously saved :class:`AdataDict`. To write an :class:`AdataDict` see :func:`~write_adata_dict`.
+    Read an :class:`AdataDict` from a previously saved :class:`AdataDict`. 
+    To write an :class:`AdataDict` see :func:`~write_adata_dict`.
 
     Parameters
     -----------
@@ -26,189 +27,161 @@ def read_adata_dict(
     --------
     An :class:`AdataDict` reconstructed from the saved files.
 
-    Example
-    --------
-    If the directory structure is:
+    Raises
+    ------
+    FileNotFoundError
+        If the directory or required metadata files don't exist.
+    ValueError
+        If the metadata files are corrupted or in an unexpected format.
 
-    .. code-block:: text
+    Examples
+    ---------
+    **Case 1: Flat hierarchy**
+
+    .. code-block:: bash
 
         directory/
-        adata_dict.hierarchy
-            Donor1/
-                Tissue1/
-                    Donor1_Tissue1.h5ad
-                Tissue2/
-                    Donor1_Tissue2.h5ad
-            Donor2/
-                Tissue1/
-                    Donor2_Tissue1.h5ad
+        ├── adata_dict.hierarchy.json
+        ├── adata_dict.db.json
+        ├── <file_prefix>Donor1_Tissue1.h5ad
+        ├── <file_prefix>Donor1_Tissue2.h5ad
+        └── <file_prefix>Donor2_Tissue1.h5ad
 
-    And the hierarchy was:
-
-    .. code-block:: text
-
-        ("Donor", "Tissue")
-
-    The reconstructed adata_dict will be:
+    The reconstructed AdataDict will be:
 
     .. code-block:: python
 
-        {
-            ("Donor1", "Tissue1"): adata_d1_t1,
-            ("Donor1", "Tissue2"): adata_d1_t2,
-            ("Donor2", "Tissue1"): adata_d2_t1,
-        }
+        print(adata_dict)
+        > {
+        >     ("Donor1", "Tissue1"): adata_d1_t1,
+        >     ("Donor1", "Tissue2"): adata_d1_t2,
+        >     ("Donor2", "Tissue1"): adata_d2_t1,
+        > }
+
+    **Case 2: Nested hierarchy**
+
+    .. code-block:: bash
+
+        directory/
+        ├── adata_dict.hierarchy.json
+        ├── adata_dict.db.json
+        ├── Donor1/
+        │   ├── <file_prefix>Tissue1.h5ad
+        │   └── <file_prefix>Tissue2.h5ad
+        └── Donor2/
+            └── <file_prefix>Tissue1.h5ad
+
+    The reconstructed AdataDict will be:
+
+    .. code-block:: python
+
+        print(adata_dict)
+        > {
+        >     ("Donor1",): {
+        >         ("Tissue1",): adata_d1_t1,
+        >         ("Tissue2",): adata_d1_t2,
+        >     },
+        >     ("Donor2",): {
+        >         ("Tissue1",): adata_d2_t1,
+        >     },
+        > }
+
+    **Case 3: Nested hierarchy with multiple indices at the deepest level**
+
+    .. code-block:: bash
+
+        directory/
+        ├── adata_dict.hierarchy.json
+        ├── adata_dict.db.json
+        ├── Donor1/
+        │   ├── <file_prefix>Tissue1_CellType1.h5ad
+        │   ├── <file_prefix>Tissue1_CellType2.h5ad
+        │   └── <file_prefix>Tissue2_CellType3.h5ad
+        └── Donor2/
+            └── <file_prefix>Tissue1_CellType1.h5ad
+
+    The reconstructed AdataDict will be:
+
+    .. code-block:: python
+
+        print(adata_dict)
+        > {
+        >     ("Donor1",): {
+        >         ("Tissue1", "CellType1"): adata_d1_t1_c1,
+        >         ("Tissue1", "CellType2"): adata_d1_t1_c2,
+        >         ("Tissue2", "CellType3"): adata_d1_t2_c3,
+        >     },
+        >     ("Donor2",): {
+        >         ("Tissue1", "CellType1"): adata_d2_t1_c1,
+        >     },
+        > }
 
     See Also
     ---------
     :func:`~write_adata_dict` : To write an :class:`AdataDict`
     """
+    # Check if directory exists
+    if not os.path.exists(directory):
+        raise FileNotFoundError(f"Directory {directory} does not exist")
 
-    # Read the hierarchy from the file
-    hierarchy_file_path = os.path.join(directory, "adata_dict.hierarchy")
-    with open(hierarchy_file_path, "r", encoding="utf-8") as f:
-        # tuples will be converted to lists on write, so need to convert back to tuple on load
-        hierarchy = to_nested_tuple(json.load(f))
+    # Read the hierarchy
+    hierarchy_path = os.path.join(directory, "adata_dict.hierarchy.json")
+    if not os.path.exists(hierarchy_path):
+        raise FileNotFoundError(f"Hierarchy file not found in {directory}")
 
-    # Initialize an empty AdataDict with the hierarchy
-    adata_dict = AdataDict(hierarchy=hierarchy)
+    with open(hierarchy_path, "r", encoding="utf-8") as f:
+        hierarchy = json.load(f)
 
-    # Function to recursively rebuild the nested AdataDict
-    def add_to_adata_dict(current_dict, key_tuple, adata):
-        """
-        Recursively adds the AnnData object to the appropriate place in the nested AdataDict.
+    # Read the database mapping files to keys
+    db_path = os.path.join(directory, "adata_dict.db.json")
+    if not os.path.exists(db_path):
+        raise FileNotFoundError(f"Database file not found in {directory}")
 
-        Parameters
-        ------------
-        current_dict
-            The current level of AdataDict.
-        key_tuple
-            Tuple of key elements indicating the path.
-        adata
-            The AnnData object to add.
-        """
-        if len(key_tuple) == 1:
-            current_dict[key_tuple[0]] = adata
-        else:
-            key = key_tuple[0]
-            if key not in current_dict:
-                current_dict[key] = AdataDict(hierarchy=hierarchy[1:])
-            add_to_adata_dict(current_dict[key], key_tuple[1:], adata)
+    with open(db_path, "r", encoding="utf-8") as f:
+        db_entries = json.load(f)
 
-    # Walk through the directory structure
-    for root, dirs, files in os.walk(directory):
-        # Skip the top-level directory where the hierarchy file is located
-        relative_path = os.path.relpath(root, directory)
-        if relative_path == ".":
-            continue
-        for file in files:
-            if file.endswith(".h5ad"):
-                # Reconstruct the key from the directory path
-                path_parts = relative_path.split(os.sep)
-                key_elements = path_parts
-                # Remove empty strings (if any)
-                key_elements = [k for k in key_elements if k]
-                key = tuple(key_elements)
-                # Read the AnnData object
-                file_path = os.path.join(root, file)
-                adata = sc.read(file_path)
-                # Add to the AdataDict
-                add_to_adata_dict(adata_dict, key, adata)
-    return adata_dict
+    # Helper function to create nested dictionary from key path
+    def create_nested_dict(data_dict: dict, key_path: tuple, value: any) -> None:
+        """Create nested dictionary structure from a key path and value."""
+        # For flat hierarchies, use the full key_path as a single tuple key
+        if not any(isinstance(x, list) for x in hierarchy):
+            data_dict[key_path] = value
+            return
 
-
-def read(
-    directory_list: str | list[str],
-    *,
-    keys: list[str] | None = None,
-) -> AdataDict:
-    """
-    Process a list of directories or file paths to read AnnData objects. 
-
-    For each directory, if a `.hierarchy` file is found, the directory is processed 
-    with `read_adata_dict`. Otherwise, the highest-level directory is processed with 
-    `read_adata_dict_from_h5ad`. Subdirectories of a directory containing a `.hierarchy` 
-    file are not processed with `read_adata_dict_from_h5ad`.
-
-    Parameters
-    ------------
-    directory_list
-        String or list of strings, paths to directories or `.h5ad` files.
-
-    keys
-        List of strings that will be used as keys for the resulting dictionary.
-
-    Returns
-    -------
-    An :class:`AdataDict` of all AnnData objects.
-    """
-    if isinstance(directory_list, str):
-        directory_list = [directory_list]
-
-    adata_dict = {}
-
-    # Set to keep track of directories that have been processed with read_adata_dict
-    hierarchy_dirs = set()
-
-    # List to collect .h5ad files to process
-    h5ad_files = []
-
-    # Function to find all directories containing adata_dict.hierarchy files
-    def find_hierarchy_dirs(dir_path):
-        for root, dirs, files in os.walk(dir_path):
-            if "adata_dict.hierarchy" in files:
-                hierarchy_dirs.add(root)
-                # Do not traverse subdirectories of directories with hierarchy files
-                dirs[:] = []
+        # For nested hierarchies, we need to handle each level
+        current = data_dict
+        # Split the key_path according to the hierarchy structure
+        current_pos = 0
+        for level in hierarchy:
+            if isinstance(level, list):
+                # This level contains the remaining elements
+                remaining_len = len(level)
+                level_key = key_path[current_pos:current_pos + remaining_len]
+                current[level_key] = value
+                break
             else:
-                # Continue traversing subdirectories
-                pass
+                # This level is a single element
+                level_key = (key_path[current_pos],)
+                if level_key not in current:
+                    current[level_key] = {}
+                current = current[level_key]
+                current_pos += 1
 
-    # First, process the input paths to find hierarchy directories and collect .h5ad files
-    for path in directory_list:
-        if os.path.isfile(path):
-            if path.endswith(".h5ad"):
-                h5ad_files.append(path)
-        elif os.path.isdir(path):
-            # Find hierarchy directories
-            find_hierarchy_dirs(path)
-        else:
-            raise ValueError(f"Path {path} is neither a file nor a directory.")
+    # Initialize the data dictionary
+    data_dict: dict = {}
 
-    # Process directories with hierarchy files using read_adata_dict
-    for h_dir in hierarchy_dirs:
-        adata_dict.update(read_adata_dict(h_dir))
+    # Read each AnnData file and reconstruct the dictionary
+    for entry in db_entries:
+        file_path = os.path.join(directory, entry["file_path"])
+        if not os.path.exists(file_path):
+            raise FileNotFoundError(f"AnnData file not found: {file_path}")
 
-    # Build a set of directories to exclude (hierarchy_dirs and their subdirectories)
-    exclude_dirs = set()
-    for h_dir in hierarchy_dirs:
-        for root, dirs, files in os.walk(h_dir):
-            exclude_dirs.add(root)
+        key = tuple(entry["key"])  # Convert key from list to tuple
+        adata = sc.read_h5ad(file_path)
+        create_nested_dict(data_dict, key, adata)
 
-    # Function to collect .h5ad files not under exclude_dirs
-    def collect_h5ad_files(dir_path):
-        for root, dirs, files in os.walk(dir_path):
-            # Skip directories under exclude_dirs
-            if any(
-                os.path.commonpath([root, excl_dir]) == excl_dir
-                for excl_dir in exclude_dirs
-            ):
-                dirs[:] = []
-                continue
-            for file in files:
-                if file.endswith(".h5ad"):
-                    h5ad_files.append(os.path.join(root, file))
-
-    # Collect .h5ad files from directories not containing hierarchy files
-    for path in directory_list:
-        if os.path.isdir(path):
-            collect_h5ad_files(path)
-
-    # Process the collected .h5ad files using read_adata_dict_from_h5ad
-    if h5ad_files:
-        adata_dict.update(read_adata_dict_from_h5ad(h5ad_files, keys=keys))
-
-    return adata_dict
+    # Create and return the AdataDict
+    return AdataDict(data_dict, hierarchy=to_nested_tuple(hierarchy))
 
 
 def read_adata_dict_from_h5ad(
@@ -248,12 +221,13 @@ def read_adata_dict_from_h5ad(
     adata_dict = {}
     file_paths = []
 
-    # First, collect all file paths
+    # First, collect all file paths recursively
     for path in paths:
         if os.path.isdir(path):
-            for file in os.listdir(path):
-                if file.endswith(".h5ad"):
-                    file_paths.append(os.path.join(path, file))
+            for root, _, files in os.walk(path):
+                for file in files:
+                    if file.endswith(".h5ad"):
+                        file_paths.append(os.path.join(root, file))
         elif path.endswith(".h5ad"):
             file_paths.append(path)
 

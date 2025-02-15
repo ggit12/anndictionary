@@ -12,6 +12,18 @@ Build
    :toctree: generated
 
    build_adata_dict
+
+
+Add Stratification
+---------------------
+.. automodule:: anndict.adata_dict.add_stratification
+   :noindex:
+
+.. currentmodule:: anndict.adata_dict
+
+.. autosummary::
+   :toctree: generated
+
    add_stratification
 
 
@@ -40,8 +52,6 @@ Read
 
    read_adata_dict
    read_adata_dict_from_h5ad
-   read
-
 
 
 Concatenate

@@ -39,7 +39,7 @@ from .confusion_matrix_plots import (
 
 from .stabilizing_classifier_plots import (
     plot_training_history,
-    plot_changes,
+    plot_label_changes,
 
 )
 
@@ -66,5 +66,5 @@ __all__ = [
 
     # from stabilizing_classifier_plots.py
     "plot_training_history",
-    "plot_changes",
+    "plot_label_changes",
 ]

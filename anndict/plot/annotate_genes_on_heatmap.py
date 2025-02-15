@@ -1,6 +1,8 @@
 """
 This module contains visualizations functions for gene annotation.
 """
+import re
+
 import textwrap
 import matplotlib.pyplot as plt
 
@@ -28,19 +30,25 @@ def annotate_gene_groups_with_ai_biological_process(
     df
         Output from :func:`adt.ai_annotate_biological_process`, containing gene group information
         with the following columns:
-            - ``'groupby'``: Identifier for each gene group.
-            - ``'top_10_genes'``: List of gene names in the group.
+
+            - ``f'{groupby}'``: Identifier for each gene group.
+            - ``f'top_{n_top_genes}_genes'``: List of gene names in the group.
             - ``'ai_biological_process'``: Biological process label for the group.
 
     group_by
         The grouping column name.
 
     adt_key
-        Used by :func:`adata_dict_fapply` and :func:`adata_dict_fapply_return` when passing this function.
+        Used by :func:`adata_dict_fapply` and 
+        :func:`adata_dict_fapply_return` when passing this function.
 
     Returns
     -------
     ``None``
+
+    Notes
+    -----
+    Modifies ``plot_obj`` in-place by adding text annotations.
 
     See Also
     ----------
@@ -58,10 +66,13 @@ def annotate_gene_groups_with_ai_biological_process(
     xlabels = [tick.get_text() for tick in heatmap_ax.get_xticklabels()]
     gene_positions = {gene: xtick for gene, xtick in zip(xlabels, xticks)}
 
+    # get the gene column name
+    gene_col = [col for col in df.columns if re.search(r'top_\d+_genes', col)][0]
+
     group_positions = {}
-    for idx, row in df.iterrows():
+    for _, row in df.iterrows():
         group = row[groupby]
-        genes_in_group = row['top_10_genes']
+        genes_in_group = row[gene_col]
         # Filter genes that are actually in the plot
         positions = [gene_positions[gene] for gene in genes_in_group if gene in gene_positions]
         if positions:
@@ -80,10 +91,11 @@ def annotate_gene_groups_with_ai_biological_process(
         process_label = df.loc[df[groupby] == group, 'ai_biological_process'].values[0]
         # Wrap the text to fit within the group width
         # Convert group width from data to display coordinates
-        inv = heatmap_ax.transData.inverted()
+        _ = heatmap_ax.transData.inverted()
         start_display = heatmap_ax.transData.transform((pos_dict['start'], 0))
         end_display = heatmap_ax.transData.transform((pos_dict['end'], 0))
-        group_display_width = end_display[0] - start_display[0]
+        # Note: group_display_width = end_display[0] - start_display[0]
+
         # Convert display width to figure coordinates
         start_fig = fig.transFigure.inverted().transform(start_display)
         end_fig = fig.transFigure.inverted().transform(end_display)

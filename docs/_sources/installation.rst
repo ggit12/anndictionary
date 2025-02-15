@@ -53,7 +53,7 @@ How to Identify a Multithreading Issue
 This issue typically manifests as a Jupyter kernel crash (or a Python crash with ``numba`` or ``tbb`` related errors, if running directly in Python). 
 One error you might see is:
 
-.. code-block:: python
+.. code-block:: text
 
     Error processing {your_data} on attempt 0: No threading layer could be loaded. 
         HINT: 

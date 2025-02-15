@@ -1,4 +1,3 @@
-# llm_manager.py
 """
 A manager class for configuring and interacting with
 Language Learning Models (LLMs) through a unified interface.
@@ -8,26 +7,30 @@ import os
 import importlib
 from typing import Any, Optional
 from langchain.schema import HumanMessage, AIMessage, SystemMessage
-from .llm_providers import LLMProviders  # type: ignore
+from .provider_initializer_mapping import LLMProviders  # type: ignore
 
 
 class LLMManager:
     """Internal manager class for LLM operations"""
 
+    _llm_instance: Any | None = None  
+    _llm_config: dict[str, Any] | None = None
+
     @staticmethod
-    def configure_llm_backend(provider: str,
-    model: str,
-    **kwargs
-    ) -> None:
+    def configure_llm_backend(provider: str, model: str, **kwargs) -> None:
         """
-        Call this function before using LLM integrations. Configures the LLM backend by setting environment variables.
+        Call this function before using LLM integrations.
+        Configures the LLM backend by setting environment variables.
 
         Parameters
         -----------
         provider
-            The LLM provider name. Run :func:`LLMProviders.get_providers` to view list of supported providers.
+            The LLM provider name. Run :func:`LLMProviders.get_providers`
+            to view list of supported providers.
+
         model
             The LLM model name.
+
         **kwargs
             Additional configuration parameters passed to :func:`LLMManager.configure_llm_backend`
 
@@ -107,6 +110,9 @@ class LLMManager:
         for key, value in kwargs.items():
             os.environ[f"LLM_{key.upper()}"] = str(value)
 
+        # Reset cache using class name
+        LLMManager._llm_instance = None
+
     @staticmethod
     def get_llm_config() -> dict[str, Any]:
         """
@@ -162,7 +168,10 @@ class LLMManager:
         providers = LLMProviders.get_providers()
 
         if provider is None:
-            raise ValueError("No LLM backend found. Please configure LLM backend before attempting to use LLM features. See `adt.configure_llm_backend()`")
+            raise ValueError(
+                "No LLM backend found. Please configure LLM backend \
+                before attempting to use LLM features. See `adt.configure_llm_backend()`"
+            )
 
         if provider not in providers:
             raise ValueError(f"Unsupported provider: {provider}")
@@ -184,14 +193,14 @@ class LLMManager:
 
     @staticmethod
     def get_llm(
-        instance: Optional[Any], config: Optional[dict[str, Any]], **kwargs
+        instance: Optional[Any], **kwargs
     ) -> tuple[Any, dict[str, Any]]:
         """Dynamically retrieves the appropriate LLM based on the configuration."""
         current_config = LLMManager.get_llm_config()
 
         # Check if instance exists and config hasn't changed
-        if instance is not None and config == current_config:
-            return instance, config
+        if LLMManager._llm_instance is not None and LLMManager._llm_config == current_config:
+            return LLMManager._llm_instance, LLMManager._llm_config
 
         try:
             module = importlib.import_module(current_config["module"])
@@ -214,17 +223,23 @@ class LLMManager:
             )
 
             instance = llm_class(**constructor_args)
+
+            # Update the cache
+            LLMManager._llm_instance = instance
+            LLMManager._llm_config = current_config
+
             return instance, current_config
 
         except (ImportError, AttributeError) as e:
+            # Clear cache on error
+            LLMManager._llm_instance = None
+            LLMManager._llm_config = None
             raise ValueError(
                 f"Error initializing provider {current_config['provider']}: {str(e)}"
             ) from e
 
     @staticmethod
-    def call_llm(messages: list[dict[str, str]],
-        **kwargs
-    ) -> str:
+    def call_llm(messages: list[dict[str, str]], **kwargs) -> str:
         """
         Call the configured LLM model with given messages and parameters.
 
@@ -236,6 +251,7 @@ class LLMManager:
                     The role of the message sender (``'system'``, ``'user'``, or ``'assistant'``)
                 'content' : :class:`str`
                     The content of the message
+
         **kwargs
             Additional keyword arguments passed to the LLM provider.
 
@@ -264,7 +280,7 @@ class LLMManager:
         :func:`LLMProviders.get_providers` : To see supported providers.
         """
         config = LLMManager.get_llm_config()
-        llm, _ = LLMManager.get_llm(None, None, **kwargs)
+        llm, _ = LLMManager.get_llm(LLMManager._llm_instance, **kwargs)
 
         # Get provider config and initialize
         providers = LLMProviders.get_providers()
@@ -374,7 +390,7 @@ class LLMManager:
             try:
                 processed_result = process_response(response, **process_response_kwargs)
                 return processed_result
-            except Exception as e:
+            except Exception as e: # pylint: disable=broad-except
                 print(f"Attempt {attempt} failed: {str(e)}. Retrying...")
                 print(f"Response from failed attempt:\n{response}")
 

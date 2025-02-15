@@ -1,7 +1,9 @@
 Squidpy
 =========
 
-We've had to temporarily remove ``squidpy`` wrapper support due to dask compatibility (https://github.com/scverse/squidpy/issues/937).
+We've had to temporarily remove ``squidpy`` wrapper support due to dask compatibility, see the following github issue (https://github.com/scverse/squidpy/issues/937). 
+
+You can still view the source code of the wrappers at https://github.com/ggit12/anndictionary/blob/devel/anndict/wrappers/squidpy_.py.
 
 
 .. .. automodule:: anndict.wrappers.squidpy_

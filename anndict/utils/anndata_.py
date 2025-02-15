@@ -1,11 +1,12 @@
 """
-This module contains and adata_dict wrappers for :mod:`anndata`.
+adata_dict utility functions for :mod:`anndata`.
 Some of these ease manipulation of and information retrieval from :class:`AnnData`.
 """
 
 import re
 
 import numpy as np
+import pandas as pd
 
 from anndata import AnnData
 
@@ -52,7 +53,7 @@ def remove_genes(
 def add_col_to_adata_obs(
     adata: AnnData,
     indices: list[int] | tuple[int, ...],
-    values: list[int | float | str] | tuple[int | float | str, ...],
+    values: list[int | float | str | bool | pd.Timestamp] | tuple[int | float | str | bool | pd.Timestamp, ...],
     new_col_name: str
 ) -> None:
     """
@@ -80,22 +81,19 @@ def add_col_to_adata_obs(
     Notes
     ------
     Modifies ``adata`` in-place.
-    """
-    if isinstance(values[0], (int, np.integer)):
-        dtype = int
-    elif isinstance(values[0], (float, np.floating)):
-        dtype = float
-    else:
-        dtype = str
 
-    adata.obs[new_col_name] = np.full(adata.obs.shape[0], np.nan, dtype=dtype)
-    adata.obs.loc[indices, new_col_name] = values
+    See Also
+    ---------
+    :func:`add_col_to_adata_var` : to add a column to ``adata.var``.
+    :func:`add_col_to_pd_df` : the underlying function that adds a column to a :class:`DataFrame`.
+    """
+    add_col_to_pd_df(adata.obs, indices, values, new_col_name)
 
 
 def add_col_to_adata_var(
     adata: AnnData,
-    indices: list[int] | tuple[int, ...],
-    values: list[int | float | str] | tuple[int | float | str, ...],
+    indices: list[int | str] | tuple[int | str, ...],
+    values: list[int | float | str | bool | pd.Timestamp] | tuple[int | float | str | bool | pd.Timestamp, ...],
     new_col_name: str
 ) -> None:
     """
@@ -122,16 +120,76 @@ def add_col_to_adata_var(
     Notes
     ------
     Modifies ``adata`` in-place.
-    """
-    if isinstance(values[0], (int, np.integer)):
-        dtype = int
-    elif isinstance(values[0], (float, np.floating)):
-        dtype = float
-    else:
-        dtype = str
 
-    adata.var[new_col_name] = np.full(adata.var.shape[0], np.nan, dtype=dtype)
-    adata.var.loc[indices, new_col_name] = values
+    See Also
+    ---------
+    :func:`add_col_to_adata_obs` : to add a column to ``adata.obs``.
+    :func:`add_col_to_pd_df` : the underlying function that adds a column to a :class:`DataFrame`.
+    """
+    add_col_to_pd_df(adata.var, indices, values, new_col_name)
+
+
+def add_col_to_pd_df(
+    pd_df: pd.DataFrame,
+    indices: list[int | str] | tuple[int | str, ...],
+    values: list[int | float | str | bool | pd.Timestamp] | tuple[int | float | str | bool | pd.Timestamp, ...],
+    new_col_name: str
+) -> None:
+    """
+    Adds a column to ``pd_df`` for given indices.
+
+    Parameters
+    -----------
+    pd_df
+        An :class:`DataFrame`.
+
+    indices
+        Array of indices where labels will be assigned.
+
+    values
+        Array of labels corresponding to the indices.
+
+    new_col_name
+        Name of the new column to be created in ``pd_df``.
+
+
+    Returns
+    --------
+    ``None``
+
+    Notes
+    ------
+    Modifies ``pd_df`` in-place.
+    """
+    dtype = pd.Series(values[0]).dtype
+
+    # Choose appropriate NA value and dtype
+    if np.issubdtype(dtype, np.integer):
+        dtype = pd.Int64Dtype()
+        fill_value = pd.NA
+    elif np.issubdtype(dtype, np.floating):
+        fill_value = np.nan
+    elif np.issubdtype(dtype, np.bool_):
+        dtype = pd.BooleanDtype()
+        fill_value = pd.NA
+    else:
+        fill_value = pd.NA
+
+    full_series = pd.Series(
+        fill_value,
+        index=pd_df.index,
+        dtype=dtype
+    )
+
+    indices_array = np.array(indices)
+
+    # Use iloc only for integer indices, loc for everything else (strings, bools)
+    if np.issubdtype(indices_array.dtype, np.integer):
+        full_series.iloc[indices] = values
+    else:
+        full_series.loc[indices] = values
+
+    pd_df[new_col_name] = full_series
 
 
 def convert_obs_col_to_category(
@@ -228,14 +286,15 @@ def get_adata_columns(
     adata: AnnData,
     starts_with: str | list[str] | None = None,
     ends_with: str | list[str] | None = None,
-    contains: str | list[str] | None = None, 
+    contains: str | list[str] | None = None,
     not_starts_with: str | list[str] | None = None,
     not_ends_with: str | list[str] | None = None,
     not_contains: str | list[str] | None = None
 ) -> list[str]:
     """
-    A simple string matching and filtering function to get column names from ``adata.obs``.
-    Get the column names 
+    A simple string matching and filtering function to get column names from ``adata.obs``. 
+    The ``not_`` parameters are used to exclude columns from the results **after** the 
+    inclusion filters have already been applied.
 
     Parameters
     ----------
@@ -283,20 +342,19 @@ def get_adata_columns(
         > ['total_counts_mt', 'pct_counts_mt']
 
         #get all columns that are not total counts
-        get_adata_columns(adata, not_starts_with='total_counts')
+        get_adata_columns(adata, contains = '', not_starts_with='total_counts') #contains = '' will match all columns, then from this list, we exclude columns that start with ``'total_counts'``
         > ['cell_type', 'pct_counts_mt', 'pct_counts_protein_coding']
     """
     columns = adata.obs.columns
     matched_columns = []
 
-    #Get local variables and enforce that the filtering parameters are lists
-    filter_params = ['starts_with', 'ends_with', 'contains', 
-                     'not_starts_with', 'not_ends_with', 'not_contains']
-
-    for param in filter_params:
-        val = locals()[param]
-        if isinstance(val, str):
-            locals()[param] = [val]
+    # Convert string inputs to single-element lists
+    starts_with = [starts_with] if isinstance(starts_with, str) else starts_with
+    ends_with = [ends_with] if isinstance(ends_with, str) else ends_with
+    contains = [contains] if isinstance(contains, str) else contains
+    not_starts_with = [not_starts_with] if isinstance(not_starts_with, str) else not_starts_with
+    not_ends_with = [not_ends_with] if isinstance(not_ends_with, str) else not_ends_with
+    not_contains = [not_contains] if isinstance(not_contains, str) else not_contains
 
     if starts_with:
         for start in starts_with:
