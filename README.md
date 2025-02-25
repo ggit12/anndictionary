@@ -18,16 +18,7 @@ If you use this package, please cite:
 
 
 # Install
-Copy and paste the code below into a terminal window to download this package and install it in a conda env. It assumes conda is already installed. This should only take a few minutes total.
-
-```bash
-git clone https://github.com/ggit12/anndictionary
-cd anndictionary
-conda create -n anndict python=3.12
-conda activate anndict
-pip install -e .
-```
-
+See [Install Instructions](https://ggit12.github.io/anndictionary/installation.html)
 
 # About
 `AnnDictionary` is a package that lets you process multiple `anndata` objects in parallel with a simplified interface (so that you can avoid writing a bunch of for loops). This is accomplished by a dictionary-based wrapping of `scanpy`. We used the package to benchmark cell type annotaiton by 15 LLMs and maintain leaderboard at: https://singlecellgpt.com/celltype-annotation-leaderboard/.
@@ -41,10 +32,16 @@ These functions include `ai_annotate_cell_type`, `ai_annotate_biological_process
 
 This package supports many external LLM providers (including OpenAI, Anthropic, Google, and Bedrock). To use these, you'll need an API key. Directions on how to get an OpenAI API key can be found here: https://platform.openai.com/docs/quickstart/account-setup, and for Anthropic, here: https://docs.anthropic.com/en/api/getting-started.
 
-### If you like functions:
-The main function in this package is `adata_dict_fapply()` (and its cousin `adata_dict_fapply_return()`, which does the same thing but also returns the result as a dictionary). 
+### Objects:
+This package defines the class `AdataDict`, which is a dictionary of anndatas. There are several class methods to interact with `AdataDict`s and iterate over them, see [Docs](https://ggit12.github.io/anndictionary/api/adata_dict/adata_dict.html) and [Tutorials](https://ggit12.github.io/anndictionary/tutorials/adata_dict/index.html). Additional methods are passed through to each anndata in `AdataDict`.
 
-`adata_dict_fapply()` works just like `lapply()` in R. It takes `adata_dict_fapply(adata_dict, func, **kwargs)`. 
+The syntax looks like this: `adata_dict.fapply(func, **kwargs)`, where `adata_dict`, `func`, and `**kwargs` are as defined above.
+
+
+### Functions:
+The main function in this package is `adata_dict_fapply()`. 
+
+`adata_dict_fapply()` works similarly to `.map()` in python or `lapply()` in R. It takes `adata_dict_fapply(adata_dict, func, **kwargs)`. 
 
 - `adata_dict` is a dictionary.
 - `func` is a function to apply over each element of the dictionary.
@@ -54,15 +51,10 @@ You can have `func` take the argument `adt_key` (i.e., `func(adata, adt_key=None
 
 The value for any **kwarg can be either: 1) a single value to be used for all anndata in adata_dict, or 2) a dictionary with the same keys as adata, and a separate value for each anndata in adata_dict.
 
-Many functions in `anndict` are built around `adata_dict_fapply()`, and the package provides prebuilt wrappers for several common Scanpy functions, as well as functions to build and concatenate `adata` dictionaries.
-
-### If you like objects (under development):
-This package also defines the class AdataDict(), which is a dictionary of anndatas. When a method is called on an AdataDict, it is applied independently to each adata in the dictionary. Currently in beta.
-
-The syntax looks like this: `adata_dict.fapply(func, **kwargs)`, where `adata_dict`, `func`, and `**kwargs` are as defined above.
+Many functions in `anndict` are built around `adata_dict_fapply()`.
 
 
-Read the tutorial below for basic demonstrations.
+Read the tutorial below for a basic demonstration of automated cell type annotation.
 
 ## Compatibility
 
@@ -70,19 +62,7 @@ This package has been tested on linux (v3.10, v4.18) and macOS (v13.5, v14.7), a
 
 **macOS Compatibility Note:**
 
-We configure the Numba threading layer to `tbb` to prevent concurrency issues caused by the default `workqueue` threading layer. This is automatically applied to ensure stable performance during multi-threading and parallel execution, and is done to ensure compatibility for users on macOS (especially Apple silicon).
-
-If you encounter TBB threading layer errors, first run:
-```bash
-pip uninstall numba tbb intel-tbb
-conda remove tbb numba
-```
-
-then reinstall `numba` and `tbb` with
-
-```bash
-conda install -c conda-forge tbb numba #need to conda install these, pip won't work
-```
+See [Install Instructions](https://ggit12.github.io/anndictionary/installation.html) if you have issues with multithreading on macOS (or others).
 
 
 **How to Identify a Multithreading Issue:**
