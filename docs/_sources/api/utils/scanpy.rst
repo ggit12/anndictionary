@@ -12,5 +12,5 @@ Complex downsampling of :class:`AnnData`, optionally dropping small cell types
 .. autosummary::
    :toctree: generated
 
-   resample_adata
-   subsample_adata_dict
+   sample_and_drop
+   sample_adata_dict

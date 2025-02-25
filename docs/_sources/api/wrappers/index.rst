@@ -6,7 +6,6 @@ Fapply Wrappers
 
 .. toctree::
    :maxdepth: 1
-   :hidden:
 
    anndictionary
    scanpy

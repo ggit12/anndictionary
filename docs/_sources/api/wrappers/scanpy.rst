@@ -9,7 +9,7 @@ Scanpy
 .. autosummary::
    :toctree: generated
 
-   resample_adata_dict
+   sample_and_drop_adata_dict
    normalize_adata_dict
    log_transform_adata_dict
    set_high_variance_genes_adata_dict

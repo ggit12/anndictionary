@@ -20,6 +20,7 @@ Table of Contents
    overview
    installation
    api/index
+   tutorials/index
    contribute/index
 
 Indices and Tables

@@ -5,8 +5,7 @@ Utils
    :noindex:
 
 .. toctree::
-   :maxdepth: 1
-   :hidden:
+   :maxdepth: 2
 
    anndictionary
    anndata

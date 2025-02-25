@@ -31,9 +31,9 @@
 
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="_static/styles/sphinx-book-theme.css?v=a3416100" />
-    <link rel="stylesheet" type="text/css" href="_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css?v=be8a1c11" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="_static/plot_directive.css" />
+    <link rel="stylesheet" type="text/css" href="_static/plot_directive.css?v=7f9a90b1" />
     <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
   
   <!-- So that users can add custom icons -->
@@ -152,16 +152,19 @@
 <li class="toctree-l2 has-children"><a class="reference internal" href="api/adata_dict/index.html">Core</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3 has-children"><a class="reference internal" href="api/adata_dict/adata_dict.html">AdataDict Class</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="api/adata_dict/generated/anndict.AdataDict.set_hierarchy.html">anndict.AdataDict.set_hierarchy</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/adata_dict/generated/anndict.AdataDict.add_stratification.html">anndict.AdataDict.add_stratification</a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/adata_dict/generated/anndict.AdataDict.flatten.html">anndict.AdataDict.flatten</a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/adata_dict/generated/anndict.AdataDict.fapply.html">anndict.AdataDict.fapply</a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/adata_dict/generated/anndict.AdataDict.fapply_return.html">anndict.AdataDict.fapply_return</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/adata_dict/generated/anndict.AdataDict.index_bool.html">anndict.AdataDict.index_bool</a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/adata_dict/generated/anndict.AdataDict.set_obs_index.html">anndict.AdataDict.set_obs_index</a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/adata_dict/generated/anndict.AdataDict.set_var_index.html">anndict.AdataDict.set_var_index</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/adata_dict/generated/anndict.AdataDict.check_structure.html">anndict.AdataDict.check_structure</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/adata_dict/generated/anndict.AdataDict.copy.html">anndict.AdataDict.copy</a></li>
 </ul>
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="api/adata_dict/adata_dict_fapply.html">Iterate over AnnDictionaries</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="api/adata_dict/generated/anndict.adata_dict.adata_dict_fapply.html">anndict.adata_dict.adata_dict_fapply</a></li>
-<li class="toctree-l4"><a class="reference internal" href="api/adata_dict/generated/anndict.adata_dict.adata_dict_fapply_return.html">anndict.adata_dict.adata_dict_fapply_return</a></li>
 </ul>
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="api/adata_dict/build_write_read.html">Build, Write, and Read AnnDictionaries</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -276,8 +279,8 @@
 </ul>
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="api/utils/scanpy.html">Scanpy</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l4"><a class="reference internal" href="api/utils/generated/anndict.utils.resample_adata.html">anndict.utils.resample_adata</a></li>
-<li class="toctree-l4"><a class="reference internal" href="api/utils/generated/anndict.utils.subsample_adata_dict.html">anndict.utils.subsample_adata_dict</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/utils/generated/anndict.utils.sample_and_drop.html">anndict.utils.sample_and_drop</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/utils/generated/anndict.utils.sample_adata_dict.html">anndict.utils.sample_adata_dict</a></li>
 </ul>
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="api/utils/pca_density_filter.html">PCA Density Filter</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -331,7 +334,7 @@
 </ul>
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="api/wrappers/scanpy.html">Scanpy</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l4"><a class="reference internal" href="api/wrappers/generated/anndict.wrappers.resample_adata_dict.html">anndict.wrappers.resample_adata_dict</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/wrappers/generated/anndict.wrappers.sample_and_drop_adata_dict.html">anndict.wrappers.sample_and_drop_adata_dict</a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/wrappers/generated/anndict.wrappers.normalize_adata_dict.html">anndict.wrappers.normalize_adata_dict</a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/wrappers/generated/anndict.wrappers.log_transform_adata_dict.html">anndict.wrappers.log_transform_adata_dict</a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/wrappers/generated/anndict.wrappers.set_high_variance_genes_adata_dict.html">anndict.wrappers.set_high_variance_genes_adata_dict</a></li>
@@ -347,6 +350,24 @@
 </ul>
 </details></li>
 <li class="toctree-l3"><a class="reference internal" href="api/wrappers/squidpy.html">Squidpy</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="tutorials/index.html">Tutorials</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="tutorials/adata_dict/index.html">Using the AdataDict Class</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="tutorials/adata_dict/Build_AdataDict.html">Build an AdataDict</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorials/adata_dict/Manipulate_the_Hierarchy.html">Manipulate the Hierarchy of an AdataDict</a></li>
+
+<li class="toctree-l3"><a class="reference internal" href="tutorials/adata_dict/Iterate_Over_an_AdataDict.html">Iterate Over an AdataDict</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorials/adata_dict/Write_and_Read_an_AdataDict.html">Write and Read AdataDict</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="tutorials/annotate/index.html">Annotating with AnnDictionary</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="tutorials/annotate/automated_cell_type_marker_gene_scores.html">Automated Cell Type Marker Gene Scores</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorials/annotate/cell_type_annotation_with_an_LLM.html">Cell Type Annotation with Large Language Models (LLMs)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorials/annotate/cell_type_annotation_with_a_label_transfer_model.html">Transfer Labels Using an Sklearn Classifier</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tutorials/annotate/automated_spatial_transcriptomic_annotation.html">Automated Annotation of Spatial Transcriptomics</a></li>
 </ul>
 </details></li>
 </ul>
@@ -479,6 +500,7 @@
  | <a href="#F"><strong>F</strong></a>
  | <a href="#G"><strong>G</strong></a>
  | <a href="#H"><strong>H</strong></a>
+ | <a href="#I"><strong>I</strong></a>
  | <a href="#K"><strong>K</strong></a>
  | <a href="#L"><strong>L</strong></a>
  | <a href="#M"><strong>M</strong></a>
@@ -504,8 +526,6 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/adata_dict/generated/anndict.adata_dict.adata_dict_fapply.html#anndict.adata_dict.adata_dict_fapply">adata_dict_fapply() (in module anndict.adata_dict)</a>
 </li>
-      <li><a href="api/adata_dict/generated/anndict.adata_dict.adata_dict_fapply_return.html#anndict.adata_dict.adata_dict_fapply_return">adata_dict_fapply_return() (in module anndict.adata_dict)</a>
-</li>
       <li><a href="api/adata_dict/adata_dict.html#anndict.AdataDict">AdataDict (class in anndict)</a>
 
       <ul>
@@ -520,8 +540,12 @@
 </li>
       <li><a href="api/utils/generated/anndict.utils.add_col_to_pd_df.html#anndict.utils.add_col_to_pd_df">add_col_to_pd_df() (in module anndict.utils)</a>
 </li>
-      <li><a href="api/adata_dict/generated/anndict.adata_dict.add_stratification.html#anndict.adata_dict.add_stratification">add_stratification() (in module anndict.adata_dict)</a>
+      <li><a href="api/adata_dict/generated/anndict.AdataDict.add_stratification.html#anndict.AdataDict.add_stratification">add_stratification() (anndict.AdataDict method)</a>
+
+      <ul>
+        <li><a href="api/adata_dict/generated/anndict.adata_dict.add_stratification.html#anndict.adata_dict.add_stratification">(in module anndict.adata_dict)</a>
 </li>
+      </ul></li>
       <li><a href="api/annotate/cells/generated/anndict.annotate.cells.de_novo.ai_annotate.html#anndict.annotate.cells.de_novo.ai_annotate">ai_annotate() (in module anndict.annotate.cells.de_novo)</a>
 </li>
       <li><a href="api/annotate/cells/generated/anndict.annotate.ai_annotate_biological_process.html#anndict.annotate.ai_annotate_biological_process">ai_annotate_biological_process() (in module anndict.annotate)</a>
@@ -534,13 +558,15 @@
 </li>
       <li><a href="api/wrappers/generated/anndict.wrappers.ai_annotate_cell_sub_type_adata_dict.html#anndict.wrappers.ai_annotate_cell_sub_type_adata_dict">ai_annotate_cell_sub_type_adata_dict() (in module anndict.wrappers)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/annotate/cells/generated/anndict.annotate.ai_annotate_cell_type.html#anndict.annotate.ai_annotate_cell_type">ai_annotate_cell_type() (in module anndict.annotate)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/wrappers/generated/anndict.wrappers.ai_annotate_cell_type_adata_dict.html#anndict.wrappers.ai_annotate_cell_type_adata_dict">ai_annotate_cell_type_adata_dict() (in module anndict.wrappers)</a>
 </li>
       <li><a href="api/annotate/cells/generated/anndict.annotate.ai_annotate_cell_type_by_comparison.html#anndict.annotate.ai_annotate_cell_type_by_comparison">ai_annotate_cell_type_by_comparison() (in module anndict.annotate)</a>
+</li>
+      <li><a href="api/annotate/cells/generated/anndict.annotate.ai_annotate_from_expected_cell_types.html#anndict.annotate.ai_annotate_from_expected_cell_types">ai_annotate_from_expected_cell_types() (in module anndict.annotate)</a>
 </li>
       <li><a href="api/annotate/cells/generated/anndict.annotate.ai_cell_type.html#anndict.annotate.ai_cell_type">ai_cell_type() (in module anndict.annotate)</a>
 </li>
@@ -553,6 +579,8 @@
       <li><a href="api/annotate/cells/generated/anndict.annotate.ai_determine_leiden_resolution.html#anndict.annotate.ai_determine_leiden_resolution">ai_determine_leiden_resolution() (in module anndict.annotate)</a>
 </li>
       <li><a href="api/wrappers/generated/anndict.wrappers.ai_determine_leiden_resolution_adata_dict.html#anndict.wrappers.ai_determine_leiden_resolution_adata_dict">ai_determine_leiden_resolution_adata_dict() (in module anndict.wrappers)</a>
+</li>
+      <li><a href="api/annotate/cells/generated/anndict.annotate.ai_from_expected_cell_types.html#anndict.annotate.ai_from_expected_cell_types">ai_from_expected_cell_types() (in module anndict.annotate)</a>
 </li>
       <li><a href="api/annotate/genes/generated/anndict.annotate.ai_make_cell_type_gene_list.html#anndict.annotate.ai_make_cell_type_gene_list">ai_make_cell_type_gene_list() (in module anndict.annotate)</a>
 </li>
@@ -600,6 +628,8 @@
 </li>
       <li><a href="api/annotate/cells/generated/anndict.annotate.cell_type_marker_gene_score.html#anndict.annotate.cell_type_marker_gene_score">cell_type_marker_gene_score() (in module anndict.annotate)</a>
 </li>
+      <li><a href="api/adata_dict/generated/anndict.AdataDict.check_structure.html#anndict.AdataDict.check_structure">check_structure() (anndict.AdataDict method)</a>
+</li>
       <li><a href="api/adata_dict/generated/anndict.adata_dict.concatenate_adata_dict.html#anndict.adata_dict.concatenate_adata_dict">concatenate_adata_dict() (in module anndict.adata_dict)</a>
 </li>
       <li><a href="api/llm/generated/anndict.configure_llm_backend.html#anndict.configure_llm_backend">configure_llm_backend() (in module anndict)</a>
@@ -611,6 +641,8 @@
       <li><a href="api/utils/generated/anndict.utils.convert_obs_col_to_string.html#anndict.utils.convert_obs_col_to_string">convert_obs_col_to_string() (in module anndict.utils)</a>
 </li>
       <li><a href="api/utils/generated/anndict.utils.convert_obs_index_to_str.html#anndict.utils.convert_obs_index_to_str">convert_obs_index_to_str() (in module anndict.utils)</a>
+</li>
+      <li><a href="api/adata_dict/generated/anndict.AdataDict.copy.html#anndict.AdataDict.copy">copy() (anndict.AdataDict method)</a>
 </li>
       <li><a href="api/utils/generated/anndict.utils.create_anndata.html#anndict.utils.create_anndata">create_anndata() (in module anndict.utils)</a>
 </li>
@@ -693,6 +725,14 @@
       <li><a href="api/wrappers/generated/anndict.wrappers.harmony_label_transfer_adata_dict.html#anndict.wrappers.harmony_label_transfer_adata_dict">harmony_label_transfer_adata_dict() (in module anndict.wrappers)</a>
 </li>
       <li><a href="api/adata_dict/adata_dict.html#anndict.AdataDict.hierarchy">hierarchy (anndict.AdataDict property)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="I">I</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/adata_dict/generated/anndict.AdataDict.index_bool.html#anndict.AdataDict.index_bool">index_bool() (anndict.AdataDict method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -823,17 +863,13 @@
 </li>
       <li><a href="api/adata_dict/generated/anndict.adata_dict.read_adata_dict_from_h5ad.html#anndict.adata_dict.read_adata_dict_from_h5ad">read_adata_dict_from_h5ad() (in module anndict.adata_dict)</a>
 </li>
-      <li><a href="api/utils/generated/anndict.utils.read_transcript_coords.html#anndict.utils.read_transcript_coords">read_transcript_coords() (in module anndict.utils)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/utils/generated/anndict.utils.read_transcript_coords.html#anndict.utils.read_transcript_coords">read_transcript_coords() (in module anndict.utils)</a>
+</li>
       <li><a href="api/utils/generated/anndict.utils.remove_genes.html#anndict.utils.remove_genes">remove_genes() (in module anndict.utils)</a>
 </li>
       <li><a href="api/wrappers/generated/anndict.wrappers.remove_genes_adata_dict.html#anndict.wrappers.remove_genes_adata_dict">remove_genes_adata_dict() (in module anndict.wrappers)</a>
-</li>
-      <li><a href="api/utils/generated/anndict.utils.resample_adata.html#anndict.utils.resample_adata">resample_adata() (in module anndict.utils)</a>
-</li>
-      <li><a href="api/wrappers/generated/anndict.wrappers.resample_adata_dict.html#anndict.wrappers.resample_adata_dict">resample_adata_dict() (in module anndict.wrappers)</a>
 </li>
       <li><a href="api/llm/generated/anndict.retry_call_llm.html#anndict.retry_call_llm">retry_call_llm() (in module anndict)</a>
 </li>
@@ -843,6 +879,12 @@
 <h2 id="S">S</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/utils/generated/anndict.utils.sample_adata_dict.html#anndict.utils.sample_adata_dict">sample_adata_dict() (in module anndict.utils)</a>
+</li>
+      <li><a href="api/utils/generated/anndict.utils.sample_and_drop.html#anndict.utils.sample_and_drop">sample_and_drop() (in module anndict.utils)</a>
+</li>
+      <li><a href="api/wrappers/generated/anndict.wrappers.sample_and_drop_adata_dict.html#anndict.wrappers.sample_and_drop_adata_dict">sample_and_drop_adata_dict() (in module anndict.wrappers)</a>
+</li>
       <li><a href="api/plot/_autosummary%20%20%20%20%23%20still%20build%20these%20pages/anndict.plot.save_sankey.html#anndict.plot.save_sankey">save_sankey() (in module anndict.plot)</a>, <a href="api/plot/_autosummary/anndict.plot.save_sankey.html#anndict.plot.save_sankey">[1]</a>, <a href="api/plot/generated/anndict.plot.save_sankey.html#anndict.plot.save_sankey">[2]</a>
 </li>
       <li><a href="api/wrappers/generated/anndict.wrappers.save_sankey_adata_dict.html#anndict.wrappers.save_sankey_adata_dict">save_sankey_adata_dict() (in module anndict.wrappers)</a>
@@ -855,12 +897,12 @@
 </li>
       <li><a href="api/adata_dict/generated/anndict.AdataDict.set_obs_index.html#anndict.AdataDict.set_obs_index">set_obs_index() (anndict.AdataDict method)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/adata_dict/generated/anndict.AdataDict.set_var_index.html#anndict.AdataDict.set_var_index">set_var_index() (anndict.AdataDict method)</a>
 </li>
       <li><a href="api/automated_label_management/generated/anndict.simplify_obs_column.html#anndict.simplify_obs_column">simplify_obs_column() (in module anndict)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/wrappers/generated/anndict.wrappers.simplify_obs_column_adata_dict.html#anndict.wrappers.simplify_obs_column_adata_dict">simplify_obs_column_adata_dict() (in module anndict.wrappers)</a>
 </li>
       <li><a href="api/automated_label_management/generated/anndict.simplify_var_index.html#anndict.simplify_var_index">simplify_var_index() (in module anndict)</a>
@@ -870,8 +912,6 @@
       <li><a href="api/utils/generated/anndict.utils.stable_label.html#anndict.utils.stable_label">stable_label() (in module anndict.utils)</a>
 </li>
       <li><a href="api/utils/generated/anndict.utils.stable_label_adata.html#anndict.utils.stable_label_adata">stable_label_adata() (in module anndict.utils)</a>
-</li>
-      <li><a href="api/utils/generated/anndict.utils.subsample_adata_dict.html#anndict.utils.subsample_adata_dict">subsample_adata_dict() (in module anndict.utils)</a>
 </li>
       <li><a href="api/utils/generated/anndict.utils.summarize_metadata.html#anndict.utils.summarize_metadata">summarize_metadata() (in module anndict.utils)</a>
 </li>

@@ -65,7 +65,7 @@
     <link rel="canonical" href="https://ggit12.github.io/anndictionary/api/wrappers/scanpy.html" />
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="anndict.wrappers.resample_adata_dict" href="generated/anndict.wrappers.resample_adata_dict.html" />
+    <link rel="next" title="anndict.wrappers.sample_and_drop_adata_dict" href="generated/anndict.wrappers.sample_and_drop_adata_dict.html" />
     <link rel="prev" title="anndict.wrappers.pca_density_adata_dict" href="generated/anndict.wrappers.pca_density_adata_dict.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -164,16 +164,19 @@
 <li class="toctree-l2 has-children"><a class="reference internal" href="../adata_dict/index.html">Core</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../adata_dict/adata_dict.html">AdataDict Class</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="../adata_dict/generated/anndict.AdataDict.set_hierarchy.html">anndict.AdataDict.set_hierarchy</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../adata_dict/generated/anndict.AdataDict.add_stratification.html">anndict.AdataDict.add_stratification</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../adata_dict/generated/anndict.AdataDict.flatten.html">anndict.AdataDict.flatten</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../adata_dict/generated/anndict.AdataDict.fapply.html">anndict.AdataDict.fapply</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../adata_dict/generated/anndict.AdataDict.fapply_return.html">anndict.AdataDict.fapply_return</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../adata_dict/generated/anndict.AdataDict.index_bool.html">anndict.AdataDict.index_bool</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../adata_dict/generated/anndict.AdataDict.set_obs_index.html">anndict.AdataDict.set_obs_index</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../adata_dict/generated/anndict.AdataDict.set_var_index.html">anndict.AdataDict.set_var_index</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../adata_dict/generated/anndict.AdataDict.check_structure.html">anndict.AdataDict.check_structure</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../adata_dict/generated/anndict.AdataDict.copy.html">anndict.AdataDict.copy</a></li>
 </ul>
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../adata_dict/adata_dict_fapply.html">Iterate over AnnDictionaries</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l4"><a class="reference internal" href="../adata_dict/generated/anndict.adata_dict.adata_dict_fapply.html">anndict.adata_dict.adata_dict_fapply</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../adata_dict/generated/anndict.adata_dict.adata_dict_fapply_return.html">anndict.adata_dict.adata_dict_fapply_return</a></li>
 </ul>
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../adata_dict/build_write_read.html">Build, Write, and Read AnnDictionaries</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -288,8 +291,8 @@
 </ul>
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../utils/scanpy.html">Scanpy</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l4"><a class="reference internal" href="../utils/generated/anndict.utils.resample_adata.html">anndict.utils.resample_adata</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../utils/generated/anndict.utils.subsample_adata_dict.html">anndict.utils.subsample_adata_dict</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/generated/anndict.utils.sample_and_drop.html">anndict.utils.sample_and_drop</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/generated/anndict.utils.sample_adata_dict.html">anndict.utils.sample_adata_dict</a></li>
 </ul>
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../utils/pca_density_filter.html">PCA Density Filter</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -343,7 +346,7 @@
 </ul>
 </details></li>
 <li class="toctree-l3 current active has-children"><a class="current reference internal" href="#">Scanpy</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l4"><a class="reference internal" href="generated/anndict.wrappers.resample_adata_dict.html">anndict.wrappers.resample_adata_dict</a></li>
+<li class="toctree-l4"><a class="reference internal" href="generated/anndict.wrappers.sample_and_drop_adata_dict.html">anndict.wrappers.sample_and_drop_adata_dict</a></li>
 <li class="toctree-l4"><a class="reference internal" href="generated/anndict.wrappers.normalize_adata_dict.html">anndict.wrappers.normalize_adata_dict</a></li>
 <li class="toctree-l4"><a class="reference internal" href="generated/anndict.wrappers.log_transform_adata_dict.html">anndict.wrappers.log_transform_adata_dict</a></li>
 <li class="toctree-l4"><a class="reference internal" href="generated/anndict.wrappers.set_high_variance_genes_adata_dict.html">anndict.wrappers.set_high_variance_genes_adata_dict</a></li>
@@ -359,6 +362,24 @@
 </ul>
 </details></li>
 <li class="toctree-l3"><a class="reference internal" href="squidpy.html">Squidpy</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../tutorials/index.html">Tutorials</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../tutorials/adata_dict/index.html">Using the AdataDict Class</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/adata_dict/Build_AdataDict.html">Build an AdataDict</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/adata_dict/Manipulate_the_Hierarchy.html">Manipulate the Hierarchy of an AdataDict</a></li>
+
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/adata_dict/Iterate_Over_an_AdataDict.html">Iterate Over an AdataDict</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/adata_dict/Write_and_Read_an_AdataDict.html">Write and Read AdataDict</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../tutorials/annotate/index.html">Annotating with AnnDictionary</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/annotate/automated_cell_type_marker_gene_scores.html">Automated Cell Type Marker Gene Scores</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/annotate/cell_type_annotation_with_an_LLM.html">Cell Type Annotation with Large Language Models (LLMs)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/annotate/cell_type_annotation_with_a_label_transfer_model.html">Transfer Labels Using an Sklearn Classifier</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/annotate/automated_spatial_transcriptomic_annotation.html">Automated Annotation of Spatial Transcriptomics</a></li>
 </ul>
 </details></li>
 </ul>
@@ -531,8 +552,8 @@
 <p>This module contains adata_dict wrappers for <cite>scanpy</cite>.</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/anndict.wrappers.resample_adata_dict.html#anndict.wrappers.resample_adata_dict" title="anndict.wrappers.resample_adata_dict"><code class="xref py py-obj docutils literal notranslate"><span class="pre">resample_adata_dict</span></code></a>(adata_dict, strata_keys)</p></td>
-<td><p>Resample each <code class="xref py py-class docutils literal notranslate"><span class="pre">AnnData</span></code> in <code class="docutils literal notranslate"><span class="pre">adata_dict</span></code> based on specified strata keys and drop strata with fewer than the minimum number of cells.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/anndict.wrappers.sample_and_drop_adata_dict.html#anndict.wrappers.sample_and_drop_adata_dict" title="anndict.wrappers.sample_and_drop_adata_dict"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sample_and_drop_adata_dict</span></code></a>(adata_dict, ...)</p></td>
+<td><p>Sample each <code class="xref py py-class docutils literal notranslate"><span class="pre">AnnData</span></code> in <code class="docutils literal notranslate"><span class="pre">adata_dict</span></code> based on specified strata keys and drop strata with fewer than the minimum number of cells.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/anndict.wrappers.normalize_adata_dict.html#anndict.wrappers.normalize_adata_dict" title="anndict.wrappers.normalize_adata_dict"><code class="xref py py-obj docutils literal notranslate"><span class="pre">normalize_adata_dict</span></code></a>(adata_dict, **kwargs)</p></td>
 <td><p>Normalizes each <code class="xref py py-class docutils literal notranslate"><span class="pre">AnnData</span></code> in <code class="docutils literal notranslate"><span class="pre">adata_dict</span></code> using <code class="xref py py-func docutils literal notranslate"><span class="pre">sc.pp.normalize_total()</span></code>.</p></td>

@@ -35,6 +35,21 @@ Annotation by marker genes (in the context of the other marker genes)
    ai_annotate_cell_type_by_comparison
 
 
+Annotation based on expected cell types
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. automodule:: anndict.annotate.cells.de_novo.annotate_from_expected_cell_types
+   :noindex:
+
+.. currentmodule:: anndict.annotate
+
+.. autosummary::
+   :toctree: generated
+
+   ai_from_expected_cell_types
+   ai_annotate_from_expected_cell_types
+
+
 Automatically calculate cell type gene module scores
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

@@ -10,4 +10,3 @@ Iterate over AnnDictionaries
    :toctree: generated
 
    adata_dict_fapply
-   adata_dict_fapply_return
