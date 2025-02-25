@@ -2,12 +2,20 @@
 This module contains the functions necessary to build AdataDict objects from adata in memory.
 """
 
+from __future__ import annotations #allows type hinting without circular dependency
+
+from typing import TYPE_CHECKING
+
+
+
 import itertools
 
 import pandas as pd
 from anndata import AnnData
 
-from .adata_dict import AdataDict
+
+if TYPE_CHECKING:
+    from .adata_dict import AdataDict
 
 
 def build_adata_dict(
@@ -139,6 +147,9 @@ def build_adata_dict_main(
     Flat dictionary of class :class:`AdataDict` where 
     keys are strata tuples and values are corresponding AnnData subsets.
     """
+    # Importing AdataDict here to avoid circular import
+    from .adata_dict import AdataDict # pylint: disable=import-outside-toplevel
+
     # Ensure that the strata columns are categorical
     for key in strata_keys:
         if not isinstance(adata.obs[key].dtype, pd.CategoricalDtype):

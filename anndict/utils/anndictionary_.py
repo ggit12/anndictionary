@@ -324,7 +324,8 @@ def summarize_metadata(
 
     return results
 
-
+# This behaviour is intentional for ease of use in Jupyter notebooks.
+# pylint: disable=inconsistent-return-statements
 def display_html_summary(
     summary_dict,
     return_html=False

@@ -139,7 +139,7 @@ def plot_sankey(
 
     sankey = hv.Sankey(sankey_data, kdims=["source", "target"], vdims=["value"])
     sankey = sankey.opts(
-        cmap=cmap, label_position=label_position, edge_color=edge_color, edge_cmap=edge_cmap, colorbar=True if edge_cmap else False,
+        cmap=cmap, label_position=label_position, edge_color=edge_color, edge_cmap=edge_cmap, colorbar=True if edge_cmap else False, # pylint: disable=simplifiable-if-expression
         edge_line_width=edge_line_width, show_values=show_values, node_padding=node_padding, node_alpha=node_alpha,
         node_width=node_width, node_sort=node_sort, frame_height=frame_height, frame_width=frame_width,
         bgcolor=bgcolor, apply_ranges=apply_ranges, label_text_font_size=label_font_size, hooks=[f]

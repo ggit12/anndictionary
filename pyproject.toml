@@ -41,6 +41,10 @@ dependencies = [
     "krippendorff==0.7.0"
 ]
 
+[project.urls]
+"Source" = "https://github.com/ggit12/anndictionary"
+"Documentation" = "https://ggit12.github.io/anndictionary"
+
 [tool.setuptools]
 packages = [
     "anndict",
@@ -59,3 +63,6 @@ packages = [
     "anndict.annotate.cells.label_transfer",
     "anndict.annotate.genes"
 ]
+
+[tool.black]
+line-length = 100

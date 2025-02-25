@@ -14,10 +14,10 @@ from anndict.adata_dict import (
     concatenate_adata_dict,
 )
 
-from anndict.utils.scanpy_ import resample_adata
+from anndict.utils.scanpy_ import sample_and_drop
 
 
-def resample_adata_dict(
+def sample_and_drop_adata_dict(
     adata_dict: AdataDict,
     strata_keys: list[str],
     n_largest_groups: int | None = None,
@@ -25,7 +25,7 @@ def resample_adata_dict(
     **kwargs
 ) -> AdataDict:
     """
-    Resample each :class:`AnnData` in ``adata_dict`` based on 
+    Sample each :class:`AnnData` in ``adata_dict`` based on 
     specified strata keys and drop strata with fewer than the minimum number of cells.
 
     Parameters
@@ -41,13 +41,13 @@ def resample_adata_dict(
         Minimum number of cells required to retain a stratum.
 
     kwargs
-        Additional keyword arguments to pass to :func:`~anndict.wrappers.resample_adata`.
+        Additional keyword arguments to pass to :func:`~anndict.wrappers.sample_and_drop`.
 
     Returns
     --------
-    :class:`AdataDict` of resampled :class:`AnnData` after filtering.
+    :class:`AdataDict` of sampled :class:`AnnData` after filtering.
     """
-    return adata_dict_fapply_return(adata_dict, resample_adata, strata_keys=strata_keys, n_largest_groups=n_largest_groups, min_num_cells=min_num_cells, **kwargs)
+    return adata_dict_fapply_return(adata_dict, sample_and_drop, strata_keys=strata_keys, n_largest_groups=n_largest_groups, min_num_cells=min_num_cells, **kwargs)
 
 
 def normalize_adata_dict(
@@ -231,7 +231,8 @@ def neighbors_adata_dict(
     -----
     The function modifies ``adata_dict`` in-place.
     """
-    adata_dict_fapply(adata_dict, sc.pp.neighbors, **kwargs)
+    # use_multithreading=False to avoid issues with scanpy's multithreading
+    adata_dict_fapply(adata_dict, sc.pp.neighbors, use_multithreading=False, **kwargs)
 
 
 def leiden_adata_dict(
@@ -318,7 +319,7 @@ def leiden_sub_cluster_adata_dict(
 
     Returns
     --------
-    :class:`AdataDict` of resampled AnnData objects after filtering.
+    :class:`AdataDict` of AnnData objects.
     """
     return adata_dict_fapply_return(adata_dict, leiden_sub_cluster, groupby=groupby, **kwargs)
 
@@ -342,7 +343,8 @@ def calculate_umap_adata_dict(
     --------
     :class:`AdataDict` with UMAP coordinates added to each :class:`AnnData`.
     """
-    adata_dict_fapply(adata_dict, sc.tl.umap, **kwargs)
+    # use_multithreading=False to avoid issues with scanpy's multithreading
+    adata_dict_fapply(adata_dict, sc.tl.umap, use_multithreading=False, **kwargs)
 
 
 def plot_umap_adata_dict(

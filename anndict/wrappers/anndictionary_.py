@@ -165,7 +165,7 @@ def ai_annotate_cell_sub_type_adata_dict(
 
 @wraps(ai_determine_leiden_resolution)
 def ai_determine_leiden_resolution_adata_dict(
-    adata_dict: AdataDict, 
+    adata_dict: AdataDict,
     initial_resolution: float = 1
 ) -> AdataDict:
     """
@@ -253,13 +253,30 @@ def summarize_metadata_adata_dict(adata_dict, **kwargs):
     return adata_dict_fapply_return(adata_dict, summarize_metadata, **kwargs)
 
 @wraps(display_html_summary)
-def display_html_summary_adata_dict(summary_dict_dict):
-    """
-    Wrapper for display_html_summary.
-    """
-    for stratum, summary_dict in summary_dict_dict.items():
-        print(f"Summary for {stratum}:")
+def display_html_summary_adata_dict(summary_dict, parent_key=None):
+    """Wrapper for display_html_summary."""
+    if parent_key is None:
+        parent_key = ()
+
+    # If we've reached a dictionary whose keys are all strings,
+    # treat it as terminal and pass to display_html_summary.
+    if all(isinstance(k, str) for k in summary_dict.keys()):
+        if parent_key:
+            print(f"Summary for: {'->'.join(map(str, parent_key))}")
         display_html_summary(summary_dict)
+        return
+
+    # Otherwise, recurse deeper for each sub-dict
+    for key, value in summary_dict.items():
+        new_parent_key = parent_key + (key,)
+        if isinstance(value, dict):
+            display_html_summary_adata_dict(value, parent_key=new_parent_key)
+        else:
+            # If this branch is reached, 'value' is terminal data
+            # rather than a dict, so pass to display_html_summary.
+            print(f"Summary for: {'->'.join(map(str, new_parent_key))}")
+            display_html_summary(value)
+
 
 @wraps(pca_density_filter_adata)
 def pca_density_adata_dict(adata_dict, **kwargs):

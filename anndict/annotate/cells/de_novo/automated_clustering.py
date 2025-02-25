@@ -89,7 +89,8 @@ def determine_sign_of_resolution_change(annotation: str) -> int:
     --------
     ``-1`` for ``"decreased"``, ``1`` for ``"increased"``, ``0`` for ``"unchanged"`` or ``None``.
     """
-    if "decreased" in annotation:
+    # pylint check disabled for readability and future-proofing
+    if "decreased" in annotation: # pylint: disable=no-else-return
         return -1
     elif "increased" in annotation:
         return 1
@@ -99,7 +100,6 @@ def determine_sign_of_resolution_change(annotation: str) -> int:
         return 0
 
 
-#AI integrations
 def ai_determine_leiden_resolution(
     adata: AnnData,
     initial_resolution: float
@@ -142,7 +142,8 @@ def ai_determine_leiden_resolution(
         sign_change = determine_sign_of_resolution_change(annotation)
 
         # Check if the resolution needs to be adjusted
-        if sign_change == 0:
+        # pylint check disabled for readability
+        if sign_change == 0: # pylint: disable=no-else-return
             return resolution
         elif previous_sign_change is not None and sign_change != previous_sign_change:
             resolution = round(resolution + 0.15 * sign_change, 2)

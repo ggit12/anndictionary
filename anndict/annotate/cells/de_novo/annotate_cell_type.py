@@ -90,5 +90,19 @@ def ai_annotate_cell_type(adata: AnnData,
     Returns
     -------
     A pd.DataFrame with a column for the top marker genes for each cluster.
+
+    Examples
+    --------
+    .. code-block:: python
+
+        # This will annotate each cluster based on its top differentially expressed genes. Each group's gene list is considered independently of the others.
+        ai_annotate_cell_type(
+        adata,
+        groupby='leiden',
+        n_top_genes=10,
+        new_label_column='ai_cell_type',
+        tissue_of_origin_col='tissue'   # Passes tissue information as context to the LLM
+        )
+
     """
     return ai_annotate(func=ai_cell_type, adata=adata, groupby=groupby, n_top_genes=n_top_genes, new_label_column=new_label_column, tissue_of_origin_col=tissue_of_origin_col)

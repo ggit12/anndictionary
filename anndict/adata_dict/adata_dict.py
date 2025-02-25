@@ -1,7 +1,9 @@
 """
-This module contains the ``AdataDict`` class, which is basically a nested dictionary of anndata, with a 
-few extra features to help restructure the nesting hierarchy and iterate over it.
+This module contains the :class:`AdataDict` class, which is basically a nested dictionary of anndata, with a 
+few extra features to help restructure the nesting hierarchy and iterate over it. :class:`AdataDict` inherits from :class:`dict` and passes methods through to each :class:`AnnData` in the :class:`AdataDict`.
 """
+
+from __future__ import annotations
 
 from functools import wraps
 
@@ -9,11 +11,14 @@ from anndata import AnnData
 
 from .adata_dict_utils import to_nested_tuple, set_var_index_func, set_obs_index_func
 from .adata_dict_fapply import adata_dict_fapply, adata_dict_fapply_return
+from .add_stratification import add_stratification as add_stratification_func
+
+from .dict_utils import check_dict_structure, all_leaves_are_of_type
 
 
 class AdataDict(dict):
     """
-    ``AdataDict`` is a dictionary-like container where values are ``AnnData`` objects. ``AdataDict`` inherits from :class:`dict`.
+    :class:`AdataDict` is a dictionary-like container where values are :class:`AnnData` objects. :class:`AdataDict` inherits from :class:`dict`.
 
     This class provides three main functionalities:
 
@@ -64,6 +69,25 @@ class AdataDict(dict):
             self._hierarchy = tuple(hierarchy)  # Tuple indicating the index hierarchy
         else:
             self._hierarchy = ()
+
+    def copy(self) -> AdataDict:
+        """
+        Copy the ``AdataDict``. Creates a deep copy of each ``AnnData`` object using :func:`anndata.AnnData.copy`.
+
+        Returns
+        -------
+        A new ``AdataDict`` with copied ``AnnData`` objects.
+
+        Examples
+        ---------
+        .. code-block:: python
+
+            adata_dict_copy = adata_dict.copy()
+
+        """
+        def copy_adata(adata):
+            return adata.copy()
+        return self.fapply(copy_adata, return_as_adata_dict=True)
 
     @property
     def hierarchy(self):
@@ -321,10 +345,10 @@ class AdataDict(dict):
             if isinstance(anndata_attr, property):
                 # Handle property access
                 return self._handle_property_access(attr)
-        
+
         # If not a property, handle as a method
         return self._handle_method_access(attr)
-    
+
     def _handle_property_access(self, attr):
         """Handle property access by returning a dictionary of property values."""
         results = {}
@@ -336,7 +360,7 @@ class AdataDict(dict):
                 # Get property value directly
                 results[key] = getattr(adata, attr)
         return results
-    
+
     def _handle_method_access(self, attr):
         """Handle method access by returning a wrapper function."""
         def method(*args, **kwargs):
@@ -350,6 +374,27 @@ class AdataDict(dict):
                     results[key] = func(*args, **kwargs)
             return results
         return method
+
+    # @wraps(check_dict_structure)
+    def check_structure(
+        self,
+        input_dict: dict
+    ) -> bool:
+        """
+        Check if an ``input_dict`` has the same structure and keys as the ``AdataDict``.
+        Raises an error at the first missing key encountered.
+        If no errors are raised, the structures match.
+
+        Parameters
+        ------------
+        input_dict
+            A dictionary to be compared with the ``AdataDict``.
+
+        Returns
+        -------
+        ``True`` if the structures match (based on both keys and nesting), ``False`` otherwise.
+        """
+        return check_dict_structure(self, input_dict)
 
     @wraps(adata_dict_fapply)
     def fapply(self, func, *, use_multithreading=True, num_workers=None, max_retries=0, **kwargs_dicts):
@@ -385,3 +430,64 @@ class AdataDict(dict):
     def set_obs_index(self, cols: str | list[str]):
         """Wrapper for set_obs_index_func."""
         return set_obs_index_func(self, cols)
+
+    @wraps(add_stratification_func)
+    def add_stratification(self, strata_keys, *, desired_strata=None):
+        """
+        Wrapper for :func:`add_stratification` that modifies self in-place``.
+        """
+        adata_dict_with_new_stratification = add_stratification_func(self, strata_keys=strata_keys, desired_strata=desired_strata)
+        self.clear()
+        self.update(adata_dict_with_new_stratification)
+        self._hierarchy = adata_dict_with_new_stratification._hierarchy # pylint: disable=protected-access
+
+    # This function either modifies in place or returns, so disable this check
+    # pylint: disable=inconsistent-return-statements
+    def index_bool(self, index_dict: dict, inplace: bool = True) -> None | AdataDict:
+        """
+        Index the ``AdataDict`` by a dictionary of indices.
+
+        Parameters
+        -----------
+        index_dict
+            A :class:`dict` with the same structure as the ``AdataDict``, but values are boolean.
+
+        inplace
+            If ``True``, modifies the ``AdataDict`` in-place. Otherwise, returns a new ``AdataDict``.
+
+        Returns
+        --------
+        - ``None`` and modifies the ``AdataDict`` in-place if ``inplace=True``.
+        - New ``AdataDict`` object with the specified indices if ``inplace=False``.
+        """
+
+        # Check if index_dict has the same structure as self
+        if not self.check_structure(index_dict):
+            raise ValueError("``index_dict`` must have the same structure and keys as the ``AdataDict``")
+
+        # Enforce that all elements in index_dict are boolean
+        if not all_leaves_are_of_type(index_dict, bool):
+            raise ValueError("All leaf values in ``index_dict`` must be boolean")
+
+        # Use a new copy when not inplace
+        adata_dict_to_change = self if inplace else self.copy()
+
+        keys_to_remove = []
+        def collect_keys(adata, bool_index=None, adt_key=None): # pylint: disable=unused-argument # ``adata`` arg must be included to comply with fapply syntax
+            """
+            Delete entries from adata based on ``bool_index``.
+            """
+            if not bool_index:
+                keys_to_remove.append(adt_key)
+
+        # Collect keys to remove
+        adata_dict_to_change.fapply(collect_keys, bool_index=index_dict)
+
+        # Remove the keys (can't be done with fapply)
+        for key in keys_to_remove:
+            del adata_dict_to_change[key]
+
+
+        # Return the modified AdataDict if not inplace
+        if not inplace:
+            return adata_dict_to_change

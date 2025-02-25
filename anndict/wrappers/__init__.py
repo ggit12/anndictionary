@@ -3,7 +3,7 @@ This module contains :func:`adata_dict_fapply` and :func:`adata_dict_fapply_retu
 """
 
 from .scanpy_ import (
-    resample_adata_dict,
+    sample_and_drop_adata_dict,
     normalize_adata_dict,
     log_transform_adata_dict,
     set_high_variance_genes_adata_dict,
@@ -58,7 +58,7 @@ from .anndictionary_ import (
 __all__ = [
 
     # scanpy_
-    "resample_adata_dict",
+    "sample_and_drop_adata_dict",
     "normalize_adata_dict",
     "log_transform_adata_dict",
     "set_high_variance_genes_adata_dict",

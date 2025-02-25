@@ -63,6 +63,24 @@ def ai_annotate_cell_sub_type(adata: AnnData,
 
     :class:`dict`
         Mapping of original labels to LLM-generated labels.
+
+    Examples
+    --------
+
+    .. code-block:: python
+    
+        import anndict as adt
+
+        # This will annotate the cell subtypes based on the top 10 differentially expressed genes in each group
+
+        adt.ai_annotate_cell_sub_type(
+            adata,
+            cell_type_col='cell_type',           # Each cell will be assumed to be of the cell type indicated by this column
+            sub_cluster_col='sub_cluster',       # This is the column that indicates the sub-cluster of each cell
+            new_label_column='ai_cell_subtype',
+            tissue_of_origin_col='tissue',
+            n_top_genes=10)
+
     """
     #build adata_dict based on cell_type_col
     adata_dict = build_adata_dict(adata, strata_keys=[cell_type_col])

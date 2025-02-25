@@ -20,7 +20,8 @@ def plot_grouped_average(
     adt_key: tuple[str,...] | None = None
 ):
     """
-    Plots the average values specified in label_value across each group of label_keys in an AnnData object.
+    Plots the average values specified in ``label_value`` 
+    across each group of label_keys in an AnnData object.
 
     Parameters
     -----------
@@ -28,7 +29,9 @@ def plot_grouped_average(
         An :class:`AnnData`.
 
     label_value: 
-        A :class:`dict` where the keys are the cols in ``adata.obs`` for grouping, values are the cols in ``adata.obs`` for the values to average.
+        A :class:`dict` where the keys are the cols in ``adata.obs`` 
+        for grouping, values are the cols in ``adata.obs`` for 
+        the values to average.
 
     adt_key: 
         to print specified key
@@ -70,7 +73,8 @@ def plot_model_agreement(
     granularity: int = 2
 ) -> tuple[Figure, Axes] | ClusterGrid:
     """
-    Plots the average values of specified agreement columns across varying levels of granularity.
+    Plots the average values of specified agreement columns across varying levels of granularity. 
+    See notes for which columns are ignored based on the granularity setting.
 
     Parameters
     -----------
@@ -92,6 +96,19 @@ def plot_model_agreement(
     Returns
     --------
     The plot of agreement, averaged according to the ``granularity`` setting.
+
+    Notes
+    ------
+    If granularity is 0, ``group_by`` and ``sub_group_by`` are not used. 
+    If granularity is 1, ``sub_group_by`` is not used.
+
+    Examples
+    ---------
+
+    .. code-block:: python
+    
+        import anndict as adt
+        adt.plot_model_agreement(adata, 'cell_type', 'tissue', ['agreement_of_manual_with_model1', 'agreement_of_manual_with_model2'], granularity=0)
 
     """
     if not all(col in adata.obs for col in agreement_cols):
@@ -202,7 +219,7 @@ def plot_model_agreement(
 
         # Create a legend for tissues
         # tissue_handles = [plt.Rectangle((0,0),1,1, color=color) for color in tissue_color_map.values()]
-        # ax.legend(tissue_handles, tissue_color_map.keys(), title=sub_group_by, 
+        # ax.legend(tissue_handles, tissue_color_map.keys(), title=sub_group_by,
         #           loc='center left', bbox_to_anchor=(1, 0.5))
         # return fig, ax
 
@@ -263,6 +280,19 @@ def plot_model_agreement_categorical(
     Returns
     --------
     The plot of agreement, averaged according to the ``granularity`` setting, split by quality of agreement.
+
+    Notes
+    ------
+    If granularity is 0, ``group_by`` and ``sub_group_by`` are not used. 
+    If granularity is 1, ``sub_group_by`` is not used.
+
+    Examples
+    ---------
+
+    .. code-block:: python
+    
+        import anndict as adt
+        adt.plot_model_agreement_categorical(adata, 'cell_type', 'tissue', ['agreement_of_manual_with_model1', 'agreement_of_manual_with_model2'], granularity=0)
     """
     # Verify that the required columns exist
     if not all(col in adata.obs for col in agreement_cols):
@@ -344,7 +374,7 @@ def plot_model_agreement_categorical(
         plt.tight_layout()
         return fig, ax
 
-    elif granularity == 1:
+    if granularity == 1:
         # Calculate counts and proportions
         counts = melted.groupby([group_by, 'model_name', 'agreement']).size().reset_index(name='count')
         total_counts = counts.groupby([group_by, 'model_name'])['count'].transform('sum')
@@ -394,7 +424,7 @@ def plot_model_agreement_categorical(
         plt.tight_layout()
         return g
 
-    elif granularity == 2:
+    if granularity == 2:
         # Calculate counts and proportions
         counts = melted.groupby([group_by, sub_group_by, 'model_name', 'agreement']).size().reset_index(name='count')
         total_counts = counts.groupby([group_by, sub_group_by, 'model_name'])['count'].transform('sum')
@@ -429,5 +459,5 @@ def plot_model_agreement_categorical(
         plt.tight_layout()
         return plt.gcf()
 
-    else:
-        raise ValueError("Granularity must be 0, 1, or 2.")
+    # Raise an error if granularity is not 0, 1, or 2
+    raise ValueError("Granularity must be 0, 1, or 2.")

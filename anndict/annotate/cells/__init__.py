@@ -7,7 +7,9 @@ from .de_novo import (
     ai_annotate, ai_annotate_by_comparison,
     ai_cell_type, ai_annotate_cell_type,
     ai_cell_types_by_comparison,
+    ai_from_expected_cell_types,
     ai_annotate_cell_type_by_comparison,
+    ai_annotate_from_expected_cell_types,
     ai_annotate_cell_type_by_comparison_adata_dict,
     ai_annotate_cell_sub_type,
     ai_annotate_biological_process,
@@ -44,6 +46,10 @@ __all__ = [
     # annotate_cell_type_by_comparison.py
     "ai_cell_types_by_comparison",
     "ai_annotate_cell_type_by_comparison",
+
+    # annotate_from_expected_cell_types.py
+    "ai_from_expected_cell_types",
+    "ai_annotate_from_expected_cell_types",
 
     # annotate_cell_subtype.py
     "ai_annotate_cell_type_by_comparison_adata_dict",

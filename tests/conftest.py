@@ -37,11 +37,31 @@ def simple_adata_with_two_groups():
         {
             "cluster": ["0", "0", "1", "1"],
             "condition": ["A", "A", "B", "B"],
+            "tissue": ["blood", "blood", "liver", "liver"],
         },
         index=["cell1", "cell2", "cell3", "cell4"],
     )
     var = pd.DataFrame(index=["gene1", "gene2", "gene3"])
     X = np.array([[1, 1, 1, 1], [5, 4, 5, 4], [10, 6, 10, 8]])
+    return ad.AnnData(X=X.T, obs=obs, var=var)
+
+@pytest.fixture
+def simple_adata_with_three_unbalanced_groups():
+    """Fixture for creating test AnnData object with three groups of unbalanced sizes"""
+    obs = pd.DataFrame(
+        {
+            "cluster": pd.Categorical(["0", "0", "0", "1", "1", "2", "2", "2", "2"]),
+            "condition": pd.Categorical(["A", "A", "A", "B", "B", "C", "C", "C", "C"]),
+        },
+        index=[f"cell{i}" for i in range(1,10)],
+    )
+    var = pd.DataFrame(index=["gene1", "gene2", "gene3"])
+    # Create expression data matching the new number of cells
+    X = np.array([
+        [1, 1, 1, 2, 2, 3, 3, 3, 3],  # gene1 
+        [5, 4, 5, 6, 6, 7, 7, 7, 7],  # gene2
+        [10, 6, 10, 8, 8, 9, 9, 9, 9]  # gene3
+    ])
     return ad.AnnData(X=X.T, obs=obs, var=var)
 
 @pytest.fixture

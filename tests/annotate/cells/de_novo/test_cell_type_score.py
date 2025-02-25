@@ -123,3 +123,21 @@ def test_cell_type_marker_gene_score_validation(simple_adata_with_two_groups):
         ValueError, match="Either 'cell_type_col' or 'cell_types' must be provided"
     ):
         cell_type_marker_gene_score(adata=simple_adata_with_two_groups, species="Human")
+
+def test_cell_type_marker_gene_score_invalid_cell_types(simple_adata_with_two_groups):
+    """Test providing invalid cell types"""
+
+    # Test providing both cell_types and cell_type_col
+    with pytest.raises(ValueError):
+        cell_type_marker_gene_score(
+            adata=simple_adata_with_two_groups,
+            cell_types=["TypeA", "1"],
+        )
+
+    # Test providing both cell_types and cell_type_col
+    with pytest.raises(ValueError):
+        cell_type_marker_gene_score(
+            adata=simple_adata_with_two_groups,
+            cell_types=["TypeA", float("nan")],
+            cell_type_col="cluster",
+        )

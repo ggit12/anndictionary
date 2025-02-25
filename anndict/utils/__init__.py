@@ -27,8 +27,8 @@ from .anndata_ import (
 )
 
 from .scanpy_ import (
-    subsample_adata_dict,
-    resample_adata
+    sample_adata_dict,
+    sample_and_drop,
 
 )
 
@@ -82,8 +82,8 @@ __all__ = [
     "get_adata_columns",
 
     # scanpy_.py
-    "subsample_adata_dict",
-    "resample_adata",
+    "sample_adata_dict",
+    "sample_and_drop",
 
     # pca_density_filter.py
     "pca_density_filter_main",

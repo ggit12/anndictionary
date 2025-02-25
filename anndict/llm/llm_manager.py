@@ -13,7 +13,7 @@ from .provider_initializer_mapping import LLMProviders  # type: ignore
 class LLMManager:
     """Internal manager class for LLM operations"""
 
-    _llm_instance: Any | None = None  
+    _llm_instance: Any | None = None
     _llm_config: dict[str, Any] | None = None
 
     @staticmethod

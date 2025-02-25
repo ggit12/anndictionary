@@ -178,6 +178,7 @@ def _update_adata_and_create_results(
 
     top_genes_lists
         Top genes for each cluster
+
     Returns
     -------
     Results DataFrame
@@ -284,7 +285,7 @@ def ai_annotate(
         cell_type_annotations[cluster] = annotation
 
     return _update_adata_and_create_results(
-        adata, cell_type_annotations, groupby, new_label_column, 
+        adata, cell_type_annotations, groupby, new_label_column,
         n_top_genes, top_genes_dict
     )
 
@@ -380,6 +381,6 @@ def ai_annotate_by_comparison(
     cell_type_annotations = dict(zip(clusters, annotations))
 
     return _update_adata_and_create_results(
-        adata, cell_type_annotations, groupby, new_label_column, 
+        adata, cell_type_annotations, groupby, new_label_column,
         n_top_genes, top_genes
     )

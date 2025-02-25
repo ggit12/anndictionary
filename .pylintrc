@@ -1,0 +1,11 @@
+[MASTER]
+ignore-patterns=.*__init__.py$
+
+[MESSAGES CONTROL]
+# Disable the following checks:
+# R0801: Turn off checks for duplicate code--calls to retry_call_llm are not duplicated logic
+# C0301: Line too long
+# R0913: Too many arguments
+# R0917: Too many positional arguments
+# R0914: Too many local variables
+disable=R0801,C0301,R0913,R0917,R0914

@@ -9,6 +9,11 @@ import anndata as ad
 
 from anndict.adata_dict import AdataDict
 
+# Utility function for testing
+def select_all(adata): # pylint: disable=unused-argument
+    """Function that always returns True. Is used with AdataDict.fapply to create an all-``True`` index_dict."""
+    return True
+
 def test_adata_dict_init(simple_adata_dict):
     """Test AdataDict initialization."""
     # Test empty initialization
@@ -236,3 +241,127 @@ def test_set_obs_index_wrapper(simple_adata_dict):
     # Verify the index was set correctly in all AnnData objects
     for key, adata in simple_adata_dict.items():
         assert all(adata.obs.index == original_cell_ids[key])
+
+def test_check_structure_matching(simple_adata_dict):
+    """Test when input dictionary has the same structure as AdataDict."""
+    input_dict = simple_adata_dict.copy()
+
+    # Should not raise any error
+    assert simple_adata_dict.check_structure(input_dict)
+
+def test_check_structure_missing_key(simple_adata_dict):
+    """Test when input dictionary is missing a key that exists in AdataDict."""
+    input_dict = simple_adata_dict.copy()
+    del input_dict[("sample2",)]
+
+    assert not simple_adata_dict.check_structure(input_dict)
+
+def test_check_structure_extra_key(simple_adata_dict):
+    """Test when input dictionary has an extra key that doesn't exist in AdataDict."""
+    input_dict = simple_adata_dict.copy()
+    input_dict[("sample3",)] = input_dict[("sample1",)].copy()
+
+    assert not simple_adata_dict.check_structure(input_dict)
+
+def test_index_bool_basic(simple_adata_dict):
+    """Test basic indexing with boolean array."""
+    # create a boolean array based on simple_adata_dict
+    index_dict = simple_adata_dict.fapply(select_all)
+
+    #index with this dict
+    simple_adata_dict.index_bool(index_dict)
+
+    # should return the same dictionary
+    assert simple_adata_dict == simple_adata_dict
+
+def test_index_bool_inplace(simple_adata_dict):
+    """Test basic indexing with boolean array."""
+    original_dict = simple_adata_dict.copy()
+
+    # create a boolean array based on simple_adata_dict
+    index_dict = simple_adata_dict.fapply(select_all, use_multithreading=False)
+
+    #index with this dict
+    simple_adata_dict.index_bool(index_dict, inplace=True)
+
+    # should be modified in-place
+    # Check that original and indexed are equal
+    for key in original_dict.keys():
+        assert np.array_equal(original_dict[key].X, simple_adata_dict[key].X)
+
+def test_index_bool_remove_element_inplace(simple_adata_dict):
+    """Test that elements are correctly removed when using boolean indexing inplace."""
+    original_dict = simple_adata_dict.copy()
+
+    # Create an index dict where sample1 is kept (True) and sample2 is removed (False)
+    index_dict = {
+        ("sample1",): True,
+        ("sample2",): False
+    }
+
+    simple_adata_dict.index_bool(index_dict, inplace=True)
+
+    # make sure the original dict is unchanged
+    assert set(original_dict.keys()) == {("sample1",), ("sample2",)}
+
+    # Check that only sample1 remains
+    assert set(simple_adata_dict.keys()) == {("sample1",)}
+
+    # Check that the remaining data is unchanged
+    assert np.array_equal(simple_adata_dict[("sample1",)].X, original_dict[("sample1",)].X)
+    assert simple_adata_dict[("sample1",)].obs.equals(original_dict[("sample1",)].obs)
+    assert simple_adata_dict[("sample1",)].var.equals(original_dict[("sample1",)].var)
+
+def test_index_bool_remove_element_return(simple_adata_dict):
+    """Test that elements are correctly removed when using boolean indexing with return."""
+    # Create an index dict where sample1 is kept (True) and sample2 is removed (False)
+    index_dict = {
+        ("sample1",): True,
+        ("sample2",): False
+    }
+
+    result = simple_adata_dict.index_bool(index_dict, inplace=False)
+
+    # Original should be unchanged
+    assert set(simple_adata_dict.keys()) == {("sample1",), ("sample2",)}
+
+    # Result should only have sample1
+    assert set(result.keys()) == {("sample1",)}
+
+    # Check that the data in result is correct
+    assert np.array_equal(result[("sample1",)].X, simple_adata_dict[("sample1",)].X)
+    assert result[("sample1",)].obs.equals(simple_adata_dict[("sample1",)].obs)
+    assert result[("sample1",)].var.equals(simple_adata_dict[("sample1",)].var)
+
+def test_index_bool_different_keys(simple_adata_dict):
+    """Test that a ValueError is raised when index_dict has different keys."""
+    # Create an index dict with wrong keys
+    index_dict = {
+        ("sample1",): True,
+        ("wrong_sample",): True  # Different key than in simple_adata_dict
+    }
+
+    with pytest.raises(ValueError, match="``index_dict`` must have the same structure and keys as the ``AdataDict``"):
+        simple_adata_dict.index_bool(index_dict, inplace=True)
+
+def test_index_bool_non_boolean_values(simple_adata_dict):
+    """Test that a ValueError is raised when index_dict contains non-boolean values."""
+    # Create an index dict with non-boolean values
+    index_dict = {
+        ("sample1",): True,
+        ("sample2",): 1  # Integer instead of boolean
+    }
+
+    with pytest.raises(ValueError, match="All leaf values in ``index_dict`` must be boolean"):
+        simple_adata_dict.index_bool(index_dict, inplace=True)
+
+def test_index_bool_missing_keys(simple_adata_dict):
+    """Test that a ValueError is raised when index_dict is missing keys."""
+    # Create an index dict with missing keys
+    index_dict = {
+        ("sample1",): True,
+        # sample2 is missing
+    }
+
+    with pytest.raises(ValueError, match="``index_dict`` must have the same structure and keys as the ``AdataDict``"):
+        simple_adata_dict.index_bool(index_dict, inplace=True)

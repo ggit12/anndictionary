@@ -93,5 +93,17 @@ def ai_annotate_biological_process(
     -------
     This function also modifies the input ``adata`` 
     in place, adding annotations to ``adata.obs[new_label_col]``
+
+    Examples
+    ---------
+
+    .. code-block:: python
+
+        import anndict as adt
+
+        # This will annotate the treatment group with biological processes based on the top 10 differentially expressed genes in each group
+        ai_annotate_biological_process(adata, groupby='treatment_vs_control',
+            n_top_genes=10, new_label_column='ai_biological_process')
+
     """
     return ai_annotate(func=ai_biological_process, adata=adata, groupby=groupby, n_top_genes=n_top_genes, new_label_column=new_label_column)

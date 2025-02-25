@@ -19,8 +19,8 @@ def write_adata_dict(
     """
     Save each :class:`AnnData` object from an :class:`AdataDict` into a separate ``.h5ad`` file,
     creating a directory structure that reflects the hierarchy of the :class:`AdataDict`
-    using key values as directory names. The hierarchy is saved in a file called
-    ``adata_dict.hierarchy`` in the top-level directory.
+    using key values as directory names. The hierarchy and structure are saved in files called
+    ``adata_dict.hierarchy.json`` and ``adata_dict.db.json``, which are used internally by AnnDictionary.
 
     Parameters
     ----------

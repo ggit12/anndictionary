@@ -28,7 +28,8 @@ def plot_confusion_matrix_from_adata(
     diagonalize: bool = False,
     true_ticklabels: list[str] | None = None,
     predicted_ticklabels: list[str] | None = None,
-    annot: bool | None = None
+    annot: bool | None = None,
+    adt_key: tuple[str, ...] | None = None,
 ) -> ClusterGrid:
     """
     Plots a confusion matrix from an :class:`AnnData` object, with optional row and column colors.
@@ -57,6 +58,9 @@ def plot_confusion_matrix_from_adata(
     col_color_key
         key for column colors in ``adata.obs``.
 
+    adt_key
+        Used when wrapping with :func:`adata_dict_fapply`.
+
     Returns
     --------
     The confusion matrix plot object.
@@ -65,7 +69,7 @@ def plot_confusion_matrix_from_adata(
     ---------
     :func:`plot_confusion_matrix` : the main plotting function used.
     """
-
+    print(f"{adt_key}")
     # Check and convert row_color_key and col_color_key to lists if they are not None
     if row_color_keys is not None and not isinstance(row_color_keys, list):
         row_color_keys = [row_color_keys]
@@ -118,7 +122,7 @@ def plot_confusion_matrix(
     predicted_labels_encoded: np.ndarray,
     label_encoder: LabelEncoder,
     color_map: dict[str, dict[str, str]],
-    title: str = 'Confusion Matrix', 
+    title: str = 'Confusion Matrix',
     row_color_keys: list[str] | None = None,
     col_color_keys: list[str] | None = None,
     true_label_color_dict: dict[str, dict[str, str]] | None = None,
@@ -225,8 +229,8 @@ def plot_confusion_matrix(
 
     # Normalize the confusion matrix by row (i.e., by the number of samples in each class)
     cm_normalized = cm.astype('float') / cm.sum(axis=1, keepdims=True)
-    cm_normalized = pd.DataFrame(cm_normalized[np.ix_(labels_true, labels_pred)], 
-                                 index=label_encoder.inverse_transform(labels_true), 
+    cm_normalized = pd.DataFrame(cm_normalized[np.ix_(labels_true, labels_pred)],
+                                 index=label_encoder.inverse_transform(labels_true),
                                  columns=label_encoder.inverse_transform(labels_pred))
 
     if diagonalize:
@@ -263,9 +267,9 @@ def plot_confusion_matrix(
         col_colors = map_labels_to_colors(labels_pred_sorted, predicted_label_color_dict, color_map)
         col_colors = pd.DataFrame(col_colors, index=labels_pred_sorted)
 
-    xticklabels = predicted_ticklabels if predicted_ticklabels is not None else (True if len(labels_pred) <= 40 else False)
-    yticklabels = true_ticklabels if true_ticklabels is not None else (True if len(labels_true) <= 40 else False)
-    annot = annot if annot is not None else (True if len(labels_true) <= 40 and len(labels_pred) <= 40 else False)
+    xticklabels = predicted_ticklabels if predicted_ticklabels is not None else len(labels_pred) <= 40
+    yticklabels = true_ticklabels if true_ticklabels is not None else len(labels_true) <= 40
+    annot = annot if annot is not None else (len(labels_true) <= 40 and len(labels_pred) <= 40)
 
 
     g = sns.clustermap(cm_normalized, annot=annot, fmt=".2f", cmap="Blues",

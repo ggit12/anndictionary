@@ -228,7 +228,7 @@ def convert_obs_col_to_category(
 
 def convert_obs_col_to_string(
     adata: AnnData,
-    cols: str | list[str] 
+    cols: str | list[str]
 ) -> None:
     """
     Convert column(s) in ``adata.obs`` to ``str`` dtype.

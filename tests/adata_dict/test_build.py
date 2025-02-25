@@ -3,9 +3,6 @@ unit tests for anndict.adata_dict.build
 """
 
 import pytest
-import pandas as pd
-import numpy as np
-import anndata as ad
 from anndict.adata_dict.build import build_adata_dict
 from anndict.adata_dict import AdataDict
 

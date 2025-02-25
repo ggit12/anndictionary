@@ -154,5 +154,19 @@ def ai_annotate_cell_type_by_comparison(
     Returns
     -------
     :class:`AnnData` with LLM-generated cell type labels stored in ``adata.obs[label_column]``.
+
+    Examples
+    --------
+    .. code-block:: python
+
+        import anndict as adt
+
+        # This will annotate each cluster based on its top differentially expressed genes.
+        # All gene lists will be considered in the context of each other.
+        ai_annotate_cell_type_by_comparison(
+            adata,
+            groupby='leiden',
+            n_top_genes=10,
+            new_label_column='ai_cell_type_by_comparison')
     """
     return ai_annotate_by_comparison(func=ai_cell_types_by_comparison, adata=adata, groupby=groupby, n_top_genes=n_top_genes, new_label_column=new_label_column, cell_type_of_origin_col=cell_type_of_origin_col, tissue_of_origin_col=tissue_of_origin_col, **kwargs)

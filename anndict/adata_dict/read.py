@@ -159,13 +159,13 @@ def read_adata_dict(
                 level_key = key_path[current_pos:current_pos + remaining_len]
                 current[level_key] = value
                 break
-            else:
-                # This level is a single element
-                level_key = (key_path[current_pos],)
-                if level_key not in current:
-                    current[level_key] = {}
-                current = current[level_key]
-                current_pos += 1
+
+            # This level is a single element
+            level_key = (key_path[current_pos],)
+            if level_key not in current:
+                current[level_key] = {}
+            current = current[level_key]
+            current_pos += 1
 
     # Initialize the data dictionary
     data_dict: dict = {}

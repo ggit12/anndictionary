@@ -21,6 +21,13 @@ from .annotate_cell_type_by_comparison import (
 
 )
 
+#cell type annotation methods--by gene list (in the context of other gene lists, drawing from a list of expected cell types)
+from .annotate_from_expected_cell_types import (
+    ai_from_expected_cell_types,
+    ai_annotate_from_expected_cell_types,
+
+)
+
 from .annotate_cell_subtype import (
     ai_annotate_cell_type_by_comparison_adata_dict,
     ai_annotate_cell_sub_type,
@@ -53,7 +60,10 @@ __all__ = [
     # annotate_cell_type_by_comparison.py
     "ai_cell_types_by_comparison",
     "ai_annotate_cell_type_by_comparison",
-    
+
+    # annotate_from_expected_cell_types.py
+    "ai_from_expected_cell_types",
+    "ai_annotate_from_expected_cell_types",
 
     # annotate_cell_subtype.py
     "ai_annotate_cell_type_by_comparison_adata_dict",

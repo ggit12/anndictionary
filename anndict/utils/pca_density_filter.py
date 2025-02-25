@@ -15,7 +15,8 @@ from anndata import AnnData
 
 from anndict.utils.anndata_ import add_col_to_adata_obs, add_col_to_adata_var
 
-
+# This return behavior is intentional to allow simplified execution of the filter
+# pylint: disable=inconsistent-return-statements
 def pca_density_filter_adata(
     adata: AnnData,
     use_layer: str | None = None,
@@ -43,7 +44,7 @@ def pca_density_filter_adata(
     Returns
     --------
     If ``drop_cells`` is ``True``, returns a new :class:`AnnData` with the filtered cells.
-    Otherwise, modifies ``adata`` in-place.
+    Otherwise, modifies ``adata`` in-place by adding a boolean masking column.
     """
     # Get the data to use for PCA
     data = adata.layers[use_layer] if use_layer in adata.layers else adata.X

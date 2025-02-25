@@ -42,6 +42,24 @@ def module_score_barplot(adata: AnnData,
     Returns
     --------
     The :class:`Figure` and :class:`Axes` objects of the plot.
+
+    Examples
+    ---------
+
+    .. code-block:: python
+
+        import anndict as adt
+
+        # Calculate Scores
+        adt.cell_type_marker_gene_score(adata, cell_type_col='cell_type', species='Human', list_length="longer")
+
+        # Calculate a umap
+        sc.pp.neighbors(adata)
+        sc.tl.umap(adata)
+
+        # Plot the results
+        plots = adt.module_score_barplot(adata, group_cols='cell_type', score_cols=score_cols)
+
     """
     #print adt_key if provided
     if adt_key:
@@ -102,6 +120,24 @@ def module_score_umap(adata: AnnData,
     Returns
     --------
     :class:`Figure` containing the UMAP plots.
+
+    Examples
+    ---------
+
+    .. code-block:: python
+
+        import anndict as adt
+
+        # Calculate Scores
+        adt.cell_type_marker_gene_score(adata, cell_type_col='cell_type', species='Human', list_length="longer")
+
+        # Calculate a umap
+        sc.pp.neighbors(adata)
+        sc.tl.umap(adata)
+
+        # Plot the results
+        plots = adt.module_score_umap(adata, score_cols=score_cols + ['cell_type'])
+
     """
     # Print adt_key if provided
     if adt_key:

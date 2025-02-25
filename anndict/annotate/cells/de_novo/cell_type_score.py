@@ -7,6 +7,7 @@ import scanpy as sc
 from anndata import AnnData
 
 from anndict.utils.anndata_ import filter_gene_list
+from anndict.utils.anndictionary_ import enforce_semantic_list
 from anndict.annotate.genes import ai_make_cell_type_gene_list
 
 
@@ -63,6 +64,16 @@ def cell_type_marker_gene_score(
         - ``adata.obs`` is updated with new columns containing the computed scores for each 
             observation.
 
+    Examples
+    ---------
+
+    .. code-block:: python
+
+        import anndict as adt
+
+        # Calculate Scores
+        adt.cell_type_marker_gene_score(adata, cell_type_col='cell_type', species='Human', list_length="longer")
+
     See Also
     ---------
     :func:`module_score_umap` : To conveniently visualize these module scores on UMAPs.
@@ -84,6 +95,9 @@ def cell_type_marker_gene_score(
         # Ensure cell_types is a list
         if isinstance(cell_types, str):
             cell_types = [cell_types]
+
+    # Ensure cell_types contains only valid labels
+    enforce_semantic_list(cell_types)
 
     for cell_type in cell_types:
         cell_type = str(cell_type)  # Ensure cell_type is a string

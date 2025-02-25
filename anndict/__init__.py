@@ -2,6 +2,9 @@
 Main init for anndictionary.
 If on Mac, runs a multithreading configuration check before allowing import.
 """
+__version__ = "0.3.1.4.2"
+__author__ = "ggit12"
+
 import os
 import platform
 import sys
@@ -70,9 +73,13 @@ from .annotate import (
     # Cells
     #--------
     # De Novo
-    ai_annotate, ai_annotate_by_comparison,
-    ai_cell_type, ai_annotate_cell_type,
+    ai_cell_type,
     ai_cell_types_by_comparison,
+    ai_from_expected_cell_types,
+    ai_annotate,
+    ai_annotate_by_comparison,
+    ai_annotate_cell_type,
+    ai_annotate_from_expected_cell_types,
     ai_annotate_cell_type_by_comparison,
     ai_annotate_cell_sub_type,
     ai_annotate_biological_process,
@@ -164,8 +171,8 @@ from .utils import (
     get_adata_columns,
 
     # scanpy_.py
-    subsample_adata_dict,
-    resample_adata,
+    sample_adata_dict,
+    sample_and_drop,
 
     # pca_density_filter.py
     pca_density_filter_main,
@@ -236,11 +243,13 @@ __all__ = [
     # -----------
     # Cells
     # De Novo
+    "ai_cell_type",
+    "ai_cell_types_by_comparison",
+    "ai_from_expected_cell_types",
     "ai_annotate",
     "ai_annotate_by_comparison",
-    "ai_cell_type",
+    "ai_annotate_from_expected_cell_types",
     "ai_annotate_cell_type",
-    "ai_cell_types_by_comparison",
     "ai_annotate_cell_type_by_comparison",
     "ai_annotate_cell_sub_type",
     "ai_annotate_biological_process",
@@ -321,8 +330,8 @@ __all__ = [
     "display_html_summary",
 
     # scanpy_.py
-    "subsample_adata_dict",
-    "resample_adata",
+    "sample_adata_dict",
+    "sample_and_drop",
 
     # anndata_.py
     "remove_genes",

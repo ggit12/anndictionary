@@ -64,7 +64,7 @@ def annotate_gene_groups_with_ai_biological_process(
     # Get the genes and their positions from the x-axis
     xticks = heatmap_ax.get_xticks()
     xlabels = [tick.get_text() for tick in heatmap_ax.get_xticklabels()]
-    gene_positions = {gene: xtick for gene, xtick in zip(xlabels, xticks)}
+    gene_positions = dict(zip(xlabels, xticks))
 
     # get the gene column name
     gene_col = [col for col in df.columns if re.search(r'top_\d+_genes', col)][0]

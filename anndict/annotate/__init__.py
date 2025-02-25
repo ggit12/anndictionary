@@ -10,12 +10,14 @@ from .genes import (
 #cell annotation functions
 from .cells import (
     # De Novo
+    ai_cell_type,
+    ai_cell_types_by_comparison,
+    ai_from_expected_cell_types,
     ai_annotate,
     ai_annotate_by_comparison,
-    ai_cell_type,
     ai_annotate_cell_type,
-    ai_cell_types_by_comparison,
     ai_annotate_cell_type_by_comparison,
+    ai_annotate_from_expected_cell_types,
     ai_annotate_cell_type_by_comparison_adata_dict,
     ai_annotate_cell_sub_type,
     ai_annotate_biological_process,
@@ -42,12 +44,15 @@ __all__ = [
     # Cells
     #--------
     # De Novo
+    
+    "ai_cell_type",
+    "ai_cell_types_by_comparison",
+    "ai_from_expected_cell_types",
     "ai_annotate",
     "ai_annotate_by_comparison",
-    "ai_cell_type",
     "ai_annotate_cell_type",
-    "ai_cell_types_by_comparison",
     "ai_annotate_cell_type_by_comparison",
+    "ai_annotate_from_expected_cell_types",
     "ai_annotate_cell_type_by_comparison_adata_dict",
     "ai_annotate_cell_sub_type",
     "ai_annotate_biological_process",

@@ -1,9 +1,9 @@
 __pycache__/
-*/__pycache__/
+/__pycache__/
 
 # Ignore generated directories
 #generated/
-#*/generated/
+*/generated/
 
 # macOS specific files
 .DS_Store
@@ -13,3 +13,6 @@ dist/
 
 # docs source files
 docs_source/
+
+# llm response logs
+**/response.txt
