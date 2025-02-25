@@ -18,7 +18,7 @@ If you use this package, please cite:
 
 
 # Install
-See [Install Instructions](https://ggit12.github.io/anndictionary/installation.html)
+See [Installation Instructions](https://ggit12.github.io/anndictionary/installation.html)
 
 # About
 `AnnDictionary` is a package that lets you process multiple `anndata` objects in parallel with a simplified interface (so that you can avoid writing a bunch of for loops). This is accomplished by a dictionary-based wrapping of `scanpy`. We used the package to benchmark cell type annotaiton by 15 LLMs and maintain leaderboard at: https://singlecellgpt.com/celltype-annotation-leaderboard/.
@@ -39,7 +39,7 @@ The syntax looks like this: `adata_dict.fapply(func, **kwargs)`, where `adata_di
 
 
 ### Functions:
-The main function in this package is `adata_dict_fapply()`. 
+A core function in this package is `adata_dict_fapply()` and allows multithreaded processing of multiple anndata with smart argument broadcasting.
 
 `adata_dict_fapply()` works similarly to `.map()` in python or `lapply()` in R. It takes `adata_dict_fapply(adata_dict, func, **kwargs)`. 
 
@@ -47,9 +47,9 @@ The main function in this package is `adata_dict_fapply()`.
 - `func` is a function to apply over each element of the dictionary.
 - `**kwargs` are arguments that `func` takes.
 
-You can have `func` take the argument `adt_key` (i.e., `func(adata, adt_key=None)`) if you want the dictionary key to be available within `func`.
+You can have `func` take the argument `adt_key` (i.e., `func(adata, adt_key=None)`) if you want each anndata's key in `adata_dict` to be available to `func`.
 
-The value for any **kwarg can be either: 1) a single value to be used for all anndata in adata_dict, or 2) a dictionary with the same keys as adata, and a separate value for each anndata in adata_dict.
+The value for any **kwarg can be either: 1) a single value to be used for all anndata in adata_dict, or 2) a dictionary with the same keys as adata, and a separate value for each anndata in `adata_dict`.
 
 Many functions in `anndict` are built around `adata_dict_fapply()`.
 
@@ -72,11 +72,11 @@ This issue typically manifests as a Jupyter kernel crash (or a Python crash with
 # Tutorial
 This is the tutorial notebook for `AnnDictionary`. Follow the tutorial below to get started. The total run time is under 1 minute on a desktop computer.
 
-See `tutorial_notbooks` for other tutorials:
+See [Tutorials](https://ggit12.github.io/anndictionary/tutorials/index.html) for more, including:
 
-- Basic Tutorial (learn the basic mechanics of this package)
-- Label transfer with the Universal Cell Embedding (UCE)
-- Automated spatial transcriptomic annotation with UCE
+- [Basics of AdataDict](https://ggit12.github.io/anndictionary/tutorials/adata_dict/index.html)
+- [Different forms of automated cell type annotation](https://ggit12.github.io/anndictionary/tutorials/annotate/index.html)
+- [Automated spatial transcriptomic annotation](https://ggit12.github.io/anndictionary/tutorials/annotate/automated_spatial_transcriptomic_annotation.html)
 
 
 ```python
