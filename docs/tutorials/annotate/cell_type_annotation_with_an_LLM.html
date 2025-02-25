@@ -1,0 +1,1379 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta property="og:title" content="Cell Type Annotation with Large Language Models (LLMs)" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="tutorials/annotate/cell_type_annotation_with_an_LLM.html" />
+<meta property="og:site_name" content="AnnDictionary" />
+<meta property="og:description" content="This tutorial demonstrates how to use an LLM to do marker-gene-based cell annotation. The process is designed to mimic manual annotation by a human expert, and just have an LLM do the interpretatio..." />
+<meta property="og:image:width" content="1146" />
+<meta property="og:image:height" content="600" />
+<meta property="og:image" content="/_images/social_previews/summary_tutorials_annotate_cell_type_annotation_with_an_LLM_44e48264.png" />
+<meta property="og:image:alt" content="This tutorial demonstrates how to use an LLM to do marker-gene-based cell annotation. The process is designed to mimic manual annotation by a human expert, a..." />
+<meta name="description" content="This tutorial demonstrates how to use an LLM to do marker-gene-based cell annotation. The process is designed to mimic manual annotation by a human expert, and just have an LLM do the interpretatio..." />
+<meta name="twitter:card" content="summary_large_image" />
+
+    <title>Cell Type Annotation with Large Language Models (LLMs) &#8212; AnnDictionary Documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=a3416100" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../../_static/documentation_options.js?v=4d2f5802"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'tutorials/annotate/cell_type_annotation_with_an_LLM';</script>
+    <link rel="canonical" href="https://ggit12.github.io/anndictionary/tutorials/annotate/cell_type_annotation_with_an_LLM.html" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Transfer Labels Using an Sklearn Classifier" href="cell_type_annotation_with_a_label_transfer_model.html" />
+    <link rel="prev" title="Automated Cell Type Marker Gene Scores" href="automated_cell_type_marker_gene_scores.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">AnnDictionary Documentation</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../api/index.html">API</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../api/adata_dict/index.html">Core</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../api/adata_dict/adata_dict.html">AdataDict Class</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/adata_dict/generated/anndict.AdataDict.set_hierarchy.html">anndict.AdataDict.set_hierarchy</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/adata_dict/generated/anndict.AdataDict.add_stratification.html">anndict.AdataDict.add_stratification</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/adata_dict/generated/anndict.AdataDict.flatten.html">anndict.AdataDict.flatten</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/adata_dict/generated/anndict.AdataDict.fapply.html">anndict.AdataDict.fapply</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/adata_dict/generated/anndict.AdataDict.fapply_return.html">anndict.AdataDict.fapply_return</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/adata_dict/generated/anndict.AdataDict.index_bool.html">anndict.AdataDict.index_bool</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/adata_dict/generated/anndict.AdataDict.set_obs_index.html">anndict.AdataDict.set_obs_index</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/adata_dict/generated/anndict.AdataDict.set_var_index.html">anndict.AdataDict.set_var_index</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/adata_dict/generated/anndict.AdataDict.check_structure.html">anndict.AdataDict.check_structure</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/adata_dict/generated/anndict.AdataDict.copy.html">anndict.AdataDict.copy</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../api/adata_dict/adata_dict_fapply.html">Iterate over AnnDictionaries</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/adata_dict/generated/anndict.adata_dict.adata_dict_fapply.html">anndict.adata_dict.adata_dict_fapply</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../api/adata_dict/build_write_read.html">Build, Write, and Read AnnDictionaries</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/adata_dict/generated/anndict.adata_dict.build_adata_dict.html">anndict.adata_dict.build_adata_dict</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/adata_dict/generated/anndict.adata_dict.add_stratification.html">anndict.adata_dict.add_stratification</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/adata_dict/generated/anndict.adata_dict.write_adata_dict.html">anndict.adata_dict.write_adata_dict</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/adata_dict/generated/anndict.adata_dict.read_adata_dict.html">anndict.adata_dict.read_adata_dict</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/adata_dict/generated/anndict.adata_dict.read_adata_dict_from_h5ad.html">anndict.adata_dict.read_adata_dict_from_h5ad</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/adata_dict/generated/anndict.adata_dict.concatenate_adata_dict.html">anndict.adata_dict.concatenate_adata_dict</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../api/llm/index.html">LLM Management</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../api/llm/llm_call.html">Configure and Call</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/llm/generated/anndict.configure_llm_backend.html">anndict.configure_llm_backend</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/llm/generated/anndict.get_llm_config.html">anndict.get_llm_config</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/llm/generated/anndict.call_llm.html">anndict.call_llm</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/llm/generated/anndict.retry_call_llm.html">anndict.retry_call_llm</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../api/annotate/index.html">Annotate</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../api/annotate/cells/index.html">Cells</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/annotate/cells/de_novo.html">De Novo</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/annotate/cells/label_transfer.html">Transfer Labels</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/annotate/cells/benchmarking.html">Benchmark</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/annotate/cells/error_correction.html">Error Correction</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../api/annotate/genes/index.html">Genes</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/annotate/genes/make_gene_lists.html">Make Gene Lists</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../api/plot/index.html">Plot</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../api/plot/module_score_plots.html">Module Scores</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/plot/generated/anndict.plot.module_score_barplot.html">anndict.plot.module_score_barplot</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/plot/generated/anndict.plot.module_score_umap.html">anndict.plot.module_score_umap</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../api/plot/annotate_genes_on_heatmap.html">Annotate Genes on Heatmap</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/plot/generated/anndict.plot.annotate_gene_groups_with_ai_biological_process.html">anndict.plot.annotate_gene_groups_with_ai_biological_process</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../api/plot/confusion_matrix_plots.html">Confusion Matrix</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/plot/generated/anndict.plot.plot_confusion_matrix_from_adata.html">anndict.plot.plot_confusion_matrix_from_adata</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/plot/generated/anndict.plot.plot_confusion_matrix.html">anndict.plot.plot_confusion_matrix</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../api/plot/sankey_plots.html">Sankey Plots</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/plot/generated/anndict.plot.plot_sankey.html">anndict.plot.plot_sankey</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/plot/generated/anndict.plot.save_sankey.html">anndict.plot.save_sankey</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../api/plot/agreement_bar_plots.html">Agreement Bar Plots</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/plot/generated/anndict.plot.plot_grouped_average.html">anndict.plot.plot_grouped_average</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/plot/generated/anndict.plot.plot_model_agreement.html">anndict.plot.plot_model_agreement</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/plot/generated/anndict.plot.plot_model_agreement_categorical.html">anndict.plot.plot_model_agreement_categorical</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../api/plot/stabilizing_classifier_plots.html">Stabilizing Classifier</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/plot/generated/anndict.plot.plot_training_history.html">anndict.plot.plot_training_history</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/plot/generated/anndict.plot.plot_label_changes.html">anndict.plot.plot_label_changes</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../api/automated_label_management/index.html">Automated Label Management</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../api/automated_label_management/clean_single_column.html">Single Column</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/automated_label_management/generated/anndict.simplify_obs_column.html">anndict.simplify_obs_column</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/automated_label_management/generated/anndict.create_label_hierarchy.html">anndict.create_label_hierarchy</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/automated_label_management/generated/anndict.map_cell_type_labels_to_simplified_set.html">anndict.map_cell_type_labels_to_simplified_set</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/automated_label_management/generated/anndict.simplify_var_index.html">anndict.simplify_var_index</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/automated_label_management/generated/anndict.map_gene_labels_to_simplified_set.html">anndict.map_gene_labels_to_simplified_set</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../api/automated_label_management/unify_columns_within_adata.html">Within Adata</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/automated_label_management/generated/anndict.ensure_label_consistency_adata.html">anndict.ensure_label_consistency_adata</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/automated_label_management/generated/anndict.ensure_label_consistency_main.html">anndict.ensure_label_consistency_main</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../api/automated_label_management/unify_columns_between_adata.html">Between Adata</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/automated_label_management/generated/anndict.ai_unify_labels.html">anndict.ai_unify_labels</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../api/utils/index.html">Utils</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../api/utils/anndictionary.html">AnnDictionary</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/utils/generated/anndict.utils.enforce_semantic_list.html">anndict.utils.enforce_semantic_list</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/utils/generated/anndict.utils.make_names.html">anndict.utils.make_names</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/utils/generated/anndict.utils.normalize_string.html">anndict.utils.normalize_string</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/utils/generated/anndict.utils.normalize_label.html">anndict.utils.normalize_label</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/utils/generated/anndict.utils.summarize_metadata.html">anndict.utils.summarize_metadata</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/utils/generated/anndict.utils.display_html_summary.html">anndict.utils.display_html_summary</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/utils/generated/anndict.utils.create_color_map.html">anndict.utils.create_color_map</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/utils/generated/anndict.utils.get_slurm_cores.html">anndict.utils.get_slurm_cores</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../api/utils/anndata.html">AnnData</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/utils/generated/anndict.utils.get_adata_columns.html">anndict.utils.get_adata_columns</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/utils/generated/anndict.utils.remove_genes.html">anndict.utils.remove_genes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/utils/generated/anndict.utils.add_col_to_adata_obs.html">anndict.utils.add_col_to_adata_obs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/utils/generated/anndict.utils.add_col_to_adata_var.html">anndict.utils.add_col_to_adata_var</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/utils/generated/anndict.utils.add_col_to_pd_df.html">anndict.utils.add_col_to_pd_df</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/utils/generated/anndict.utils.convert_obs_col_to_category.html">anndict.utils.convert_obs_col_to_category</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/utils/generated/anndict.utils.convert_obs_col_to_string.html">anndict.utils.convert_obs_col_to_string</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/utils/generated/anndict.utils.convert_obs_index_to_str.html">anndict.utils.convert_obs_index_to_str</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../api/utils/scanpy.html">Scanpy</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/utils/generated/anndict.utils.sample_and_drop.html">anndict.utils.sample_and_drop</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/utils/generated/anndict.utils.sample_adata_dict.html">anndict.utils.sample_adata_dict</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../api/utils/pca_density_filter.html">PCA Density Filter</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/utils/generated/anndict.utils.pca_density_filter_adata.html">anndict.utils.pca_density_filter_adata</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/utils/generated/anndict.utils.pca_density_filter_main.html">anndict.utils.pca_density_filter_main</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../api/utils/stabilizing_classifier.html">Stabilizing Classifier</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/utils/generated/anndict.utils.stable_label_adata.html">anndict.utils.stable_label_adata</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/utils/generated/anndict.utils.stable_label.html">anndict.utils.stable_label</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../api/utils/read_spatial_data.html">Read Spatial Data</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/utils/generated/anndict.utils.build_adata_from_transcript_positions.html">anndict.utils.build_adata_from_transcript_positions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/utils/generated/anndict.utils.build_adata_from_visium.html">anndict.utils.build_adata_from_visium</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/utils/generated/anndict.utils.add_blank_image_to_adata.html">anndict.utils.add_blank_image_to_adata</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/utils/generated/anndict.utils.read_transcript_coords.html">anndict.utils.read_transcript_coords</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/utils/generated/anndict.utils.get_steps_and_coords.html">anndict.utils.get_steps_and_coords</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/utils/generated/anndict.utils.populate_sparse_array.html">anndict.utils.populate_sparse_array</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/utils/generated/anndict.utils.process_gene_counts.html">anndict.utils.process_gene_counts</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/utils/generated/anndict.utils.create_anndata.html">anndict.utils.create_anndata</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../api/utils/uce.html">UCE</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/utils/generated/anndict.utils.uce_adata.html">anndict.utils.uce_adata</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../api/wrappers/index.html">Fapply Wrappers</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../api/wrappers/anndictionary.html">AnnDictionary</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/wrappers/generated/anndict.wrappers.remove_genes_adata_dict.html">anndict.wrappers.remove_genes_adata_dict</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/wrappers/generated/anndict.wrappers.ai_annotate_biological_process_adata_dict.html">anndict.wrappers.ai_annotate_biological_process_adata_dict</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/wrappers/generated/anndict.wrappers.simplify_var_index_adata_dict.html">anndict.wrappers.simplify_var_index_adata_dict</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/wrappers/generated/anndict.wrappers.ensure_label_consistency_adata_dict.html">anndict.wrappers.ensure_label_consistency_adata_dict</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/wrappers/generated/anndict.wrappers.simplify_obs_column_adata_dict.html">anndict.wrappers.simplify_obs_column_adata_dict</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/wrappers/generated/anndict.wrappers.create_label_hierarchy_adata_dict.html">anndict.wrappers.create_label_hierarchy_adata_dict</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/wrappers/generated/anndict.wrappers.ai_annotate_cell_type_adata_dict.html">anndict.wrappers.ai_annotate_cell_type_adata_dict</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/wrappers/generated/anndict.wrappers.ai_compare_cell_type_labels_pairwise_adata_dict.html">anndict.wrappers.ai_compare_cell_type_labels_pairwise_adata_dict</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/wrappers/generated/anndict.wrappers.ai_annotate_cell_sub_type_adata_dict.html">anndict.wrappers.ai_annotate_cell_sub_type_adata_dict</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/wrappers/generated/anndict.wrappers.ai_determine_leiden_resolution_adata_dict.html">anndict.wrappers.ai_determine_leiden_resolution_adata_dict</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/wrappers/generated/anndict.wrappers.harmony_label_transfer_adata_dict.html">anndict.wrappers.harmony_label_transfer_adata_dict</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/wrappers/generated/anndict.wrappers.plot_sankey_adata_dict.html">anndict.wrappers.plot_sankey_adata_dict</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/wrappers/generated/anndict.wrappers.save_sankey_adata_dict.html">anndict.wrappers.save_sankey_adata_dict</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/wrappers/generated/anndict.wrappers.plot_grouped_average_adata_dict.html">anndict.wrappers.plot_grouped_average_adata_dict</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/wrappers/generated/anndict.wrappers.plot_label_changes_adata_dict.html">anndict.wrappers.plot_label_changes_adata_dict</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/wrappers/generated/anndict.wrappers.plot_confusion_matrix_adata_dict.html">anndict.wrappers.plot_confusion_matrix_adata_dict</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/wrappers/generated/anndict.wrappers.summarize_metadata_adata_dict.html">anndict.wrappers.summarize_metadata_adata_dict</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/wrappers/generated/anndict.wrappers.display_html_summary_adata_dict.html">anndict.wrappers.display_html_summary_adata_dict</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/wrappers/generated/anndict.wrappers.pca_density_adata_dict.html">anndict.wrappers.pca_density_adata_dict</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../api/wrappers/scanpy.html">Scanpy</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/wrappers/generated/anndict.wrappers.sample_and_drop_adata_dict.html">anndict.wrappers.sample_and_drop_adata_dict</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/wrappers/generated/anndict.wrappers.normalize_adata_dict.html">anndict.wrappers.normalize_adata_dict</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/wrappers/generated/anndict.wrappers.log_transform_adata_dict.html">anndict.wrappers.log_transform_adata_dict</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/wrappers/generated/anndict.wrappers.set_high_variance_genes_adata_dict.html">anndict.wrappers.set_high_variance_genes_adata_dict</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/wrappers/generated/anndict.wrappers.rank_genes_groups_adata_dict.html">anndict.wrappers.rank_genes_groups_adata_dict</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/wrappers/generated/anndict.wrappers.scale_adata_dict.html">anndict.wrappers.scale_adata_dict</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/wrappers/generated/anndict.wrappers.pca_adata_dict.html">anndict.wrappers.pca_adata_dict</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/wrappers/generated/anndict.wrappers.neighbors_adata_dict.html">anndict.wrappers.neighbors_adata_dict</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/wrappers/generated/anndict.wrappers.leiden_adata_dict.html">anndict.wrappers.leiden_adata_dict</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/wrappers/generated/anndict.wrappers.leiden_sub_cluster.html">anndict.wrappers.leiden_sub_cluster</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/wrappers/generated/anndict.wrappers.leiden_sub_cluster_adata_dict.html">anndict.wrappers.leiden_sub_cluster_adata_dict</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/wrappers/generated/anndict.wrappers.calculate_umap_adata_dict.html">anndict.wrappers.calculate_umap_adata_dict</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/wrappers/generated/anndict.wrappers.plot_umap_adata_dict.html">anndict.wrappers.plot_umap_adata_dict</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/wrappers/squidpy.html">Squidpy</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../index.html">Tutorials</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2 has-children"><a class="reference internal" href="../adata_dict/index.html">Using the AdataDict Class</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../adata_dict/Build_AdataDict.html">Build an AdataDict</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../adata_dict/Manipulate_the_Hierarchy.html">Manipulate the Hierarchy of an AdataDict</a></li>
+
+<li class="toctree-l3"><a class="reference internal" href="../adata_dict/Iterate_Over_an_AdataDict.html">Iterate Over an AdataDict</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../adata_dict/Write_and_Read_an_AdataDict.html">Write and Read AdataDict</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 current active has-children"><a class="reference internal" href="index.html">Annotating with AnnDictionary</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="automated_cell_type_marker_gene_scores.html">Automated Cell Type Marker Gene Scores</a></li>
+<li class="toctree-l3 current active"><a class="current reference internal" href="#">Cell Type Annotation with Large Language Models (LLMs)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cell_type_annotation_with_a_label_transfer_model.html">Transfer Labels Using an Sklearn Classifier</a></li>
+<li class="toctree-l3"><a class="reference internal" href="automated_spatial_transcriptomic_annotation.html">Automated Annotation of Spatial Transcriptomics</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contribute/index.html">Contribute</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+<a href="https://github.com/ggit12/anndictionary" target="_blank"
+   class="btn btn-sm btn-source-repository-button"
+   title="Source repository"
+   data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+
+</a>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../../_sources/tutorials/annotate/cell_type_annotation_with_an_LLM.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Cell Type Annotation with Large Language Models (LLMs)</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#for-other-tutorials-including-the-basics-see">For other tutorials (including the basics), see:</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#skip-the-tutorial">Skip the tutorial</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#on-a-single-adata">On a single adata</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#on-many-adata-at-once">On many adata at once</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#begin-the-tutorial">Begin the Tutorial</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#set-up-the-llm-backend">Set up the LLM backend.</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#build-the-dictionary-of-anndatas">Build the dictionary of anndatas.</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#now-run-the-llm-cell-type-annotation-functions-here-s-the-rationale-for-this-series-of-steps">Now, run the LLM cell type annotation functions. Here’s the rationale for this series of steps:</a></li>
+</ul>
+</li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="cell-type-annotation-with-large-language-models-llms">
+<h1>Cell Type Annotation with Large Language Models (LLMs)<a class="headerlink" href="#cell-type-annotation-with-large-language-models-llms" title="Link to this heading">#</a></h1>
+<p>This tutorial demonstrates how to use an LLM to do marker-gene-based cell annotation. The process is designed to mimic manual annotation by a human expert, and just have an LLM do the interpretation of the marker gene lists. The total run time of this tutorial is under 1 minute on a standard desktop computer.</p>
+<section id="for-other-tutorials-including-the-basics-see">
+<h2>For other tutorials (including the basics), see:<a class="headerlink" href="#for-other-tutorials-including-the-basics-see" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>Basic Tutorial (learn the basic mechanics of this package)</p></li>
+<li><p>Label transfer with an sklearn classifier</p></li>
+<li><p>Automated spatial transcriptomic annotation with UCE</p></li>
+</ul>
+</section>
+<section id="skip-the-tutorial">
+<h2>Skip the tutorial<a class="headerlink" href="#skip-the-tutorial" title="Link to this heading">#</a></h2>
+<p>In case you want to skip the tutorial, here’s the minimal code you need to run LLM cell type annotation:</p>
+</section>
+<section id="on-a-single-adata">
+<h2>On a single adata<a class="headerlink" href="#on-a-single-adata" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Import required packages</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">anndict</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">adt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">scanpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sc</span>
+
+<span class="c1"># Configure LLM backend</span>
+<span class="n">adt</span><span class="o">.</span><span class="n">configure_llm_backend</span><span class="p">(</span><span class="n">provider</span><span class="o">=</span><span class="s1">&#39;anthropic&#39;</span><span class="p">,</span>
+                          <span class="n">model</span><span class="o">=</span><span class="s1">&#39;claude-3-5-sonnet-20240620&#39;</span><span class="p">,</span>
+                          <span class="n">api_key</span><span class="o">=</span><span class="s1">&#39;my-anthropic-api-key&#39;</span><span class="p">,</span>
+                          <span class="n">requests_per_minute</span><span class="o">=</span><span class="mi">500</span>
+                          <span class="p">)</span>
+
+<span class="c1"># These are just the standard preprocessing steps (starting from raw counts)</span>
+<span class="n">sc</span><span class="o">.</span><span class="n">pp</span><span class="o">.</span><span class="n">normalize_total</span><span class="p">(</span><span class="n">adata</span><span class="p">)</span> <span class="c1"># Normalize</span>
+<span class="n">sc</span><span class="o">.</span><span class="n">pp</span><span class="o">.</span><span class="n">log1p</span><span class="p">(</span><span class="n">adata</span><span class="p">)</span> <span class="c1"># Log</span>
+<span class="n">sc</span><span class="o">.</span><span class="n">pp</span><span class="o">.</span><span class="n">highly_variable_genes</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">n_top_genes</span><span class="o">=</span><span class="mi">2000</span><span class="p">,</span> <span class="n">subset</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="c1"># Set highly variable genes</span>
+<span class="n">sc</span><span class="o">.</span><span class="n">pp</span><span class="o">.</span><span class="n">scale</span><span class="p">(</span><span class="n">adata</span><span class="p">)</span> <span class="c1"># Scale</span>
+<span class="n">sc</span><span class="o">.</span><span class="n">tl</span><span class="o">.</span><span class="n">pca</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">n_comps</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span> <span class="c1"># PCA</span>
+<span class="n">sc</span><span class="o">.</span><span class="n">pp</span><span class="o">.</span><span class="n">neighbors</span><span class="p">(</span><span class="n">adata</span><span class="p">)</span> <span class="c1"># Neighborhood graph</span>
+<span class="n">sc</span><span class="o">.</span><span class="n">tl</span><span class="o">.</span><span class="n">umap</span><span class="p">(</span><span class="n">adata</span><span class="p">)</span> <span class="c1"># UMAP</span>
+<span class="n">sc</span><span class="o">.</span><span class="n">tl</span><span class="o">.</span><span class="n">leiden</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">resolution</span><span class="o">=</span><span class="mf">0.4</span><span class="p">)</span> <span class="c1"># Cluster</span>
+
+<span class="c1"># Run differential expression analysis</span>
+<span class="n">sc</span><span class="o">.</span><span class="n">tl</span><span class="o">.</span><span class="n">rank_genes_groups</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">groupby</span><span class="o">=</span><span class="s1">&#39;leiden&#39;</span><span class="p">)</span>
+
+<span class="c1"># Get the model name directly from the LLM config (just for naming the column in .obs)</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">adt</span><span class="o">.</span><span class="n">get_llm_config</span><span class="p">()[</span><span class="s1">&#39;model&#39;</span><span class="p">]</span>
+
+<span class="c1"># Use an LLM to annotate celltypes based on the &#39;leiden&#39; column, pass tissue information from &#39;tissue&#39; column.</span>
+<span class="c1"># The column containing the new labels will be in adata.obs[label_column]</span>
+<span class="n">label_column</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">model</span><span class="si">}</span><span class="s1">_ai_cell_type&#39;</span>
+<span class="n">label_results</span> <span class="o">=</span> <span class="n">adt</span><span class="o">.</span><span class="n">ai_annotate_cell_type</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">groupby</span><span class="o">=</span><span class="s1">&#39;leiden&#39;</span><span class="p">,</span> <span class="n">n_top_genes</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">label_column</span><span class="o">=</span><span class="n">label_column</span><span class="p">,</span> <span class="n">tissue_of_origin_col</span><span class="o">=</span><span class="s1">&#39;tissue&#39;</span><span class="p">)</span>
+
+<span class="c1"># These labels may have some redundancy, so merge them with the LLM</span>
+<span class="n">ai_label_column</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">model</span><span class="si">}</span><span class="s1">_simplified_ai_cell_type&#39;</span>
+<span class="n">simplified_mappings</span> <span class="o">=</span> <span class="n">adt</span><span class="o">.</span><span class="n">simplify_obs_column</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">label_column</span><span class="p">,</span> <span class="n">ai_label_column</span><span class="p">,</span> <span class="n">simplification_level</span><span class="o">=</span><span class="s1">&#39;redundancy-removed&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="on-many-adata-at-once">
+<h2>On many adata at once<a class="headerlink" href="#on-many-adata-at-once" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Import required packages</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">anndict</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">adt</span>
+
+<span class="c1"># Configure LLM backend</span>
+<span class="n">adt</span><span class="o">.</span><span class="n">configure_llm_backend</span><span class="p">(</span><span class="n">provider</span><span class="o">=</span><span class="s1">&#39;anthropic&#39;</span><span class="p">,</span>
+                          <span class="n">model</span><span class="o">=</span><span class="s1">&#39;claude-3-5-sonnet-20240620&#39;</span><span class="p">,</span>
+                          <span class="n">api_key</span><span class="o">=</span><span class="s1">&#39;my-anthropic-api-key&#39;</span><span class="p">,</span>
+                          <span class="n">requests_per_minute</span><span class="o">=</span><span class="mi">500</span>
+                          <span class="p">)</span>
+
+<span class="c1"># These are just the standard preprocessing steps (starting from raw counts)</span>
+<span class="n">adt</span><span class="o">.</span><span class="n">normalize_adata_dict</span><span class="p">(</span><span class="n">adata_dict</span><span class="p">)</span> <span class="c1"># Normalize</span>
+<span class="n">adt</span><span class="o">.</span><span class="n">log_transform_adata_dict</span><span class="p">(</span><span class="n">adata_dict</span><span class="p">)</span> <span class="c1"># Log</span>
+<span class="n">adt</span><span class="o">.</span><span class="n">set_high_variance_genes_adata_dict</span><span class="p">(</span><span class="n">adata_dict</span><span class="p">,</span> <span class="n">n_top_genes</span><span class="o">=</span><span class="mi">2000</span><span class="p">,</span> <span class="n">subset</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="c1"># Set highly variable genes</span>
+<span class="n">adt</span><span class="o">.</span><span class="n">scale_adata_dict</span><span class="p">(</span><span class="n">adata_dict</span><span class="p">)</span> <span class="c1"># Scale</span>
+<span class="n">adt</span><span class="o">.</span><span class="n">pca_adata_dict</span><span class="p">(</span><span class="n">adata_dict</span><span class="p">,</span> <span class="n">n_comps</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">mask_var</span><span class="o">=</span><span class="s1">&#39;highly_variable&#39;</span><span class="p">)</span> <span class="c1">#PCA</span>
+<span class="n">adt</span><span class="o">.</span><span class="n">neighbors_adata_dict</span><span class="p">(</span><span class="n">adata_dict</span><span class="p">)</span> <span class="c1"># Neighborhood graph</span>
+<span class="n">adt</span><span class="o">.</span><span class="n">calculate_umap_adata_dict</span><span class="p">(</span><span class="n">adata_dict</span><span class="p">)</span> <span class="c1"># UMAP</span>
+<span class="n">adt</span><span class="o">.</span><span class="n">leiden_adata_dict</span><span class="p">(</span><span class="n">adata_dict</span><span class="p">,</span> <span class="n">resolution</span><span class="o">=</span><span class="mf">0.4</span><span class="p">)</span> <span class="c1"># Cluster</span>
+
+<span class="c1"># Run differential expression analysis independently on each anndata in adata_dict</span>
+<span class="n">adt</span><span class="o">.</span><span class="n">wrappers</span><span class="o">.</span><span class="n">rank_genes_groups_adata_dict</span><span class="p">(</span><span class="n">adata_dict</span><span class="p">,</span> <span class="n">groupby</span><span class="o">=</span><span class="s1">&#39;leiden&#39;</span><span class="p">)</span>
+
+<span class="c1"># Get the model name directly from the LLM config (just for naming the column in .obs)</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">adt</span><span class="o">.</span><span class="n">get_llm_config</span><span class="p">()[</span><span class="s1">&#39;model&#39;</span><span class="p">]</span>
+
+<span class="c1"># Use the LLM to annotate celltypes based on the &#39;leiden&#39; column, pass tissue information from &#39;tissue&#39; column.</span>
+<span class="c1"># The column containing the new labels will be in adata.obs[label_column] for each adata in adata_dict</span>
+<span class="n">label_column</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">model</span><span class="si">}</span><span class="s1">_ai_cell_type&#39;</span>
+<span class="n">label_results</span> <span class="o">=</span> <span class="n">adt</span><span class="o">.</span><span class="n">ai_annotate_cell_type_adata_dict</span><span class="p">(</span><span class="n">adata_dict</span><span class="p">,</span> <span class="n">groupby</span><span class="o">=</span><span class="s1">&#39;leiden&#39;</span><span class="p">,</span> <span class="n">n_top_genes</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">label_column</span><span class="o">=</span><span class="n">label_column</span><span class="p">,</span> <span class="n">tissue_of_origin_col</span><span class="o">=</span><span class="s1">&#39;tissue&#39;</span><span class="p">)</span>
+
+<span class="c1"># These labels may have some redundancy, so merge them with the LLM</span>
+<span class="n">ai_label_column</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">model</span><span class="si">}</span><span class="s1">_simplified_ai_cell_type&#39;</span>
+<span class="n">simplified_mappings</span> <span class="o">=</span> <span class="n">adt</span><span class="o">.</span><span class="n">simplify_obs_column_adata_dict</span><span class="p">(</span><span class="n">adata_dict</span><span class="p">,</span> <span class="n">label_column</span><span class="p">,</span> <span class="n">ai_label_column</span><span class="p">,</span> <span class="n">simplification_level</span><span class="o">=</span><span class="s1">&#39;redundancy-removed&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="begin-the-tutorial">
+<h2>Begin the Tutorial<a class="headerlink" href="#begin-the-tutorial" title="Link to this heading">#</a></h2>
+</section>
+<section id="set-up-the-llm-backend">
+<h2>Set up the LLM backend.<a class="headerlink" href="#set-up-the-llm-backend" title="Link to this heading">#</a></h2>
+<p>This package supports most LLM providers including (but not limited to):</p>
+<ul class="simple">
+<li><p>OpenAI</p></li>
+<li><p>Anthropic</p></li>
+<li><p>Google Gen AI</p></li>
+<li><p>Amazon Bedrock</p></li>
+</ul>
+<p>If there’s an LLM you want that we don’t support yet, let us know. Any of these models can be configured or swapped with the single function call below to <code class="docutils literal notranslate"><span class="pre">adt.configure_llm_backend</span></code>. This function takes 3 required arguments, <code class="docutils literal notranslate"><span class="pre">provider</span></code>, <code class="docutils literal notranslate"><span class="pre">model</span></code>, and <code class="docutils literal notranslate"><span class="pre">api_key</span></code>, and then any provider-specific configurations as additional keyword arguments. See the <a class="reference external" href="https://ggit12.github.io/anndictionary/api/llm/generated/anndict.configure_llm_backend.html#anndict.configure_llm_backend">LLM configuration documentation</a> for how to configure different providers.</p>
+<p>To use LLMs, you’ll need to get an API key from your chosen provider. An API key is like a username/password bundled into one, and is used for billing.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">adt</span><span class="o">.</span><span class="n">configure_llm_backend</span><span class="p">(</span><span class="n">provider</span><span class="o">=</span><span class="s1">&#39;anthropic&#39;</span><span class="p">,</span>
+                          <span class="n">model</span><span class="o">=</span><span class="s1">&#39;claude-3-5-sonnet-20240620&#39;</span><span class="p">,</span>
+                          <span class="n">api_key</span><span class="o">=</span><span class="s1">&#39;my-anthropic-api-key&#39;</span><span class="p">,</span>
+                          <span class="n">requests_per_minute</span><span class="o">=</span><span class="mi">500</span>
+                          <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Download a sample dataset from the cellxgene census. To run this download, you’ll need the <code class="docutils literal notranslate"><span class="pre">cellxgene_census</span></code> package which can be installed via</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>cellxgene_census
+</pre></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#load an anndata</span>
+
+<span class="c1">#for this tutorial, we&#39;ll use Tabula Sapiens from cellxgene census</span>
+<span class="c1">#but you could use any anndata you want</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">cellxgene_census</span>
+
+<span class="c1">#this command gets liver and kidney from tabula sapiens </span>
+<span class="n">census</span> <span class="o">=</span> <span class="n">cellxgene_census</span><span class="o">.</span><span class="n">open_soma</span><span class="p">(</span><span class="n">census_version</span><span class="o">=</span><span class="s2">&quot;2023-12-15&quot;</span><span class="p">)</span>
+<span class="n">adata</span> <span class="o">=</span> <span class="n">cellxgene_census</span><span class="o">.</span><span class="n">get_anndata</span><span class="p">(</span>
+    <span class="n">census</span><span class="p">,</span>
+    <span class="n">organism</span> <span class="o">=</span> <span class="s2">&quot;homo_sapiens&quot;</span><span class="p">,</span>
+    <span class="n">measurement_name</span> <span class="o">=</span> <span class="s2">&quot;RNA&quot;</span><span class="p">,</span>
+    <span class="n">obs_value_filter</span> <span class="o">=</span> <span class="s2">&quot;(dataset_id == &#39;53d208b0-2cfd-4366-9866-c3c6114081bc&#39;) &amp; ((tissue_general == &#39;liver&#39;) | (tissue_general == &#39;kidney&#39;))&quot;</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Alternativley, use the block of code below to read your own adata.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#read data</span>
+<span class="n">adata_path</span> <span class="o">=</span> <span class="s1">&#39;path-to-your-adata.h5ad&#39;</span>
+<span class="n">adata</span> <span class="o">=</span> <span class="n">sc</span><span class="o">.</span><span class="n">read_h5ad</span><span class="p">(</span><span class="n">adata_path</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">adata</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>AnnData object with n_obs × n_vars = 14648 × 60664
+    obs: &#39;soma_joinid&#39;, &#39;dataset_id&#39;, &#39;assay&#39;, &#39;assay_ontology_term_id&#39;, &#39;cell_type&#39;, &#39;cell_type_ontology_term_id&#39;, &#39;development_stage&#39;, &#39;development_stage_ontology_term_id&#39;, &#39;disease&#39;, &#39;disease_ontology_term_id&#39;, &#39;donor_id&#39;, &#39;is_primary_data&#39;, &#39;self_reported_ethnicity&#39;, &#39;self_reported_ethnicity_ontology_term_id&#39;, &#39;sex&#39;, &#39;sex_ontology_term_id&#39;, &#39;suspension_type&#39;, &#39;tissue&#39;, &#39;tissue_ontology_term_id&#39;, &#39;tissue_general&#39;, &#39;tissue_general_ontology_term_id&#39;, &#39;raw_sum&#39;, &#39;nnz&#39;, &#39;raw_mean_nnz&#39;, &#39;raw_variance_nnz&#39;, &#39;n_measured_vars&#39;
+    var: &#39;soma_joinid&#39;, &#39;feature_id&#39;, &#39;feature_name&#39;, &#39;feature_length&#39;, &#39;nnz&#39;, &#39;n_measured_obs&#39;
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#note, .X contains raw counts</span>
+<span class="n">adata</span><span class="o">.</span><span class="n">X</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">20</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([ 1.,  1.,  1.,  1.,  1.,  1.,  2.,  3.,  1.,  1.,  1.,  1.,  2.,
+        1.,  1., 74.,  1.,  8.,  4.], dtype=float32)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#set X to be raw counts (in this case, .X already is raw counts)</span>
+<span class="c1"># adata.X = adata.layers[&#39;raw_counts&#39;].copy()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>It’s import to make sure that the indices of <code class="docutils literal notranslate"><span class="pre">adata.var</span></code> are semantic (i.e. gene names) and not integers or accession numbers. This is because the indices are used by the LLM for interpretation.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#make sure that adata.var.index has gene names and not integers (or integers cast as string)</span>
+<span class="n">adata</span><span class="o">.</span><span class="n">var</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">adata</span><span class="o">.</span><span class="n">var</span><span class="o">.</span><span class="n">feature_name</span> <span class="c1">#the default index from cellxgene censuse is integer cast as string</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#get only protein coding genes</span>
+
+<span class="c1">#load/define your list of protein-coding genes here, otherwise, annotation will be based on all genes in object (optionally filtered to only highly variable).</span>
+<span class="n">protein_coding</span> <span class="o">=</span> <span class="kc">None</span>
+
+<span class="k">if</span> <span class="n">protein_coding</span><span class="p">:</span>
+    <span class="n">adata</span><span class="o">.</span><span class="n">var</span><span class="p">[</span><span class="s1">&#39;protein_coding&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[(</span><span class="n">i</span> <span class="ow">in</span> <span class="n">protein_coding</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">adata</span><span class="o">.</span><span class="n">var_names</span><span class="p">]</span>
+    <span class="c1"># Subset to keep only protein-coding genes</span>
+    <span class="n">adata</span> <span class="o">=</span> <span class="n">adata</span><span class="p">[:,</span> <span class="n">adata</span><span class="o">.</span><span class="n">var</span><span class="p">[</span><span class="s1">&#39;protein_coding&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="build-the-dictionary-of-anndatas">
+<h2>Build the dictionary of anndatas.<a class="headerlink" href="#build-the-dictionary-of-anndatas" title="Link to this heading">#</a></h2>
+<p>The function <code class="docutils literal notranslate"><span class="pre">adt.build_adata_dict</span></code> will create separate anndatas based on the column names you provide. The following code creates a dictionary where each entry is the anndata for an individual tissue. You can also select only certain tissues by setting the argument <code class="docutils literal notranslate"><span class="pre">desired_strata</span></code>. See the Basic Tutorial notebook and function documentation for more examples and information on how to use this function.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#build adata_dict</span>
+<span class="n">adt</span><span class="o">.</span><span class="n">convert_obs_col_to_category</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="s1">&#39;tissue&#39;</span><span class="p">)</span> <span class="c1">#stratifying column must be categorical to run build_adata_dict</span>
+<span class="n">adata_dict</span> <span class="o">=</span> <span class="n">adt</span><span class="o">.</span><span class="n">build_adata_dict</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;tissue&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#remove a standard list of uninformative genes</span>
+<span class="n">abundant_rnas</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;MALAT1&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;NEAT1&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;XIST&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;KCNQ1OT1&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;RPPH1&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;RN7SL1&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;RMRP&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;SNHG1&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;MIAT&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;H19&quot;</span>
+<span class="p">]</span>
+
+<span class="n">adt</span><span class="o">.</span><span class="n">remove_genes_adata_dict</span><span class="p">(</span><span class="n">adata_dict</span><span class="p">,</span> <span class="n">abundant_rnas</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Removed 8 genes from liver. 60656 genes remaining.
+Removed 8 genes from kidney. 60656 genes remaining.
+</pre></div>
+</div>
+</div>
+</div>
+<p>This section is just the standard Scanpy preprocessing pipeline, except here, we do it on each tissue independently and in parallel (by taking advantage of multithreading).</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#Run leiden clustering on each adata independently</span>
+<span class="c1">#adata.X is raw counts, so run standard preprocessing</span>
+<span class="c1"># Normalize each AnnData in the dictionary</span>
+<span class="n">adt</span><span class="o">.</span><span class="n">normalize_adata_dict</span><span class="p">(</span><span class="n">adata_dict</span><span class="p">)</span>
+
+<span class="c1"># Log transform each AnnData in the dictionary</span>
+<span class="n">adt</span><span class="o">.</span><span class="n">log_transform_adata_dict</span><span class="p">(</span><span class="n">adata_dict</span><span class="p">)</span>
+
+<span class="c1"># Optionally, you might subset the data to only high-variance genes</span>
+<span class="n">adt</span><span class="o">.</span><span class="n">set_high_variance_genes_adata_dict</span><span class="p">(</span><span class="n">adata_dict</span><span class="p">,</span> <span class="n">n_top_genes</span><span class="o">=</span><span class="mi">2000</span><span class="p">,</span> <span class="n">subset</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="c1"># Scale each AnnData in the dictionary</span>
+<span class="n">adt</span><span class="o">.</span><span class="n">scale_adata_dict</span><span class="p">(</span><span class="n">adata_dict</span><span class="p">)</span>
+
+<span class="c1"># Perform PCA on each AnnData in the dictionary</span>
+<span class="n">adt</span><span class="o">.</span><span class="n">pca_adata_dict</span><span class="p">(</span><span class="n">adata_dict</span><span class="p">,</span> <span class="n">n_comps</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">mask_var</span><span class="o">=</span><span class="s1">&#39;highly_variable&#39;</span><span class="p">)</span>
+
+<span class="c1">#Calculate the neighborhood graph</span>
+<span class="n">adt</span><span class="o">.</span><span class="n">neighbors_adata_dict</span><span class="p">(</span><span class="n">adata_dict</span><span class="p">)</span>
+
+<span class="c1">#Calculate the UMAP</span>
+<span class="n">adt</span><span class="o">.</span><span class="n">calculate_umap_adata_dict</span><span class="p">(</span><span class="n">adata_dict</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>{&#39;kidney&#39;: AnnData object with n_obs × n_vars = 9641 × 60656
+     obs: &#39;soma_joinid&#39;, &#39;dataset_id&#39;, &#39;assay&#39;, &#39;assay_ontology_term_id&#39;, &#39;cell_type&#39;, &#39;cell_type_ontology_term_id&#39;, &#39;development_stage&#39;, &#39;development_stage_ontology_term_id&#39;, &#39;disease&#39;, &#39;disease_ontology_term_id&#39;, &#39;donor_id&#39;, &#39;is_primary_data&#39;, &#39;self_reported_ethnicity&#39;, &#39;self_reported_ethnicity_ontology_term_id&#39;, &#39;sex&#39;, &#39;sex_ontology_term_id&#39;, &#39;suspension_type&#39;, &#39;tissue&#39;, &#39;tissue_ontology_term_id&#39;, &#39;tissue_general&#39;, &#39;tissue_general_ontology_term_id&#39;, &#39;raw_sum&#39;, &#39;nnz&#39;, &#39;raw_mean_nnz&#39;, &#39;raw_variance_nnz&#39;, &#39;n_measured_vars&#39;
+     var: &#39;soma_joinid&#39;, &#39;feature_id&#39;, &#39;feature_name&#39;, &#39;feature_length&#39;, &#39;nnz&#39;, &#39;n_measured_obs&#39;, &#39;highly_variable&#39;, &#39;means&#39;, &#39;dispersions&#39;, &#39;dispersions_norm&#39;, &#39;mean&#39;, &#39;std&#39;
+     uns: &#39;log1p&#39;, &#39;hvg&#39;, &#39;pca&#39;, &#39;neighbors&#39;, &#39;umap&#39;
+     obsm: &#39;X_pca&#39;, &#39;X_umap&#39;
+     varm: &#39;PCs&#39;
+     obsp: &#39;distances&#39;, &#39;connectivities&#39;,
+ &#39;liver&#39;: AnnData object with n_obs × n_vars = 5007 × 60656
+     obs: &#39;soma_joinid&#39;, &#39;dataset_id&#39;, &#39;assay&#39;, &#39;assay_ontology_term_id&#39;, &#39;cell_type&#39;, &#39;cell_type_ontology_term_id&#39;, &#39;development_stage&#39;, &#39;development_stage_ontology_term_id&#39;, &#39;disease&#39;, &#39;disease_ontology_term_id&#39;, &#39;donor_id&#39;, &#39;is_primary_data&#39;, &#39;self_reported_ethnicity&#39;, &#39;self_reported_ethnicity_ontology_term_id&#39;, &#39;sex&#39;, &#39;sex_ontology_term_id&#39;, &#39;suspension_type&#39;, &#39;tissue&#39;, &#39;tissue_ontology_term_id&#39;, &#39;tissue_general&#39;, &#39;tissue_general_ontology_term_id&#39;, &#39;raw_sum&#39;, &#39;nnz&#39;, &#39;raw_mean_nnz&#39;, &#39;raw_variance_nnz&#39;, &#39;n_measured_vars&#39;
+     var: &#39;soma_joinid&#39;, &#39;feature_id&#39;, &#39;feature_name&#39;, &#39;feature_length&#39;, &#39;nnz&#39;, &#39;n_measured_obs&#39;, &#39;highly_variable&#39;, &#39;means&#39;, &#39;dispersions&#39;, &#39;dispersions_norm&#39;, &#39;mean&#39;, &#39;std&#39;
+     uns: &#39;log1p&#39;, &#39;hvg&#39;, &#39;pca&#39;, &#39;neighbors&#39;, &#39;umap&#39;
+     obsm: &#39;X_pca&#39;, &#39;X_umap&#39;
+     varm: &#39;PCs&#39;
+     obsp: &#39;distances&#39;, &#39;connectivities&#39;}
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#Determine appropriate cluster resolutions using AI. This function only works with LLMs that accept image inputs</span>
+<span class="c1">#This will leave the final column as &#39;leiden&#39; in the .obs of each anndata</span>
+<span class="c1"># appropriate_resolution_dict = adt.ai_determine_leiden_resolution_adata_dict(adata_dict, initial_resolution=0.5)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#recluster at 0.4 for this example</span>
+<span class="c1">#get leiden clusters</span>
+<span class="n">adt</span><span class="o">.</span><span class="n">leiden_adata_dict</span><span class="p">(</span><span class="n">adata_dict</span><span class="p">,</span> <span class="n">resolution</span><span class="o">=</span><span class="mf">0.4</span><span class="p">)</span>
+
+<span class="c1"># could also do </span>
+<span class="c1"># adt.leiden_adata_dict(adata_dict, resolution=appropriate_resolution_dict)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#Run differential expression analysis independently on each anndata in adata_dict</span>
+<span class="n">adt</span><span class="o">.</span><span class="n">rank_genes_groups_adata_dict</span><span class="p">(</span><span class="n">adata_dict</span><span class="p">,</span> <span class="n">groupby</span><span class="o">=</span><span class="s1">&#39;leiden&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<section id="now-run-the-llm-cell-type-annotation-functions-here-s-the-rationale-for-this-series-of-steps">
+<h3>Now, run the LLM cell type annotation functions. Here’s the rationale for this series of steps:<a class="headerlink" href="#now-run-the-llm-cell-type-annotation-functions-here-s-the-rationale-for-this-series-of-steps" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>First, Use an LLM to label each leiden cluster based on the top differentially expressed genes using <code class="docutils literal notranslate"><span class="pre">ai_annotate_cell_type_adata_dict</span></code>.</p></li>
+<li><p>Because each cluster is labelled independently, there might be some redundant labels with slight differences, for example (‘Macropage’ and ‘macrophage.’). So, the next step is to use an LLM to merge these redundant category labels with <code class="docutils literal notranslate"><span class="pre">simplify_obs_column_adata_dict</span></code>.</p></li>
+<li><p>Finally, the dictionary of anndatas is merged into a single anndata. At this point, since each anndata has been processed independently, there might again be redundancies, which we remove (with an LLM) using <code class="docutils literal notranslate"><span class="pre">ensure_label_consistency_adata</span></code>. Note that this function can take a list of columns across which to unify labels (here we pass only a single column).</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#get the model name directly from the LLM config (just for naming the column in .obs)</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">adt</span><span class="o">.</span><span class="n">get_llm_config</span><span class="p">()[</span><span class="s1">&#39;model&#39;</span><span class="p">]</span>
+
+<span class="c1"># Use the LLM to annotate celltypes based on the &#39;leiden&#39; column, pass tissue information from &#39;tissue&#39; column.</span>
+<span class="c1"># The column containing the new labels will be in adata.obs[label_column] for each adata in adata_dict</span>
+<span class="n">label_column</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">model</span><span class="si">}</span><span class="s1">_ai_cell_type&#39;</span>
+<span class="n">label_results</span> <span class="o">=</span> <span class="n">adt</span><span class="o">.</span><span class="n">ai_annotate_cell_type_adata_dict</span><span class="p">(</span><span class="n">adata_dict</span><span class="p">,</span> <span class="n">groupby</span><span class="o">=</span><span class="s1">&#39;leiden&#39;</span><span class="p">,</span> <span class="n">n_top_genes</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">label_column</span><span class="o">=</span><span class="n">label_column</span><span class="p">,</span> <span class="n">tissue_of_origin_col</span><span class="o">=</span><span class="s1">&#39;tissue&#39;</span><span class="p">)</span>
+
+<span class="c1">#These labels seem to have some redundancy, let&#39;s merge them with AI</span>
+<span class="n">ai_label_column</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">model</span><span class="si">}</span><span class="s1">_simplified_ai_cell_type&#39;</span>
+<span class="n">simplified_mappings</span> <span class="o">=</span> <span class="n">adt</span><span class="o">.</span><span class="n">simplify_obs_column_adata_dict</span><span class="p">(</span><span class="n">adata_dict</span><span class="p">,</span> <span class="n">label_column</span><span class="p">,</span> <span class="n">ai_label_column</span><span class="p">,</span> <span class="n">simplification_level</span><span class="o">=</span><span class="s1">&#39;redundancy-removed&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#View the results on a UMAP</span>
+<span class="n">adt</span><span class="o">.</span><span class="n">plot_umap_adata_dict</span><span class="p">(</span><span class="n">adata_dict</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;cell_type&#39;</span><span class="p">,</span> <span class="n">ai_label_column</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Plotting UMAP for key: kidney
+</pre></div>
+</div>
+<img alt="../../_images/836be675f7b45a8de209cb7320cfa65b1b8417487cd512cf5751bbb805bcc5f0.png" src="../../_images/836be675f7b45a8de209cb7320cfa65b1b8417487cd512cf5751bbb805bcc5f0.png" />
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Plotting UMAP for key: liver
+</pre></div>
+</div>
+<img alt="../../_images/90a7cdf3240c61351b0cf86b3b6f8130a73c1349b4d87b6b23c2490c0b796e55.png" src="../../_images/90a7cdf3240c61351b0cf86b3b6f8130a73c1349b4d87b6b23c2490c0b796e55.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#Confirm an annotation using a marker gene score</span>
+<span class="n">endothelial_cell_markers</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;PECAM1&quot;</span><span class="p">,</span> <span class="s2">&quot;VWF&quot;</span><span class="p">,</span> <span class="s2">&quot;ENG&quot;</span><span class="p">,</span> <span class="s2">&quot;CDH5&quot;</span><span class="p">,</span> <span class="s2">&quot;FLT1&quot;</span><span class="p">]</span>
+<span class="n">sc</span><span class="o">.</span><span class="n">tl</span><span class="o">.</span><span class="n">score_genes</span><span class="p">(</span><span class="n">adata_dict</span><span class="p">[(</span><span class="s1">&#39;liver&#39;</span><span class="p">,)],</span> <span class="n">gene_list</span><span class="o">=</span><span class="n">endothelial_cell_markers</span><span class="p">,</span> <span class="n">score_name</span><span class="o">=</span><span class="s1">&#39;Endothelial_Score&#39;</span><span class="p">)</span>
+
+<span class="c1"># Plot UMAP (Kupffer Score)</span>
+<span class="n">sc</span><span class="o">.</span><span class="n">pl</span><span class="o">.</span><span class="n">umap</span><span class="p">(</span><span class="n">adata_dict</span><span class="p">[(</span><span class="s1">&#39;liver&#39;</span><span class="p">,)],</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;Endothelial_Score&#39;</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Endothelial Module Score&#39;</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="s1">&#39;p99&#39;</span><span class="p">,</span> <span class="n">return_fig</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/c16f16141a39fd85e6d56e4c0c2ac8e01b5e747bfb34e210f99e04b0ca100eb6.png" src="../../_images/c16f16141a39fd85e6d56e4c0c2ac8e01b5e747bfb34e210f99e04b0ca100eb6.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#Merge the adata_dict</span>
+<span class="n">adata</span> <span class="o">=</span> <span class="n">adt</span><span class="o">.</span><span class="n">concatenate_adata_dict</span><span class="p">(</span><span class="n">adata_dict</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">adata</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>AnnData object with n_obs × n_vars = 14648 × 60656
+    obs: &#39;soma_joinid&#39;, &#39;dataset_id&#39;, &#39;assay&#39;, &#39;assay_ontology_term_id&#39;, &#39;cell_type&#39;, &#39;cell_type_ontology_term_id&#39;, &#39;development_stage&#39;, &#39;development_stage_ontology_term_id&#39;, &#39;disease&#39;, &#39;disease_ontology_term_id&#39;, &#39;donor_id&#39;, &#39;is_primary_data&#39;, &#39;self_reported_ethnicity&#39;, &#39;self_reported_ethnicity_ontology_term_id&#39;, &#39;sex&#39;, &#39;sex_ontology_term_id&#39;, &#39;suspension_type&#39;, &#39;tissue&#39;, &#39;tissue_ontology_term_id&#39;, &#39;tissue_general&#39;, &#39;tissue_general_ontology_term_id&#39;, &#39;raw_sum&#39;, &#39;nnz&#39;, &#39;raw_mean_nnz&#39;, &#39;raw_variance_nnz&#39;, &#39;n_measured_vars&#39;, &#39;leiden&#39;, &#39;claude-3-5-sonnet-20240620_ai_cell_type&#39;, &#39;claude-3-5-sonnet-20240620_simplified_ai_cell_type&#39;
+    obsm: &#39;X_pca&#39;, &#39;X_umap&#39;
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#unify the labels from the different adata in the adata_dict (i.e. use an LLM to merge categories like &#39;Macrophage&#39; and &#39;macrophages.&#39;)</span>
+<span class="c1">#this allows calculation of kappa</span>
+<span class="n">manual_cell_type_col</span> <span class="o">=</span> <span class="s1">&#39;cell_type&#39;</span>
+<span class="n">label_map_with_manual</span> <span class="o">=</span> <span class="n">adt</span><span class="o">.</span><span class="n">ensure_label_consistency_adata</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="p">[</span><span class="n">ai_label_column</span><span class="p">,</span> <span class="n">manual_cell_type_col</span><span class="p">],</span> <span class="n">simplification_level</span><span class="o">=</span><span class="s1">&#39;unified&#39;</span><span class="p">,</span> <span class="n">new_col_prefix</span><span class="o">=</span><span class="s1">&#39;unified&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">label_map_with_manual</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>{&#39;hepatocytes&#39;: &#39;Hepatocyte&#39;,
+ &#39;b lymphocytes&#39;: &#39;B Cell&#39;,
+ &#39;erythroid precursor cells&#39;: &#39;Erythroid Cell&#39;,
+ &#39;kidney epithelial cell&#39;: &#39;Epithelial Cell&#39;,
+ &#39;plasma cells&#39;: &#39;Plasma Cell&#39;,
+ &#39;endothelial cell&#39;: &#39;Endothelial Cell&#39;,
+ &#39;kupffer cells&#39;: &#39;Kupffer Cell&#39;,
+ &#39;hepatocyte&#39;: &#39;Hepatocyte&#39;,
+ &#39;immune cells&#39;: &#39;Immune Cell&#39;,
+ &#39;macrophage&#39;: &#39;Macrophage&#39;,
+ &#39;endothelial cell of hepatic sinusoid&#39;: &#39;Endothelial Cell&#39;,
+ &#39;plasma cell&#39;: &#39;Plasma Cell&#39;,
+ &#39;intrahepatic cholangiocyte&#39;: &#39;Cholangiocyte&#39;,
+ &#39;monocyte&#39;: &#39;Monocyte&#39;,
+ &#39;cholangiocytes&#39;: &#39;Cholangiocyte&#39;,
+ &#39;hepatic stellate cells&#39;: &#39;Hepatic Stellate Cell&#39;,
+ &#39;b cell&#39;: &#39;B Cell&#39;,
+ &#39;liver dendritic cell&#39;: &#39;Dendritic Cell&#39;,
+ &#39;erythrocyte&#39;: &#39;Erythrocyte&#39;,
+ &#39;neutrophil&#39;: &#39;Neutrophil&#39;,
+ &#39;mature nk t cell&#39;: &#39;NK T Cell&#39;,
+ &#39;proximal tubule epithelial cells&#39;: &#39;Epithelial Cell&#39;,
+ &#39;endothelial cells&#39;: &#39;Endothelial Cell&#39;,
+ &#39;cd4positive helper t cell&#39;: &#39;T Cell&#39;,
+ &#39;t cell&#39;: &#39;T Cell&#39;,
+ &#39;fibroblast&#39;: &#39;Fibroblast&#39;,
+ &#39;macrophages&#39;: &#39;Macrophage&#39;,
+ &#39;tnk cells&#39;: &#39;NK T Cell&#39;,
+ &#39;cd8positive alphabeta t cell&#39;: &#39;T Cell&#39;}
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#get unified cols</span>
+<span class="n">unified_cell_types</span> <span class="o">=</span> <span class="n">adt</span><span class="o">.</span><span class="n">get_adata_columns</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">col_contains</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;unified&#39;</span><span class="p">])</span>
+<span class="n">unified_cell_types</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[&#39;unified_claude-3-5-sonnet-20240620_simplified_ai_cell_type&#39;,
+ &#39;unified_cell_type&#39;]
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#assess accuracy compared to manual (for benchmarking)</span>
+<span class="n">label_agreement_binary</span> <span class="o">=</span> <span class="n">adt</span><span class="o">.</span><span class="n">ai_compare_cell_type_labels_pairwise</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="p">[</span><span class="n">unified_cell_types</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span> <span class="p">[</span><span class="n">unified_cell_types</span><span class="p">[</span><span class="mi">1</span><span class="p">]],</span> <span class="n">new_col_prefix</span><span class="o">=</span><span class="s1">&#39;binary_agreement&#39;</span><span class="p">,</span> <span class="n">comparison_level</span><span class="o">=</span><span class="s1">&#39;binary&#39;</span><span class="p">)</span>
+<span class="n">label_agreement_categorical</span> <span class="o">=</span> <span class="n">adt</span><span class="o">.</span><span class="n">ai_compare_cell_type_labels_pairwise</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="p">[</span><span class="n">unified_cell_types</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span> <span class="p">[</span><span class="n">unified_cell_types</span><span class="p">[</span><span class="mi">1</span><span class="p">]],</span> <span class="n">new_col_prefix</span><span class="o">=</span><span class="s1">&#39;categorical_agreement&#39;</span><span class="p">,</span> <span class="n">comparison_level</span><span class="o">=</span><span class="s1">&#39;categorical&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">label_agreement_binary</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>{(&#39;unified_claude-3-5-sonnet-20240620_simplified_ai_cell_type&#39;,
+  &#39;unified_cell_type&#39;):                      col1              col2 raw_agreement  agreement
+ 0         Epithelial Cell   Epithelial Cell           yes          1
+ 1                  B Cell            B Cell           yes          1
+ 2               NK T Cell            T Cell           yes          1
+ 3         Epithelial Cell  Endothelial Cell            no          0
+ 4              Macrophage        Macrophage           yes          1
+ 5               NK T Cell         NK T Cell           yes          1
+ 6         Epithelial Cell        Macrophage            no          0
+ 7         Epithelial Cell            T Cell            no          0
+ 8                  B Cell        Macrophage            no          0
+ 9              Macrophage   Epithelial Cell            no          0
+ 10        Epithelial Cell            B Cell            no          0
+ 11              NK T Cell            B Cell            no          0
+ 12                 B Cell            T Cell            no          0
+ 13              NK T Cell        Macrophage            no          0
+ 14           Kupffer Cell        Macrophage           yes          1
+ 15           Kupffer Cell          Monocyte            no          0
+ 16       Endothelial Cell  Endothelial Cell           yes          1
+ 17           Kupffer Cell    Dendritic Cell            no          0
+ 18            Immune Cell         NK T Cell           yes          1
+ 19  Hepatic Stellate Cell        Fibroblast           yes          1
+ 20             Hepatocyte        Hepatocyte           yes          1
+ 21            Immune Cell          Monocyte           yes          1
+ 22       Endothelial Cell        Macrophage            no          0
+ 23          Cholangiocyte     Cholangiocyte           yes          1
+ 24             Hepatocyte        Macrophage            no          0
+ 25            Immune Cell            T Cell           yes          1
+ 26  Hepatic Stellate Cell        Neutrophil            no          0
+ 27          Cholangiocyte        Macrophage            no          0
+ 28            Plasma Cell       Plasma Cell           yes          1
+ 29           Kupffer Cell         NK T Cell            no          0
+ 30            Immune Cell        Macrophage           yes          1
+ 31             Hepatocyte          Monocyte            no          0
+ 32          Cholangiocyte  Endothelial Cell            no          0
+ 33            Immune Cell  Endothelial Cell            no          0
+ 34          Cholangiocyte          Monocyte            no          0
+ 35       Endothelial Cell    Dendritic Cell            no          0
+ 36           Kupffer Cell        Neutrophil            no          0
+ 37            Immune Cell        Neutrophil           yes          1
+ 38             Hepatocyte        Neutrophil            no          0
+ 39           Kupffer Cell            T Cell            no          0
+ 40         Erythroid Cell       Erythrocyte           yes          1
+ 41           Kupffer Cell  Endothelial Cell            no          0
+ 42            Plasma Cell        Hepatocyte            no          0
+ 43            Plasma Cell          Monocyte            no          0
+ 44             Hepatocyte            T Cell            no          0
+ 45            Immune Cell       Erythrocyte            no          0
+ 46       Endothelial Cell            T Cell            no          0
+ 47             Hepatocyte  Endothelial Cell            no          0
+ 48             Hepatocyte         NK T Cell            no          0}
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">label_agreement_categorical</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>{(&#39;unified_claude-3-5-sonnet-20240620_simplified_ai_cell_type&#39;,
+  &#39;unified_cell_type&#39;):                      col1              col2  raw_agreement  agreement
+ 0         Epithelial Cell   Epithelial Cell  perfect match          2
+ 1                  B Cell            B Cell  perfect match          2
+ 2               NK T Cell            T Cell  partial match          1
+ 3         Epithelial Cell  Endothelial Cell       no match          0
+ 4              Macrophage        Macrophage  perfect match          2
+ 5               NK T Cell         NK T Cell  perfect match          2
+ 6         Epithelial Cell        Macrophage       no match          0
+ 7         Epithelial Cell            T Cell       no match          0
+ 8                  B Cell        Macrophage       no match          0
+ 9              Macrophage   Epithelial Cell       no match          0
+ 10        Epithelial Cell            B Cell       no match          0
+ 11              NK T Cell            B Cell       no match          0
+ 12                 B Cell            T Cell       no match          0
+ 13              NK T Cell        Macrophage       no match          0
+ 14           Kupffer Cell        Macrophage  partial match          1
+ 15           Kupffer Cell          Monocyte  partial match          1
+ 16       Endothelial Cell  Endothelial Cell  perfect match          2
+ 17           Kupffer Cell    Dendritic Cell       no match          0
+ 18            Immune Cell         NK T Cell  partial match          1
+ 19  Hepatic Stellate Cell        Fibroblast  partial match          1
+ 20             Hepatocyte        Hepatocyte  perfect match          2
+ 21            Immune Cell          Monocyte  partial match          1
+ 22       Endothelial Cell        Macrophage       no match          0
+ 23          Cholangiocyte     Cholangiocyte  perfect match          2
+ 24             Hepatocyte        Macrophage       no match          0
+ 25            Immune Cell            T Cell  partial match          1
+ 26  Hepatic Stellate Cell        Neutrophil       no match          0
+ 27          Cholangiocyte        Macrophage       no match          0
+ 28            Plasma Cell       Plasma Cell  perfect match          2
+ 29           Kupffer Cell         NK T Cell       no match          0
+ 30            Immune Cell        Macrophage  partial match          1
+ 31             Hepatocyte          Monocyte       no match          0
+ 32          Cholangiocyte  Endothelial Cell       no match          0
+ 33            Immune Cell  Endothelial Cell       no match          0
+ 34          Cholangiocyte          Monocyte       no match          0
+ 35       Endothelial Cell    Dendritic Cell       no match          0
+ 36           Kupffer Cell        Neutrophil       no match          0
+ 37            Immune Cell        Neutrophil  partial match          1
+ 38             Hepatocyte        Neutrophil       no match          0
+ 39           Kupffer Cell            T Cell       no match          0
+ 40         Erythroid Cell       Erythrocyte  partial match          1
+ 41           Kupffer Cell  Endothelial Cell       no match          0
+ 42            Plasma Cell        Hepatocyte       no match          0
+ 43            Plasma Cell          Monocyte       no match          0
+ 44             Hepatocyte            T Cell       no match          0
+ 45            Immune Cell       Erythrocyte  partial match          1
+ 46       Endothelial Cell            T Cell       no match          0
+ 47             Hepatocyte  Endothelial Cell       no match          0
+ 48             Hepatocyte         NK T Cell       no match          0}
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#get the agreement columns</span>
+<span class="n">binary_agreement_cols</span> <span class="o">=</span> <span class="n">adt</span><span class="o">.</span><span class="n">get_adata_columns</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">col_contains</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;binary_agreement&#39;</span><span class="p">])</span>
+<span class="n">categorical_agreement_cols</span> <span class="o">=</span> <span class="n">adt</span><span class="o">.</span><span class="n">get_adata_columns</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">col_contains</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;categorical_agreement&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#change scale of categorical label agreement cols from 0 to 1 (raw has values 0, 1, and 2)</span>
+<span class="n">adata</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="n">categorical_agreement_cols</span><span class="p">]</span> <span class="o">=</span> <span class="n">adata</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="n">categorical_agreement_cols</span><span class="p">]</span><span class="o">/</span><span class="mi">2</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#plot the agreement at the binary level</span>
+<span class="n">agreement_plot_overall_binary</span> <span class="o">=</span> <span class="n">adt</span><span class="o">.</span><span class="n">plot_model_agreement_binary</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">group_by</span><span class="o">=</span><span class="n">manual_cell_type_col</span><span class="p">,</span> <span class="n">sub_group_by</span><span class="o">=</span><span class="s1">&#39;tissue&#39;</span><span class="p">,</span> <span class="n">model_cols</span><span class="o">=</span><span class="n">binary_agreement_cols</span><span class="p">,</span> <span class="n">granularity</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="c1">#clean plot up for display</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">set_xticks_rotation_and_resize</span><span class="p">(</span><span class="n">fig_ax_tuple</span><span class="p">):</span>
+    <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">fig_ax_tuple</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">set_size_inches</span><span class="p">((</span><span class="mi">4</span><span class="p">,</span> <span class="mi">11</span><span class="p">))</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>  <span class="c1"># Adjust layout to fit the new size</span>
+    
+    <span class="c1"># Rotate x-axis tick labels</span>
+    <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">ax</span><span class="o">.</span><span class="n">get_xticklabels</span><span class="p">():</span>
+        <span class="n">label</span><span class="o">.</span><span class="n">set_rotation</span><span class="p">(</span><span class="mi">90</span><span class="p">)</span>
+    
+    <span class="c1"># Check if legend exists and update labels if necessary</span>
+    <span class="n">legend</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">get_legend</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">legend</span><span class="p">:</span>
+        <span class="c1"># Define label mapping</span>
+        <span class="n">label_mapping</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;0.0&#39;</span><span class="p">:</span> <span class="s1">&#39;No&#39;</span><span class="p">,</span> <span class="s1">&#39;0.5&#39;</span><span class="p">:</span> <span class="s1">&#39;Partial&#39;</span><span class="p">,</span> <span class="s1">&#39;1.0&#39;</span><span class="p">:</span> <span class="s1">&#39;Perfect&#39;</span><span class="p">}</span>
+        
+        <span class="c1"># Iterate over legend texts and update if in mapping</span>
+        <span class="k">for</span> <span class="n">text</span> <span class="ow">in</span> <span class="n">legend</span><span class="o">.</span><span class="n">get_texts</span><span class="p">():</span>
+            <span class="n">original_label</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">get_text</span><span class="p">()</span>
+            <span class="n">new_label</span> <span class="o">=</span> <span class="n">label_mapping</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">original_label</span><span class="p">,</span> <span class="n">original_label</span><span class="p">)</span>
+            <span class="n">text</span><span class="o">.</span><span class="n">set_text</span><span class="p">(</span><span class="n">new_label</span><span class="p">)</span>
+<span class="n">set_xticks_rotation_and_resize</span><span class="p">(</span><span class="n">agreement_plot_overall_binary</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/e705692add96d1c43f2a79899bb93dc13af5841eb32febf5c029fbbb4dbd1619.png" src="../../_images/e705692add96d1c43f2a79899bb93dc13af5841eb32febf5c029fbbb4dbd1619.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#plot the agreement at the binary level</span>
+<span class="n">agreement_plot_overall_categorical</span> <span class="o">=</span> <span class="n">adt</span><span class="o">.</span><span class="n">plot_model_agreement_categorical</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">group_by</span><span class="o">=</span><span class="n">manual_cell_type_col</span><span class="p">,</span> <span class="n">sub_group_by</span><span class="o">=</span><span class="s1">&#39;tissue&#39;</span><span class="p">,</span> <span class="n">model_cols</span><span class="o">=</span><span class="n">categorical_agreement_cols</span><span class="p">,</span> <span class="n">granularity</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="c1">#clean plot up for display</span>
+<span class="n">set_xticks_rotation_and_resize</span><span class="p">(</span><span class="n">agreement_plot_overall_categorical</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/1c4a3e397ba273939efe4a82062dbcf73fa8d5027b304edfaee2b03a400de7b2.png" src="../../_images/1c4a3e397ba273939efe4a82062dbcf73fa8d5027b304edfaee2b03a400de7b2.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#calculate kappa</span>
+<span class="n">kappa</span> <span class="o">=</span> <span class="n">adt</span><span class="o">.</span><span class="n">kappa_adata</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">unified_cell_types</span><span class="p">)</span>
+<span class="n">kappa</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>{&#39;pairwise&#39;: {(&#39;unified_claude-3-5-sonnet-20240620_simplified_ai_cell_type&#39;,
+   &#39;unified_cell_type&#39;): 0.6337789381249733,
+  (&#39;unified_cell_type&#39;,
+   &#39;unified_claude-3-5-sonnet-20240620_simplified_ai_cell_type&#39;): 0.6337789381249733},
+ &#39;average_pairwise&#39;: {&#39;unified_claude-3-5-sonnet-20240620_simplified_ai_cell_type&#39;: 0.6337789381249733,
+  &#39;unified_cell_type&#39;: 0.6337789381249733},
+ &#39;fleiss&#39;: 0.6282839565968413}
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#Visualize agreement at the tissue-celltype level</span>
+<span class="n">agreement_plot_overall_binary</span> <span class="o">=</span> <span class="n">adt</span><span class="o">.</span><span class="n">plot_model_agreement_binary</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">group_by</span><span class="o">=</span><span class="n">manual_cell_type_col</span><span class="p">,</span> <span class="n">sub_group_by</span><span class="o">=</span><span class="s1">&#39;tissue&#39;</span><span class="p">,</span> <span class="n">model_cols</span><span class="o">=</span><span class="n">binary_agreement_cols</span><span class="p">,</span> <span class="n">granularity</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/d83a2211399d68987d28f15ad1749ccec1c470a0dd58ce8af970515f70d12eb1.png" src="../../_images/d83a2211399d68987d28f15ad1749ccec1c470a0dd58ce8af970515f70d12eb1.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#write the adata</span>
+<span class="n">path_to_write_adata</span> <span class="o">=</span> <span class="s1">&#39;your-path-here.h5ad&#39;</span>
+<span class="n">adata</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">path_to_write_adata</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+</section>
+
+
+                </article>
+              
+
+              
+              
+              
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#for-other-tutorials-including-the-basics-see">For other tutorials (including the basics), see:</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#skip-the-tutorial">Skip the tutorial</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#on-a-single-adata">On a single adata</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#on-many-adata-at-once">On many adata at once</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#begin-the-tutorial">Begin the Tutorial</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#set-up-the-llm-backend">Set up the LLM backend.</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#build-the-dictionary-of-anndatas">Build the dictionary of anndatas.</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#now-run-the-llm-cell-type-annotation-functions-here-s-the-rationale-for-this-series-of-steps">Now, run the LLM cell type annotation functions. Here’s the rationale for this series of steps:</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By ggit12
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2024, ggit12.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>
