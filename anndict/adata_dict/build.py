@@ -90,6 +90,12 @@ def build_adata_dict(
                 ("Donor1", "Tissue2"): adata_d1_t2
             }
     """
+
+    # Ensure that the strata columns are categorical
+    for key in strata_keys:
+        if not isinstance(adata.obs[key].dtype, pd.CategoricalDtype):
+            adata.obs[key] = adata.obs[key].astype("category")
+
     if desired_strata is None:
         # Generate all combinations of categories in adata.obs[strata_keys]
         all_categories = [adata.obs[key].cat.categories.tolist() for key in strata_keys]
@@ -123,7 +129,7 @@ def build_adata_dict_main(
     strata_keys: list[str],
     desired_strata: list[tuple],
     *,
-    print_missing_strata: bool = True,
+    print_missing_strata: bool = False,
 ) -> AdataDict:
     """
     Function to build a dictionary of AnnData objects based on desired strata values.
@@ -149,11 +155,6 @@ def build_adata_dict_main(
     """
     # Importing AdataDict here to avoid circular import
     from .adata_dict import AdataDict # pylint: disable=import-outside-toplevel
-
-    # Ensure that the strata columns are categorical
-    for key in strata_keys:
-        if not isinstance(adata.obs[key].dtype, pd.CategoricalDtype):
-            adata.obs[key] = adata.obs[key].astype("category")
 
     # Group indices by combinations of strata_keys for efficient access
     groups = adata.obs.groupby(strata_keys, observed=False).indices

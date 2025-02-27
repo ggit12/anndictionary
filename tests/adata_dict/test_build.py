@@ -26,6 +26,25 @@ def test_build_adata_dict_basic(simple_adata):
     # Check hierarchy
     assert adata_dict.hierarchy == ('cell_type',)
 
+def test_build_adata_dict_with_non_category_column(simple_adata):
+    """Test building with non-categorical columns."""
+
+    # build_adata_dict should convert non-categorical columns to category
+    adata_dict = build_adata_dict(simple_adata, ['cell_type'])
+
+    # Check structure
+    assert isinstance(adata_dict, AdataDict)
+    assert len(adata_dict) == 2
+    assert ('A',) in adata_dict
+    assert ('B',) in adata_dict
+
+    # Check contents
+    assert adata_dict[('A',)].n_obs == 1
+    assert adata_dict[('B',)].n_obs == 1
+
+    # Check hierarchy
+    assert adata_dict.hierarchy == ('cell_type',)
+
 def test_build_adata_dict_multiple_strata(simple_adata):
     """Test building with multiple stratification keys."""
     # Convert columns to category
