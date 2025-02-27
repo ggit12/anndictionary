@@ -54,41 +54,49 @@ def build_adata_dict(
 
     Examples
     --------
-        Case 1: Take all groups
-            >>> import pandas as pd
-            >>> from anndata import AnnData
-            >>> # Create an example AnnData object
-            >>> adata = AnnData(obs=pd.DataFrame({
-            ...     "Donor": ["Donor1", "Donor1", "Donor2"],
-            ...     "Tissue": ["Tissue1", "Tissue2", "Tissue1"]
-            ... }))
-            >>> strata_keys = ["Donor", "Tissue"]
-            >>> adata_dict = build_adata_dict(adata, strata_keys)
-            >>> print(adata_dict)
-            {
-                ("Donor1", "Tissue1"): adata_d1_t1,
-                ("Donor1", "Tissue2"): adata_d1_t2,
-                ("Donor2", "Tissue1"): adata_d2_t1,
-            }
-        Case 2: Take only some groups
-            >>> import pandas as pd
-            >>> from anndata import AnnData
-            >>> # Create an example AnnData object
-            >>> adata = AnnData(obs=pd.DataFrame({
-            ...     "Donor": ["Donor1", "Donor1", "Donor2"],
-            ...     "Tissue": ["Tissue1", "Tissue2", "Tissue1"]
-            ... }))
-            >>> strata_keys = ["Donor", "Tissue"]
-            >>> desired_strata = {
-                                    "Donor": ["Donor1"], #Take only Donor1
-                                    "Tissue": ["Tissue1", "Tissue2"] #Take Tissue1 and Tissue2
-            }
-            >>> adata_dict = build_adata_dict(adata, strata_keys, desired_strata=desired_strata)
-            >>> print(adata_dict)
-            {
-                ("Donor1", "Tissue1"): adata_d1_t1,
-                ("Donor1", "Tissue2"): adata_d1_t2
-            }
+    **Case 1: Take all groups**
+
+    .. code-block:: python
+
+        import pandas as pd
+        from anndata import AnnData
+        # Create an example AnnData object
+        adata = AnnData(obs=pd.DataFrame({
+            "Donor": ["Donor1", "Donor1", "Donor2"],
+            "Tissue": ["Tissue1", "Tissue2", "Tissue1"]
+        }))
+        strata_keys = ["Donor", "Tissue"]
+        adata_dict = build_adata_dict(adata, strata_keys)
+        print(adata_dict)
+        > {
+        >     ("Donor1", "Tissue1"): adata_d1_t1,
+        >     ("Donor1", "Tissue2"): adata_d1_t2,
+        >     ("Donor2", "Tissue1"): adata_d2_t1,
+        > }
+
+    **Case 2: Take only some groups**
+
+    .. code-block:: python
+
+        import pandas as pd
+        from anndata import AnnData
+        # Create an example AnnData object
+        adata = AnnData(obs=pd.DataFrame({
+            "Donor": ["Donor1", "Donor1", "Donor2"],
+            "Tissue": ["Tissue1", "Tissue2", "Tissue1"]
+        }))
+        strata_keys = ["Donor", "Tissue"]
+        desired_strata = {
+            "Donor": ["Donor1"], #Take only Donor1
+            "Tissue": ["Tissue1", "Tissue2"] #Take Tissue1 and Tissue2
+        }
+        adata_dict = build_adata_dict(adata, strata_keys, desired_strata=desired_strata)
+        print(adata_dict)
+        > {
+        >     ("Donor1", "Tissue1"): adata_d1_t1,
+        >     ("Donor1", "Tissue2"): adata_d1_t2
+        > }
+
     """
 
     # Ensure that the strata columns are categorical

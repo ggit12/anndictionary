@@ -695,8 +695,6 @@ Labeled Kidney —-&gt; Unlabeled Kidney</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#split the adata by tissue so that we can handle each separatley</span>
-<span class="n">adt</span><span class="o">.</span><span class="n">convert_obs_col_to_category</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="s1">&#39;tissue&#39;</span><span class="p">)</span> <span class="c1">#needs to be a category to build_adata_dict</span>
-<span class="n">adt</span><span class="o">.</span><span class="n">convert_obs_col_to_category</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="s1">&#39;cell_type&#39;</span><span class="p">)</span> <span class="c1">#for operations later</span>
 <span class="n">adata_dict</span> <span class="o">=</span> <span class="n">adt</span><span class="o">.</span><span class="n">build_adata_dict</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">strata_keys</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;tissue&#39;</span><span class="p">])</span>
 </pre></div>
 </div>

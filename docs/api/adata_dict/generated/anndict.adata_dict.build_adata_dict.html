@@ -559,7 +559,7 @@
 <h1>anndict.adata_dict.build_adata_dict<a class="headerlink" href="#anndict-adata-dict-build-adata-dict" title="Link to this heading">#</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="anndict.adata_dict.build_adata_dict">
-<span class="sig-prename descclassname"><span class="pre">anndict.adata_dict.</span></span><span class="sig-name descname"><span class="pre">build_adata_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strata_keys</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">desired_strata</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/ggit12/anndictionary/tree/main/anndict/adata_dict/build.py#L21-L118"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.adata_dict.build_adata_dict" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">anndict.adata_dict.</span></span><span class="sig-name descname"><span class="pre">build_adata_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strata_keys</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">desired_strata</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/ggit12/anndictionary/tree/main/anndict/adata_dict/build.py#L21-L132"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.adata_dict.build_adata_dict" title="Link to this definition">#</a></dt>
 <dd><p>Build a dictionary of <code class="xref py py-class docutils literal notranslate"><span class="pre">AnnData</span></code> objects split
 by the <code class="docutils literal notranslate"><span class="pre">obs</span></code> columns specified in <code class="docutils literal notranslate"><span class="pre">strata_keys</span></code>.</p>
 <dl class="field-list simple">
@@ -588,47 +588,45 @@ are strata tuples and values are corresponding <code class="xref py py-class doc
 </dd>
 </dl>
 <p class="rubric">Examples</p>
-<dl>
-<dt>Case 1: Take all groups</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">anndata</span><span class="w"> </span><span class="kn">import</span> <span class="n">AnnData</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Create an example AnnData object</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">adata</span> <span class="o">=</span> <span class="n">AnnData</span><span class="p">(</span><span class="n">obs</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
-<span class="gp">... </span>    <span class="s2">&quot;Donor&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;Donor1&quot;</span><span class="p">,</span> <span class="s2">&quot;Donor1&quot;</span><span class="p">,</span> <span class="s2">&quot;Donor2&quot;</span><span class="p">],</span>
-<span class="gp">... </span>    <span class="s2">&quot;Tissue&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;Tissue1&quot;</span><span class="p">,</span> <span class="s2">&quot;Tissue2&quot;</span><span class="p">,</span> <span class="s2">&quot;Tissue1&quot;</span><span class="p">]</span>
-<span class="gp">... </span><span class="p">}))</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">strata_keys</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Donor&quot;</span><span class="p">,</span> <span class="s2">&quot;Tissue&quot;</span><span class="p">]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">adata_dict</span> <span class="o">=</span> <span class="n">build_adata_dict</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">strata_keys</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">adata_dict</span><span class="p">)</span>
-<span class="go">{</span>
-<span class="go">    (&quot;Donor1&quot;, &quot;Tissue1&quot;): adata_d1_t1,</span>
-<span class="go">    (&quot;Donor1&quot;, &quot;Tissue2&quot;): adata_d1_t2,</span>
-<span class="go">    (&quot;Donor2&quot;, &quot;Tissue1&quot;): adata_d2_t1,</span>
-<span class="go">}</span>
+<p><strong>Case 1: Take all groups</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">anndata</span><span class="w"> </span><span class="kn">import</span> <span class="n">AnnData</span>
+<span class="c1"># Create an example AnnData object</span>
+<span class="n">adata</span> <span class="o">=</span> <span class="n">AnnData</span><span class="p">(</span><span class="n">obs</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
+    <span class="s2">&quot;Donor&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;Donor1&quot;</span><span class="p">,</span> <span class="s2">&quot;Donor1&quot;</span><span class="p">,</span> <span class="s2">&quot;Donor2&quot;</span><span class="p">],</span>
+    <span class="s2">&quot;Tissue&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;Tissue1&quot;</span><span class="p">,</span> <span class="s2">&quot;Tissue2&quot;</span><span class="p">,</span> <span class="s2">&quot;Tissue1&quot;</span><span class="p">]</span>
+<span class="p">}))</span>
+<span class="n">strata_keys</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Donor&quot;</span><span class="p">,</span> <span class="s2">&quot;Tissue&quot;</span><span class="p">]</span>
+<span class="n">adata_dict</span> <span class="o">=</span> <span class="n">build_adata_dict</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">strata_keys</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">adata_dict</span><span class="p">)</span>
+<span class="o">&gt;</span> <span class="p">{</span>
+<span class="o">&gt;</span>     <span class="p">(</span><span class="s2">&quot;Donor1&quot;</span><span class="p">,</span> <span class="s2">&quot;Tissue1&quot;</span><span class="p">):</span> <span class="n">adata_d1_t1</span><span class="p">,</span>
+<span class="o">&gt;</span>     <span class="p">(</span><span class="s2">&quot;Donor1&quot;</span><span class="p">,</span> <span class="s2">&quot;Tissue2&quot;</span><span class="p">):</span> <span class="n">adata_d1_t2</span><span class="p">,</span>
+<span class="o">&gt;</span>     <span class="p">(</span><span class="s2">&quot;Donor2&quot;</span><span class="p">,</span> <span class="s2">&quot;Tissue1&quot;</span><span class="p">):</span> <span class="n">adata_d2_t1</span><span class="p">,</span>
+<span class="o">&gt;</span> <span class="p">}</span>
 </pre></div>
 </div>
-</dd>
-<dt>Case 2: Take only some groups</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">anndata</span><span class="w"> </span><span class="kn">import</span> <span class="n">AnnData</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Create an example AnnData object</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">adata</span> <span class="o">=</span> <span class="n">AnnData</span><span class="p">(</span><span class="n">obs</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
-<span class="gp">... </span>    <span class="s2">&quot;Donor&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;Donor1&quot;</span><span class="p">,</span> <span class="s2">&quot;Donor1&quot;</span><span class="p">,</span> <span class="s2">&quot;Donor2&quot;</span><span class="p">],</span>
-<span class="gp">... </span>    <span class="s2">&quot;Tissue&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;Tissue1&quot;</span><span class="p">,</span> <span class="s2">&quot;Tissue2&quot;</span><span class="p">,</span> <span class="s2">&quot;Tissue1&quot;</span><span class="p">]</span>
-<span class="gp">... </span><span class="p">}))</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">strata_keys</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Donor&quot;</span><span class="p">,</span> <span class="s2">&quot;Tissue&quot;</span><span class="p">]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">desired_strata</span> <span class="o">=</span> <span class="p">{</span>
-<span class="go">                        &quot;Donor&quot;: [&quot;Donor1&quot;], #Take only Donor1</span>
-<span class="go">                        &quot;Tissue&quot;: [&quot;Tissue1&quot;, &quot;Tissue2&quot;] #Take Tissue1 and Tissue2</span>
-<span class="go">}</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">adata_dict</span> <span class="o">=</span> <span class="n">build_adata_dict</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">strata_keys</span><span class="p">,</span> <span class="n">desired_strata</span><span class="o">=</span><span class="n">desired_strata</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">adata_dict</span><span class="p">)</span>
-<span class="go">{</span>
-<span class="go">    (&quot;Donor1&quot;, &quot;Tissue1&quot;): adata_d1_t1,</span>
-<span class="go">    (&quot;Donor1&quot;, &quot;Tissue2&quot;): adata_d1_t2</span>
-<span class="go">}</span>
+<p><strong>Case 2: Take only some groups</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">anndata</span><span class="w"> </span><span class="kn">import</span> <span class="n">AnnData</span>
+<span class="c1"># Create an example AnnData object</span>
+<span class="n">adata</span> <span class="o">=</span> <span class="n">AnnData</span><span class="p">(</span><span class="n">obs</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
+    <span class="s2">&quot;Donor&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;Donor1&quot;</span><span class="p">,</span> <span class="s2">&quot;Donor1&quot;</span><span class="p">,</span> <span class="s2">&quot;Donor2&quot;</span><span class="p">],</span>
+    <span class="s2">&quot;Tissue&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;Tissue1&quot;</span><span class="p">,</span> <span class="s2">&quot;Tissue2&quot;</span><span class="p">,</span> <span class="s2">&quot;Tissue1&quot;</span><span class="p">]</span>
+<span class="p">}))</span>
+<span class="n">strata_keys</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Donor&quot;</span><span class="p">,</span> <span class="s2">&quot;Tissue&quot;</span><span class="p">]</span>
+<span class="n">desired_strata</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;Donor&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;Donor1&quot;</span><span class="p">],</span> <span class="c1">#Take only Donor1</span>
+    <span class="s2">&quot;Tissue&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;Tissue1&quot;</span><span class="p">,</span> <span class="s2">&quot;Tissue2&quot;</span><span class="p">]</span> <span class="c1">#Take Tissue1 and Tissue2</span>
+<span class="p">}</span>
+<span class="n">adata_dict</span> <span class="o">=</span> <span class="n">build_adata_dict</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">strata_keys</span><span class="p">,</span> <span class="n">desired_strata</span><span class="o">=</span><span class="n">desired_strata</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">adata_dict</span><span class="p">)</span>
+<span class="o">&gt;</span> <span class="p">{</span>
+<span class="o">&gt;</span>     <span class="p">(</span><span class="s2">&quot;Donor1&quot;</span><span class="p">,</span> <span class="s2">&quot;Tissue1&quot;</span><span class="p">):</span> <span class="n">adata_d1_t1</span><span class="p">,</span>
+<span class="o">&gt;</span>     <span class="p">(</span><span class="s2">&quot;Donor1&quot;</span><span class="p">,</span> <span class="s2">&quot;Tissue2&quot;</span><span class="p">):</span> <span class="n">adata_d1_t2</span>
+<span class="o">&gt;</span> <span class="p">}</span>
 </pre></div>
 </div>
-</dd>
-</dl>
 </dd></dl>
 
 </section>
