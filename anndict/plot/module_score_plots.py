@@ -60,6 +60,10 @@ def module_score_barplot(adata: AnnData,
         # Plot the results
         plots = adt.module_score_barplot(adata, group_cols='cell_type', score_cols=score_cols)
 
+    See Also
+    ---------
+    :func:`cell_type_marker_gene_score` : To calculate cell type marker gene scores.
+
     """
     #print adt_key if provided
     if adt_key:
