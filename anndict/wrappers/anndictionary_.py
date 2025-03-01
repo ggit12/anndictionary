@@ -65,12 +65,12 @@ def ai_annotate_biological_process_adata_dict(
     adata_dict: AdataDict,
     groupby: str,
     n_top_genes: int = 10,
-    label_column: str = 'ai_biological_process'
+    new_label_column: str = 'ai_biological_process'
 ) -> AdataDict:
     """
     Wrapper for ai_annotate_biological_process.
     """
-    return adata_dict_fapply_return(adata_dict, ai_annotate_biological_process, max_retries=3, groupby=groupby, n_top_genes=n_top_genes, label_column=label_column)
+    return adata_dict_fapply_return(adata_dict, ai_annotate_biological_process, max_retries=3, groupby=groupby, n_top_genes=n_top_genes, new_label_column=new_label_column)
 
 @wraps(simplify_var_index)
 def simplify_var_index_adata_dict(
@@ -124,13 +124,13 @@ def ai_annotate_cell_type_adata_dict(
     adata_dict: AdataDict,
     groupby: str,
     n_top_genes: int = 10,
-    label_column: str = 'ai_cell_type',
+    new_label_column: str = 'ai_cell_type',
     tissue_of_origin_col: str | None = None
 ) -> dict[tuple[str,...], DataFrame]:
     """
     Wrapper for ai_annotate_cell_type.
     """
-    return adata_dict_fapply_return(adata_dict, ai_annotate_cell_type, max_retries=3, groupby=groupby, n_top_genes=n_top_genes, label_column=label_column, tissue_of_origin_col=tissue_of_origin_col)
+    return adata_dict_fapply_return(adata_dict, ai_annotate_cell_type, max_retries=3, groupby=groupby, n_top_genes=n_top_genes, new_label_column=new_label_column, tissue_of_origin_col=tissue_of_origin_col)
 
 @wraps(ai_compare_cell_type_labels_pairwise)
 def ai_compare_cell_type_labels_pairwise_adata_dict(
