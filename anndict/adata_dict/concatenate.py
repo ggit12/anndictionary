@@ -13,7 +13,7 @@ from .adata_dict_fapply import adata_dict_fapply
 def concatenate_adata_dict(
     adata_dict: AdataDict,
     *,
-    new_col_name: str | None = 'adt_key',
+    new_col_name: str | None = None,
     **kwargs,
 ) -> AnnData:
     """
@@ -27,7 +27,7 @@ def concatenate_adata_dict(
 
     new_col_name
         If provided, the name of the new column that will store the ``adata_dict`` 
-        key in ``.obs`` of the concatenated AnnData. Defaults to ``'adt_key'``.
+        key in ``.obs`` of the concatenated AnnData. Defaults to ``None``.
 
     kwargs
         Additional keyword arguments for concatenation.
