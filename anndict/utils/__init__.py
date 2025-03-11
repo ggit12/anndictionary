@@ -23,6 +23,7 @@ from .anndata_ import (
     convert_obs_col_to_string,
     convert_obs_index_to_str,
     get_adata_columns,
+    filter_gene_list,
 
 )
 
@@ -80,6 +81,7 @@ __all__ = [
     "convert_obs_col_to_string",
     "convert_obs_index_to_str",
     "get_adata_columns",
+    "filter_gene_list",
 
     # scanpy_.py
     "sample_adata_dict",
