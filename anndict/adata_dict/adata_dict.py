@@ -9,11 +9,14 @@ from functools import wraps
 
 from anndata import AnnData
 
-from .adata_dict_utils import to_nested_tuple, set_var_index_func, set_obs_index_func
+from .adata_dict_utils import to_nested_tuple, to_nested_list, set_var_index_func, set_obs_index_func
 from .adata_dict_fapply import adata_dict_fapply, adata_dict_fapply_return
 from .add_stratification import add_stratification as add_stratification_func
 
 from .dict_utils import check_dict_structure, all_leaves_are_of_type
+
+type NestedList = str | list["NestedList"]
+type NestedTuple = str | tuple["NestedTuple", ...]
 
 
 class AdataDict(dict):
@@ -164,7 +167,7 @@ class AdataDict(dict):
         return levels
 
     def set_hierarchy(self,
-    nesting_list: list
+    nesting_list: NestedList | NestedTuple
     ):
         """
         Rearrange the hierarchy of :class:`AdataDict` based on the provided nesting structure.
@@ -173,6 +176,11 @@ class AdataDict(dict):
         ------------
         nesting_list
             Nested list indicating the new hierarchy structure.
+
+        Notes
+        -------
+        Supports input as a nested list or nested tuple. Recommended to supply as a nested list. 
+        Nested tupple support is supplied for ease of use when caching, see **Case 4: Caching the hierarchy** below.
 
         Examples
         ---------
@@ -220,7 +228,52 @@ class AdataDict(dict):
             >         ("Tissue1", "CellType1"): adata4,
             >     },
             > }
+
+        **Case 4: Caching the hierarchy**
+
+        .. code-block:: python
+
+            # Initial Structure
+            print(adata_dict) # Is nested
+            > {
+            >     ("Donor1",): {
+            >         ("Tissue1",): adata1,
+            >         ("Tissue2",): adata2,
+            >     },
+            >     ("Donor2",): {
+            >         ("Tissue1",): adata3,
+            >     },
+            > }
+
+            # Cache the hierarchy
+            cached_hierarchy = adata_dict.hierarchy
+
+            # Change the hierarchy (flatten for this example)
+            adata_dict.flatten()
+            print(adata_dict) # Is now flat
+            > {
+            >     ("Donor1", "Tissue1"): adata1,
+            >     ("Donor1", "Tissue2"): adata2,
+            >     ("Donor2", "Tissue1"): adata3,
+            > }
+
+            #Restore the hierarchy
+            adata_dict.set_hierarchy(cached_hierarchy)
+            print(adata_dict) # Is nested again
+            > {
+            >     ("Donor1",): {
+            >         ("Tissue1",): adata1,
+            >         ("Tissue2",): adata2,
+            >     },
+            >     ("Donor2",): {
+            >         ("Tissue1",): adata3,
+            >     },
+            > }
+
         """
+        # Convert nesting_list to list if tuple for ease of use when caching
+        if isinstance(nesting_list, tuple):
+            nesting_list = to_nested_list(nesting_list)
 
         # Flatten the nested data
         flat_data = self._flatten()
@@ -324,19 +377,6 @@ class AdataDict(dict):
         if not isinstance(key, tuple):
             key = (key,)
         super().__setitem__(key, value)
-
-    # def __getattr__(self, attr):
-    #     def method(*args, **kwargs):
-    #         results = {}
-    #         for key, adata in self.items():
-    #             if isinstance(adata, AdataDict):
-    #                 # Recurse into nested AdataDict
-    #                 results[key] = getattr(adata, attr)(*args, **kwargs)
-    #             else:
-    #                 func = getattr(adata, attr)
-    #                 results[key] = func(*args, **kwargs)
-    #         return results
-    #     return method
 
     def __getattr__(self, attr):
         # First check if this is a property of AnnData
