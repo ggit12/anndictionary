@@ -6,6 +6,7 @@ import pytest
 import numpy as np
 
 from anndict.adata_dict.concatenate import concatenate_adata_dict
+from anndict.adata_dict.dict_utils import check_dict_structure
 
 def test_concatenate_simple_adata_dict(simple_adata_dict):
     """Test concatenation of a simple AdataDict with two samples."""
@@ -22,13 +23,14 @@ def test_concatenate_simple_adata_dict(simple_adata_dict):
     assert sum(result.obs['sample'] == ('sample2',)) == 2
 
     # Verify data integrity
-    assert np.array_equal(result[result.obs['sample'] == ('sample1',)].X, 
+    assert np.array_equal(result[result.obs['sample'] == ('sample1',)].X,
                          np.array([[1, 2], [3, 4]]))
-    assert np.array_equal(result[result.obs['sample'] == ('sample2',)].X, 
+    assert np.array_equal(result[result.obs['sample'] == ('sample2',)].X,
                          np.array([[5, 6], [7, 8]]))
 
 def test_concatenate_nested_adata_dict(nested_adata_dict):
     """Test concatenation of a nested AdataDict with group/sample hierarchy."""
+    nested_adata_dict_original = nested_adata_dict.copy()
     result = concatenate_adata_dict(nested_adata_dict, new_col_name='group')
 
     # Check dimensions
@@ -36,7 +38,7 @@ def test_concatenate_nested_adata_dict(nested_adata_dict):
     assert result.n_vars == 2  # Should maintain same number of genes
 
     # Check group assignment - expecting full tuples
-    expected_groups = {('group1', 'sample1'), ('group1', 'sample2'), 
+    expected_groups = {('group1', 'sample1'), ('group1', 'sample2'),
                       ('group2', 'sample3'), ('group2', 'sample4')}
     assert set(result.obs['group'].unique()) == expected_groups
     assert sum(result.obs['group'].isin([('group1', 'sample1'), ('group1', 'sample2')])) == 2
@@ -48,6 +50,9 @@ def test_concatenate_nested_adata_dict(nested_adata_dict):
     assert all(result[group1_mask].obs['condition'] == 'ctrl')
     assert all(result[group2_mask].obs['condition'] == 'treat')
 
+    # Check that nested_adata_dict structure is preserved
+    assert check_dict_structure(nested_adata_dict, nested_adata_dict_original)
+
 def test_concatenate_complex_nested_adata_dict(complex_nested_adata_dict):
     """Test concatenation of a complex nested AdataDict with group/sample/celltype hierarchy."""
     result = concatenate_adata_dict(complex_nested_adata_dict, new_col_name='group')
@@ -58,20 +63,71 @@ def test_concatenate_complex_nested_adata_dict(complex_nested_adata_dict):
 
     # Check group assignment - expecting full tuples
     expected_groups = {
-        ('group1', 'sample1', 'celltype1'), 
+        ('group1', 'sample1', 'celltype1'),
         ('group1', 'sample2', 'celltype2'),
-        ('group2', 'sample3', 'celltype3'), 
+        ('group2', 'sample3', 'celltype3'),
         ('group2', 'sample4', 'celltype4')
     }
     assert set(result.obs['group'].unique()) == expected_groups
 
     # Check group counts
     group1_mask = result.obs['group'].isin([
-        ('group1', 'sample1', 'celltype1'), 
+        ('group1', 'sample1', 'celltype1'),
         ('group1', 'sample2', 'celltype2')
     ])
     group2_mask = result.obs['group'].isin([
-        ('group2', 'sample3', 'celltype3'), 
+        ('group2', 'sample3', 'celltype3'),
+        ('group2', 'sample4', 'celltype4')
+    ])
+    assert sum(group1_mask) == 2
+    assert sum(group2_mask) == 2
+
+    # Check conditions are preserved
+    assert all(result[group1_mask].obs['condition'] == 'ctrl')
+    assert all(result[group2_mask].obs['condition'] == 'treat')
+
+    # Check data integrity
+    assert np.array_equal(
+        result[result.obs['group'] == ('group1', 'sample1', 'celltype1')].X,
+        np.array([[1, 2]])
+    )
+    assert np.array_equal(
+        result[result.obs['group'] == ('group2', 'sample4', 'celltype4')].X,
+        np.array([[7, 8]])
+    )
+
+def test_concatenate_complex_nested_adata_dict_lower_peak_memory(complex_nested_adata_dict):
+    """
+    Test concatenation of a complex nested AdataDict with lower_peak_memory=True.
+    All other parameters are the same as test_concatenate_complex_nested_adata_dict.
+    """
+
+    with pytest.warns(UserWarning, match="`lower_peak_memory=True`. `adata_dict` will be deleted during merge."):
+        result = concatenate_adata_dict(complex_nested_adata_dict, new_col_name='group', lower_peak_memory=True)
+
+    # complex_nested_adata_dict should be empty
+    assert len(complex_nested_adata_dict) == 0
+
+    # Check dimensions
+    assert result.n_obs == 4  # Total cells across all groups/samples
+    assert result.n_vars == 2  # Should maintain same number of genes
+
+    # Check group assignment - expecting full tuples
+    expected_groups = {
+        ('group1', 'sample1', 'celltype1'),
+        ('group1', 'sample2', 'celltype2'),
+        ('group2', 'sample3', 'celltype3'),
+        ('group2', 'sample4', 'celltype4')
+    }
+    assert set(result.obs['group'].unique()) == expected_groups
+
+    # Check group counts
+    group1_mask = result.obs['group'].isin([
+        ('group1', 'sample1', 'celltype1'),
+        ('group1', 'sample2', 'celltype2')
+    ])
+    group2_mask = result.obs['group'].isin([
+        ('group2', 'sample3', 'celltype3'),
         ('group2', 'sample4', 'celltype4')
     ])
     assert sum(group1_mask) == 2
