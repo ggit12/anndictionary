@@ -200,7 +200,7 @@ def map_cell_type_labels_to_simplified_set(
         >     'arterial endothelial cell': 'endothelial cell'
         > }
     """
-    #todo, could allow passing custom examples
+    #TODO could allow passing custom examples
     #enforce that labels are semantic
     enforce_semantic_list(labels)
 
@@ -218,7 +218,7 @@ def map_cell_type_labels_to_simplified_set(
                 'CD8-positive T Cells.':'T Cell','CD4-positive T Cells.':'T Cell'}}"},
         {"role": "user",
          "content": f"Here is the full list of labels to be simplified: {initial_labels_str}. \
-                nowledge that you've seen all labels. Do not provide the mapping yet."}
+                Succinctly acknowledge that you've seen all labels. Do not provide the mapping yet."}
     ]
 
     # Get initial acknowledgment
