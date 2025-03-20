@@ -11,11 +11,8 @@
 <meta property="og:type" content="website" />
 <meta property="og:url" content="api/adata_dict/generated/anndict.adata_dict.concatenate_adata_dict.html" />
 <meta property="og:site_name" content="AnnDictionary" />
-<meta property="og:image:width" content="1146" />
-<meta property="og:image:height" content="600" />
-<meta property="og:image" content="/None" />
-<meta property="og:image:alt" content="" />
-<meta name="twitter:card" content="summary_large_image" />
+<meta property="og:image" content="_static/logo.png" />
+<meta property="og:image:alt" content="AnnDictionary" />
 
     <title>anndict.adata_dict.concatenate_adata_dict &#8212; AnnDictionary Documentation</title>
   
@@ -61,6 +58,7 @@
     <script src="../../../_static/design-tabs.js?v=f930bc37"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'api/adata_dict/generated/anndict.adata_dict.concatenate_adata_dict';</script>
     <link rel="canonical" href="https://ggit12.github.io/anndictionary/api/adata_dict/generated/anndict.adata_dict.concatenate_adata_dict.html" />
+    <link rel="icon" href="../../../_static/favicon.ico"/>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
     <link rel="next" title="LLM Management" href="../../llm/index.html" />
@@ -141,8 +139,14 @@
   
   
   
+    
+    
+      
+    
+    
+    <img src="../../../_static/logo.svg" class="logo__image only-light" alt="AnnDictionary Documentation - Home"/>
+    <img src="../../../_static/logo.svg" class="logo__image only-dark pst-js-only" alt="AnnDictionary Documentation - Home"/>
   
-    <p class="title logo__title">AnnDictionary Documentation</p>
   
 </a></div>
         <div class="sidebar-primary-item">
@@ -286,6 +290,7 @@
 <li class="toctree-l4"><a class="reference internal" href="../../utils/generated/anndict.utils.convert_obs_col_to_category.html">anndict.utils.convert_obs_col_to_category</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../utils/generated/anndict.utils.convert_obs_col_to_string.html">anndict.utils.convert_obs_col_to_string</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../utils/generated/anndict.utils.convert_obs_index_to_str.html">anndict.utils.convert_obs_index_to_str</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../utils/generated/anndict.utils.filter_gene_list.html">anndict.utils.filter_gene_list</a></li>
 </ul>
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../../utils/scanpy.html">Scanpy</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -559,7 +564,7 @@
 <h1>anndict.adata_dict.concatenate_adata_dict<a class="headerlink" href="#anndict-adata-dict-concatenate-adata-dict" title="Link to this heading">#</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="anndict.adata_dict.concatenate_adata_dict">
-<span class="sig-prename descclassname"><span class="pre">anndict.adata_dict.</span></span><span class="sig-name descname"><span class="pre">concatenate_adata_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata_dict</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_col_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'adt_key'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/ggit12/anndictionary/tree/main/anndict/adata_dict/concatenate.py#L13-L71"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.adata_dict.concatenate_adata_dict" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">anndict.adata_dict.</span></span><span class="sig-name descname"><span class="pre">concatenate_adata_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata_dict</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_col_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lower_peak_memory</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/ggit12/anndictionary/tree/main/anndict/adata_dict/concatenate.py#L17-L114"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.adata_dict.concatenate_adata_dict" title="Link to this definition">#</a></dt>
 <dd><p>Concatenate all AnnData objects in <cite>adata_dict</cite> into a single AnnData object.
 If only a single AnnData object is present, return it as is.</p>
 <dl class="field-list simple">
@@ -567,8 +572,11 @@ If only a single AnnData object is present, return it as is.</p>
 <dd class="field-odd"><dl class="simple">
 <dt><strong>adata_dict</strong> <span class="classifier"><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="../_generated/anndict.adata_dict.adata_dict.AdataDict.html#anndict.adata_dict.adata_dict.AdataDict" title="anndict.adata_dict.adata_dict.AdataDict"><code class="xref py py-class docutils literal notranslate"><span class="pre">AdataDict</span></code></a></span></span></dt></dt><dd><p><code class="xref py py-class docutils literal notranslate"><span class="pre">AdataDict</span></code></p>
 </dd>
-<dt><strong>new_col_name</strong> <span class="classifier"><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span> (default: <code class="docutils literal notranslate"><span class="pre">'adt_key'</span></code>)</span></dt></dt><dd><p>If provided, the name of the new column that will store the <code class="docutils literal notranslate"><span class="pre">adata_dict</span></code>
-key in <code class="docutils literal notranslate"><span class="pre">.obs</span></code> of the concatenated AnnData. Defaults to <code class="docutils literal notranslate"><span class="pre">'adt_key'</span></code>.</p>
+<dt><strong>new_col_name</strong> <span class="classifier"><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span> (default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</span></dt></dt><dd><p>If provided, the name of the new column that will store the <code class="docutils literal notranslate"><span class="pre">adata_dict</span></code>
+key in <code class="docutils literal notranslate"><span class="pre">.obs</span></code> of the concatenated AnnData. Defaults to <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
+</dd>
+<dt><strong>lower_peak_memory</strong> <span class="classifier"><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></span> (default: <code class="docutils literal notranslate"><span class="pre">False</span></code>)</span></dt></dt><dd><p>If True, the the function concatenates the AnnData objects in <cite>adata_dict</cite> sequentially,
+and deletes the data from <code class="docutils literal notranslate"><span class="pre">adata_dict</span></code> as it does so. This reduces peak memory usage.</p>
 </dd>
 <dt><strong>kwargs</strong></dt><dd><p>Additional keyword arguments for concatenation.</p>
 </dd>
@@ -585,6 +593,13 @@ The <code class="docutils literal notranslate"><span class="pre">.obs</span></co
 <dd class="field-even"><p><strong>ValueError</strong> – If <cite>adata_dict</cite> is empty.</p>
 </dd>
 </dl>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p><code class="docutils literal notranslate"><span class="pre">lower_peak_memory</span></code> defaults to <code class="docutils literal notranslate"><span class="pre">False</span></code>. If <cite>lower_peak_memory</cite> is set to <code class="docutils literal notranslate"><span class="pre">True</span></code>,
+<code class="docutils literal notranslate"><span class="pre">adata_dict</span></code> will be deleted during the concatenation process.</p>
+</div>
+<p class="rubric">Notes</p>
+<p>Memory is only freed if no other references to the <code class="xref py py-class docutils literal notranslate"><span class="pre">AnnData</span></code> objects in <code class="docutils literal notranslate"><span class="pre">adata_dict</span></code> exist.</p>
 </dd></dl>
 
 </section>

@@ -12,12 +12,9 @@
 <meta property="og:url" content="api/adata_dict/adata_dict.html" />
 <meta property="og:site_name" content="AnnDictionary" />
 <meta property="og:description" content="This module contains the AdataDict class, which is basically a nested dictionary of anndata, with a few extra features to help restructure the nesting hierarchy and iterate over it. AdataDict inher..." />
-<meta property="og:image:width" content="1146" />
-<meta property="og:image:height" content="600" />
-<meta property="og:image" content="/None" />
-<meta property="og:image:alt" content="This module contains the AdataDict class, which is basically a nested dictionary of anndata, with a few extra features to help restructure the nesting hierar..." />
+<meta property="og:image" content="_static/logo.png" />
+<meta property="og:image:alt" content="AnnDictionary" />
 <meta name="description" content="This module contains the AdataDict class, which is basically a nested dictionary of anndata, with a few extra features to help restructure the nesting hierarchy and iterate over it. AdataDict inher..." />
-<meta name="twitter:card" content="summary_large_image" />
 
     <title>AdataDict Class &#8212; AnnDictionary Documentation</title>
   
@@ -63,6 +60,7 @@
     <script src="../../_static/design-tabs.js?v=f930bc37"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'api/adata_dict/adata_dict';</script>
     <link rel="canonical" href="https://ggit12.github.io/anndictionary/api/adata_dict/adata_dict.html" />
+    <link rel="icon" href="../../_static/favicon.ico"/>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="anndict.AdataDict.set_hierarchy" href="generated/anndict.AdataDict.set_hierarchy.html" />
@@ -143,8 +141,14 @@
   
   
   
+    
+    
+      
+    
+    
+    <img src="../../_static/logo.svg" class="logo__image only-light" alt="AnnDictionary Documentation - Home"/>
+    <img src="../../_static/logo.svg" class="logo__image only-dark pst-js-only" alt="AnnDictionary Documentation - Home"/>
   
-    <p class="title logo__title">AnnDictionary Documentation</p>
   
 </a></div>
         <div class="sidebar-primary-item">
@@ -288,6 +292,7 @@
 <li class="toctree-l4"><a class="reference internal" href="../utils/generated/anndict.utils.convert_obs_col_to_category.html">anndict.utils.convert_obs_col_to_category</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../utils/generated/anndict.utils.convert_obs_col_to_string.html">anndict.utils.convert_obs_col_to_string</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../utils/generated/anndict.utils.convert_obs_index_to_str.html">anndict.utils.convert_obs_index_to_str</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/generated/anndict.utils.filter_gene_list.html">anndict.utils.filter_gene_list</a></li>
 </ul>
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../utils/scanpy.html">Scanpy</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -571,7 +576,7 @@
 few extra features to help restructure the nesting hierarchy and iterate over it. <a class="reference internal" href="_generated/anndict.adata_dict.adata_dict.AdataDict.html#anndict.adata_dict.adata_dict.AdataDict" title="anndict.adata_dict.adata_dict.AdataDict"><code class="xref py py-class docutils literal notranslate"><span class="pre">AdataDict</span></code></a> inherits from <code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code> and passes methods through to each <code class="xref py py-class docutils literal notranslate"><span class="pre">AnnData</span></code> in the <a class="reference internal" href="_generated/anndict.adata_dict.adata_dict.AdataDict.html#anndict.adata_dict.adata_dict.AdataDict" title="anndict.adata_dict.adata_dict.AdataDict"><code class="xref py py-class docutils literal notranslate"><span class="pre">AdataDict</span></code></a>.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="anndict.AdataDict">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">anndict.</span></span><span class="sig-name descname"><span class="pre">AdataDict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hierarchy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/ggit12/anndictionary/tree/main/anndict/adata_dict/adata_dict.py#L19-L493"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.AdataDict" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">anndict.</span></span><span class="sig-name descname"><span class="pre">AdataDict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hierarchy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/ggit12/anndictionary/tree/main/anndict/adata_dict/adata_dict.py#L22-L533"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.AdataDict" title="Link to this definition">#</a></dt>
 <dd><p><a class="reference internal" href="#anndict.AdataDict" title="anndict.AdataDict"><code class="xref py py-class docutils literal notranslate"><span class="pre">AdataDict</span></code></a> is a dictionary-like container where values are <code class="xref py py-class docutils literal notranslate"><span class="pre">AnnData</span></code> objects. <a class="reference internal" href="#anndict.AdataDict" title="anndict.AdataDict"><code class="xref py py-class docutils literal notranslate"><span class="pre">AdataDict</span></code></a> inherits from <code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code>.</p>
 <p>This class provides three main functionalities:</p>
 <ol class="arabic simple">

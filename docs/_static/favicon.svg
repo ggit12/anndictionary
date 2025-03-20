@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 48 48">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: none;
+        stroke: #3776ab;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        stroke-width: 3px;
+      }
+
+      .cls-2 {
+        fill: #3776ab;
+      }
+
+      .cls-2, .cls-3, .cls-4, .cls-5 {
+        stroke-width: 0px;
+      }
+
+      .cls-3 {
+        fill: #646464;
+      }
+
+      .cls-4 {
+        fill: #ffd43b;
+      }
+
+      .cls-6 {
+        fill: #000;
+        stroke: #eee;
+      }
+
+      .cls-5 {
+        fill: #fff;
+      }
+    </style>
+  </defs>
+  <circle class="cls-2" cx="24" cy="24" r="24"/>
+  <path class="cls-4" d="M38,40V8H10v32h28Z"/>
+  <path class="cls-3" d="M38,40V8h-4v32h4Z"/>
+  <path class="cls-5" d="M34,40H10V8h24v32Z"/>
+  <path class="cls-6" d="M34,36H14M34,32H14M34,28H14M34,24H14M34,20H14M34,16H14M34,12H14"/>
+  <path class="cls-1" d="M30,32l-6-16-6,16M28,27h-8"/>
+  <circle class="cls-4" cx="11" cy="36" r="2"/>
+  <circle class="cls-4" cx="11" cy="28" r="2"/>
+  <circle class="cls-4" cx="11" cy="20" r="2"/>
+  <circle class="cls-4" cx="11" cy="12" r="2"/>
+</svg>

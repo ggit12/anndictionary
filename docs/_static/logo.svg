@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 69.4 59.9">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: none;
+        stroke: #3776ab;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        stroke-width: 3px;
+      }
+
+      .cls-2, .cls-3, .cls-4, .cls-5 {
+        stroke-width: 0px;
+      }
+
+      .cls-2, .cls-6 {
+        fill: #3776ab;
+      }
+
+      .cls-3 {
+        fill: #646464;
+      }
+
+      .cls-4 {
+        fill: #ffd43b;
+      }
+
+      .cls-7 {
+        fill: #000;
+        stroke: #eee;
+      }
+
+      .cls-5 {
+        fill: #fff;
+      }
+
+      .cls-6 {
+        font-family: ArialRoundedMTBold, 'Arial Rounded MT Bold';
+        font-size: 10px;
+      }
+    </style>
+  </defs>
+  <circle class="cls-2" cx="34.7" cy="24" r="24"/>
+  <path class="cls-4" d="M48.7,40V8h-28v32h28Z"/>
+  <path class="cls-3" d="M48.7,40V8h-4v32h4Z"/>
+  <path class="cls-5" d="M44.7,40h-24V8h24v32Z"/>
+  <path class="cls-7" d="M44.7,36h-20M44.7,32h-20M44.7,28h-20M44.7,24h-20M44.7,20h-20M44.7,16h-20M44.7,12h-20"/>
+  <path class="cls-1" d="M40.7,32l-6-16-6,16M38.7,27h-8"/>
+  <circle class="cls-4" cx="21.7" cy="36" r="2"/>
+  <circle class="cls-4" cx="21.7" cy="28" r="2"/>
+  <circle class="cls-4" cx="21.7" cy="20" r="2"/>
+  <circle class="cls-4" cx="21.7" cy="12" r="2"/>
+  <text class="cls-6" transform="translate(0 57.8)"><tspan x="0" y="0">AnnDictionary</tspan></text>
+</svg>

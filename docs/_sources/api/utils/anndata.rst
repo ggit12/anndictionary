@@ -40,3 +40,10 @@ Convert column dtypes
    convert_obs_col_to_category
    convert_obs_col_to_string
    convert_obs_index_to_str
+
+Filter a list of genes based on their presence in ``adata.var.index``
+------------------------------------------------------------------
+.. autosummary::
+   :toctree: generated
+
+   filter_gene_list
