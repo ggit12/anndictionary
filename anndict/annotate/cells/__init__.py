@@ -12,7 +12,7 @@ from .de_novo import (
     ai_annotate_from_expected_cell_types,
     ai_annotate_cell_type_by_comparison_adata_dict,
     ai_annotate_cell_sub_type,
-    ai_annotate_biological_process,
+    ai_biological_process, ai_annotate_biological_process,
     cell_type_marker_gene_score,
     ai_determine_leiden_resolution
 )
@@ -56,6 +56,7 @@ __all__ = [
     "ai_annotate_cell_sub_type",
 
     # annotate_biological_process.py
+    "ai_biological_process",
     "ai_annotate_biological_process",
 
     # cell_type_score.py

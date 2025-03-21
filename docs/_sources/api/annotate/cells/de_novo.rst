@@ -1,7 +1,7 @@
 De Novo
 ========
 
-.. automodule:: anndict.annotate
+.. automodule:: anndict.annotate.cells.de_novo
    :noindex:
 
 Annotation by marker genes
@@ -75,6 +75,7 @@ Annotate groups of cells by Biological Process
 .. autosummary::
    :toctree: generated
 
+   ai_biological_process
    ai_annotate_biological_process
 
 

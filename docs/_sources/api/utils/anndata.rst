@@ -42,7 +42,7 @@ Convert column dtypes
    convert_obs_index_to_str
 
 Filter a list of genes based on their presence in ``adata.var.index``
-------------------------------------------------------------------
+-----------------------------------------------------------------------
 .. autosummary::
    :toctree: generated
 

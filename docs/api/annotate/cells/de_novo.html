@@ -11,10 +11,10 @@
 <meta property="og:type" content="website" />
 <meta property="og:url" content="api/annotate/cells/de_novo.html" />
 <meta property="og:site_name" content="AnnDictionary" />
-<meta property="og:description" content="This subpackage contains functions to annotate and assess cell and gene annotation. Annotation by marker genes: This module handles LLM querying to annotate cell types in the context of all other c..." />
+<meta property="og:description" content="This subpackage contains functions to annotate cells de novo (from scratch), based on marker genes. Generally in this subpackage, you will find a function named ai_annotate_blank that takes an AnnD..." />
 <meta property="og:image" content="_static/logo.png" />
 <meta property="og:image:alt" content="AnnDictionary" />
-<meta name="description" content="This subpackage contains functions to annotate and assess cell and gene annotation. Annotation by marker genes: This module handles LLM querying to annotate cell types in the context of all other c..." />
+<meta name="description" content="This subpackage contains functions to annotate cells de novo (from scratch), based on marker genes. Generally in this subpackage, you will find a function named ai_annotate_blank that takes an AnnD..." />
 
     <title>De Novo &#8212; AnnDictionary Documentation</title>
   
@@ -40,9 +40,9 @@
 
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/sphinx-book-theme.css?v=a3416100" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css?v=be8a1c11" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/plot_directive.css?v=7f9a90b1" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/plot_directive.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.min.css?v=95c83b7e" />
   
   <!-- So that users can add custom icons -->
@@ -570,7 +570,11 @@
                   
   <section id="de-novo">
 <h1>De Novo<a class="headerlink" href="#de-novo" title="Link to this heading">#</a></h1>
-<p>This subpackage contains functions to annotate and assess cell and gene annotation.</p>
+<p>This subpackage contains functions to annotate cells de novo (from scratch), based on marker genes.</p>
+<p>Generally in this subpackage, you will find a function named <code class="docutils literal notranslate"><span class="pre">ai_annotate_blank</span></code> that
+takes an <code class="xref py py-class docutils literal notranslate"><span class="pre">AnnData</span></code> object, and internally calls <code class="docutils literal notranslate"><span class="pre">ai_blank</span></code>, a function that takes a gene list.</p>
+<p>For convenience, we provide documentation for both forms of the function in case you want to use an <code class="xref py py-class docutils literal notranslate"><span class="pre">AnnData</span></code> object as input,
+or directly pass lists of genes for flexibility/customization of inputs.</p>
 <section id="annotation-by-marker-genes">
 <h2>Annotation by marker genes<a class="headerlink" href="#annotation-by-marker-genes" title="Link to this heading">#</a></h2>
 <p>This module handles LLM querying to annotate cell types in the context of all other cells, based on marker genes alone.</p>
@@ -639,7 +643,10 @@ Can pass cell type information if looking for subtypes with <code class="docutil
 <p>This module annotates groups of cells with a biological process, based on the group’s enriched genes</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/anndict.annotate.ai_annotate_biological_process.html#anndict.annotate.ai_annotate_biological_process" title="anndict.annotate.ai_annotate_biological_process"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ai_annotate_biological_process</span></code></a>(adata, ...[, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/anndict.annotate.ai_biological_process.html#anndict.annotate.ai_biological_process" title="anndict.annotate.ai_biological_process"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ai_biological_process</span></code></a>(gene_list)</p></td>
+<td><p>Describes the most prominent biological process represented by a list of genes using an LLM.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/anndict.annotate.ai_annotate_biological_process.html#anndict.annotate.ai_annotate_biological_process" title="anndict.annotate.ai_annotate_biological_process"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ai_annotate_biological_process</span></code></a>(adata, ...[, ...])</p></td>
 <td><p>Annotate biological processes based on the top n marker genes for each cluster.</p></td>
 </tr>
 </tbody>

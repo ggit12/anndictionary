@@ -1,5 +1,11 @@
 """
 This subpackage contains functions to annotate cells de novo (from scratch), based on marker genes.
+
+Generally in this subpackage, you will find a function named ``ai_annotate_blank`` that 
+takes an :class:`AnnData` object, and internally calls ``ai_blank``, a function that takes a gene list.
+
+For convenience, we provide documentation for both forms of the function in case you want to use an :class:`AnnData` object as input, 
+or directly pass lists of genes for flexibility/customization of inputs.
 """
 
 #the base ai_annotate functions
@@ -35,6 +41,7 @@ from .annotate_cell_subtype import (
 
 #annotate groups of cells with biological process (and not cell type)
 from .annotate_biological_process import (
+    ai_biological_process,
     ai_annotate_biological_process,
 )
 
@@ -70,6 +77,7 @@ __all__ = [
     "ai_annotate_cell_sub_type",
 
     # annotate_biological_process.py
+    "ai_biological_process",
     "ai_annotate_biological_process",
 
     # cell_type_score.py
