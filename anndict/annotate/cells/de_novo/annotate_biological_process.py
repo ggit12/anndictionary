@@ -11,7 +11,7 @@ from anndict.annotate.cells.de_novo.base import ai_annotate
 
 
 def ai_biological_process(gene_list: list[str]
-) -> dict:
+) -> str:
     """
     Describes the most prominent biological process represented by a list of genes using an LLM.
 
@@ -22,7 +22,7 @@ def ai_biological_process(gene_list: list[str]
 
     Returns
     ---------
-        A :class:`dictionary` containing the description of the biological process.
+    The biological process annotation of ``gene_list``.
     """
     if not gene_list:
         raise ValueError("Empty gene list passed to ai_biological_process")
