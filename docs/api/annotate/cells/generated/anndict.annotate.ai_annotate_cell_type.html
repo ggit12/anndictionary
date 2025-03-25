@@ -38,9 +38,9 @@
 
     <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/styles/sphinx-book-theme.css?v=a3416100" />
-    <link rel="stylesheet" type="text/css" href="../../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css?v=be8a1c11" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../../../../_static/plot_directive.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/plot_directive.css?v=7f9a90b1" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/sphinx-design.min.css?v=95c83b7e" />
   
   <!-- So that users can add custom icons -->
@@ -564,11 +564,11 @@
 <h1>anndict.annotate.ai_annotate_cell_type<a class="headerlink" href="#anndict-annotate-ai-annotate-cell-type" title="Link to this heading">#</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="anndict.annotate.ai_annotate_cell_type">
-<span class="sig-prename descclassname"><span class="pre">anndict.annotate.</span></span><span class="sig-name descname"><span class="pre">ai_annotate_cell_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">groupby</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_top_genes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_label_column</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ai_cell_type'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tissue_of_origin_col</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/ggit12/anndictionary/tree/main/anndict/annotate/cells/de_novo/annotate_cell_type.py#L62-L108"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.annotate.ai_annotate_cell_type" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">anndict.annotate.</span></span><span class="sig-name descname"><span class="pre">ai_annotate_cell_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">groupby</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_top_genes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_label_column</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ai_cell_type'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tissue_of_origin_col</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/ggit12/anndictionary/tree/main/anndict/annotate/cells/de_novo/annotate_cell_type.py#L62-L112"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.annotate.ai_annotate_cell_type" title="Link to this definition">#</a></dt>
 <dd><p>Annotate cell types based on the top marker genes for each cluster.</p>
 <p>This function performs differential expression analysis to identify marker genes for each cluster
 and applies ai_annotate_cell_type to determine the cell type for each cluster based on the top
-marker genes. The results are added to the AnnData object and returned as a DataFrame.</p>
+marker genes. The results are added to <code class="docutils literal notranslate"><span class="pre">adata</span></code> and returned as a <code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">

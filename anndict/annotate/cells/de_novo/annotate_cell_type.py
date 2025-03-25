@@ -70,19 +70,23 @@ def ai_annotate_cell_type(adata: AnnData,
 
     This function performs differential expression analysis to identify marker genes for each cluster
     and applies ai_annotate_cell_type to determine the cell type for each cluster based on the top 
-    marker genes. The results are added to the AnnData object and returned as a DataFrame.
+    marker genes. The results are added to ``adata`` and returned as a :class:`DataFrame`.
 
     Parameters
     ----------
     adata
         Column in adata.obs to group by for differential expression analysis.
+
     groupby
         Column in adata.obs to group by for differential expression analysis.
+
     n_top_genes
         The number of top marker genes to consider for each cluster.
+
     new_label_column
         The name of the new column in adata.obs where the cell type annotations will be stored.
         Default: 'ai_cell_type'
+
     tissue_of_origin_col
         Missing description for this parameter.
         Default: None

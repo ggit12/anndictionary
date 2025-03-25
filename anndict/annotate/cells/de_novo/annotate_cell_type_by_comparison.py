@@ -16,7 +16,7 @@ def ai_cell_types_by_comparison(
     subtype: bool = False
 ) -> list[str]:
     """
-    Returns cell type labels for multiple lists of marker genes as determined by an LLM.
+    Returns cell type labels for multiple lists of marker genes (in the context of each other) as determined by an LLM.
 
     Parameters
     -------------
@@ -120,10 +120,8 @@ def ai_annotate_cell_type_by_comparison(
     **kwargs
 ) -> AnnData:
     """
-    Annotate cell types by comparison using LLMs.
-
-    This function wraps the ai_annotate function to perform cell type annotation
-    based on comparison of gene expression profiles.
+    Uses an LLM to annotate cell types based on their enriched genes, 
+    by considering each gene set in the context of the other sets of genes.
 
     Parameters
     -------------

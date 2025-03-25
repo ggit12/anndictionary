@@ -21,7 +21,8 @@ def ai_from_expected_cell_types(
     subtype: bool = False
 ) -> list[str]:
     """
-    Returns cell type labels for multiple lists of marker genes as determined by an LLM.
+    Returns cell type labels for multiple lists of marker genes. 
+    The output cell type labels are drawn from an input list of expected cell types, ``expected_cell_types``.
 
     Parameters
     -------------
@@ -163,10 +164,8 @@ def ai_annotate_from_expected_cell_types(
     **kwargs
 ) -> AnnData:
     """
-    Annotate cell types by comparison using LLMs.
-
-    This function wraps the ai_annotate function to perform cell type annotation
-    based on comparison of gene expression profiles.
+    Annotate cell types based on the top differentially expressed genes in each cluster.
+    The output cell type labels are drawn from a list of expected cell types, ``expected_cell_types``.
 
     Parameters
     -------------

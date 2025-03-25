@@ -599,10 +599,10 @@ or directly pass lists of genes for flexibility/customization of inputs.</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/anndict.annotate.ai_cell_types_by_comparison.html#anndict.annotate.ai_cell_types_by_comparison" title="anndict.annotate.ai_cell_types_by_comparison"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ai_cell_types_by_comparison</span></code></a>(gene_lists[, ...])</p></td>
-<td><p>Returns cell type labels for multiple lists of marker genes as determined by an LLM.</p></td>
+<td><p>Returns cell type labels for multiple lists of marker genes (in the context of each other) as determined by an LLM.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/anndict.annotate.ai_annotate_cell_type_by_comparison.html#anndict.annotate.ai_annotate_cell_type_by_comparison" title="anndict.annotate.ai_annotate_cell_type_by_comparison"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ai_annotate_cell_type_by_comparison</span></code></a>(adata, ...)</p></td>
-<td><p>Annotate cell types by comparison using LLMs.</p></td>
+<td><p>Uses an LLM to annotate cell types based on their enriched genes, by considering each gene set in the context of the other sets of genes.</p></td>
 </tr>
 </tbody>
 </table>
@@ -617,10 +617,10 @@ Can pass cell type information if looking for subtypes with <code class="docutil
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/anndict.annotate.ai_from_expected_cell_types.html#anndict.annotate.ai_from_expected_cell_types" title="anndict.annotate.ai_from_expected_cell_types"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ai_from_expected_cell_types</span></code></a>(gene_lists[, ...])</p></td>
-<td><p>Returns cell type labels for multiple lists of marker genes as determined by an LLM.</p></td>
+<td><p>Returns cell type labels for multiple lists of marker genes.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/anndict.annotate.ai_annotate_from_expected_cell_types.html#anndict.annotate.ai_annotate_from_expected_cell_types" title="anndict.annotate.ai_annotate_from_expected_cell_types"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ai_annotate_from_expected_cell_types</span></code></a>(adata, ...)</p></td>
-<td><p>Annotate cell types by comparison using LLMs.</p></td>
+<td><p>Annotate cell types based on the top differentially expressed genes in each cluster.</p></td>
 </tr>
 </tbody>
 </table>
