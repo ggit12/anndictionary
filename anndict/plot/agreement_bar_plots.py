@@ -262,7 +262,7 @@ def plot_model_agreement_categorical(
 
     Parameters
     ------------
-    adat 
+    adata
         An :class:`AnnData`.
 
     group_by
@@ -290,7 +290,7 @@ def plot_model_agreement_categorical(
     ---------
 
     .. code-block:: python
-    
+
         import anndict as adt
         adt.plot_model_agreement_categorical(adata, 'cell_type', 'tissue', ['agreement_of_manual_with_model1', 'agreement_of_manual_with_model2'], granularity=0)
     """
@@ -333,11 +333,18 @@ def plot_model_agreement_categorical(
         counts = melted.groupby(['model_name', 'agreement']).size().reset_index(name='count')
         total_counts = counts.groupby('model_name')['count'].transform('sum')
         counts['proportion'] = counts['count'] / total_counts
-
-        # Sort models based on total proportion of highest agreement category
-        highest_agreement = counts.groupby('model_name')['proportion'].max().reset_index()
-        sorted_models = highest_agreement.sort_values('proportion', ascending=False)['model_name']
+        
+        # Identify the highest agreement category
+        # Use the first category from the reversed categories (which should be the highest)
+        highest_agreement_category = reversed_categories[0]
+        
+        # Sort models based on their proportion in the highest agreement category
+        highest_agreement_df = counts[counts["agreement"] == highest_agreement_category].copy()
+        sorted_models = highest_agreement_df.sort_values("proportion", ascending=False)["model_name"]
+        
+        # Convert model_name to categorical with specific order
         counts['model_name'] = pd.Categorical(counts['model_name'], categories=sorted_models, ordered=True)
+
 
         # Plot grouped bar chart
         fig, ax = plt.subplots(figsize=(14, 8))
@@ -380,6 +387,14 @@ def plot_model_agreement_categorical(
         total_counts = counts.groupby([group_by, 'model_name'])['count'].transform('sum')
         counts['proportion'] = counts['count'] / total_counts
 
+        # Identify the highest agreement category (same as in granularity==0)
+        highest_agreement_category = reversed_categories[0]
+        
+        # Sort models based on their proportion in the highest agreement category
+        highest_agreement_df = counts[counts["agreement"] == highest_agreement_category].copy()
+        sorted_models = highest_agreement_df.groupby('model_name')['proportion'].mean().reset_index()
+        sorted_models = sorted_models.sort_values("proportion", ascending=False)["model_name"]
+        
         # Sort 'group_by' categories based on total proportion
         total_per_group = counts.groupby(group_by)['proportion'].sum().reset_index()
         sorted_groups = total_per_group.sort_values('proportion', ascending=False)[group_by]
