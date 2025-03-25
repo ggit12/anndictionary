@@ -115,3 +115,38 @@ class GoogleGenAILLMInitializer(BaseLLMInitializer):
         constructor_args["rate_limiter"] = rate_limiter
 
         return constructor_args, {}
+
+class OpenAILLMInitializer(BaseLLMInitializer):
+    """Initialization logic for OpenAI"""
+
+
+    MODELS_WITHOUT_SYSTEM_MESSAGES = {
+        "o1-mini-2024-09-12",
+    }
+
+    MODELS_WITHOUT_TEMPERATURE = {
+        "o1-mini-2024-09-12",
+        "o3-mini-2025-01-31",
+    }
+
+    def initialize(
+        self, constructor_args: dict[str, Any], **kwargs
+    ) -> tuple[dict[str, Any], dict[str, Any]]:
+        model_id = os.environ.get("LLM_MODEL")
+
+        if "o1" in model_id or "o3" in model_id:
+            raise ValueError("o-series reasoning models not yet supported in AnnDictionary. Coming Soon.")
+        # TODO: Uncomment this because OpenAI has deprecated "max_tokens" in favor of "max_completion_tokens"... will do when support is added for o-series models
+        # if "max_tokens" in kwargs:
+        #     constructor_args["max_completion_tokens"] = kwargs.pop("max_tokens")
+        # if model_id in self.MODELS_WITHOUT_TEMPERATURE:
+        #     kwargs.pop("temperature")
+
+        kwargs["supports_system_messages"] = (
+            model_id not in self.MODELS_WITHOUT_SYSTEM_MESSAGES
+        )
+
+        rate_limiter = self.create_rate_limiter(constructor_args)
+        constructor_args["rate_limiter"] = rate_limiter
+
+        return constructor_args, kwargs

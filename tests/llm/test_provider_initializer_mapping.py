@@ -8,6 +8,7 @@ from anndict.llm.custom_llm_initalizers import (
     BedrockLLMInitializer,
     AzureMLLLMInitializer,
     GoogleGenAILLMInitializer,
+    OpenAILLMInitializer,
 )
 
 def test_get_providers_returns_expected_providers():
@@ -53,10 +54,16 @@ def test_specific_provider_configurations():
     assert azure_config.module_path == "langchain_community.chat_models.azureml_endpoint"
     assert azure_config.init_class == AzureMLLLMInitializer
 
+    # Test OpenAI configuration
+    openai_config = providers["openai"]
+    assert openai_config.class_name == "ChatOpenAI"
+    assert openai_config.module_path == "langchain_openai.chat_models"
+    assert openai_config.init_class == OpenAILLMInitializer
+
 def test_default_initializer_providers():
     """Test that standard providers use DefaultLLMInitializer"""
     providers = LLMProviders.get_providers()
-    default_providers = ["openai", "anthropic", "cohere", "huggingface", "vertexai", "ollama", "azure_openai"]
+    default_providers = ["anthropic", "cohere", "huggingface", "vertexai", "ollama", "azure_openai"]
 
     for provider in default_providers:
         assert providers[provider].init_class == DefaultLLMInitializer, f"{provider} should use DefaultLLMInitializer"

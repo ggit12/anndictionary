@@ -10,6 +10,7 @@ from .custom_llm_initalizers import (  # type: ignore
     BedrockLLMInitializer,
     AzureMLLLMInitializer,
     GoogleGenAILLMInitializer,
+    OpenAILLMInitializer,
 )
 
 
@@ -35,7 +36,7 @@ class LLMProviders:
             "openai": LLMProviderConfig(
                 class_name="ChatOpenAI",
                 module_path="langchain_openai.chat_models",
-                init_class=DefaultLLMInitializer,
+                init_class=OpenAILLMInitializer,
             ),
             "anthropic": LLMProviderConfig(
                 class_name="ChatAnthropic",
