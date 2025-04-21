@@ -147,6 +147,12 @@ def ai_compare_cell_type_labels_pairwise(
     and values as DataFrames with the comparison results.
     """
 
+    # Validate that cols1 and cols2 are not empty
+    if not cols1:
+        raise ValueError("``cols1`` is an empty list.")
+    if not cols2:
+        raise ValueError("``cols2`` is an empty list.")
+
     # Call create_label_df to generate the label combinations DataFrame
     label_combinations = create_label_df(adata, cols1, cols2)
 

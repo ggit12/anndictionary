@@ -5,6 +5,7 @@ unit tests for anndict.annotate.cells.benchmarking.ai_compare_cell_type_labels
 from unittest.mock import patch
 
 import pandas as pd
+import pytest
 
 from anndict.llm import configure_llm_backend
 from anndict.annotate.cells.benchmarking.ai_compare_cell_type_labels import (
@@ -152,3 +153,33 @@ def test_ai_compare_cell_type_labels_pairwise(simple_adata_with_many_obs_labels)
         assert df2.shape == (2, 4)
         assert df2.iloc[0].tolist() == ["T", "naive", "no", 0]
         assert df2.iloc[1].tolist() == ["B", "memory", "yes", 1]
+
+def test_ai_compare_cell_type_labels_pairwise_empty_cols2(simple_adata_with_many_obs_labels):
+    """Test the pairwise comparison of cell type labels with empty cols2"""
+
+    with patch("anndict.llm.llm_manager.LLMManager.call_llm") as mock_call_llm:
+        # Set up mock responses for call_llm calls
+        # We don't expect any calls since cols2 is empty
+        mock_call_llm.side_effect = []
+
+        # Configure LLM backend
+        configure_llm_backend(provider="openai", model="gpt-4", api_key="test-key")
+
+        # Test the comparison function with empty cols2
+         # Test empty cols1
+        with pytest.raises(ValueError, match="``cols1`` is an empty list."):
+            ai_compare_cell_type_labels_pairwise(
+                adata=simple_adata_with_many_obs_labels,
+                cols1=[],  # Empty list for cols1
+                cols2=["cell_type_2", "cell_type_3"],
+                comparison_level="binary",
+            )
+
+        # Test empty cols2
+        with pytest.raises(ValueError, match="``cols2`` is an empty list."):
+            ai_compare_cell_type_labels_pairwise(
+                adata=simple_adata_with_many_obs_labels,
+                cols1=["cell_type_1"],
+                cols2=[],  # Empty list for cols2
+                comparison_level="binary",
+            )
