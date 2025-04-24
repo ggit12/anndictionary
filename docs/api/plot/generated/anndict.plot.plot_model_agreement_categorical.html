@@ -38,9 +38,9 @@
 
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/sphinx-book-theme.css?v=a3416100" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css?v=be8a1c11" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/plot_directive.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/plot_directive.css?v=7f9a90b1" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.min.css?v=95c83b7e" />
   
   <!-- So that users can add custom icons -->
@@ -564,12 +564,12 @@
 <h1>anndict.plot.plot_model_agreement_categorical<a class="headerlink" href="#anndict-plot-plot-model-agreement-categorical" title="Link to this heading">#</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="anndict.plot.plot_model_agreement_categorical">
-<span class="sig-prename descclassname"><span class="pre">anndict.plot.</span></span><span class="sig-name descname"><span class="pre">plot_model_agreement_categorical</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group_by</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sub_group_by</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">agreement_cols</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">granularity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/ggit12/anndictionary/tree/main/anndict/plot/agreement_bar_plots.py#L253-L463"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.plot.plot_model_agreement_categorical" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">anndict.plot.</span></span><span class="sig-name descname"><span class="pre">plot_model_agreement_categorical</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group_by</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sub_group_by</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">agreement_cols</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">granularity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/ggit12/anndictionary/tree/main/anndict/plot/agreement_bar_plots.py#L253-L478"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.plot.plot_model_agreement_categorical" title="Link to this definition">#</a></dt>
 <dd><p>Plots the relative proportions of categories within specified model columns across varying levels of granularity.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>adat</strong></dt><dd><p>An <code class="xref py py-class docutils literal notranslate"><span class="pre">AnnData</span></code>.</p>
+<dt><strong>adata</strong> <span class="classifier"><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">AnnData</span></code></span></span></dt></dt><dd><p>An <code class="xref py py-class docutils literal notranslate"><span class="pre">AnnData</span></code>.</p>
 </dd>
 <dt><strong>group_by</strong> <span class="classifier"><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span></span></dt></dt><dd><p>key in <code class="docutils literal notranslate"><span class="pre">adata.obs</span></code> for the main grouping (e.g., <code class="docutils literal notranslate"><span class="pre">'cell_type'</span></code>).</p>
 </dd>
@@ -578,8 +578,6 @@
 <dt><strong>agreement_cols</strong> <span class="classifier"><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>]</span></span></dt></dt><dd><p>Column names specifying the agreement columns (e.g., <code class="docutils literal notranslate"><span class="pre">['categorical_agreement_of_manual_with_model1',</span> <span class="pre">'categorical_agreement_of_manual_with_model2']</span></code>). These should be categorical.</p>
 </dd>
 <dt><strong>granularity</strong> <span class="classifier"><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></span> (default: <code class="docutils literal notranslate"><span class="pre">2</span></code>)</span></dt></dt><dd><p>level of detail in the plot (<code class="docutils literal notranslate"><span class="pre">0</span></code> = models only, <code class="docutils literal notranslate"><span class="pre">1</span></code> = models within cell types, <code class="docutils literal notranslate"><span class="pre">2</span></code> = models within cell types and tissues).</p>
-</dd>
-<dt><strong>adata</strong> <span class="classifier"><em>AnnData</em></span></dt></dt><dd><p></p>
 </dd>
 </dl>
 </dd>
