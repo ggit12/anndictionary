@@ -101,7 +101,7 @@ def module_score_umap(adata: AnnData,
     score_cols: list[str],
     adt_key: tuple[str,...] | None = None,
     **kwargs
-) -> Figure:
+) -> tuple[Figure, np.ndarray[Axes]]:
     """
     Generates UMAP plots for specified module scores in a single figure.
 
@@ -171,4 +171,4 @@ def module_score_umap(adata: AnnData,
         ax.axis('off')
 
     plt.tight_layout()
-    return fig
+    return fig, axes

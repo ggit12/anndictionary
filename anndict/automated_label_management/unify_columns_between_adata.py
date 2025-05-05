@@ -42,7 +42,8 @@ def ai_unify_labels(
     Modifies each ``adata`` in ``adata_dict`` in-place by 
     adding ``adata.obs[new_label_column]`` with the unified label mapping.
     """
-    # todo: use adata_dict_fapply instead of loops
+    # TODO: port string normalization from ai_unify_labels to this function
+    # TODO: use adata_dict_fapply instead of loops
     def get_unique_labels_from_obs_column(adata, label_column):
         return adata.obs[label_column].unique().tolist()
 
