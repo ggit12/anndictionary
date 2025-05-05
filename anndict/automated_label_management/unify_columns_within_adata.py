@@ -19,7 +19,7 @@ from anndict.automated_label_management.clean_single_column.in_adata_obs import 
 
 def ensure_label_consistency_adata(
     adata: AnnData,
-    cols: list[str],
+    cols: str | list[str],
     simplification_level: str = 'unified, typo-fixed',
     new_col_prefix: str = 'consistent'
     ) -> dict:
@@ -62,6 +62,10 @@ def ensure_label_consistency_adata(
     :func:`krippendorff_alpha_adata`: To calculate Krippendorff's 
         Alpha, a measure of inter-rater reliability.
     """
+    # Step 0: make sure cols is a list
+    if isinstance(cols, str):
+        cols = [cols]
+
     # Step 1: Extract the relevant columns from adata.obs into a DataFrame
     df = adata.obs[cols].copy()
 

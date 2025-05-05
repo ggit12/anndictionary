@@ -180,9 +180,10 @@ def adata_with_umap():
 
 def test_module_score_umap_basic(adata_with_umap):
     """Test basic functionality with a single score."""
-    fig = module_score_umap(adata=adata_with_umap, score_cols=["score1"])
+    fig, axes = module_score_umap(adata=adata_with_umap, score_cols=["score1"])
 
     assert isinstance(fig, Figure)
+    assert isinstance(axes, np.ndarray)
 
     # For a single plot, we expect 2 axes (main plot + colorbar)
     assert len(fig.axes) == 2
@@ -201,9 +202,10 @@ def test_module_score_umap_basic(adata_with_umap):
 def test_module_score_umap_multiple_scores(adata_with_umap):
     """Test with multiple score columns."""
     score_cols = ["score1", "score2", "score3"]
-    fig = module_score_umap(adata=adata_with_umap, score_cols=score_cols)
+    fig, axes = module_score_umap(adata=adata_with_umap, score_cols=score_cols)
 
     assert isinstance(fig, Figure)
+    assert isinstance(axes, np.ndarray)
 
     # Calculate expected grid dimensions
     n_cols = int(np.ceil(np.sqrt(len(score_cols))))
@@ -240,9 +242,10 @@ def test_module_score_umap_grid_layout(adata_with_umap):
     """Test grid layout with different numbers of plots."""
     # Test with 4 scores (should create 2x2 grid)
     score_cols = ["score1", "score2", "score3", "score_with_underscore"]
-    fig = module_score_umap(adata=adata_with_umap, score_cols=score_cols)
+    fig, axes = module_score_umap(adata=adata_with_umap, score_cols=score_cols)
 
     assert isinstance(fig, Figure)
+    assert isinstance(axes, np.ndarray)
     # For 4 plots in a 2x2 grid, we expect 8 axes (4 main plots + 4 colorbars)
     assert len(fig.axes) == 8
 
@@ -267,7 +270,7 @@ def test_module_score_umap_with_adt_key(adata_with_umap, capsys):
 def test_module_score_umap_title_formatting(adata_with_umap):
     """Test title formatting for different score column names."""
     score_cols = ["score_with_underscore", "score1"]
-    fig = module_score_umap(adata=adata_with_umap, score_cols=score_cols)
+    fig, axes = module_score_umap(adata=adata_with_umap, score_cols=score_cols)
 
     # Filter to get only the main plot axes (those with titles)
     main_axes = [ax for ax in fig.axes if ax.get_title()]
@@ -280,11 +283,12 @@ def test_module_score_umap_title_formatting(adata_with_umap):
 
 def test_module_score_umap_extra_kwargs(adata_with_umap):
     """Test passing additional kwargs to sc.pl.umap."""
-    fig = module_score_umap(
+    fig, axes = module_score_umap(
         adata=adata_with_umap, score_cols=["score1"], frameon=False, vmax=0.5
     )
 
     assert isinstance(fig, Figure)
+    assert isinstance(axes, np.ndarray)
 
 
 def test_module_score_umap_input_validation():
