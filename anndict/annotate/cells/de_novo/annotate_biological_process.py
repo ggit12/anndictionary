@@ -67,9 +67,8 @@ def ai_annotate_biological_process(
     Annotate biological processes based on the top n marker genes for each cluster.
 
     This function performs differential expression analysis to identify marker genes 
-    for each cluster and applies a user-defined function to determine the biological 
-    processes for each cluster based on the top marker genes. The results are added 
-    to the AnnData object and returned as a DataFrame.
+    for each group in ``adata.obs[groupby]`` and labels the list of genes with the biological 
+    process it represents. The results are added to ``adata`` and returned as a :class:`DataFrame`.
 
     Parameters
     ------------
@@ -82,8 +81,8 @@ def ai_annotate_biological_process(
     n_top_genes
         The number of top marker genes to consider.
 
-    label_column
-        The name of the new column in ``adata.obs`` where the cell type annotations will be stored.
+    new_label_column
+        The name of the new column in ``adata.obs`` where the biological process annotations will be stored.
 
     Returns
     --------
@@ -102,8 +101,11 @@ def ai_annotate_biological_process(
         import anndict as adt
 
         # This will annotate the treatment group with biological processes based on the top 10 differentially expressed genes in each group
-        ai_annotate_biological_process(adata, groupby='treatment_vs_control',
+        adt.ai_annotate_biological_process(adata, groupby='treatment_vs_control',
             n_top_genes=10, new_label_column='ai_biological_process')
+
+        adata.obs['ai_biological_process']
+        >>> ['immune response', 'cell cycle regulation', ...]
 
     """
     return ai_annotate(func=ai_biological_process, adata=adata, groupby=groupby, n_top_genes=n_top_genes, new_label_column=new_label_column)

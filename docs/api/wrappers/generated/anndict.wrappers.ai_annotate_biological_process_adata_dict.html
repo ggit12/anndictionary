@@ -564,12 +564,11 @@
 <h1>anndict.wrappers.ai_annotate_biological_process_adata_dict<a class="headerlink" href="#anndict-wrappers-ai-annotate-biological-process-adata-dict" title="Link to this heading">#</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="anndict.wrappers.ai_annotate_biological_process_adata_dict">
-<span class="sig-prename descclassname"><span class="pre">anndict.wrappers.</span></span><span class="sig-name descname"><span class="pre">ai_annotate_biological_process_adata_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">groupby</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_top_genes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_label_column</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ai_biological_process'</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/ggit12/anndictionary/tree/main/anndict/annotate/cells/de_novo/annotate_biological_process.py#L60-L109"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.wrappers.ai_annotate_biological_process_adata_dict" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">anndict.wrappers.</span></span><span class="sig-name descname"><span class="pre">ai_annotate_biological_process_adata_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">groupby</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_top_genes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_label_column</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ai_biological_process'</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/ggit12/anndictionary/tree/main/anndict/annotate/cells/de_novo/annotate_biological_process.py#L60-L111"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.wrappers.ai_annotate_biological_process_adata_dict" title="Link to this definition">#</a></dt>
 <dd><p>Annotate biological processes based on the top n marker genes for each cluster.</p>
 <p>This function performs differential expression analysis to identify marker genes
-for each cluster and applies a user-defined function to determine the biological
-processes for each cluster based on the top marker genes. The results are added
-to the AnnData object and returned as a DataFrame.</p>
+for each group in <code class="docutils literal notranslate"><span class="pre">adata.obs[groupby]</span></code> and labels the list of genes with the biological
+process it represents. The results are added to <code class="docutils literal notranslate"><span class="pre">adata</span></code> and returned as a <code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
@@ -579,9 +578,7 @@ to the AnnData object and returned as a DataFrame.</p>
 </dd>
 <dt><strong>n_top_genes</strong> <span class="classifier"><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></span></span></dt></dt><dd><p>The number of top marker genes to consider.</p>
 </dd>
-<dt><strong>label_column</strong></dt><dd><p>The name of the new column in <code class="docutils literal notranslate"><span class="pre">adata.obs</span></code> where the cell type annotations will be stored.</p>
-</dd>
-<dt><strong>new_label_column</strong> <span class="classifier"><em>str</em></span></dt></dt><dd><p></p>
+<dt><strong>new_label_column</strong> <span class="classifier"><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span> (default: <code class="docutils literal notranslate"><span class="pre">'ai_biological_process'</span></code>)</span></dt></dt><dd><p>The name of the new column in <code class="docutils literal notranslate"><span class="pre">adata.obs</span></code> where the biological process annotations will be stored.</p>
 </dd>
 </dl>
 </dd>
@@ -599,8 +596,11 @@ in place, adding annotations to <code class="docutils literal notranslate"><span
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">anndict</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">adt</span>
 
 <span class="c1"># This will annotate the treatment group with biological processes based on the top 10 differentially expressed genes in each group</span>
-<span class="n">ai_annotate_biological_process</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">groupby</span><span class="o">=</span><span class="s1">&#39;treatment_vs_control&#39;</span><span class="p">,</span>
+<span class="n">adt</span><span class="o">.</span><span class="n">ai_annotate_biological_process</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">groupby</span><span class="o">=</span><span class="s1">&#39;treatment_vs_control&#39;</span><span class="p">,</span>
     <span class="n">n_top_genes</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">new_label_column</span><span class="o">=</span><span class="s1">&#39;ai_biological_process&#39;</span><span class="p">)</span>
+
+<span class="n">adata</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="s1">&#39;ai_biological_process&#39;</span><span class="p">]</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="p">[</span><span class="s1">&#39;immune response&#39;</span><span class="p">,</span> <span class="s1">&#39;cell cycle regulation&#39;</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span>
 </pre></div>
 </div>
 </dd></dl>
