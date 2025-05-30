@@ -10,6 +10,7 @@ AnnDictionary provides a suite of tools for annotating single-cell data and comp
 .. toctree::
    :maxdepth: 1
 
+   biological_process_annotation_with_an_LLM.ipynb
    automated_cell_type_marker_gene_scores.ipynb
    cell_type_annotation_with_an_LLM.ipynb
    cell_type_annotation_with_a_label_transfer_model.ipynb

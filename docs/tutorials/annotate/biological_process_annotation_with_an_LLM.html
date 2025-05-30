@@ -7,16 +7,16 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
-<meta property="og:title" content="Annotating with AnnDictionary" />
+<meta property="og:title" content="Annotating Gene Sets with Biological Processes Using an LLM" />
 <meta property="og:type" content="website" />
-<meta property="og:url" content="tutorials/annotate/index.html" />
+<meta property="og:url" content="tutorials/annotate/biological_process_annotation_with_an_LLM.html" />
 <meta property="og:site_name" content="AnnDictionary" />
-<meta property="og:description" content="AnnDictionary provides a suite of tools for annotating single-cell data and comparing the results. These notebooks demonstrate several of these tools. For the full list, see the documentation, incl..." />
+<meta property="og:description" content="This notebook shows how to use AnnDictionary’s functions to have LLMs label a set of genes based on the biological process that they may represent. To demonstrate this functionality, we’ll re-annot..." />
 <meta property="og:image" content="_static/logo.png" />
 <meta property="og:image:alt" content="AnnDictionary" />
-<meta name="description" content="AnnDictionary provides a suite of tools for annotating single-cell data and comparing the results. These notebooks demonstrate several of these tools. For the full list, see the documentation, incl..." />
+<meta name="description" content="This notebook shows how to use AnnDictionary’s functions to have LLMs label a set of genes based on the biological process that they may represent. To demonstrate this functionality, we’ll re-annot..." />
 
-    <title>Annotating with AnnDictionary &#8212; AnnDictionary Documentation</title>
+    <title>Annotating Gene Sets with Biological Processes Using an LLM &#8212; AnnDictionary Documentation</title>
   
   
   
@@ -58,13 +58,13 @@
     <script src="../../_static/copybutton.js?v=f281be69"></script>
     <script src="../../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
     <script src="../../_static/design-tabs.js?v=f930bc37"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'tutorials/annotate/index';</script>
-    <link rel="canonical" href="https://ggit12.github.io/anndictionary/tutorials/annotate/index.html" />
+    <script>DOCUMENTATION_OPTIONS.pagename = 'tutorials/annotate/biological_process_annotation_with_an_LLM';</script>
+    <link rel="canonical" href="https://ggit12.github.io/anndictionary/tutorials/annotate/biological_process_annotation_with_an_LLM.html" />
     <link rel="icon" href="../../_static/favicon.ico"/>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Annotating Gene Sets with Biological Processes Using an LLM" href="biological_process_annotation_with_an_LLM.html" />
-    <link rel="prev" title="Write and Read AdataDict" href="../adata_dict/Write_and_Read_an_AdataDict.html" />
+    <link rel="next" title="Automated Cell Type Marker Gene Scores" href="automated_cell_type_marker_gene_scores.html" />
+    <link rel="prev" title="Annotating with AnnDictionary" href="index.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="" />
@@ -380,8 +380,8 @@
 <li class="toctree-l3"><a class="reference internal" href="../adata_dict/Write_and_Read_an_AdataDict.html">Write and Read AdataDict</a></li>
 </ul>
 </details></li>
-<li class="toctree-l2 current active has-children"><a class="current reference internal" href="#">Annotating with AnnDictionary</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l3"><a class="reference internal" href="biological_process_annotation_with_an_LLM.html">Annotating Gene Sets with Biological Processes Using an LLM</a></li>
+<li class="toctree-l2 current active has-children"><a class="reference internal" href="index.html">Annotating with AnnDictionary</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l3 current active"><a class="current reference internal" href="#">Annotating Gene Sets with Biological Processes Using an LLM</a></li>
 <li class="toctree-l3"><a class="reference internal" href="automated_cell_type_marker_gene_scores.html">Automated Cell Type Marker Gene Scores</a></li>
 <li class="toctree-l3"><a class="reference internal" href="cell_type_annotation_with_an_LLM.html">Cell Type Annotation with Large Language Models (LLMs)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="cell_type_annotation_with_a_label_transfer_model.html">Transfer Labels Using an Sklearn Classifier</a></li>
@@ -465,7 +465,7 @@
       
       
       
-      <li><a href="../../_sources/tutorials/annotate/index.rst" target="_blank"
+      <li><a href="../../_sources/tutorials/annotate/biological_process_annotation_with_an_LLM.ipynb" target="_blank"
    class="btn btn-sm btn-download-source-button dropdown-item"
    title="Download source file"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -475,7 +475,7 @@
 <span class="btn__icon-container">
   <i class="fas fa-file"></i>
   </span>
-<span class="btn__text-container">.rst</span>
+<span class="btn__text-container">.ipynb</span>
 </a>
 </li>
       
@@ -528,7 +528,9 @@
 <button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
     <i class="fa-solid fa-magnifying-glass fa-lg"></i>
 </button>
-
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
 </div></div>
       
     </div>
@@ -539,11 +541,24 @@
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>Annotating with AnnDictionary</h1>
+    <h1>Annotating Gene Sets with Biological Processes Using an LLM</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
             
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#skip-the-tutorial">Skip the tutorial</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#to-annotate-a-list-of-genes">To annotate a list of genes:</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#to-annotate-the-results-of-rank-genes-groups-in-an-anndata-object">To annotate the results of rank_genes_groups in an AnnData object:</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#begin-the-tutorial">Begin the tutorial</a></li>
+</ul>
+            </nav>
         </div>
     </div>
 </div>
@@ -553,23 +568,132 @@
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="annotating-with-anndictionary">
-<h1>Annotating with AnnDictionary<a class="headerlink" href="#annotating-with-anndictionary" title="Link to this heading">#</a></h1>
-<p>AnnDictionary provides a suite of tools for annotating single-cell data and comparing the results. These notebooks demonstrate several of these tools. For the full list, see the documentation, including:</p>
-<ul class="simple">
-<li><p><a class="reference external" href="https://ggit12.github.io/anndictionary/api/annotate/cells/index.html">Annotate Cells</a></p></li>
-<li><p><a class="reference external" href="https://ggit12.github.io/anndictionary/api/annotate/genes/index.html">Annotate Genes</a></p></li>
-<li><p><a class="reference external" href="https://ggit12.github.io/anndictionary/api/plot/index.html">Plot</a></p></li>
-</ul>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="biological_process_annotation_with_an_LLM.html">Annotating Gene Sets with Biological Processes Using an LLM</a></li>
-<li class="toctree-l1"><a class="reference internal" href="automated_cell_type_marker_gene_scores.html">Automated Cell Type Marker Gene Scores</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cell_type_annotation_with_an_LLM.html">Cell Type Annotation with Large Language Models (LLMs)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="cell_type_annotation_with_a_label_transfer_model.html">Transfer Labels Using an Sklearn Classifier</a></li>
-<li class="toctree-l1"><a class="reference internal" href="automated_spatial_transcriptomic_annotation.html">Automated Annotation of Spatial Transcriptomics</a></li>
-</ul>
+  <section id="annotating-gene-sets-with-biological-processes-using-an-llm">
+<h1>Annotating Gene Sets with Biological Processes Using an LLM<a class="headerlink" href="#annotating-gene-sets-with-biological-processes-using-an-llm" title="Link to this heading">#</a></h1>
+<p>This notebook shows how to use AnnDictionary’s functions to have LLMs label a set of genes based on the biological process that they may represent. To demonstrate this functionality, we’ll re-annotate some known gene sets from GO Biological Process (GOBP)</p>
+<section id="skip-the-tutorial">
+<h2>Skip the tutorial<a class="headerlink" href="#skip-the-tutorial" title="Link to this heading">#</a></h2>
+<p>In case you want to skip the tutorial, here’s all the code you need to run this type of annotation.</p>
+<section id="to-annotate-a-list-of-genes">
+<h3>To annotate a list of genes:<a class="headerlink" href="#to-annotate-a-list-of-genes" title="Link to this heading">#</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">anndict</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">adt</span>
+<span class="n">gene_list</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;gene1&#39;</span><span class="p">,</span> <span class="s1">&#39;gene2&#39;</span><span class="p">,</span> <span class="s1">&#39;gene3&#39;</span><span class="p">]</span>
+<span class="n">annotation</span> <span class="o">=</span> <span class="n">adt</span><span class="o">.</span><span class="n">ai_biological_process</span><span class="p">(</span><span class="n">gene_list</span><span class="o">=</span><span class="n">gene_list</span><span class="p">)</span>
+</pre></div>
 </div>
+</section>
+<section id="to-annotate-the-results-of-rank-genes-groups-in-an-anndata-object">
+<h3>To annotate the results of rank_genes_groups in an AnnData object:<a class="headerlink" href="#to-annotate-the-results-of-rank-genes-groups-in-an-anndata-object" title="Link to this heading">#</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">anndict</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">adt</span>
+
+<span class="c1">#The results will be returned and also stored in `adata.obs[&#39;ai_biological_process&#39;]`.</span>
+<span class="n">annotation_df</span> <span class="o">=</span> <span class="n">adt</span><span class="o">.</span><span class="n">ai_annotate_biological_process</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">groupby</span><span class="o">=</span><span class="s1">&#39;disease vs. control&#39;</span><span class="p">,</span> <span class="n">n_top_genes</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">new_label_column</span><span class="o">=</span><span class="s1">&#39;ai_biological_process&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="begin-the-tutorial">
+<h2>Begin the tutorial<a class="headerlink" href="#begin-the-tutorial" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">anndict</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">adt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">gseapy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gp</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Configure LLM backend</span>
+<span class="n">adt</span><span class="o">.</span><span class="n">configure_llm_backend</span><span class="p">(</span><span class="n">provider</span><span class="o">=</span><span class="s1">&#39;anthropic&#39;</span><span class="p">,</span>
+                          <span class="n">model</span><span class="o">=</span><span class="s1">&#39;claude-3-5-sonnet-20240620&#39;</span><span class="p">,</span>
+                          <span class="n">api_key</span><span class="o">=</span><span class="s1">&#39;my-anthropic-api-key&#39;</span><span class="p">,</span>
+                          <span class="n">requests_per_minute</span><span class="o">=</span><span class="mi">100</span>
+                          <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>We’ll use <code class="docutils literal notranslate"><span class="pre">gseapy</span></code> to access the GOBP database, and re-annotate some gene lists of known process.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Download the latest Human GOBP gene set collection (2023 release on Enrichr)</span>
+<span class="n">gobp</span> <span class="o">=</span> <span class="n">gp</span><span class="o">.</span><span class="n">get_library</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;GO_Biological_Process_2023&quot;</span><span class="p">,</span> <span class="n">organism</span><span class="o">=</span><span class="s2">&quot;Human&quot;</span><span class="p">)</span>  <span class="c1"># dict: {term: [genes]}</span>
+
+<span class="c1"># Inspect how many gene sets were retrieved</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Total GOBP terms: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">gobp</span><span class="p">)</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Total GOBP terms: 5,406
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Grab any three terms</span>
+<span class="n">terms_of_interest</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">gobp</span><span class="o">.</span><span class="n">keys</span><span class="p">())[:</span><span class="mi">3</span><span class="p">]</span>
+
+<span class="c1"># Build a dictionary of the selected gene sets</span>
+<span class="n">selected_gene_sets</span> <span class="o">=</span> <span class="p">{</span><span class="n">term</span><span class="p">:</span> <span class="n">gobp</span><span class="p">[</span><span class="n">term</span><span class="p">]</span> <span class="k">for</span> <span class="n">term</span> <span class="ow">in</span> <span class="n">terms_of_interest</span><span class="p">}</span>
+
+<span class="c1"># Display the gene symbols for each selected term (truncate for readability)</span>
+<span class="k">for</span> <span class="n">term</span><span class="p">,</span> <span class="n">genes</span> <span class="ow">in</span> <span class="n">selected_gene_sets</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="si">{</span><span class="n">term</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">genes</span><span class="p">)</span><span class="si">}</span><span class="s2"> genes)&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">genes</span><span class="p">[:</span><span class="mi">15</span><span class="p">]),</span> <span class="s2">&quot;...&quot;</span><span class="p">)</span>       <span class="c1"># first 15 genes as a preview</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&#39;De Novo&#39; AMP Biosynthetic Process (GO:0044208) (6 genes)
+ATIC, PAICS, PFAS, ADSS1, ADSS2, GART ...
+
+&#39;De Novo&#39; Post-Translational Protein Folding (GO:0051084) (32 genes)
+SDF2L1, HSPA9, CCT2, HSPA6, ST13, ENTPD5, HSPA1L, HSPA5, PTGES3, HSPA8, HSPA7, DNAJB13, HSPA2, DNAJB14, HSPE1 ...
+
+2-Oxoglutarate Metabolic Process (GO:0006103) (14 genes)
+IDH1, PHYH, GOT2, MRPS36, GOT1, IDH2, ADHFE1, GPT2, TAT, DLST, OGDHL, L2HGDH, D2HGDH, OGDH ...
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Now, Let&#39;s annotate these known gene sets with an LLM</span>
+<span class="n">llm_annotation</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="k">for</span> <span class="n">term</span><span class="p">,</span> <span class="n">genes</span> <span class="ow">in</span> <span class="n">selected_gene_sets</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="n">llm_annotation</span><span class="p">[</span><span class="n">term</span><span class="p">]</span> <span class="o">=</span> <span class="n">adt</span><span class="o">.</span><span class="n">ai_biological_process</span><span class="p">(</span><span class="n">gene_list</span><span class="o">=</span><span class="n">genes</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/Users/geocr/repos-local/anndict/anndict/llm/base_llm_initializer.py:49: LangChainBetaWarning: Introduced in 0.2.24. API subject to change.
+  return InMemoryRateLimiter(
+/Users/geocr/repos-local/anndict/anndict/llm/llm_manager.py:309: LangChainDeprecationWarning: The method `BaseChatModel.__call__` was deprecated in langchain-core 0.1.7 and will be removed in 1.0. Use invoke instead.
+  response = llm(langchain_messages, **kwargs)
+</pre></div>
+</div>
+</div>
+</div>
+<p>Now, we can view the results. Here, the keys are the label of the pathway in GOBP, and the values are the LLM-derived label of the same pathway. These example results have remarkable agreement.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># And View the results</span>
+<span class="n">llm_annotation</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>{&quot;&#39;De Novo&#39; AMP Biosynthetic Process (GO:0044208)&quot;: &#39;Purine biosynthesis pathway&#39;,
+ &quot;&#39;De Novo&#39; Post-Translational Protein Folding (GO:0051084)&quot;: &#39;Protein folding and chaperone-mediated quality control.&#39;,
+ &#39;2-Oxoglutarate Metabolic Process (GO:0006103)&#39;: &#39;Mitochondrial tricarboxylic acid (TCA) cycle and related metabolic pathways.&#39;}
+</pre></div>
+</div>
+</div>
+</div>
+</section>
 </section>
 
 
@@ -583,6 +707,27 @@
             </div>
             
             
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#skip-the-tutorial">Skip the tutorial</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#to-annotate-a-list-of-genes">To annotate a list of genes:</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#to-annotate-the-results-of-rank-genes-groups-in-an-anndata-object">To annotate the results of rank_genes_groups in an AnnData object:</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#begin-the-tutorial">Begin the tutorial</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
               
             
           </div>
