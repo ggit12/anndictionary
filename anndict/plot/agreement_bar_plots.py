@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt
 
 from matplotlib.figure import Figure
 from matplotlib.axes import Axes
+from matplotlib.patches import Patch
 from seaborn.matrix import ClusterGrid
 from seaborn import FacetGrid
 from anndata import AnnData
@@ -70,7 +71,8 @@ def plot_model_agreement(
     group_by: str,
     sub_group_by: str,
     agreement_cols: list[str],
-    granularity: int = 2
+    granularity: int = 2,
+    legend: bool = False
 ) -> tuple[Figure, Axes] | ClusterGrid:
     """
     Plots the average values of specified agreement columns across varying levels of granularity. 
@@ -92,6 +94,9 @@ def plot_model_agreement(
 
     granularity
         Level of detail in the plot (``0`` = models only, ``1`` = models within cell types, ``2`` = models within cell types and tissues).
+
+    legend
+        If ``True`` and if ``granularity=2``, adds a legend for ``sub_group_by``.
 
     Returns
     --------
@@ -161,9 +166,8 @@ def plot_model_agreement(
             "#9467bd", "#c5b0d5", "#8c564b", "#c49c94",
             "#e377c2", "#f7b6d2", "#7f7f7f", "#c7c7c7",
             "#bcbd22", "#dbdb8d", "#17becf", "#9edae5",
-            "#7f9ec0", "#ffab60", "#5ab4ac",
-            # 5 additional concordant colors
-            "#8b4513", "#ff6347", "#4682b4", "#dda0dd", "#ffd700"
+            "#7f9ec0", "#ffab60", "#5ab4ac", "#8b4513",
+            "#ff6347", "#4682b4", "#dda0dd", "#ffd700"
         ]
 
         # Ensure that the number of tissues does not exceed the number of available colors
@@ -214,6 +218,18 @@ def plot_model_agreement(
         # Add vertical lines at color change positions
         for pos in color_changes:
             ax.axvline(pos, color='black', linewidth=0.5)
+
+        # Add a legend if requested
+        if legend:
+            handles = [Patch(facecolor=tissue_color_map[t], label=t) for t in tissues]
+            g.ax_col_dendrogram.legend(
+                handles=handles,
+                loc="upper center",
+                bbox_to_anchor=(0.5,1.15),
+                ncol=1,
+                fontsize='small',
+                frameon=False
+            )
 
         return g
 

@@ -7,6 +7,7 @@ unit tests for anndict.plot.agreement_bar_plots
 import pytest
 import numpy as np
 
+import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 from matplotlib.axes import Axes
 from seaborn.matrix import ClusterGrid
@@ -172,9 +173,13 @@ def test_plot_model_agreement_granularity_2(agreement_adata):
         sub_group_by="tissue",
         agreement_cols=agreement_cols,
         granularity=2,
+        legend=True
     )
 
     assert isinstance(result, (tuple, ClusterGrid))
+
+    #show the plot
+    plt.show()
 
 
 def test_plot_model_agreement_all_models(agreement_adata):
