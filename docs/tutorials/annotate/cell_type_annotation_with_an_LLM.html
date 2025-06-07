@@ -381,6 +381,7 @@
 </ul>
 </details></li>
 <li class="toctree-l2 current active has-children"><a class="reference internal" href="index.html">Annotating with AnnDictionary</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="biological_process_annotation_with_an_LLM.html">Annotating Gene Sets with Biological Processes Using an LLM</a></li>
 <li class="toctree-l3"><a class="reference internal" href="automated_cell_type_marker_gene_scores.html">Automated Cell Type Marker Gene Scores</a></li>
 <li class="toctree-l3 current active"><a class="current reference internal" href="#">Cell Type Annotation with Large Language Models (LLMs)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="cell_type_annotation_with_a_label_transfer_model.html">Transfer Labels Using an Sklearn Classifier</a></li>
@@ -934,7 +935,7 @@ Removed 8 genes from kidney. 60656 genes remaining.
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#View the results on a UMAP</span>
-<span class="n">adt</span><span class="o">.</span><span class="n">plot_umap_adata_dict</span><span class="p">(</span><span class="n">adata_dict</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;cell_type&#39;</span><span class="p">,</span> <span class="n">ai_label_column</span><span class="p">])</span>
+<span class="n">adt</span><span class="o">.</span><span class="n">wrappers</span><span class="o">.</span><span class="n">plot_umap_adata_dict</span><span class="p">(</span><span class="n">adata_dict</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;cell_type&#39;</span><span class="p">,</span> <span class="n">ai_label_column</span><span class="p">])</span>
 </pre></div>
 </div>
 </div>
