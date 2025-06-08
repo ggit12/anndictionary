@@ -2,7 +2,7 @@
 Main init for anndictionary.
 If on Mac, runs a multithreading configuration check before allowing import.
 """
-__version__ = "0.3.1.4.2"
+__version__ = "0.3.64"
 __author__ = "ggit12"
 
 import os
