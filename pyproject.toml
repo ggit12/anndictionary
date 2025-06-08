@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "anndict"
-version = "0.3.64"
+version = "0.3.65"
 description = "Conveniently process a dictionary of anndatas (adata_dict)"
 authors = [
     {name = "ggit12"}
