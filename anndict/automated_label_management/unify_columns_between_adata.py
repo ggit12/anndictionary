@@ -41,6 +41,42 @@ def ai_unify_labels(
     -------
     Modifies each ``adata`` in ``adata_dict`` in-place by 
     adding ``adata.obs[new_label_column]`` with the unified label mapping.
+
+    Example
+    ---------
+
+    .. code-block:: python
+
+        #import package
+        import anndict as adt
+
+        #configure LLM backend
+        configure_llm_backend('your-provider-name','your-provider-model-name',api_key='your-provider-api-key')
+        
+        #load the data as an AdataDict
+        adata_paths = ['path/to/adata1.h5ad', 'path/to/adata2.h5ad']
+        adata_dict = adt.read_adata_dict_from_h5ad(adata_paths)
+
+        #define the label columns for each adata
+        label_columns = {
+            ('adata1',): 'cell_type',
+            ('adata2',): 'cell_type_label', # this could be different in each adata
+        }
+        new_label_column = 'unified_cell_type'
+
+        #unify the labels across the adata
+        mapping_dict = adt.ai_unify_labels(
+            adata_dict,
+            label_columns=label_columns,
+            new_label_column=new_label_column,
+            simplification_level="unified, typo-fixed"
+        )
+
+        # Now each adata in adata_dict has a new column 'unified_cell_type'
+
+        # Write the adata_dict to disk (an adata_dict on disk is just a directory containing .h5ad files)
+        adt.write_adata_dict(adata_dict, 'path/to/unified_adata_dict/')
+
     """
     # TODO: port string normalization from ai_unify_labels to this function
     # TODO: use adata_dict_fapply instead of loops

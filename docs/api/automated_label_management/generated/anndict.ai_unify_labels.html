@@ -379,6 +379,7 @@
 </ul>
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../../tutorials/annotate/index.html">Annotating with AnnDictionary</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/annotate/biological_process_annotation_with_an_LLM.html">Annotating Gene Sets with Biological Processes Using an LLM</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../tutorials/annotate/automated_cell_type_marker_gene_scores.html">Automated Cell Type Marker Gene Scores</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../tutorials/annotate/cell_type_annotation_with_an_LLM.html">Cell Type Annotation with Large Language Models (LLMs)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../tutorials/annotate/cell_type_annotation_with_a_label_transfer_model.html">Transfer Labels Using an Sklearn Classifier</a></li>
@@ -564,7 +565,7 @@
 <h1>anndict.ai_unify_labels<a class="headerlink" href="#anndict-ai-unify-labels" title="Link to this heading">#</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="anndict.ai_unify_labels">
-<span class="sig-prename descclassname"><span class="pre">anndict.</span></span><span class="sig-name descname"><span class="pre">ai_unify_labels</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label_columns</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_label_column</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simplification_level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'unified,</span> <span class="pre">typo-fixed'</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/ggit12/anndictionary/tree/main/anndict/automated_label_management/unify_columns_between_adata.py#L9-L68"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.ai_unify_labels" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">anndict.</span></span><span class="sig-name descname"><span class="pre">ai_unify_labels</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label_columns</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_label_column</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simplification_level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'unified,</span> <span class="pre">typo-fixed'</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/ggit12/anndictionary/tree/main/anndict/automated_label_management/unify_columns_between_adata.py#L9-L104"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.ai_unify_labels" title="Link to this definition">#</a></dt>
 <dd><p>Unifies cell type labels across multiple AnnData objects
 by mapping them to a simplified, unified set of labels.</p>
 <dl class="field-list simple">
@@ -593,6 +594,38 @@ the values are the unified labels.</p>
 <p class="rubric">Notes</p>
 <p>Modifies each <code class="docutils literal notranslate"><span class="pre">adata</span></code> in <code class="docutils literal notranslate"><span class="pre">adata_dict</span></code> in-place by
 adding <code class="docutils literal notranslate"><span class="pre">adata.obs[new_label_column]</span></code> with the unified label mapping.</p>
+<p class="rubric">Example</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1">#import package</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">anndict</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">adt</span>
+
+<span class="c1">#configure LLM backend</span>
+<span class="n">configure_llm_backend</span><span class="p">(</span><span class="s1">&#39;your-provider-name&#39;</span><span class="p">,</span><span class="s1">&#39;your-provider-model-name&#39;</span><span class="p">,</span><span class="n">api_key</span><span class="o">=</span><span class="s1">&#39;your-provider-api-key&#39;</span><span class="p">)</span>
+
+<span class="c1">#load the data as an AdataDict</span>
+<span class="n">adata_paths</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;path/to/adata1.h5ad&#39;</span><span class="p">,</span> <span class="s1">&#39;path/to/adata2.h5ad&#39;</span><span class="p">]</span>
+<span class="n">adata_dict</span> <span class="o">=</span> <span class="n">adt</span><span class="o">.</span><span class="n">read_adata_dict_from_h5ad</span><span class="p">(</span><span class="n">adata_paths</span><span class="p">)</span>
+
+<span class="c1">#define the label columns for each adata</span>
+<span class="n">label_columns</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="p">(</span><span class="s1">&#39;adata1&#39;</span><span class="p">,):</span> <span class="s1">&#39;cell_type&#39;</span><span class="p">,</span>
+    <span class="p">(</span><span class="s1">&#39;adata2&#39;</span><span class="p">,):</span> <span class="s1">&#39;cell_type_label&#39;</span><span class="p">,</span> <span class="c1"># this could be different in each adata</span>
+<span class="p">}</span>
+<span class="n">new_label_column</span> <span class="o">=</span> <span class="s1">&#39;unified_cell_type&#39;</span>
+
+<span class="c1">#unify the labels across the adata</span>
+<span class="n">mapping_dict</span> <span class="o">=</span> <span class="n">adt</span><span class="o">.</span><span class="n">ai_unify_labels</span><span class="p">(</span>
+    <span class="n">adata_dict</span><span class="p">,</span>
+    <span class="n">label_columns</span><span class="o">=</span><span class="n">label_columns</span><span class="p">,</span>
+    <span class="n">new_label_column</span><span class="o">=</span><span class="n">new_label_column</span><span class="p">,</span>
+    <span class="n">simplification_level</span><span class="o">=</span><span class="s2">&quot;unified, typo-fixed&quot;</span>
+<span class="p">)</span>
+
+<span class="c1"># Now each adata in adata_dict has a new column &#39;unified_cell_type&#39;</span>
+
+<span class="c1"># Write the adata_dict to disk (an adata_dict on disk is just a directory containing .h5ad files)</span>
+<span class="n">adt</span><span class="o">.</span><span class="n">write_adata_dict</span><span class="p">(</span><span class="n">adata_dict</span><span class="p">,</span> <span class="s1">&#39;path/to/unified_adata_dict/&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
 </dd></dl>
 
 </section>
