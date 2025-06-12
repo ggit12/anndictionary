@@ -41,17 +41,13 @@ This package defines the class `AdataDict`, which is a dictionary of `anndata`. 
 
 The core syntax for iterating a function `func` over an `AdataDict` called `adata_dict` looks like this:
 
-    ```python
     adata_dict.fapply(func, **kwargs)
-    ```
 
 where `adata_dict`, `func`, and `**kwargs` are as defined above.
 
 `.fapply()` can also be called in a functional way using [`adata_dict_fapply()`](https://ggit12.github.io/anndictionary/api/adata_dict/generated/anndict.adata_dict.adata_dict_fapply.html#anndict.adata_dict.adata_dict_fapply):
 
-    ```python
     adata_dict_fapply(adata_dict, func, **kwargs)
-    ```
 
 In either case, `fapply()` works conceptually similar to `.map()` in python or `lapply()` in R. `fapply()` multithreads the iteration (multithreading can be turned off when needed), and uses smart argument broadcasting. This means that the value for any `**kwarg` can be either: 1) a single value to be used for all `anndata` in `adata_dict`, or 2) a `dictionary` with the same keys as `adata_dict`, and a separate value for each `anndata` in `adata_dict`.
 
