@@ -1,5 +1,4 @@
-# AnnDictionary
-A package for processing multiple `anndata` objects in parallel with LLMs
+<div align="center"><img src="docs/_static/logo.svg" alt="AnnDictionary Logo" width="300px" /><br>A package for processing <code>anndata</code> objects in parallel with LLMs</div>
 
 # Documentation
 
