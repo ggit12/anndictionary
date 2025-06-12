@@ -31,12 +31,12 @@ To get started, see [Tutorials](https://ggit12.github.io/anndictionary/tutorials
 # About
 `AnnDictionary` is a package that lets you process multiple `anndata` objects in parallel with a simplified interface (so that you can avoid writing a bunch of for loops). This is accomplished by a dictionary-based wrapping of `scanpy`. We used the package to benchmark cell type annotaiton by 15 LLMs and maintain leaderboard at: https://singlecellgpt.com/celltype-annotation-leaderboard/.
 
-### Use LLMs to simplify categorical label processing
+## Use LLMs to simplify categorical label processing
 We provide several LLM-based functions to handle tedious labeling tasks. These include cell type annotation based on differentially expressed genes with [`ai_annotate_cell_type()`](https://ggit12.github.io/anndictionary/api/annotate/cells/de_novo.html#annotation-by-marker-genes), and making cell type labels match across multiple anndatas with [Automated Label Management](https://ggit12.github.io/anndictionary/api/automated_label_management/index.html). There are also AI-based functions to [annotate gene sets with biological processes](https://ggit12.github.io/anndictionary/api/annotate/cells/de_novo.html#annotate-groups-of-cells-by-biological-process).
 
-This package supports many external LLM providers (including OpenAI, Anthropic, Google, and Bedrock). To use these, you'll need an API key. Directions on how to get an OpenAI API key can be found here: https://platform.openai.com/docs/quickstart/account-setup, and for Anthropic, here: https://docs.anthropic.com/en/api/getting-started.
+This package supports many external LLM providers (including OpenAI, Anthropic, Google, and Bedrock). To use LLM features, you'll need an API key. Directions on how to get an OpenAI API key can be found here: https://platform.openai.com/docs/quickstart/account-setup, and for Anthropic, here: https://docs.anthropic.com/en/api/getting-started.
 
-### Parallel processing of Anndatas
+## Parallel processing of Anndatas
 This package defines the class `AdataDict`, which is a dictionary of `anndata`s. There are several class methods to interact with `AdataDict`s and iterate over them, see [Docs](https://ggit12.github.io/anndictionary/api/adata_dict/adata_dict.html) and [Tutorials](https://ggit12.github.io/anndictionary/tutorials/adata_dict/index.html). Additional methods and attributes are passed through to each anndata in `AdataDict`.
 
 The core syntax for iterating a function `func` over an `AdataDict` called `adata_dict` looks like this:
