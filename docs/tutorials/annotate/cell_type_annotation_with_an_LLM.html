@@ -646,14 +646,14 @@
                           <span class="p">)</span>
 
 <span class="c1"># These are just the standard preprocessing steps (starting from raw counts)</span>
-<span class="n">adt</span><span class="o">.</span><span class="n">normalize_adata_dict</span><span class="p">(</span><span class="n">adata_dict</span><span class="p">)</span> <span class="c1"># Normalize</span>
-<span class="n">adt</span><span class="o">.</span><span class="n">log_transform_adata_dict</span><span class="p">(</span><span class="n">adata_dict</span><span class="p">)</span> <span class="c1"># Log</span>
-<span class="n">adt</span><span class="o">.</span><span class="n">set_high_variance_genes_adata_dict</span><span class="p">(</span><span class="n">adata_dict</span><span class="p">,</span> <span class="n">n_top_genes</span><span class="o">=</span><span class="mi">2000</span><span class="p">,</span> <span class="n">subset</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="c1"># Set highly variable genes</span>
-<span class="n">adt</span><span class="o">.</span><span class="n">scale_adata_dict</span><span class="p">(</span><span class="n">adata_dict</span><span class="p">)</span> <span class="c1"># Scale</span>
-<span class="n">adt</span><span class="o">.</span><span class="n">pca_adata_dict</span><span class="p">(</span><span class="n">adata_dict</span><span class="p">,</span> <span class="n">n_comps</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">mask_var</span><span class="o">=</span><span class="s1">&#39;highly_variable&#39;</span><span class="p">)</span> <span class="c1">#PCA</span>
-<span class="n">adt</span><span class="o">.</span><span class="n">neighbors_adata_dict</span><span class="p">(</span><span class="n">adata_dict</span><span class="p">)</span> <span class="c1"># Neighborhood graph</span>
-<span class="n">adt</span><span class="o">.</span><span class="n">calculate_umap_adata_dict</span><span class="p">(</span><span class="n">adata_dict</span><span class="p">)</span> <span class="c1"># UMAP</span>
-<span class="n">adt</span><span class="o">.</span><span class="n">leiden_adata_dict</span><span class="p">(</span><span class="n">adata_dict</span><span class="p">,</span> <span class="n">resolution</span><span class="o">=</span><span class="mf">0.4</span><span class="p">)</span> <span class="c1"># Cluster</span>
+<span class="n">adt</span><span class="o">.</span><span class="n">wrappers</span><span class="o">.</span><span class="n">normalize_adata_dict</span><span class="p">(</span><span class="n">adata_dict</span><span class="p">)</span> <span class="c1"># Normalize</span>
+<span class="n">adt</span><span class="o">.</span><span class="n">wrappers</span><span class="o">.</span><span class="n">log_transform_adata_dict</span><span class="p">(</span><span class="n">adata_dict</span><span class="p">)</span> <span class="c1"># Log</span>
+<span class="n">adt</span><span class="o">.</span><span class="n">wrappers</span><span class="o">.</span><span class="n">set_high_variance_genes_adata_dict</span><span class="p">(</span><span class="n">adata_dict</span><span class="p">,</span> <span class="n">n_top_genes</span><span class="o">=</span><span class="mi">2000</span><span class="p">,</span> <span class="n">subset</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="c1"># Set highly variable genes</span>
+<span class="n">adt</span><span class="o">.</span><span class="n">wrappers</span><span class="o">.</span><span class="n">scale_adata_dict</span><span class="p">(</span><span class="n">adata_dict</span><span class="p">)</span> <span class="c1"># Scale</span>
+<span class="n">adt</span><span class="o">.</span><span class="n">wrappers</span><span class="o">.</span><span class="n">pca_adata_dict</span><span class="p">(</span><span class="n">adata_dict</span><span class="p">,</span> <span class="n">n_comps</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">mask_var</span><span class="o">=</span><span class="s1">&#39;highly_variable&#39;</span><span class="p">)</span> <span class="c1">#PCA</span>
+<span class="n">adt</span><span class="o">.</span><span class="n">wrappers</span><span class="o">.</span><span class="n">neighbors_adata_dict</span><span class="p">(</span><span class="n">adata_dict</span><span class="p">)</span> <span class="c1"># Neighborhood graph</span>
+<span class="n">adt</span><span class="o">.</span><span class="n">wrappers</span><span class="o">.</span><span class="n">calculate_umap_adata_dict</span><span class="p">(</span><span class="n">adata_dict</span><span class="p">)</span> <span class="c1"># UMAP</span>
+<span class="n">adt</span><span class="o">.</span><span class="n">wrappers</span><span class="o">.</span><span class="n">leiden_adata_dict</span><span class="p">(</span><span class="n">adata_dict</span><span class="p">,</span> <span class="n">resolution</span><span class="o">=</span><span class="mf">0.4</span><span class="p">)</span> <span class="c1"># Cluster</span>
 
 <span class="c1"># Run differential expression analysis independently on each anndata in adata_dict</span>
 <span class="n">adt</span><span class="o">.</span><span class="n">wrappers</span><span class="o">.</span><span class="n">rank_genes_groups_adata_dict</span><span class="p">(</span><span class="n">adata_dict</span><span class="p">,</span> <span class="n">groupby</span><span class="o">=</span><span class="s1">&#39;leiden&#39;</span><span class="p">)</span>
@@ -838,25 +838,25 @@ Removed 8 genes from kidney. 60656 genes remaining.
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#Run leiden clustering on each adata independently</span>
 <span class="c1">#adata.X is raw counts, so run standard preprocessing</span>
 <span class="c1"># Normalize each AnnData in the dictionary</span>
-<span class="n">adt</span><span class="o">.</span><span class="n">normalize_adata_dict</span><span class="p">(</span><span class="n">adata_dict</span><span class="p">)</span>
+<span class="n">adt</span><span class="o">.</span><span class="n">wrappers</span><span class="o">.</span><span class="n">normalize_adata_dict</span><span class="p">(</span><span class="n">adata_dict</span><span class="p">)</span>
 
 <span class="c1"># Log transform each AnnData in the dictionary</span>
-<span class="n">adt</span><span class="o">.</span><span class="n">log_transform_adata_dict</span><span class="p">(</span><span class="n">adata_dict</span><span class="p">)</span>
+<span class="n">adt</span><span class="o">.</span><span class="n">wrappers</span><span class="o">.</span><span class="n">log_transform_adata_dict</span><span class="p">(</span><span class="n">adata_dict</span><span class="p">)</span>
 
 <span class="c1"># Optionally, you might subset the data to only high-variance genes</span>
-<span class="n">adt</span><span class="o">.</span><span class="n">set_high_variance_genes_adata_dict</span><span class="p">(</span><span class="n">adata_dict</span><span class="p">,</span> <span class="n">n_top_genes</span><span class="o">=</span><span class="mi">2000</span><span class="p">,</span> <span class="n">subset</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">adt</span><span class="o">.</span><span class="n">wrappers</span><span class="o">.</span><span class="n">set_high_variance_genes_adata_dict</span><span class="p">(</span><span class="n">adata_dict</span><span class="p">,</span> <span class="n">n_top_genes</span><span class="o">=</span><span class="mi">2000</span><span class="p">,</span> <span class="n">subset</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
 <span class="c1"># Scale each AnnData in the dictionary</span>
-<span class="n">adt</span><span class="o">.</span><span class="n">scale_adata_dict</span><span class="p">(</span><span class="n">adata_dict</span><span class="p">)</span>
+<span class="n">adt</span><span class="o">.</span><span class="n">wrappers</span><span class="o">.</span><span class="n">scale_adata_dict</span><span class="p">(</span><span class="n">adata_dict</span><span class="p">)</span>
 
 <span class="c1"># Perform PCA on each AnnData in the dictionary</span>
-<span class="n">adt</span><span class="o">.</span><span class="n">pca_adata_dict</span><span class="p">(</span><span class="n">adata_dict</span><span class="p">,</span> <span class="n">n_comps</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">mask_var</span><span class="o">=</span><span class="s1">&#39;highly_variable&#39;</span><span class="p">)</span>
+<span class="n">adt</span><span class="o">.</span><span class="n">wrappers</span><span class="o">.</span><span class="n">pca_adata_dict</span><span class="p">(</span><span class="n">adata_dict</span><span class="p">,</span> <span class="n">n_comps</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">mask_var</span><span class="o">=</span><span class="s1">&#39;highly_variable&#39;</span><span class="p">)</span>
 
 <span class="c1">#Calculate the neighborhood graph</span>
-<span class="n">adt</span><span class="o">.</span><span class="n">neighbors_adata_dict</span><span class="p">(</span><span class="n">adata_dict</span><span class="p">)</span>
+<span class="n">adt</span><span class="o">.</span><span class="n">wrappers</span><span class="o">.</span><span class="n">neighbors_adata_dict</span><span class="p">(</span><span class="n">adata_dict</span><span class="p">)</span>
 
 <span class="c1">#Calculate the UMAP</span>
-<span class="n">adt</span><span class="o">.</span><span class="n">calculate_umap_adata_dict</span><span class="p">(</span><span class="n">adata_dict</span><span class="p">)</span>
+<span class="n">adt</span><span class="o">.</span><span class="n">wrappers</span><span class="o">.</span><span class="n">calculate_umap_adata_dict</span><span class="p">(</span><span class="n">adata_dict</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -883,7 +883,7 @@ Removed 8 genes from kidney. 60656 genes remaining.
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#Determine appropriate cluster resolutions using AI. This function only works with LLMs that accept image inputs</span>
 <span class="c1">#This will leave the final column as &#39;leiden&#39; in the .obs of each anndata</span>
-<span class="c1"># appropriate_resolution_dict = adt.ai_determine_leiden_resolution_adata_dict(adata_dict, initial_resolution=0.5)</span>
+<span class="c1"># appropriate_resolution_dict = adt.wrappers.ai_determine_leiden_resolution_adata_dict(adata_dict, initial_resolution=0.5)</span>
 </pre></div>
 </div>
 </div>
@@ -892,10 +892,10 @@ Removed 8 genes from kidney. 60656 genes remaining.
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#recluster at 0.4 for this example</span>
 <span class="c1">#get leiden clusters</span>
-<span class="n">adt</span><span class="o">.</span><span class="n">leiden_adata_dict</span><span class="p">(</span><span class="n">adata_dict</span><span class="p">,</span> <span class="n">resolution</span><span class="o">=</span><span class="mf">0.4</span><span class="p">)</span>
+<span class="n">adt</span><span class="o">.</span><span class="n">wrappers</span><span class="o">.</span><span class="n">leiden_adata_dict</span><span class="p">(</span><span class="n">adata_dict</span><span class="p">,</span> <span class="n">resolution</span><span class="o">=</span><span class="mf">0.4</span><span class="p">)</span>
 
 <span class="c1"># could also do </span>
-<span class="c1"># adt.leiden_adata_dict(adata_dict, resolution=appropriate_resolution_dict)</span>
+<span class="c1"># adt.wrappers.leiden_adata_dict(adata_dict, resolution=appropriate_resolution_dict)</span>
 </pre></div>
 </div>
 </div>
@@ -903,7 +903,7 @@ Removed 8 genes from kidney. 60656 genes remaining.
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#Run differential expression analysis independently on each anndata in adata_dict</span>
-<span class="n">adt</span><span class="o">.</span><span class="n">rank_genes_groups_adata_dict</span><span class="p">(</span><span class="n">adata_dict</span><span class="p">,</span> <span class="n">groupby</span><span class="o">=</span><span class="s1">&#39;leiden&#39;</span><span class="p">)</span>
+<span class="n">adt</span><span class="o">.</span><span class="n">wrappers</span><span class="o">.</span><span class="n">rank_genes_groups_adata_dict</span><span class="p">(</span><span class="n">adata_dict</span><span class="p">,</span> <span class="n">groupby</span><span class="o">=</span><span class="s1">&#39;leiden&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -923,11 +923,11 @@ Removed 8 genes from kidney. 60656 genes remaining.
 <span class="c1"># Use the LLM to annotate celltypes based on the &#39;leiden&#39; column, pass tissue information from &#39;tissue&#39; column.</span>
 <span class="c1"># The column containing the new labels will be in adata.obs[label_column] for each adata in adata_dict</span>
 <span class="n">new_label_column</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">model</span><span class="si">}</span><span class="s1">_ai_cell_type&#39;</span>
-<span class="n">label_results</span> <span class="o">=</span> <span class="n">adt</span><span class="o">.</span><span class="n">ai_annotate_cell_type_adata_dict</span><span class="p">(</span><span class="n">adata_dict</span><span class="p">,</span> <span class="n">groupby</span><span class="o">=</span><span class="s1">&#39;leiden&#39;</span><span class="p">,</span> <span class="n">n_top_genes</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">new_label_column</span><span class="o">=</span><span class="n">new_label_column</span><span class="p">,</span> <span class="n">tissue_of_origin_col</span><span class="o">=</span><span class="s1">&#39;tissue&#39;</span><span class="p">)</span>
+<span class="n">label_results</span> <span class="o">=</span> <span class="n">adt</span><span class="o">.</span><span class="n">wrappers</span><span class="o">.</span><span class="n">ai_annotate_cell_type_adata_dict</span><span class="p">(</span><span class="n">adata_dict</span><span class="p">,</span> <span class="n">groupby</span><span class="o">=</span><span class="s1">&#39;leiden&#39;</span><span class="p">,</span> <span class="n">n_top_genes</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">new_label_column</span><span class="o">=</span><span class="n">new_label_column</span><span class="p">,</span> <span class="n">tissue_of_origin_col</span><span class="o">=</span><span class="s1">&#39;tissue&#39;</span><span class="p">)</span>
 
 <span class="c1">#These labels seem to have some redundancy, let&#39;s merge them with AI</span>
 <span class="n">ai_label_column</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">model</span><span class="si">}</span><span class="s1">_simplified_ai_cell_type&#39;</span>
-<span class="n">simplified_mappings</span> <span class="o">=</span> <span class="n">adt</span><span class="o">.</span><span class="n">simplify_obs_column_adata_dict</span><span class="p">(</span><span class="n">adata_dict</span><span class="p">,</span> <span class="n">new_label_column</span><span class="p">,</span> <span class="n">ai_label_column</span><span class="p">,</span> <span class="n">simplification_level</span><span class="o">=</span><span class="s1">&#39;redundancy-removed&#39;</span><span class="p">)</span>
+<span class="n">simplified_mappings</span> <span class="o">=</span> <span class="n">adt</span><span class="o">.</span><span class="n">wrappers</span><span class="o">.</span><span class="n">simplify_obs_column_adata_dict</span><span class="p">(</span><span class="n">adata_dict</span><span class="p">,</span> <span class="n">new_label_column</span><span class="p">,</span> <span class="n">ai_label_column</span><span class="p">,</span> <span class="n">simplification_level</span><span class="o">=</span><span class="s1">&#39;redundancy-removed&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
