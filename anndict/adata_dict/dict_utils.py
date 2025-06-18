@@ -4,36 +4,62 @@ Utility functions for dictionaries.
 
 def check_dict_structure(
     dict_1: dict,
-    dict_2: dict
+    dict_2: dict,
+    *,
+    full_depth: bool = False
 ) -> bool:
     """
-    Compare two nested dictionaries to see if their keys and nesting structure match.
+    If ``full_depth`` is ``False`` (default) check that ``dict_2`` contains at least
+    the same nested-key structure as ``dict_1`` (extra depth in ``dict_2``
+    is ignored).  
+    If ``full_depth`` is ``True``, require both dictionaries to match at every
+    level.
 
     Parameters
     ----------
-    dict_1 : dict
-        First dictionary to compare.
+    dict_1
+        Template dictionary (sets maximum depth when ``full_depth`` is False).
 
-    dict_2 : dict
-        Second dictionary to compare.
+    dict_2
+        Candidate dictionary to compare.
+
+    full_depth
+        If ``True``, check that both dictionaries have the same keys and nesting structure at every level.
+        If ``False``, check that ``dict_2`` has at least the same keys and nesting structure as ``dict_1``, ignoring extra depth in ``dict_2``.
 
     Returns
     -------
-    True if both dictionaries have the same keys and nesting structure, False otherwise.
+    ``True`` if both dictionaries have the same keys and nesting structure (ignoring extra depth in ``dict_2`` if ``full_depth`` is ``False``), ``False`` otherwise.
     """
-    def compare_nested_keys(d1, d2):
-        """Recursively compare keys in nested dictionaries, respecting nesting structure."""
-        for key in d1:
-            if key not in d2:
-                return False
-            if isinstance(d1[key], dict) and isinstance(d2[key], dict):
-                if not compare_nested_keys(d1[key], d2[key]):
+
+    if not (isinstance(dict_1, dict) and isinstance(dict_2, dict)):
+        return False
+
+    def _match(template: dict, candidate: dict) -> bool:
+        # Reject extra or missing sibling keys at this depth
+        if set(candidate.keys()) != set(template.keys()):
+            return False
+
+        for k, v in template.items():
+            cand_v = candidate[k]
+            if isinstance(v, dict):
+                if not isinstance(cand_v, dict):
                     return False
-            elif isinstance(d1[key], dict) != isinstance(d2[key], dict):
-                return False
+                if not _match(v, cand_v):
+                    return False
+            else:
+                # Template stops here. Extra depth in candidate is OK
+                # unless strict checking is requested.
+                if full_depth and isinstance(cand_v, dict):
+                    return False
         return True
 
-    return compare_nested_keys(dict_1, dict_2) and compare_nested_keys(dict_2, dict_1)
+    if full_depth:
+        # Two-way comparison
+        return _match(dict_1, dict_2) and _match(dict_2, dict_1)
+
+    # One-way comparison
+    return _match(dict_1, dict_2)
 
 
 def all_leaves_are_of_type(

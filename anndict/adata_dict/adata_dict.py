@@ -434,7 +434,7 @@ class AdataDict(dict):
         -------
         ``True`` if the structures match (based on both keys and nesting), ``False`` otherwise.
         """
-        return check_dict_structure(self, input_dict)
+        return check_dict_structure(self, input_dict, full_depth=True)
 
     @wraps(adata_dict_fapply)
     def fapply(self, func, *, use_multithreading=True, num_workers=None, max_retries=0, **kwargs_dicts):

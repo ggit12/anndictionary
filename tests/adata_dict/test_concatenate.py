@@ -51,7 +51,7 @@ def test_concatenate_nested_adata_dict(nested_adata_dict):
     assert all(result[group2_mask].obs['condition'] == 'treat')
 
     # Check that nested_adata_dict structure is preserved
-    assert check_dict_structure(nested_adata_dict, nested_adata_dict_original)
+    assert check_dict_structure(nested_adata_dict, nested_adata_dict_original, full_depth=True)
 
 def test_concatenate_complex_nested_adata_dict(complex_nested_adata_dict):
     """Test concatenation of a complex nested AdataDict with group/sample/celltype hierarchy."""
