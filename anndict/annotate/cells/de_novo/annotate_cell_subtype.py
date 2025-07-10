@@ -45,14 +45,14 @@ def ai_annotate_cell_sub_type(adata: AnnData,
     sub_cluster_col
         Column name in adata.obs containing sub-cluster information.
 
-    new_label_col
+    new_label_column
         Name of the column to store the LLM-generated subtype labels.
 
     tissue_of_origin_col
-        Missing description for this parameter.
+        Column name in adata.obs containing tissue of origin information.
 
     n_top_genes
-        Missing description for this parameter.
+        Number of top differentially expressed genes to consider for each group when generating subtype labels.
 
     Returns
     -------

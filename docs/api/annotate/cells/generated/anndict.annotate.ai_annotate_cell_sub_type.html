@@ -38,9 +38,9 @@
 
     <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/styles/sphinx-book-theme.css?v=a3416100" />
-    <link rel="stylesheet" type="text/css" href="../../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css?v=be8a1c11" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../../../../_static/plot_directive.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/plot_directive.css?v=7f9a90b1" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/sphinx-design.min.css?v=95c83b7e" />
   
   <!-- So that users can add custom icons -->
@@ -379,6 +379,7 @@
 </ul>
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../../../tutorials/annotate/index.html">Annotating with AnnDictionary</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../../tutorials/annotate/biological_process_annotation_with_an_LLM.html">Annotating Gene Sets with Biological Processes Using an LLM</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../tutorials/annotate/automated_cell_type_marker_gene_scores.html">Automated Cell Type Marker Gene Scores</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../tutorials/annotate/cell_type_annotation_with_an_LLM.html">Cell Type Annotation with Large Language Models (LLMs)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../tutorials/annotate/cell_type_annotation_with_a_label_transfer_model.html">Transfer Labels Using an Sklearn Classifier</a></li>
@@ -577,13 +578,11 @@ by their main cell type, then annotating subtypes within each group.</p>
 </dd>
 <dt><strong>sub_cluster_col</strong> <span class="classifier"><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span></span></dt></dt><dd><p>Column name in adata.obs containing sub-cluster information.</p>
 </dd>
-<dt><strong>new_label_col</strong></dt><dd><p>Name of the column to store the LLM-generated subtype labels.</p>
+<dt><strong>new_label_column</strong> <span class="classifier"><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span></span></dt></dt><dd><p>Name of the column to store the LLM-generated subtype labels.</p>
 </dd>
-<dt><strong>tissue_of_origin_col</strong> <span class="classifier"><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span> (default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</span></dt></dt><dd><p>Missing description for this parameter.</p>
+<dt><strong>tissue_of_origin_col</strong> <span class="classifier"><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span> (default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</span></dt></dt><dd><p>Column name in adata.obs containing tissue of origin information.</p>
 </dd>
-<dt><strong>n_top_genes</strong> <span class="classifier"><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></span> (default: <code class="docutils literal notranslate"><span class="pre">10</span></code>)</span></dt></dt><dd><p>Missing description for this parameter.</p>
-</dd>
-<dt><strong>new_label_column</strong> <span class="classifier"><em>str</em></span></dt></dt><dd><p></p>
+<dt><strong>n_top_genes</strong> <span class="classifier"><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></span> (default: <code class="docutils literal notranslate"><span class="pre">10</span></code>)</span></dt></dt><dd><p>Number of top differentially expressed genes to consider for each group when generating subtype labels.</p>
 </dd>
 </dl>
 </dd>

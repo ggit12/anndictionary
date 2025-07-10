@@ -150,14 +150,14 @@ def ai_annotate_cell_sub_type_adata_dict(
     adata_dict,
     cell_type_col,
     sub_cluster_col,
-    new_label_col,
+    new_label_column,
     tissue_of_origin_col=None,
     n_top_genes=10
 ) -> tuple[AdataDict, dict[str,str]]:
     """
     Wrapper for ai_annotate_cell_sub_type.
     """
-    results = adata_dict_fapply_return(adata_dict, ai_annotate_cell_sub_type, max_retries=3, cell_type_col=cell_type_col, sub_cluster_col=sub_cluster_col, new_label_col=new_label_col, tissue_of_origin_col=tissue_of_origin_col, n_top_genes=n_top_genes)
+    results = adata_dict_fapply_return(adata_dict, ai_annotate_cell_sub_type, max_retries=3, cell_type_col=cell_type_col, sub_cluster_col=sub_cluster_col, new_label_column=new_label_column, tissue_of_origin_col=tissue_of_origin_col, n_top_genes=n_top_genes)
     annotated_adata_dict = {key: result[0] for key, result in results.items()}
     label_mappings_dict = {key: result[1] for key, result in results.items()}
 
