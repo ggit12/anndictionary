@@ -276,14 +276,14 @@ def summarize_metadata(
     .. code-block:: python
 
         import anndict as adt
-        adt.wrappers.summarize_metadata(adata, ['donor', 'tissue'])
+        adt.summarize_metadata(adata, ['donor', 'tissue'])
 
     **Case 2: calculate joint frequency of donor x tissue**
 
     .. code-block:: python
 
         import anndict as adt
-        adt.wrappers.summarize_metadata(adata, ['donor*tissue'])
+        adt.summarize_metadata(adata, ['donor*tissue'])
 
     See Also
     ---------
