@@ -46,7 +46,7 @@ def sample_adata_dict(
         if n_obs is None or adata.n_obs > n_obs:
             sc.pp.subsample(adata, **kwargs)
 
-    return adata_dict_fapply(adata_dict, sample_adata, return_as_adata_dict=True, **kwargs)
+    return adata_dict_fapply(adata_dict, sample_adata, **kwargs)
 
 
 def sample_and_drop(

@@ -89,6 +89,13 @@ class AdataDict(dict):
 
         """
         def copy_adata(adata):
+            """
+            Wrapper for :func:`anndata.AnnData.copy` that returns ``None`` if ``adata`` is ``None``.
+
+            #TODO: handle cases where certain elements are ``None``.
+            """
+            # if adata is None:
+            #     return None
             return adata.copy()
         return self.fapply(copy_adata, return_as_adata_dict=True)
 
@@ -526,7 +533,6 @@ class AdataDict(dict):
         # Remove the keys (can't be done with fapply)
         for key in keys_to_remove:
             del adata_dict_to_change[key]
-
 
         # Return the modified AdataDict if not inplace
         if not inplace:
