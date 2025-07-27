@@ -212,7 +212,7 @@ def read_adata_dict_from_h5ad(
 
     Returns
     -------
-    An :class:`AdataDict`.
+    An flat :class:`AdataDict` (with hierarchy set to ``('keys',)``).
     """
 
     if isinstance(paths, str):
@@ -280,4 +280,4 @@ def read_adata_dict_from_h5ad(
     for i, file_path in enumerate(file_paths):
         adata_dict[tuple_keys[i]] = ad.read_h5ad(file_path)
 
-    return adata_dict
+    return AdataDict(adata_dict, hierarchy=("keys",))
