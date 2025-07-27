@@ -613,7 +613,7 @@
 <span class="n">sc</span><span class="o">.</span><span class="n">tl</span><span class="o">.</span><span class="n">leiden</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">resolution</span><span class="o">=</span><span class="mf">0.4</span><span class="p">)</span> <span class="c1"># Cluster</span>
 
 <span class="c1"># Run differential expression analysis</span>
-<span class="n">sc</span><span class="o">.</span><span class="n">tl</span><span class="o">.</span><span class="n">rank_genes_groups</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">groupby</span><span class="o">=</span><span class="s1">&#39;leiden&#39;</span><span class="p">)</span>
+<span class="n">sc</span><span class="o">.</span><span class="n">tl</span><span class="o">.</span><span class="n">rank_genes_groups</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">groupby</span><span class="o">=</span><span class="s1">&#39;leiden&#39;</span><span class="p">,</span> <span class="n">use_raw</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
 <span class="c1"># Get the model name directly from the LLM config (just for naming the column in .obs)</span>
 <span class="n">model</span> <span class="o">=</span> <span class="n">adt</span><span class="o">.</span><span class="n">get_llm_config</span><span class="p">()[</span><span class="s1">&#39;model&#39;</span><span class="p">]</span>
@@ -656,7 +656,7 @@
 <span class="n">adt</span><span class="o">.</span><span class="n">wrappers</span><span class="o">.</span><span class="n">leiden_adata_dict</span><span class="p">(</span><span class="n">adata_dict</span><span class="p">,</span> <span class="n">resolution</span><span class="o">=</span><span class="mf">0.4</span><span class="p">)</span> <span class="c1"># Cluster</span>
 
 <span class="c1"># Run differential expression analysis independently on each anndata in adata_dict</span>
-<span class="n">adt</span><span class="o">.</span><span class="n">wrappers</span><span class="o">.</span><span class="n">rank_genes_groups_adata_dict</span><span class="p">(</span><span class="n">adata_dict</span><span class="p">,</span> <span class="n">groupby</span><span class="o">=</span><span class="s1">&#39;leiden&#39;</span><span class="p">)</span>
+<span class="n">adt</span><span class="o">.</span><span class="n">wrappers</span><span class="o">.</span><span class="n">rank_genes_groups_adata_dict</span><span class="p">(</span><span class="n">adata_dict</span><span class="p">,</span> <span class="n">groupby</span><span class="o">=</span><span class="s1">&#39;leiden&#39;</span><span class="p">,</span> <span class="n">use_raw</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
 <span class="c1"># Get the model name directly from the LLM config (just for naming the column in .obs)</span>
 <span class="n">model</span> <span class="o">=</span> <span class="n">adt</span><span class="o">.</span><span class="n">get_llm_config</span><span class="p">()[</span><span class="s1">&#39;model&#39;</span><span class="p">]</span>
@@ -903,7 +903,7 @@ Removed 8 genes from kidney. 60656 genes remaining.
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#Run differential expression analysis independently on each anndata in adata_dict</span>
-<span class="n">adt</span><span class="o">.</span><span class="n">wrappers</span><span class="o">.</span><span class="n">rank_genes_groups_adata_dict</span><span class="p">(</span><span class="n">adata_dict</span><span class="p">,</span> <span class="n">groupby</span><span class="o">=</span><span class="s1">&#39;leiden&#39;</span><span class="p">)</span>
+<span class="n">adt</span><span class="o">.</span><span class="n">wrappers</span><span class="o">.</span><span class="n">rank_genes_groups_adata_dict</span><span class="p">(</span><span class="n">adata_dict</span><span class="p">,</span> <span class="n">groupby</span><span class="o">=</span><span class="s1">&#39;leiden&#39;</span><span class="p">,</span> <span class="n">use_raw</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
