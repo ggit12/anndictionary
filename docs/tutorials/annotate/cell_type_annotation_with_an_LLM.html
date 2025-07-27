@@ -1040,7 +1040,7 @@ Removed 8 genes from kidney. 60656 genes remaining.
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#get unified cols</span>
-<span class="n">unified_cell_types</span> <span class="o">=</span> <span class="n">adt</span><span class="o">.</span><span class="n">get_adata_columns</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">col_contains</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;unified&#39;</span><span class="p">])</span>
+<span class="n">unified_cell_types</span> <span class="o">=</span> <span class="n">adt</span><span class="o">.</span><span class="n">get_adata_columns</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">contains</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;unified&#39;</span><span class="p">])</span>
 <span class="n">unified_cell_types</span>
 </pre></div>
 </div>
@@ -1188,8 +1188,8 @@ Removed 8 genes from kidney. 60656 genes remaining.
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#get the agreement columns</span>
-<span class="n">binary_agreement_cols</span> <span class="o">=</span> <span class="n">adt</span><span class="o">.</span><span class="n">get_adata_columns</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">col_contains</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;binary_agreement&#39;</span><span class="p">])</span>
-<span class="n">categorical_agreement_cols</span> <span class="o">=</span> <span class="n">adt</span><span class="o">.</span><span class="n">get_adata_columns</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">col_contains</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;categorical_agreement&#39;</span><span class="p">])</span>
+<span class="n">binary_agreement_cols</span> <span class="o">=</span> <span class="n">adt</span><span class="o">.</span><span class="n">get_adata_columns</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">contains</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;binary_agreement&#39;</span><span class="p">])</span>
+<span class="n">categorical_agreement_cols</span> <span class="o">=</span> <span class="n">adt</span><span class="o">.</span><span class="n">get_adata_columns</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">contains</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;categorical_agreement&#39;</span><span class="p">])</span>
 </pre></div>
 </div>
 </div>
