@@ -212,7 +212,7 @@ def read_adata_dict_from_h5ad(
 
     Returns
     -------
-    An flat :class:`AdataDict` (with hierarchy set to ``('keys',)``).
+    A flat :class:`AdataDict` (with hierarchy set to ``('keys',)``).
     """
 
     if isinstance(paths, str):
