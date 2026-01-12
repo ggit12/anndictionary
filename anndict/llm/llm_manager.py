@@ -59,7 +59,7 @@ class LLMManager:
         .. code-block:: python
 
             configure_llm_backend('anthropic',
-                'claude-3-5-sonnet-20240620',
+                'claude-sonnet-4-5-20250929',
                 api_key='your-anthropic-api-key'
             )
 

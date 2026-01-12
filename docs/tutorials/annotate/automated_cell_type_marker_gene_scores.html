@@ -64,7 +64,7 @@
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="Cell Type Annotation with Large Language Models (LLMs)" href="cell_type_annotation_with_an_LLM.html" />
-    <link rel="prev" title="Annotating with AnnDictionary" href="index.html" />
+    <link rel="prev" title="Annotating Gene Sets with Biological Processes Using an LLM" href="biological_process_annotation_with_an_LLM.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="" />
@@ -381,6 +381,7 @@
 </ul>
 </details></li>
 <li class="toctree-l2 current active has-children"><a class="reference internal" href="index.html">Annotating with AnnDictionary</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="biological_process_annotation_with_an_LLM.html">Annotating Gene Sets with Biological Processes Using an LLM</a></li>
 <li class="toctree-l3 current active"><a class="current reference internal" href="#">Automated Cell Type Marker Gene Scores</a></li>
 <li class="toctree-l3"><a class="reference internal" href="cell_type_annotation_with_an_LLM.html">Cell Type Annotation with Large Language Models (LLMs)</a></li>
 <li class="toctree-l3"><a class="reference internal" href="cell_type_annotation_with_a_label_transfer_model.html">Transfer Labels Using an Sklearn Classifier</a></li>
@@ -587,7 +588,7 @@
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Configure LLM backend</span>
 <span class="n">adt</span><span class="o">.</span><span class="n">configure_llm_backend</span><span class="p">(</span><span class="n">provider</span><span class="o">=</span><span class="s1">&#39;anthropic&#39;</span><span class="p">,</span>
-                          <span class="n">model</span><span class="o">=</span><span class="s1">&#39;claude-3-5-sonnet-20240620&#39;</span><span class="p">,</span>
+                          <span class="n">model</span><span class="o">=</span><span class="s1">&#39;claude-sonnet-4-5-20250929&#39;</span><span class="p">,</span>
                           <span class="n">api_key</span><span class="o">=</span><span class="s1">&#39;my-anthropic-api-key&#39;</span><span class="p">,</span>
                           <span class="n">requests_per_minute</span><span class="o">=</span><span class="mi">100</span>
                           <span class="p">)</span>
