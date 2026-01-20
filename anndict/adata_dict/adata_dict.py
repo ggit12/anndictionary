@@ -153,14 +153,28 @@ class AdataDict(dict):
                 hierarchy.append(item)
         return hierarchy
 
-    def get_levels(self, nesting_list, levels=None, depth=0):
+    def get_levels(self,
+        nesting_list: list,
+        levels: list | None = None,
+        depth: int = 0
+    ) -> list:
         """
         Get the levels of hierarchy based on the nesting structure.
 
-        :param nesting_list: Nested list indicating the new hierarchy structure.
-        :param levels: List to store the levels.
-        :param depth: Current depth in recursion.
-        :return: List of levels with hierarchy elements.
+        Parameters
+        ------------
+        nesting_list
+            Nested list indicating the new hierarchy structure.
+
+        levels
+            List to store the levels.
+
+        depth
+            Current depth in recursion.
+
+        Returns
+        -------
+        List of levels with hierarchy elements.
         """
         if levels is None:
             levels = []
