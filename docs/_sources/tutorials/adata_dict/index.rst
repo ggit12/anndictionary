@@ -1,7 +1,7 @@
 Using the AdataDict Class
 ==========================
 
-These notebooks covers the basic mechanics around working with `AdataDict`s.  
+These notebooks cover the basic mechanics around working with ``AdataDict``\\s.  
 
 This is the core class implemented in `AnnDictionary`,
 a package for processing multiple `anndata` objects in parallel with LLMs.

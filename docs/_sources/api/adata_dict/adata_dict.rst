@@ -33,7 +33,6 @@ Iterate over :class:`AdataDict`
    :toctree: generated
 
    AdataDict.fapply
-   AdataDict.fapply_return
 
 .. seealso::
 
