@@ -4,7 +4,7 @@ This module contains functions to annotate cell subtype.
 from functools import wraps
 
 from anndata import AnnData
-from anndict.adata_dict import AdataDict, adata_dict_fapply_return, build_adata_dict, concatenate_adata_dict
+from anndict.adata_dict import AdataDict, adata_dict_fapply, build_adata_dict, concatenate_adata_dict
 from anndict.annotate.cells.de_novo.annotate_cell_type_by_comparison import ai_annotate_cell_type_by_comparison
 
 @wraps(ai_annotate_cell_type_by_comparison)
@@ -20,7 +20,7 @@ def ai_annotate_cell_type_by_comparison_adata_dict(
     """
     Wrapper for ai_annotate_cell_type_by_comparison.
     """
-    return adata_dict_fapply_return(adata_dict, ai_annotate_cell_type_by_comparison, max_retries=3, groupby=groupby, n_top_genes=n_top_genes, new_label_column=new_label_column, cell_type_of_origin_col=cell_type_of_origin_col, tissue_of_origin_col=tissue_of_origin_col, **kwargs)
+    return adata_dict_fapply(adata_dict, ai_annotate_cell_type_by_comparison, max_retries=3, groupby=groupby, n_top_genes=n_top_genes, new_label_column=new_label_column, cell_type_of_origin_col=cell_type_of_origin_col, tissue_of_origin_col=tissue_of_origin_col, **kwargs)
 
 def ai_annotate_cell_sub_type(adata: AnnData,
     cell_type_col: str,

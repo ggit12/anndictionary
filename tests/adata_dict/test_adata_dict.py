@@ -206,18 +206,6 @@ def test_fapply_wrapper(simple_adata_dict):
         assert 'extra_param' in adata.uns
         assert adata.uns['extra_param'] == 'test_value'
 
-def test_fapply_return_wrapper(simple_adata_dict):
-    """Test fapply_return wrapper with a function that returns values."""
-    # Test with default return (as dict)
-    result = simple_adata_dict.fapply_return(return_func, extra_param='test_value')
-    assert isinstance(result, dict)
-    assert all(v == 'test_value' for v in result.values())
-
-    # Test with return_as_adata_dict=True
-    result = simple_adata_dict.fapply_return(return_func, return_as_adata_dict=True)
-    assert isinstance(result, AdataDict)
-    assert all(v == 'done' for v in result.values())
-
 def test_set_var_index_wrapper(simple_adata_dict):
     """Test set_var_index wrapper."""
     # Store original gene_ids

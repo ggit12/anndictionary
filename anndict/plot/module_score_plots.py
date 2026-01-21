@@ -36,7 +36,7 @@ def module_score_barplot(adata: AnnData,
         The figure size (width, height)
 
     adt_key
-        Used by :func:`adata_dict_fapply` and :func:`adata_dict_fapply_return` 
+        Used by :func:`adata_dict_fapply` 
         when passing this function.
 
     Returns
@@ -114,7 +114,7 @@ def module_score_umap(adata: AnnData,
         List of column names in `adata` containing module scores to plot.
     
     adt_key
-        Used by :func:`adata_dict_fapply` and :func:`adata_dict_fapply_return` 
+        Used by :func:`adata_dict_fapply` 
         when passing this function.
 
     **kwargs

@@ -48,7 +48,7 @@ def cell_type_marker_gene_score(
         Suffix for the computed score names. Defaults to '_score'.
 
     adt_key
-        Used by :func:`adata_dict_fapply` or :func:`adata_dict_fapply_return` 
+        Used by :func:`adata_dict_fapply` 
         when passing this function to them.
 
     **kwargs

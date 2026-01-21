@@ -1,5 +1,5 @@
 """
-This module contains :func:`adata_dict_fapply` and :func:`adata_dict_fapply_return` wrappers for common packages and functions.
+This module contains :func:`adata_dict_fapply` wrappers for common packages and functions.
 """
 
 from .scanpy_ import (

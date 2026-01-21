@@ -30,7 +30,7 @@ def remove_genes(
         A list of gene names to remove.
 
     adt_key
-        Used by :func:`adata_dict_fapply` and :func:`adata_dict_fapply_return` when passing this function.
+        Used by :func:`adata_dict_fapply` when passing this function.
 
     Returns
     --------

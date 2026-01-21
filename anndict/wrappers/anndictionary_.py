@@ -11,7 +11,6 @@ from sklearn.base import ClassifierMixin
 from anndict.adata_dict import (
     AdataDict,
     adata_dict_fapply,
-    adata_dict_fapply_return,
 )
 
 from anndict.annotate import (
@@ -70,7 +69,7 @@ def ai_annotate_biological_process_adata_dict(
     """
     Wrapper for ai_annotate_biological_process.
     """
-    return adata_dict_fapply_return(adata_dict, ai_annotate_biological_process, max_retries=3, groupby=groupby, n_top_genes=n_top_genes, new_label_column=new_label_column)
+    return adata_dict_fapply(adata_dict, ai_annotate_biological_process, max_retries=3, groupby=groupby, n_top_genes=n_top_genes, new_label_column=new_label_column)
 
 @wraps(simplify_var_index)
 def simplify_var_index_adata_dict(
@@ -82,7 +81,7 @@ def simplify_var_index_adata_dict(
     """
     Wrapper for simplify_var_index.
     """
-    return adata_dict_fapply_return(adata_dict, simplify_var_index, max_retries=3, column=column, new_column_name=new_column_name, simplification_level=simplification_level)
+    return adata_dict_fapply(adata_dict, simplify_var_index, max_retries=3, column=column, new_column_name=new_column_name, simplification_level=simplification_level)
 
 @wraps(ensure_label_consistency_adata)
 def ensure_label_consistency_adata_dict(
@@ -94,7 +93,7 @@ def ensure_label_consistency_adata_dict(
     """
     Wrapper for ensure_label_consistency_adata.
     """
-    return adata_dict_fapply_return(adata_dict, ensure_label_consistency_adata, cols=cols, simplification_level=simplification_level, new_col_prefix=new_col_prefix)
+    return adata_dict_fapply(adata_dict, ensure_label_consistency_adata, cols=cols, simplification_level=simplification_level, new_col_prefix=new_col_prefix)
 
 @wraps(simplify_obs_column)
 def simplify_obs_column_adata_dict(
@@ -106,7 +105,7 @@ def simplify_obs_column_adata_dict(
     """
     Wrapper for simplify_obs_column.
     """
-    return adata_dict_fapply_return(adata_dict, simplify_obs_column, max_retries=3, column=column, new_column_name=new_column_name, simplification_level=simplification_level)
+    return adata_dict_fapply(adata_dict, simplify_obs_column, max_retries=3, column=column, new_column_name=new_column_name, simplification_level=simplification_level)
 
 @wraps(create_label_hierarchy)
 def create_label_hierarchy_adata_dict(
@@ -117,7 +116,7 @@ def create_label_hierarchy_adata_dict(
     """
     Wrapper for create_label_hierarchy.
     """
-    return adata_dict_fapply_return(adata_dict, create_label_hierarchy, max_retries=3, col=col, simplification_levels=simplification_levels)
+    return adata_dict_fapply(adata_dict, create_label_hierarchy, max_retries=3, col=col, simplification_levels=simplification_levels)
 
 @wraps(ai_annotate_cell_type)
 def ai_annotate_cell_type_adata_dict(
@@ -130,7 +129,7 @@ def ai_annotate_cell_type_adata_dict(
     """
     Wrapper for ai_annotate_cell_type.
     """
-    return adata_dict_fapply_return(adata_dict, ai_annotate_cell_type, max_retries=3, groupby=groupby, n_top_genes=n_top_genes, new_label_column=new_label_column, tissue_of_origin_col=tissue_of_origin_col)
+    return adata_dict_fapply(adata_dict, ai_annotate_cell_type, max_retries=3, groupby=groupby, n_top_genes=n_top_genes, new_label_column=new_label_column, tissue_of_origin_col=tissue_of_origin_col)
 
 @wraps(ai_compare_cell_type_labels_pairwise)
 def ai_compare_cell_type_labels_pairwise_adata_dict(
@@ -143,7 +142,7 @@ def ai_compare_cell_type_labels_pairwise_adata_dict(
     """
     Wrapper for ai_compare_cell_type_labels_pairwise.
     """
-    return adata_dict_fapply_return(adata_dict, ai_compare_cell_type_labels_pairwise, max_retries=3, cols1=cols1, cols2=cols2, new_col_prefix=new_col_prefix, comparison_level=comparison_level)
+    return adata_dict_fapply(adata_dict, ai_compare_cell_type_labels_pairwise, max_retries=3, cols1=cols1, cols2=cols2, new_col_prefix=new_col_prefix, comparison_level=comparison_level)
 
 @wraps(ai_annotate_cell_sub_type)
 def ai_annotate_cell_sub_type_adata_dict(
@@ -157,7 +156,7 @@ def ai_annotate_cell_sub_type_adata_dict(
     """
     Wrapper for ai_annotate_cell_sub_type.
     """
-    results = adata_dict_fapply_return(adata_dict, ai_annotate_cell_sub_type, max_retries=3, cell_type_col=cell_type_col, sub_cluster_col=sub_cluster_col, new_label_column=new_label_column, tissue_of_origin_col=tissue_of_origin_col, n_top_genes=n_top_genes)
+    results = adata_dict_fapply(adata_dict, ai_annotate_cell_sub_type, max_retries=3, cell_type_col=cell_type_col, sub_cluster_col=sub_cluster_col, new_label_column=new_label_column, tissue_of_origin_col=tissue_of_origin_col, n_top_genes=n_top_genes)
     annotated_adata_dict = {key: result[0] for key, result in results.items()}
     label_mappings_dict = {key: result[1] for key, result in results.items()}
 
@@ -171,7 +170,7 @@ def ai_determine_leiden_resolution_adata_dict(
     """
     Wrapper for ai_determine_leiden_resolution.
     """
-    return adata_dict_fapply_return(adata_dict, ai_determine_leiden_resolution, max_retries=3, initial_resolution=initial_resolution)
+    return adata_dict_fapply(adata_dict, ai_determine_leiden_resolution, max_retries=3, initial_resolution=initial_resolution)
 
 @wraps(transfer_labels_using_classifier)
 def transfer_labels_using_classifier_adata_dict(
@@ -187,7 +186,7 @@ def transfer_labels_using_classifier_adata_dict(
     """
     Wrapper for transfer_labels_using_classifier.
     """
-    return adata_dict_fapply_return(
+    return adata_dict_fapply(
         origin_adata_dict,
         transfer_labels_using_classifier,
         destination_adata=destination_adata_dict,
@@ -214,7 +213,7 @@ def plot_sankey_adata_dict(adata_dict, cols, params=None):
     """
     Wrapper for plot_sankey.
     """
-    return adata_dict_fapply_return(adata_dict, plot_sankey, cols=cols, params=params)
+    return adata_dict_fapply(adata_dict, plot_sankey, cols=cols, params=params)
 
 @wraps(save_sankey)
 def save_sankey_adata_dict(plot_dict, filename):
@@ -250,7 +249,7 @@ def summarize_metadata_adata_dict(adata_dict, **kwargs):
     """
     Wrapper for summarize_metadata.
     """
-    return adata_dict_fapply_return(adata_dict, summarize_metadata, **kwargs)
+    return adata_dict_fapply(adata_dict, summarize_metadata, **kwargs)
 
 @wraps(display_html_summary)
 def display_html_summary_adata_dict(summary_dict, parent_key=None):
@@ -283,4 +282,4 @@ def pca_density_adata_dict(adata_dict, **kwargs):
     """
     Wrapper for pca_density_filter_adata.
     """
-    return adata_dict_fapply_return(adata_dict, pca_density_filter_adata, **kwargs)
+    return adata_dict_fapply(adata_dict, pca_density_filter_adata, **kwargs)

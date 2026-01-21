@@ -9,7 +9,6 @@ from anndata import AnnData
 from anndict.adata_dict import (
     AdataDict,
     adata_dict_fapply,
-    adata_dict_fapply_return,
     build_adata_dict,
     concatenate_adata_dict,
 )
@@ -47,7 +46,7 @@ def sample_and_drop_adata_dict(
     --------
     :class:`AdataDict` of sampled :class:`AnnData` after filtering.
     """
-    return adata_dict_fapply_return(adata_dict, sample_and_drop, strata_keys=strata_keys, n_largest_groups=n_largest_groups, min_num_cells=min_num_cells, **kwargs)
+    return adata_dict_fapply(adata_dict, sample_and_drop, strata_keys=strata_keys, n_largest_groups=n_largest_groups, min_num_cells=min_num_cells, **kwargs)
 
 
 def normalize_adata_dict(
@@ -321,7 +320,7 @@ def leiden_sub_cluster_adata_dict(
     --------
     :class:`AdataDict` of AnnData objects.
     """
-    return adata_dict_fapply_return(adata_dict, leiden_sub_cluster, groupby=groupby, **kwargs)
+    return adata_dict_fapply(adata_dict, leiden_sub_cluster, groupby=groupby, **kwargs)
 
 
 def calculate_umap_adata_dict(

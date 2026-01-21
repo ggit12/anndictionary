@@ -5,7 +5,7 @@ utils for :class:`AdataDict`
 from __future__ import annotations  # allows type hinting without circular dependency
 from typing import TYPE_CHECKING
 
-from .adata_dict_fapply import adata_dict_fapply_return
+from .adata_dict_fapply import adata_dict_fapply
 
 if TYPE_CHECKING:
     from .adata_dict import AdataDict
@@ -53,7 +53,7 @@ def set_var_index_func(adata_dict: AdataDict, column: str) -> AdataDict:
         adata.var = adata.var.set_index(column)
         return adata
 
-    return adata_dict_fapply_return(
+    return adata_dict_fapply(
         adata_dict, set_var_index_main, column=column, return_as_adata_dict=True
     )
 
@@ -81,6 +81,6 @@ def set_obs_index_func(adata_dict: AdataDict, column: str) -> AdataDict:
         adata.obs = adata.obs.set_index(column)
         return adata
 
-    return adata_dict_fapply_return(
+    return adata_dict_fapply(
         adata_dict, set_obs_index_main, column=column, return_as_adata_dict=True
     )

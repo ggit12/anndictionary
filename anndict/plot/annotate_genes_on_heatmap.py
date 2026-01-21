@@ -39,8 +39,8 @@ def annotate_gene_groups_with_ai_biological_process(
         The grouping column name.
 
     adt_key
-        Used by :func:`adata_dict_fapply` and 
-        :func:`adata_dict_fapply_return` when passing this function.
+        Used by :func:`adata_dict_fapply` 
+        when passing this function.
 
     Returns
     -------

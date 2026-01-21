@@ -5,7 +5,7 @@ from functools import wraps
 
 import squidpy as sq
 
-from anndict.adata_dict import AdataDict, adata_dict_fapply, adata_dict_fapply_return
+from anndict.adata_dict import AdataDict, adata_dict_fapply
 
 @wraps(sq.gr.spatial_neighbors)
 def compute_spatial_neighbors_adata_dict(
@@ -57,7 +57,7 @@ def compute_interaction_matrix_adata_dict(
     """
     Wrapper for :func:`sq.gr.interaction_matrix`.
     """
-    return adata_dict_fapply_return(adata_dict, sq.gr.interaction_matrix, cluster_key=cluster_key, **kwargs)
+    return adata_dict_fapply(adata_dict, sq.gr.interaction_matrix, cluster_key=cluster_key, **kwargs)
 
 @wraps(sq.pl.interaction_matrix)
 def plot_interaction_matrix_adata_dict(

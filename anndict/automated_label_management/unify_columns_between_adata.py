@@ -87,7 +87,7 @@ def ai_unify_labels(
         adata.obs[new_column] = adata.obs[original_column].map(mapping_dict)
 
     # Step 1: Aggregate all labels
-    # aggregated_labels = adata_dict_fapply_return(adata_dict, get_unique_labels_from_obs_column, )
+    # aggregated_labels = adata_dict_fapply(adata_dict, get_unique_labels_from_obs_column, )
     aggregated_labels = []
     for key in adata_dict:
         labels = get_unique_labels_from_obs_column(adata_dict[key], label_columns[key])

@@ -194,7 +194,7 @@ def ai_annotate_from_expected_cell_types(
         Used to provide context to the LLM.
 
     adt_key
-        Used by :func:`adata_dict_fapply` or :func:`adata_dict_fapply_return` 
+        Used by :func:`adata_dict_fapply` 
         when passing this function to them.
 
     Returns

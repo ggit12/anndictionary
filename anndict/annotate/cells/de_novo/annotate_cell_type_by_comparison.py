@@ -146,7 +146,7 @@ def ai_annotate_cell_type_by_comparison(
         Used to provide context to the LLM.
 
     adt_key
-        Used by :func:`adata_dict_fapply` or :func:`adata_dict_fapply_return` 
+        Used by :func:`adata_dict_fapply` 
         when passing this function to them.
 
     Returns

@@ -316,29 +316,6 @@ def adata_dict_fapply(
     return results
 
 
-# @wraps(apply_func)
-def apply_func_return(
-    adt_key: tuple[str, ...],
-    adata: AnnData,
-    func: callable,
-    accepts_key: bool,
-    max_retries: int,
-    catch_errors: bool,
-    **func_args
-) -> Any | None:
-    """Legacy wrapper for apply_func. Use apply_func instead."""
-    return apply_func(
-        adt_key,
-        adata,
-        func,
-        accepts_key,
-        max_retries,
-        catch_errors,
-        **func_args
-    )
-
-
-# @wraps(adata_dict_fapply)
 def adata_dict_fapply_return(
     adata_dict: AdataDict,
     func: callable,
@@ -351,15 +328,8 @@ def adata_dict_fapply_return(
     max_depth: int | str | list[str] | tuple[str, ...] | None = None,
     **kwargs_dicts: Any,
 ) -> dict | AdataDict | None:
-    """Legacy wrapper for adata_dict_fapply. Use adata_dict_fapply instead."""
-    return adata_dict_fapply(
-        adata_dict,
-        func,
-        use_multithreading=use_multithreading,
-        num_workers=num_workers,
-        max_retries=max_retries,
-        catch_errors=catch_errors,
-        return_as_adata_dict=return_as_adata_dict,
-        max_depth=max_depth,
-        **kwargs_dicts
-    )
+    """Completely deprecated. Use adata_dict_fapply instead. Stub left for compatibility."""
+    raise RuntimeError(
+    "fapply_return behaviour has been replaced by adata_dict_fapply(). "
+    "Replace this call with adata_dict_fapply(...) directly; "
+    "no other code changes are needed.")

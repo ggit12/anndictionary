@@ -7,7 +7,7 @@ from __future__ import annotations #allows type hinting without circular depende
 from typing import TYPE_CHECKING
 
 from .adata_dict_utils import to_nested_list, to_nested_tuple
-from .adata_dict_fapply import adata_dict_fapply_return
+from .adata_dict_fapply import adata_dict_fapply
 from .build import build_adata_dict
 
 if TYPE_CHECKING:
@@ -116,7 +116,7 @@ def add_stratification(
 
 
     # Split the adata_dict
-    adata_dict = adata_dict_fapply_return(adata_dict, build_adata_dict,
+    adata_dict = adata_dict_fapply(adata_dict, build_adata_dict,
                                          strata_keys=strata_keys,
                                          desired_strata=desired_strata,
                                          return_as_adata_dict=True)

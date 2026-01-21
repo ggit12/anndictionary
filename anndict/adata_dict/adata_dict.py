@@ -10,7 +10,7 @@ from functools import wraps
 from anndata import AnnData
 
 from .adata_dict_utils import to_nested_tuple, to_nested_list, set_var_index_func, set_obs_index_func
-from .adata_dict_fapply import adata_dict_fapply, adata_dict_fapply_return
+from .adata_dict_fapply import adata_dict_fapply
 from .add_stratification import add_stratification as add_stratification_func
 
 from .dict_utils import check_dict_structure, all_leaves_are_of_type
@@ -27,7 +27,7 @@ class AdataDict(dict):
 
     1. It has the ``set_hierarchy`` method to restructure the nesting hierarchy, and the ``hierarchy`` attribute to keep track.
     2. It behaves like an ``AnnData`` object by passing methods through to each ``AnnData`` in the dictionary.
-    3. It has methods ``fapply(func, kwargs)`` and ``fapply_return(func, kwargs)`` that apply a given function ``func`` with arguments ``kwargs`` to each ``AnnData`` object in the :class:`AdataDict`.
+    3. It has method ``fapply(func, kwargs)`` that apply a given function ``func`` with arguments ``kwargs`` to each ``AnnData`` object in the :class:`AdataDict`.
 
     Parameters
     -----------
@@ -42,7 +42,6 @@ class AdataDict(dict):
     # --------
 
     # :func:`adata_dict_fapply` : The function underneath ``fapply`` that can be used separatley.
-    # :func:`adata_dict_fapply_return` : The function underneath ``fapply_return`` that can be used separatley.
 
     def __init__(
     self,
@@ -470,19 +469,12 @@ class AdataDict(dict):
             **kwargs_dicts,
         )
 
-    @wraps(adata_dict_fapply_return)
     def fapply_return(self, func, *, use_multithreading=True, num_workers=None, max_retries=0, return_as_adata_dict=False, max_depth=None, **kwargs_dicts):
-        """Wrapper for adata_dict_fapply_return."""
-        return adata_dict_fapply_return(
-            self,
-            func,
-            use_multithreading=use_multithreading,
-            num_workers=num_workers,
-            max_retries=max_retries,
-            return_as_adata_dict=return_as_adata_dict,
-            max_depth=max_depth,
-            **kwargs_dicts,
-        )
+        """Completely deprecated. Use .fapply(...) instead. Stub left for compatibility."""
+        raise RuntimeError(
+        "fapply_return behaviour has been replaced by .fapply(...). "
+        "Replace this call with .fapply(...) directly; "
+        "no other code changes are needed.")
 
     @wraps(set_var_index_func)
     def set_var_index(self, cols: str | list[str]):
