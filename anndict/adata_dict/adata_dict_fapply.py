@@ -16,6 +16,66 @@ if TYPE_CHECKING:
     from anndata import AnnData
     from .adata_dict import AdataDict
 
+
+def get_depth(
+    max_depth: int | str | list[str] | tuple[str, ...] | None,
+    adata_dict: "AdataDict" | dict,
+) -> int | None:
+    """
+    Resolve ``max_depth`` into an integer depth.
+
+    Parameters
+    ------------
+    max_depth
+        The depth at which to stop recursing and apply ``func``.
+        - ``None`` (default): recurse to leaves.
+        - ``0``: apply to the full input ``adata_dict``.
+        - ``1``: apply to each top-level value in ``adata_dict``.
+        - ``int``: stop at that integer depth (0-indexed from root).
+        - ``str`` / ``list[str]`` / ``tuple[str, ...]``: stop at the depth matching the name(s) in ``adata_dict.hierarchy``.    
+
+    adata_dict
+        An :class:`AdataDict`.
+
+    Returns
+    -------
+    The integer depth, or ``None`` if ``max_depth`` is ``None``.
+    """
+    if max_depth is None:
+        return None
+
+    if isinstance(max_depth, int):
+        if max_depth < 0:
+            raise ValueError("max_depth must be >= 0")
+        return max_depth
+
+    if not hasattr(adata_dict, "hierarchy") or not adata_dict.hierarchy:
+        raise ValueError(
+            "Hierarchy not set so can't use semantic depth; use integer max_depth or recreate the adata_dict with build_adata_dict() and try again."
+        )
+
+    target_levels = {max_depth} if isinstance(max_depth, str) else set(max_depth)
+
+    def _get_levels_local(nesting, levels=None, depth=0):
+        if levels is None:
+            levels = []
+        if len(levels) <= depth:
+            levels.append([])
+        for item in nesting:
+            if isinstance(item, (list, tuple)):
+                _get_levels_local(item, levels, depth + 1)
+            else:
+                levels[depth].append(item)
+        return levels
+
+    levels = _get_levels_local(adata_dict.hierarchy)
+    for depth, level_items in enumerate(levels):
+        if not target_levels.isdisjoint(level_items):
+            # hierarchy depth 0 corresponds to top-level keys (max_depth=1). Root is max_depth=0.
+            return depth + 1
+
+    raise ValueError(f"Level(s) {max_depth} not found in hierarchy.")
+
 # This is intentional and necessary for error handling
 # pylint: disable=inconsistent-return-statements
 def apply_func(
@@ -94,6 +154,7 @@ def adata_dict_fapply(
     max_retries: int = 0,
     catch_errors: bool = True,
     return_as_adata_dict: bool = False,
+    max_depth: int | str | list[str] | tuple[str, ...] | None = None,
     **kwargs_dicts: Any,
 ) -> dict | AdataDict | None:
     """
@@ -131,6 +192,14 @@ def adata_dict_fapply(
         Whether to return the results as a :class:`dict` (if ``False``) 
         or :class:`AdataDict` (if ``True``).
 
+    max_depth
+        The depth at which to stop recursing and apply ``func``.
+        - ``None`` (default): recurse to leaves.
+        - ``0``: apply to the full input ``adata_dict``.
+        - ``1``: apply to each top-level value in ``adata_dict``.
+        - ``int``: stop at that integer depth (0-indexed from root).
+        - ``str`` / ``list[str]`` / ``tuple[str, ...]``: stop at the depth matching the name(s) in ``adata_dict.hierarchy``.
+
     kwargs_dicts
         Additional keyword arguments to pass to the function.
 
@@ -156,6 +225,18 @@ def adata_dict_fapply(
     results = {}
     has_non_none_result = False
 
+    max_depth = get_depth(max_depth, adata_dict)
+    if max_depth == 0:
+        return apply_func(
+            (),
+            adata_dict,
+            func,
+            accepts_key,
+            max_retries,
+            catch_errors,
+            **kwargs_dicts,
+        )
+
     if return_as_adata_dict:
         hierarchy = adata_dict.hierarchy if hasattr(adata_dict, "hierarchy") else ()
 
@@ -170,16 +251,17 @@ def adata_dict_fapply(
         else:
             non_matching_kwargs[arg_name] = arg_value
 
-    def process_item(adt_key, adata):
+    def process_item(adt_key, adata, current_depth: int):
         nonlocal has_non_none_result
-        # If this is a nested AdataDict or dict, recursively process it
-        if isinstance(adata, (dict, AdataDict)):
+        if max_depth is not None and current_depth >= max_depth:
+            pass
+        elif isinstance(adata, (dict, AdataDict)):
             nested_results = {}
             for nested_key, nested_adata in adata.items():
-                nested_results[nested_key] = process_item(nested_key, nested_adata)
+                nested_results[nested_key] = process_item(nested_key, nested_adata, current_depth + 1)
             return AdataDict(nested_results) if return_as_adata_dict else nested_results
 
-        # is an AnnData at this point
+        # is an AnnData leaf OR we hit max_depth and 'adata' is a dict/AdataDict
         # Build the kwargs for this specific adt_key
         current_kwargs = {}
         current_kwargs.update(non_matching_kwargs)
@@ -204,13 +286,14 @@ def adata_dict_fapply(
             for adt_key, adata in adata_dict.items():
                 if isinstance(adata, (dict, AdataDict)):
                     # Handle nested structures sequentially
-                    results[adt_key] = process_item(adt_key, adata)
+                    results[adt_key] = process_item(adt_key, adata, 1)
                 else:
                     # Only use threading for leaf nodes (actual AnnData objects)
                     futures[executor.submit(
                         process_item,
                         adt_key,
-                        adata
+                        adata,
+                        1,
                     )] = adt_key
 
             for future in as_completed(futures):
@@ -219,7 +302,7 @@ def adata_dict_fapply(
 
     else:
         for adt_key, adata in adata_dict.items():
-            results[adt_key] = process_item(adt_key, adata)
+            results[adt_key] = process_item(adt_key, adata, 1)
 
     # If requested, return as an AdataDict
     if return_as_adata_dict:
@@ -265,6 +348,7 @@ def adata_dict_fapply_return(
     max_retries: int = 0,
     catch_errors: bool = True,
     return_as_adata_dict: bool = False,
+    max_depth: int | str | list[str] | tuple[str, ...] | None = None,
     **kwargs_dicts: Any,
 ) -> dict | AdataDict | None:
     """Legacy wrapper for adata_dict_fapply. Use adata_dict_fapply instead."""
@@ -276,5 +360,6 @@ def adata_dict_fapply_return(
         max_retries=max_retries,
         catch_errors=catch_errors,
         return_as_adata_dict=return_as_adata_dict,
+        max_depth=max_depth,
         **kwargs_dicts
     )
