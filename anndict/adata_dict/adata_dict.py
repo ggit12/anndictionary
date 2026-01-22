@@ -310,6 +310,21 @@ class AdataDict(dict):
         levels = self.get_levels(nesting_list)
         old_hierarchy = self._hierarchy
 
+        def _levels_to_nesting_list(levels_slice: list[list[str]]) -> list:
+            """
+            Convert a slice of ``levels`` (as returned by ``get_levels``) back into a nested-list
+            hierarchy representation.
+
+            This is used to set correct ``hierarchy`` values on nested sub-:class:`AdataDict`s
+            created during hierarchy restructuring.
+            """
+            if not levels_slice:
+                return []
+            out = list(levels_slice[0])
+            if len(levels_slice) > 1:
+                out.append(_levels_to_nesting_list(levels_slice[1:]))
+            return out
+
         # Function to recursively create nested AdataDicts
         def create_nested_adata_dict(current_level, key_indices, value, level_idx):
             if level_idx == len(levels):
@@ -320,8 +335,9 @@ class AdataDict(dict):
             remaining_key_indices = key_indices[level_length:]
             if level_key not in current_level:
                 # Remaining hierarchy for nested AdataDict
-                remaining_hierarchy = levels[level_idx + 1 :] if level_idx + 1 < len(levels) else []
-                current_level[level_key] = AdataDict(hierarchy=remaining_hierarchy)
+                remaining_levels = levels[level_idx + 1 :] if level_idx + 1 < len(levels) else []
+                remaining_hierarchy_list = _levels_to_nesting_list(remaining_levels)
+                current_level[level_key] = AdataDict(hierarchy=to_nested_tuple(remaining_hierarchy_list))
             # Recurse into the next level
             nested_dict = current_level[level_key]
             nested_value = create_nested_adata_dict(nested_dict, remaining_key_indices, value, level_idx + 1)

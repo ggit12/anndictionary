@@ -153,6 +153,75 @@ def test_fapply_with_kwargs_broadcasting(simple_adata_dict):
     assert simple_adata_dict[('sample1',)].uns['kwarg1'] == 'value1'
     assert simple_adata_dict[('sample2',)].uns['kwarg1'] == 'value2'
 
+def test_fapply_with_kwargs_broadcasting_deeper_subtree(simple_adata_dict):
+    """
+    Test kwargs broadcasting when a kwarg dict is deeper than adata_dict.
+
+    If the kwarg dict matches adata_dict's structure up to some depth, then the entire
+    kwarg subtree at that depth should be passed to ``func`` as the kwarg value.
+    """
+    kwarg1 = {
+        ('sample1',): {'subtree': {'x': 1, 'y': [1, 2, 3]}},
+        ('sample2',): {'subtree': {'x': 2}},
+    }
+
+    def func_with_kwargs(adata, kwarg1=None):
+        adata.uns['kwarg1'] = kwarg1
+
+    adata_dict_fapply(simple_adata_dict, func_with_kwargs, kwarg1=kwarg1)
+    assert simple_adata_dict[('sample1',)].uns['kwarg1'] == {'subtree': {'x': 1, 'y': [1, 2, 3]}}
+    assert simple_adata_dict[('sample2',)].uns['kwarg1'] == {'subtree': {'x': 2}}
+
+def test_fapply_with_kwargs_broadcasting_nested_2lvl_kwarg_3lvl(nested_adata_dict):
+    """
+    Test kwargs broadcasting where ``adata_dict`` has 2 levels and a kwarg dict has 3.
+
+    Here we apply ``func`` at depth=1 (group-level), so the kwarg dict matches up to the
+    group key, and the entire subtree under that group (sample -> extra level) should be
+    passed through as the kwarg value.
+    """
+    kwarg1 = {
+        ('group1',): {
+            ('sample1',): {'payload': {'x': 1}},
+            ('sample2',): {'payload': {'x': 2, 'y': [1, 2]}},
+        },
+        ('group2',): {
+            ('sample3',): {'payload': {'x': 3}},
+            ('sample4',): {'payload': {'x': 4}},
+        },
+    }
+
+    def return_kwarg_subtree(obj, kwarg1=None):
+        return kwarg1
+
+    out = adata_dict_fapply(
+        nested_adata_dict,
+        return_kwarg_subtree,
+        use_multithreading=False,
+        max_depth=1,
+        kwarg1=kwarg1,
+    )
+    assert out[('group1',)] == kwarg1[('group1',)]
+    assert out[('group2',)] == kwarg1[('group2',)]
+
+def test_fapply_with_kwargs_broadcasting_2lvl_template_3lvl_kwarg_apply_at_leaf():
+    adata_dict = {
+        ('group1',): {('sub1',): object()},
+        ('group2',): {('sub1',): object()},
+    }
+
+    kwarg1 = {
+        ('group1',): {('sub1',): {'payload': 1}},
+        ('group2',): {('sub1',): {'payload': 2}},
+    }
+
+    def f(obj, kwarg1=None):
+        return kwarg1
+
+    out = adata_dict_fapply(adata_dict, f, use_multithreading=False, kwarg1=kwarg1)
+    assert out[('group1',)][('sub1',)] == {'payload': 1}
+    assert out[('group2',)][('sub1',)] == {'payload': 2}
+
 def test_fapply_obs_modification(simple_adata_dict):
     """Test modification of obs dataframe."""
     adata_dict_fapply(simple_adata_dict, create_test_function('obs'))

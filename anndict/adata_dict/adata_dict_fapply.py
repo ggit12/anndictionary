@@ -251,21 +251,34 @@ def adata_dict_fapply(
         else:
             non_matching_kwargs[arg_name] = arg_value
 
-    def process_item(adt_key, adata, current_depth: int):
+    def process_item(adt_key, adata, current_depth: int, matching_kwarg_subtrees: dict[str, Any]):
         nonlocal has_non_none_result
         if max_depth is not None and current_depth >= max_depth:
             pass
         elif isinstance(adata, (dict, AdataDict)):
             nested_results = {}
             for nested_key, nested_adata in adata.items():
-                nested_results[nested_key] = process_item(nested_key, nested_adata, current_depth + 1)
+                child_matching = {}
+                for arg_name, subtree in matching_kwarg_subtrees.items():
+                    if isinstance(subtree, (dict, AdataDict)):
+                        child_matching[arg_name] = subtree[nested_key]
+                    else:
+                        child_matching[arg_name] = subtree
+                nested_results[nested_key] = process_item(
+                    nested_key,
+                    nested_adata,
+                    current_depth + 1,
+                    child_matching,
+                )
             return AdataDict(nested_results) if return_as_adata_dict else nested_results
 
         # is an AnnData leaf OR we hit max_depth and 'adata' is a dict/AdataDict
         # Build the kwargs for this specific adt_key
         current_kwargs = {}
         current_kwargs.update(non_matching_kwargs)
-        current_kwargs.update({k: v[adt_key] for k, v in matching_kwargs.items()})
+        # For matching kwargs, we track the aligned subtree as we recurse (so nested dict keys
+        # don't need to be flattened into a global key path).
+        current_kwargs.update(matching_kwarg_subtrees)
 
         result = apply_func(
             adt_key,
@@ -284,9 +297,10 @@ def adata_dict_fapply(
         with ThreadPoolExecutor(max_workers=num_workers) as executor:
             futures = {}
             for adt_key, adata in adata_dict.items():
+                top_matching = {k: v[adt_key] for k, v in matching_kwargs.items()}
                 if isinstance(adata, (dict, AdataDict)):
                     # Handle nested structures sequentially
-                    results[adt_key] = process_item(adt_key, adata, 1)
+                    results[adt_key] = process_item(adt_key, adata, 1, top_matching)
                 else:
                     # Only use threading for leaf nodes (actual AnnData objects)
                     futures[executor.submit(
@@ -294,6 +308,7 @@ def adata_dict_fapply(
                         adt_key,
                         adata,
                         1,
+                        top_matching,
                     )] = adt_key
 
             for future in as_completed(futures):
@@ -302,7 +317,8 @@ def adata_dict_fapply(
 
     else:
         for adt_key, adata in adata_dict.items():
-            results[adt_key] = process_item(adt_key, adata, 1)
+            top_matching = {k: v[adt_key] for k, v in matching_kwargs.items()}
+            results[adt_key] = process_item(adt_key, adata, 1, top_matching)
 
     # If requested, return as an AdataDict
     if return_as_adata_dict:

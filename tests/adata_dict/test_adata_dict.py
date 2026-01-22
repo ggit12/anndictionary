@@ -78,9 +78,9 @@ def test_adata_dict_flatten_complex(complex_nested_adata_dict):
 
     # Check that keys are properly combined
     expected_keys = {
-        ('group1', 'sample1', 'celltype1'), 
+        ('group1', 'sample1', 'celltype1'),
         ('group1', 'sample2', 'celltype2'),
-        ('group2', 'sample3', 'celltype3'), 
+        ('group2', 'sample3', 'celltype3'),
         ('group2', 'sample4', 'celltype4')
     }
     assert set(complex_nested_adata_dict.keys()) == expected_keys
@@ -111,6 +111,7 @@ def test_adata_dict_set_hierarchy_nested(nested_adata_dict):
     assert isinstance(nested_adata_dict[('sample2',)], AdataDict)
     assert isinstance(nested_adata_dict[('sample3',)], AdataDict)
     assert isinstance(nested_adata_dict[('sample4',)], AdataDict)
+    assert nested_adata_dict[('sample1',)].hierarchy == ('group',)
     assert isinstance(nested_adata_dict[('sample1',)][('group1',)], ad.AnnData)
     assert isinstance(nested_adata_dict[('sample2',)][('group1',)], ad.AnnData)
     assert isinstance(nested_adata_dict[('sample3',)][('group2',)], ad.AnnData)
