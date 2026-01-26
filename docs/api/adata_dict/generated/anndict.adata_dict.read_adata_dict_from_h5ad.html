@@ -38,9 +38,9 @@
 
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/sphinx-book-theme.css?v=a3416100" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css?v=be8a1c11" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/plot_directive.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/plot_directive.css?v=7f9a90b1" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.min.css?v=95c83b7e" />
   
   <!-- So that users can add custom icons -->
@@ -564,7 +564,7 @@
 <h1>anndict.adata_dict.read_adata_dict_from_h5ad<a class="headerlink" href="#anndict-adata-dict-read-adata-dict-from-h5ad" title="Link to this heading">#</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="anndict.adata_dict.read_adata_dict_from_h5ad">
-<span class="sig-prename descclassname"><span class="pre">anndict.adata_dict.</span></span><span class="sig-name descname"><span class="pre">read_adata_dict_from_h5ad</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">paths</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keys</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/ggit12/anndictionary/tree/main/anndict/adata_dict/read.py#L187-L283"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.adata_dict.read_adata_dict_from_h5ad" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">anndict.adata_dict.</span></span><span class="sig-name descname"><span class="pre">read_adata_dict_from_h5ad</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">paths</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keys</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/ggit12/anndictionary/tree/main/anndict/adata_dict/read.py#L191-L291"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#anndict.adata_dict.read_adata_dict_from_h5ad" title="Link to this definition">#</a></dt>
 <dd><p>Read <code class="docutils literal notranslate"><span class="pre">.h5ad</span></code> files from a list of paths and return them in a dictionary.</p>
 <p>For each element in the provided list of paths, if the element is a directory,
 it reads all <code class="docutils literal notranslate"><span class="pre">.h5ad</span></code> files in that directory. If the element is an <code class="docutils literal notranslate"><span class="pre">.h5ad</span></code> file,
@@ -580,6 +580,8 @@ if disambiguation is needed.</p>
 </dd>
 <dt><strong>keys</strong> <span class="classifier"><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>] | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span> (default: <code class="docutils literal notranslate"><span class="pre">None</span></code>)</span></dt></dt><dd><p>A list of strings to use as keys for the adata_dict. If provided, must be equal
 in length to the number of <code class="docutils literal notranslate"><span class="pre">.h5ad</span></code> files read.</p>
+</dd>
+<dt><strong>kwargs</strong> <span class="classifier"><span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></span></span></dt></dt><dd><p>Additional keyword arguments to pass to <code class="xref py py-func docutils literal notranslate"><span class="pre">read_h5ad()</span></code>.</p>
 </dd>
 </dl>
 </dd>

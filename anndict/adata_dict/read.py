@@ -5,14 +5,15 @@ This module contains the functions necessary to read :class:`AdataDict` objects 
 import os
 import json
 from collections import Counter
+from typing import Any
 
-import anndata as ad
 import scanpy as sc
 
 from .adata_dict import AdataDict, to_nested_tuple
 
 def read_adata_dict(
     directory: str,
+    **kwargs: Any,
 ) -> AdataDict:
     """
     Read an :class:`AdataDict` from a previously saved :class:`AdataDict`. 
@@ -22,6 +23,9 @@ def read_adata_dict(
     -----------
     directory
         Base directory where the ``.h5ad`` files and hierarchy file are located.
+
+    kwargs
+        Additional keyword arguments to pass to :func:`~scanpy.read_h5ad()`.
 
     Returns
     --------
@@ -177,7 +181,7 @@ def read_adata_dict(
             raise FileNotFoundError(f"AnnData file not found: {file_path}")
 
         key = tuple(entry["key"])  # Convert key from list to tuple
-        adata = sc.read_h5ad(file_path)
+        adata = sc.read_h5ad(file_path, **kwargs)
         create_nested_dict(data_dict, key, adata)
 
     # Create and return the AdataDict
@@ -188,6 +192,7 @@ def read_adata_dict_from_h5ad(
     paths: str | list[str],
     *,
     keys: list[str] | None = None,
+    **kwargs: Any,
 ) -> AdataDict:
     """
     Read ``.h5ad`` files from a list of paths and return them in a dictionary.
@@ -209,6 +214,9 @@ def read_adata_dict_from_h5ad(
     keys
         A list of strings to use as keys for the adata_dict. If provided, must be equal 
         in length to the number of ``.h5ad`` files read.
+
+    kwargs
+        Additional keyword arguments to pass to :func:`~scanpy.read_h5ad()`.
 
     Returns
     -------
@@ -278,6 +286,6 @@ def read_adata_dict_from_h5ad(
 
     # Process the files with the finalized tuple keys
     for i, file_path in enumerate(file_paths):
-        adata_dict[tuple_keys[i]] = ad.read_h5ad(file_path)
+        adata_dict[tuple_keys[i]] = sc.read_h5ad(file_path, **kwargs)
 
     return AdataDict(adata_dict, hierarchy=("keys",))
