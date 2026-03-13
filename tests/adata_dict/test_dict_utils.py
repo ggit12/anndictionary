@@ -39,7 +39,7 @@ def matching_dict():
 
 def test_matching_structure(dict_1, matching_dict):
     """Test when both dictionaries have exactly matching structure"""
-    assert check_dict_structure(dict_1, matching_dict, full_depth=True)
+    assert check_dict_structure(dict_1, matching_dict)
 
 def test_extra_key_in_dict1(dict_1):
     """Test when dict_1 has an extra key that dict_2 doesn't have"""
@@ -50,7 +50,7 @@ def test_extra_key_in_dict1(dict_1):
     dict_1["b"]["extra_key"] = 4
 
     # shouldn't pass check
-    assert not check_dict_structure(dict_1, dict_2, full_depth=True)
+    assert not check_dict_structure(dict_1, dict_2)
 
 def test_extra_key_in_dict2(dict_1, matching_dict):
     """Test when dict_2 has an extra key that dict_1 doesn't have"""
@@ -62,7 +62,7 @@ def test_extra_key_in_dict2(dict_1, matching_dict):
     dict_2["b"]["extra_key"] = 40
 
     # shouldn't pass check
-    assert not check_dict_structure(dict_1, dict_2, full_depth=True)
+    assert not check_dict_structure(dict_1, dict_2)
 
 def test_different_nesting(dict_1):
     """Test when dictionaries have same keys but different nesting structure"""
@@ -77,7 +77,7 @@ def test_different_nesting(dict_1):
     }
 
     # shouldn't pass check
-    assert not check_dict_structure(dict_1, dict_2, full_depth=True)
+    assert not check_dict_structure(dict_1, dict_2)
 
 # def test_dict2_as_nested_dict():
 #     """Test when dictionaries have same keys but different nesting structure"""

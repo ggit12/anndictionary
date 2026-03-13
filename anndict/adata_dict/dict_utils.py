@@ -6,55 +6,64 @@ def check_dict_structure(
     dict_1: dict,
     dict_2: dict,
     *,
-    full_depth: bool = False
+    exact: bool = False,
+    max_depth: int | None = None,
 ) -> bool:
     """
-    If ``full_depth`` is ``False`` (default) check that ``dict_2`` contains at least
-    the same nested-key structure as ``dict_1`` (extra depth in ``dict_2``
-    is ignored).  
-    If ``full_depth`` is ``True``, require both dictionaries to match at every
-    level.
+    Check whether two dicts share the same nested-key structure.
+
+    When ``exact`` is ``True`` (default), keys and nesting depth must match
+    in both directions.  When ``exact`` is ``False``, the check is one-way:
+    wherever ``dict_1`` has a dict value, ``dict_2`` must also have a dict
+    with the same keys; wherever ``dict_1`` has a leaf, any value in
+    ``dict_2`` is accepted (extra depth in ``dict_2`` is OK).
+
+    ``max_depth`` independently limits how many nesting levels are compared.
+    Below that limit, dict values in ``dict_1`` that are dicts are treated
+    as leaves (deeper structure is ignored).
 
     Parameters
     ----------
     dict_1
-        Template dictionary (sets maximum depth when ``full_depth`` is False).
+        Template dictionary.
 
     dict_2
         Candidate dictionary to compare.
 
-    full_depth
-        If ``True``, check that both dictionaries have the same keys and nesting structure at every level.
-        If ``False``, check that ``dict_2`` has at least the same keys and nesting structure as ``dict_1``, ignoring extra depth in ``dict_2``.
+    exact
+        If ``True``, require keys and nesting to match in both directions.
+        If ``False``, only require ``dict_2`` to match ``dict_1``'s
+        structure; extra depth in ``dict_2`` is ignored.
+
+    max_depth
+        If not ``None``, limit the comparison to this many levels of nesting.
+        At the depth limit, deeper structure in the template is ignored.
 
     Returns
     -------
-    ``True`` if both dictionaries have the same keys and nesting structure (ignoring extra depth in ``dict_2`` if ``full_depth`` is ``False``), ``False`` otherwise.
+    ``True`` if the structures match under the rules described above,
+    ``False`` otherwise.
     """
 
     if not (isinstance(dict_1, dict) and isinstance(dict_2, dict)):
         return False
 
-    def _match(template: dict, candidate: dict) -> bool:
-        # Reject extra or missing sibling keys at this depth
+    def _match(template: dict, candidate: dict, depth: int = 1) -> bool:
         if set(candidate.keys()) != set(template.keys()):
             return False
 
+        at_limit = max_depth is not None and depth >= max_depth
+
         for k, v in template.items():
             cand_v = candidate[k]
-            if isinstance(v, dict):
+            if isinstance(v, dict) and not at_limit:
                 if not isinstance(cand_v, dict):
                     return False
-                if not _match(v, cand_v):
-                    return False
-            else:
-                # Template stops here. Extra depth in candidate is OK
-                # unless strict checking is requested.
-                if full_depth and isinstance(cand_v, dict):
+                if not _match(v, cand_v, depth + 1):
                     return False
         return True
 
-    if full_depth:
+    if exact:
         # Two-way comparison
         return _match(dict_1, dict_2) and _match(dict_2, dict_1)
 

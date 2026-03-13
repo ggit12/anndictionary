@@ -246,7 +246,7 @@ def adata_dict_fapply(
     matching_kwargs = {}
     non_matching_kwargs = {}
     for arg_name, arg_value in kwargs_dicts.items():
-        if isinstance(arg_value, (dict, AdataDict)) and check_dict_structure(adata_dict, arg_value):
+        if isinstance(arg_value, (dict, AdataDict)) and check_dict_structure(adata_dict, arg_value, max_depth=max_depth):
             matching_kwargs[arg_name] = arg_value
         else:
             non_matching_kwargs[arg_name] = arg_value
