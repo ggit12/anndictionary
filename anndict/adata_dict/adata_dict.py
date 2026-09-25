@@ -473,7 +473,7 @@ class AdataDict(dict):
         return check_dict_structure(self, input_dict, exact=True)
 
     @wraps(adata_dict_fapply)
-    def fapply(self, func, *, use_multithreading=True, num_workers=None, max_retries=0, max_depth=None, **kwargs_dicts):
+    def fapply(self, func, *, use_multithreading=True, num_workers=None, max_retries=0, max_depth=None, isolate_rng=True, **kwargs_dicts):
         """Wrapper for adata_dict_fapply."""
         return adata_dict_fapply(
             self,
@@ -482,6 +482,7 @@ class AdataDict(dict):
             num_workers=num_workers,
             max_retries=max_retries,
             max_depth=max_depth,
+            isolate_rng=isolate_rng,
             **kwargs_dicts,
         )
 

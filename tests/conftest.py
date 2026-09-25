@@ -8,9 +8,40 @@ import pytest
 import numpy as np
 import pandas as pd
 import anndata as ad
+import matplotlib
+import matplotlib.pyplot as plt
 
 from scipy import sparse
 from anndict.adata_dict import AdataDict
+
+
+# Plotting switch
+def pytest_addoption(parser):
+    """Register the ``--show-plots`` switch."""
+    parser.addoption(
+        "--show-plots",
+        action="store_true",
+        default=False,
+        help="Show plots interactively (plt.show() blocks). Default: non-interactive Agg backend.",
+    )
+
+
+def pytest_configure(config):
+    """Use the non-interactive Agg backend unless ``--show-plots`` is given."""
+    if not config.getoption("--show-plots"):
+        matplotlib.use("Agg", force=True)
+        config.addinivalue_line(
+            "filterwarnings",
+            "ignore:.*is non-interactive, and thus cannot be shown:UserWarning",
+        )
+
+
+@pytest.fixture(autouse=True)
+def _close_figures(request):
+    """Close figures left open by plotting functions when running non-interactively."""
+    yield
+    if not request.config.getoption("--show-plots"):
+        plt.close("all")
 
 
 # AnnData fixtures

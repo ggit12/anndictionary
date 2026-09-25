@@ -6,11 +6,13 @@ from __future__ import annotations #allows type hinting without circular depende
 import inspect
 
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from contextlib import nullcontext
 
 from typing import TYPE_CHECKING
 from typing import Any
 
 from .dict_utils import check_dict_structure
+from ._task_rng import run_in_task, task_rng_scope
 
 if TYPE_CHECKING:
     from anndata import AnnData
@@ -155,6 +157,7 @@ def adata_dict_fapply(
     catch_errors: bool = True,
     return_as_adata_dict: bool = False,
     max_depth: int | str | list[str] | tuple[str, ...] | None = None,
+    isolate_rng: bool = True,
     **kwargs_dicts: Any,
 ) -> dict | AdataDict | None:
     """
@@ -200,6 +203,11 @@ def adata_dict_fapply(
         - ``int``: stop at that integer depth (0-indexed from root).
         - ``str`` / ``list[str]`` / ``tuple[str, ...]``: stop at the depth matching the name(s) in ``adata_dict.hierarchy``.
 
+    isolate_rng
+        If ``True`` (default) and ``use_multithreading`` is ``True``, each threaded call of ``func`` gets
+        its own copy of the process-global random number generators, so results do not depend on
+        thread scheduling. See Notes.
+
     kwargs_dicts
         Additional keyword arguments to pass to the function.
 
@@ -217,6 +225,21 @@ def adata_dict_fapply(
     log-transform the data, then does something that fails, the second 
     time ``func`` is called, the already log-transformed data will have 
     another log transform applied.
+
+    With ``use_multithreading=True`` and ``isolate_rng=True``, each call of ``func`` runs with its
+    own NumPy global ``RandomState``, :mod:`random` generator and igraph generator, which threads
+    started by ``func`` share. A ``func`` that seeds a global generator (e.g.
+    :func:`scanpy.tl.score_genes` with ``random_state=0``) gives the same results as with
+    ``use_multithreading=False``, and unseeded draws are reproducible if :func:`numpy.random.seed`
+    and :func:`random.seed` were called beforehand. While ``adata_dict_fapply`` runs, the global RNG
+    functions are routed process-wide; threads that are not running ``func`` use the real generators.
+
+    Use ``use_multithreading=False`` if ``func`` draws random numbers through a reference to a global
+    generator captured before the call (other than :mod:`scipy.stats` distributions), through RNG
+    state inside other compiled code, or in a process pool. Threads that ``func`` starts
+    and that outlive it keep using its generators. A custom igraph generator set before the call is
+    replaced by :mod:`random` afterwards. Numba-jitted code (e.g. UMAP) keeps its own per-thread RNG
+    state, so such functions may not be reproducible when threaded.
     """
     from .adata_dict import AdataDict  # pylint: disable=import-outside-toplevel
 
@@ -294,7 +317,9 @@ def adata_dict_fapply(
         return result
 
     if use_multithreading:
-        with ThreadPoolExecutor(max_workers=num_workers) as executor:
+        # Give each threaded call its own copy of the process-global RNGs (see Notes)
+        rng_scope = task_rng_scope() if isolate_rng else nullcontext()
+        with rng_scope as spawn_task_rng, ThreadPoolExecutor(max_workers=num_workers) as executor:
             futures = {}
             for adt_key, adata in adata_dict.items():
                 top_matching = {k: v[adt_key] for k, v in matching_kwargs.items()}
@@ -303,13 +328,10 @@ def adata_dict_fapply(
                     results[adt_key] = process_item(adt_key, adata, 1, top_matching)
                 else:
                     # Only use threading for leaf nodes (actual AnnData objects)
-                    futures[executor.submit(
-                        process_item,
-                        adt_key,
-                        adata,
-                        1,
-                        top_matching,
-                    )] = adt_key
+                    task = (process_item, adt_key, adata, 1, top_matching)
+                    if spawn_task_rng is not None:
+                        task = (run_in_task, spawn_task_rng(), *task)
+                    futures[executor.submit(*task)] = adt_key
 
             for future in as_completed(futures):
                 adt_key = futures[future]

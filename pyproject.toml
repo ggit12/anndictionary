@@ -4,8 +4,9 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "anndict"
-version = "0.4.22"
+version = "0.5.0"
 description = "Conveniently process a dictionary of anndatas (adata_dict)"
+requires-python = ">=3.11"
 authors = [
     {name = "ggit12"}
 ]
@@ -14,8 +15,7 @@ classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
     "License :: OSI Approved :: BSD License",
-    "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.7"
+    "Programming Language :: Python :: 3"
 ]
 dependencies = [
     "numpy==1.26.4",
@@ -24,7 +24,7 @@ dependencies = [
     "scanpy==1.10.2",
     "anndata==0.10.8",
     "IPython==8.26.0",
-    "scipy==1.14.1",
+    "scipy==1.17.1",
     "seaborn==0.13.2",
     "matplotlib==3.9.2",
     # "squidpy==1.6.2", #was 1.6.0
